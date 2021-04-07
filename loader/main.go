@@ -217,7 +217,7 @@ func (t *Loader) validate_Model_Info() error {
 
 	{
 		t.errStack.Push("version")
-		if util.StrIsEmpty(t.rc.Model.Info.Version) {
+		if t.rc.Model.Info.Version.IsEmpty() {
 			return model.CannotBeEmptyErr
 		}
 		t.errStack.Pop()
@@ -225,7 +225,7 @@ func (t *Loader) validate_Model_Info() error {
 
 	{
 		t.errStack.Push("title")
-		if util.StrIsEmpty(t.rc.Model.Info.Title) {
+		if t.rc.Model.Info.Title.IsEmpty() {
 			return model.CannotBeEmptyErr
 		}
 		t.errStack.Pop()
@@ -233,7 +233,7 @@ func (t *Loader) validate_Model_Info() error {
 
 	{
 		t.errStack.Push("description")
-		if util.StrIsEmpty(t.rc.Model.Info.Description) {
+		if t.rc.Model.Info.Description.IsEmpty() {
 			return model.CannotBeEmptyErr
 		}
 		t.errStack.Pop()
@@ -253,7 +253,7 @@ func (t *Loader) validate_Model_Servers() error {
 
 		{
 			t.errStack.Push("url")
-			if util.StrIsEmpty(s.Url) {
+			if s.Url.IsEmpty() {
 				return model.CannotBeEmptyErr
 			}
 			t.errStack.Pop()

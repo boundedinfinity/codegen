@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"path"
 	"strings"
+
+	"github.com/boundedinfinity/optional"
 )
 
 func ifeq(v1, v2 string) bool {
@@ -31,12 +33,12 @@ func basePath(v string) string {
 	return path.Base(v)
 }
 
-func peq(v1 *string, v2 string) bool {
-	if v1 == nil {
+func peq(v1 optional.StringOptional, v2 string) bool {
+	if v1.IsEmpty() {
 		return false
 	}
 
-	return *v1 == v2
+	return v1.Get() == v2
 }
 
 func typeGo(v model.JsonSchema_Draft07) string {

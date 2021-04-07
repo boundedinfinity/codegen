@@ -27,86 +27,86 @@ type OpenApiV310 struct {
 }
 
 type OpenApiV310Info struct {
-	Title          *string             `json:"title,omitempty" yaml:"title,omitempty"`
-	Summary        *string             `json:"summary,omitempty" yaml:"summary,omitempty"`
-	Description    *string             `json:"description,omitempty" yaml:"description,omitempty"`
-	TermsOfService *string             `json:"termsOfService,omitempty" yaml:"termsOfService,omitempty"`
-	Contact        *OpenApiV310Contact `json:"contact,omitempty" yaml:"contact,omitempty"`
-	License        *OpenApiV310License `json:"license,omitempty" yaml:"license,omitempty"`
-	Version        *string             `json:"version,omitempty" yaml:"version,omitempty"`
+	Title          optional.StringOptional `json:"title,omitempty" yaml:"title,omitempty"`
+	Summary        optional.StringOptional `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Description    optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	TermsOfService optional.StringOptional `json:"termsOfService,omitempty" yaml:"termsOfService,omitempty"`
+	Contact        *OpenApiV310Contact     `json:"contact,omitempty" yaml:"contact,omitempty"`
+	License        *OpenApiV310License     `json:"license,omitempty" yaml:"license,omitempty"`
+	Version        optional.StringOptional `json:"version,omitempty" yaml:"version,omitempty"`
 }
 
 type OpenApiV310Contact struct {
-	Name  *string `json:"name,omitempty" yaml:"name,omitempty"`
-	Url   *string `json:"url,omitempty" yaml:"url,omitempty"`
-	Email *string `json:"email,omitempty" yaml:"email,omitempty"`
+	Name  optional.StringOptional `json:"name,omitempty" yaml:"name,omitempty"`
+	Url   optional.StringOptional `json:"url,omitempty" yaml:"url,omitempty"`
+	Email optional.StringOptional `json:"email,omitempty" yaml:"email,omitempty"`
 }
 
 type OpenApiV310License struct {
-	Name       *string `json:"name,omitempty" yaml:"name,omitempty"`
-	Identifier *string `json:"identifier,omitempty" yaml:"identifier,omitempty"`
-	Url        *string `json:"url,omitempty" yaml:"url,omitempty"`
+	Name       optional.StringOptional `json:"name,omitempty" yaml:"name,omitempty"`
+	Identifier optional.StringOptional `json:"identifier,omitempty" yaml:"identifier,omitempty"`
+	Url        optional.StringOptional `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
 type OpenApiV310Server struct {
-	Url         *string                              `json:"url,omitempty" yaml:"url,omitempty"`
-	Description *string                              `json:"description,omitempty" yaml:"description,omitempty"`
+	Url         optional.StringOptional              `json:"url,omitempty" yaml:"url,omitempty"`
+	Description optional.StringOptional              `json:"description,omitempty" yaml:"description,omitempty"`
 	Variables   map[string]OpenApiV310ServerVariable `json:"variables,omitempty" yaml:"variables,omitempty"`
 }
 
 type OpenApiV310ServerVariable struct {
-	Enum        []string `json:"enum,omitempty" yaml:"enum,omitempty"`
-	Description *string  `json:"description,omitempty" yaml:"description,omitempty"`
-	Default     *string  `json:"default,omitempty" yaml:"default,omitempty"`
+	Enum        []string                `json:"enum,omitempty" yaml:"enum,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Default     optional.StringOptional `json:"default,omitempty" yaml:"default,omitempty"`
 }
 
 type OpenApiV310PathItem struct {
-	Ref         string                 `json:"$ref,omitempty" yaml:"$ref,omitempty"`
-	Description string                 `json:"description,omitempty" yaml:"description,omitempty"`
-	Summary     string                 `json:"summary,omitempty" yaml:"summary,omitempty"`
-	Get         *OpenApiV310Operation  `json:"get,omitempty" yaml:"get,omitempty"`
-	Put         *OpenApiV310Operation  `json:"put,omitempty" yaml:"put,omitempty"`
-	Post        *OpenApiV310Operation  `json:"post,omitempty" yaml:"post,omitempty"`
-	Delete      *OpenApiV310Operation  `json:"delete,omitempty" yaml:"delete,omitempty"`
-	Options     *OpenApiV310Operation  `json:"options,omitempty" yaml:"options,omitempty"`
-	Head        *OpenApiV310Operation  `json:"head,omitempty" yaml:"head,omitempty"`
-	Patch       *OpenApiV310Operation  `json:"patch,omitempty" yaml:"patch,omitempty"`
-	Trace       *OpenApiV310Operation  `json:"trace,omitempty" yaml:"trace,omitempty"`
-	Servers     []OpenApiV310Server    `json:"servers,omitempty" yaml:"servers,omitempty"`
-	Parameters  []OpenApiV310Parameter `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	Ref         optional.StringOptional `json:"$ref,omitempty" yaml:"$ref,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Summary     optional.StringOptional `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Get         *OpenApiV310Operation   `json:"get,omitempty" yaml:"get,omitempty"`
+	Put         *OpenApiV310Operation   `json:"put,omitempty" yaml:"put,omitempty"`
+	Post        *OpenApiV310Operation   `json:"post,omitempty" yaml:"post,omitempty"`
+	Delete      *OpenApiV310Operation   `json:"delete,omitempty" yaml:"delete,omitempty"`
+	Options     *OpenApiV310Operation   `json:"options,omitempty" yaml:"options,omitempty"`
+	Head        *OpenApiV310Operation   `json:"head,omitempty" yaml:"head,omitempty"`
+	Patch       *OpenApiV310Operation   `json:"patch,omitempty" yaml:"patch,omitempty"`
+	Trace       *OpenApiV310Operation   `json:"trace,omitempty" yaml:"trace,omitempty"`
+	Servers     []OpenApiV310Server     `json:"servers,omitempty" yaml:"servers,omitempty"`
+	Parameters  []OpenApiV310Parameter  `json:"parameters,omitempty" yaml:"parameters,omitempty"`
 }
 
 type OpenApiV310Operation struct {
 	Tags         []string                          `json:"tags,omitempty" yaml:"tags,omitempty"`
-	Description  *string                           `json:"description,omitempty" yaml:"description,omitempty"`
-	Summary      *string                           `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Description  optional.StringOptional           `json:"description,omitempty" yaml:"description,omitempty"`
+	Summary      optional.StringOptional           `json:"summary,omitempty" yaml:"summary,omitempty"`
 	ExternalDocs *OpenApiV310ExternalDocumentation `json:"externalDocs,omitempty" yaml:"externalDocs,omitempty"`
-	OperationId  *string                           `json:"operationId,omitempty" yaml:"operationId,omitempty"`
+	OperationId  optional.StringOptional           `json:"operationId,omitempty" yaml:"operationId,omitempty"`
 	Parameters   []OpenApiV310Parameter            `json:"parameters,omitempty" yaml:"parameters,omitempty"`
 	RequestBody  *OpenApiV310RequestBody           `json:"requestBody,omitempty" yaml:"requestBody,omitempty"`
 	Responses    map[string]OpenApiV310Response    `json:"responses,omitempty" yaml:"responses,omitempty"`
 	Callbacks    *OpenApiV310Callback              `json:"callbacks,omitempty" yaml:"callbacks,omitempty"`
-	Deprecated   *bool                             `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
+	Deprecated   optional.BoolOptional             `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
 	Security     *OpenApiV310SecurityRequirement   `json:"security,omitempty" yaml:"security,omitempty"`
 	Servers      []OpenApiV310Server               `json:"servers,omitempty" yaml:"servers,omitempty"`
 }
 
 type OpenApiV310Parameter struct {
-	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
-	Summary     *string `json:"summary,omitempty" yaml:"summary,omitempty"`
-	OperationId *string `json:"operationId,omitempty" yaml:"operationId,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Summary     optional.StringOptional `json:"summary,omitempty" yaml:"summary,omitempty"`
+	OperationId optional.StringOptional `json:"operationId,omitempty" yaml:"operationId,omitempty"`
 }
 
 type OpenApiV310Reference struct {
-	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
-	Summary     *string `json:"summary,omitempty" yaml:"summary,omitempty"`
-	Ref         *string `json:"$ref,omitempty" yaml:"$ref,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Summary     optional.StringOptional `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Ref         optional.StringOptional `json:"$ref,omitempty" yaml:"$ref,omitempty"`
 }
 
 type OpenApiV310RequestBody struct {
-	Description *string                         `json:"description,omitempty" yaml:"description,omitempty"`
+	Description optional.StringOptional         `json:"description,omitempty" yaml:"description,omitempty"`
 	Content     map[string]OpenApiV310MediaType `json:"content,omitempty" yaml:"content,omitempty"`
-	Required    *bool                           `json:"required,omitempty" yaml:"required,omitempty"`
+	Required    optional.BoolOptional           `json:"required,omitempty" yaml:"required,omitempty"`
 }
 
 type OpenApiV310MediaType struct {
@@ -115,16 +115,16 @@ type OpenApiV310MediaType struct {
 }
 
 type OpenApiV310Encoding struct {
-	ContentType   *string                      `json:"contentType,omitempty" yaml:"contentType,omitempty"`
+	ContentType   optional.StringOptional      `json:"contentType,omitempty" yaml:"contentType,omitempty"`
 	Headers       map[string]OpenApiV310Header `json:"headers,omitempty" yaml:"headers,omitempty"`
-	Style         *string                      `json:"style,omitempty" yaml:"style,omitempty"`
-	Explode       *bool                        `json:"explode,omitempty" yaml:"explode,omitempty"`
-	AllowReserved *bool                        `json:"allowReserved,omitempty" yaml:"allowReserved,omitempty"`
+	Style         optional.StringOptional      `json:"style,omitempty" yaml:"style,omitempty"`
+	Explode       optional.BoolOptional        `json:"explode,omitempty" yaml:"explode,omitempty"`
+	AllowReserved optional.BoolOptional        `json:"allowReserved,omitempty" yaml:"allowReserved,omitempty"`
 }
 
 type OpenApiV310Header struct {
-	Name        *string `json:"name,omitempty" yaml:"name,omitempty"`
-	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
+	Name        optional.StringOptional `json:"name,omitempty" yaml:"name,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
 }
 
 type OpenApiV310SecurityRequirement struct {
@@ -134,20 +134,20 @@ type OpenApiV310Callback struct {
 }
 
 type OpenApiV310ExternalDocumentation struct {
-	Description *string `json:"description,omitempty" yaml:"description,omitempty"`
-	Url         *string `json:"url,omitempty" yaml:"url,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Url         optional.StringOptional `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
 type OpenApiV310Response struct {
-	Description *string                         `json:"description,omitempty" yaml:"description,omitempty"`
+	Description optional.StringOptional         `json:"description,omitempty" yaml:"description,omitempty"`
 	Headers     map[string]OpenApiV310Header    `json:"headers,omitempty" yaml:"headers,omitempty"`
 	Content     map[string]OpenApiV310MediaType `json:"content,omitempty" yaml:"content,omitempty"`
 	Links       map[string]OpenApiV310Link      `json:"links,omitempty" yaml:"links,omitempty"`
 }
 
 type OpenApiV310Link struct {
-	OperationRef *string `json:"operationRef,omitempty" yaml:"operationRef,omitempty"`
-	OperationId  *string `json:"operationId,omitempty" yaml:"operationId,omitempty"`
+	OperationRef optional.StringOptional `json:"operationRef,omitempty" yaml:"operationRef,omitempty"`
+	OperationId  optional.StringOptional `json:"operationId,omitempty" yaml:"operationId,omitempty"`
 }
 
 type OpenApiV310Components struct {
@@ -221,10 +221,10 @@ func (t OpenApiV310Components) LookupPathItem(p string) (string, OpenApiV310Path
 }
 
 type OpenApiV310Example struct {
-	Summary       *string `json:"summary,omitempty" yaml:"summary,omitempty"`
-	Description   *string `json:"description,omitempty" yaml:"description,omitempty"`
-	Value         *string `json:"value,omitempty" yaml:"value,omitempty"`
-	ExternalValue *string `json:"externalValue,omitempty" yaml:"externalValue,omitempty"`
+	Summary       optional.StringOptional `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Description   optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Value         optional.StringOptional `json:"value,omitempty" yaml:"value,omitempty"`
+	ExternalValue optional.StringOptional `json:"externalValue,omitempty" yaml:"externalValue,omitempty"`
 }
 
 type OpenApiV310SecuritySchemeType string
@@ -239,13 +239,13 @@ const (
 
 type OpenApiV310SecurityScheme struct {
 	Type             *OpenApiV310SecuritySchemeType `json:"type,omitempty" yaml:"type,omitempty"`
-	Description      *string                        `json:"description,omitempty" yaml:"description,omitempty"`
-	Name             *string                        `json:"name,omitempty" yaml:"name,omitempty"`
-	In               *string                        `json:"in,omitempty" yaml:"in,omitempty"`
-	Scheme           *string                        `json:"scheme,omitempty" yaml:"scheme,omitempty"`
-	BearerFormat     *string                        `json:"bearerFormat,omitempty" yaml:"bearerFormat,omitempty"`
+	Description      optional.StringOptional        `json:"description,omitempty" yaml:"description,omitempty"`
+	Name             optional.StringOptional        `json:"name,omitempty" yaml:"name,omitempty"`
+	In               optional.StringOptional        `json:"in,omitempty" yaml:"in,omitempty"`
+	Scheme           optional.StringOptional        `json:"scheme,omitempty" yaml:"scheme,omitempty"`
+	BearerFormat     optional.StringOptional        `json:"bearerFormat,omitempty" yaml:"bearerFormat,omitempty"`
 	Flows            *OpenApiV310OauthFlows         `json:"flows,omitempty" yaml:"flows,omitempty"`
-	OpenIdConnectUrl *string                        `json:"openIdConnectUrl,omitempty" yaml:"openIdConnectUrl,omitempty"`
+	OpenIdConnectUrl optional.StringOptional        `json:"openIdConnectUrl,omitempty" yaml:"openIdConnectUrl,omitempty"`
 }
 
 type OpenApiV310OauthFlows struct {
@@ -256,8 +256,8 @@ type OpenApiV310OauthFlows struct {
 }
 
 type OpenApiV310OauthFlow struct {
-	AuthorizationUrl *string           `json:"authorizationUrl,omitempty" yaml:"authorizationUrl,omitempty"`
-	TokenUrl         *string           `json:"tokenUrl,omitempty" yaml:"tokenUrl,omitempty"`
-	RefreshUrl       *string           `json:"refreshUrl,omitempty" yaml:"refreshUrl,omitempty"`
-	Scopes           map[string]string `json:"scopes,omitempty" yaml:"scopes,omitempty"`
+	AuthorizationUrl optional.StringOptional `json:"authorizationUrl,omitempty" yaml:"authorizationUrl,omitempty"`
+	TokenUrl         optional.StringOptional `json:"tokenUrl,omitempty" yaml:"tokenUrl,omitempty"`
+	RefreshUrl       optional.StringOptional `json:"refreshUrl,omitempty" yaml:"refreshUrl,omitempty"`
+	Scopes           map[string]string       `json:"scopes,omitempty" yaml:"scopes,omitempty"`
 }

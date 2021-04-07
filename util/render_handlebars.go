@@ -33,8 +33,8 @@ func renderHandlebars(s string, d interface{}) (string, error) {
 func operationId(path string, operation string, v model.OpenApiV310Operation) string {
 	var operationId string
 
-	if !StrIsEmpty(v.OperationId) {
-		operationId = *v.OperationId
+	if v.OperationId.IsDefined() {
+		operationId = v.OperationId.Get()
 	} else {
 
 		operationId = strings.Join(strings.Split(path, "/"), " ")

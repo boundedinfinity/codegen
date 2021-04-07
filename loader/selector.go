@@ -1,5 +1,7 @@
 package loader
 
+import "github.com/boundedinfinity/optional"
+
 type OpenApiVersionSelector struct {
-	Openapi *string `json:"openapi" yaml:"openapi"`
+	Openapi optional.StringOptional `json:"openapi" yaml:"openapi"`
 }
