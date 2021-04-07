@@ -86,7 +86,7 @@ func (t *Loader) validate_Model_XBiGo() error {
 
 	{
 		t.errStack.Push("input")
-		if t.rc.Model.X_Bi_Go.Input.IsDefined() {
+		if t.rc.Model.X_Bi_Go.Input.IsEmpty() {
 			return model.CannotBeEmptyErr
 		}
 
@@ -296,7 +296,6 @@ func (t *Loader) validate_Model_Components_Schemas() error {
 		t.errStack.Pop()
 	}
 
-	t.errStack.Pop()
 	return nil
 }
 
@@ -304,6 +303,8 @@ func (t *Loader) validate_Model_Components_Schema_XbiGo(s *model.OpenApiV310Exte
 	if s == nil {
 		return nil
 	}
+
+	t.errStack.Push("x-bi-go")
 
 	if err := t.validate_Model_XBiGo_Templates(s.Templates); err != nil {
 		return err

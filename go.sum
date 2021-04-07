@@ -6,6 +6,8 @@ github.com/boundedinfinity/optional v0.0.0-20210104140347-349d828ca84f h1:RnXwWi
 github.com/boundedinfinity/optional v0.0.0-20210104140347-349d828ca84f/go.mod h1:iNc41vX3NFthTE7X3rXETgHlXqnI0jbzJ+GqDfSahKM=
 github.com/boundedinfinity/optional v0.0.0-20210407043536-bdb30ff9eefe h1:6RAykbx9XksxfVm0CbucGIXKTaOha1bIwjL1enGzwwA=
 github.com/boundedinfinity/optional v0.0.0-20210407043536-bdb30ff9eefe/go.mod h1:0LisO1LLs74W9D2UUUzwCgDwXFB5iDLaqk9t/UNL/bY=
+github.com/boundedinfinity/optional v0.0.0-20210407141403-b656be5ecb97 h1:qmFtUlln5hzZPDXIK/6VO458kCUDq+KRSt5Pz43Y600=
+github.com/boundedinfinity/optional v0.0.0-20210407141403-b656be5ecb97/go.mod h1:0LisO1LLs74W9D2UUUzwCgDwXFB5iDLaqk9t/UNL/bY=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
