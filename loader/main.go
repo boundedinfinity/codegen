@@ -6,210 +6,309 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/boundedinfinity/optional"
 )
 
 type Loader struct {
-	errPath *model.StrStack
+	errStack     *model.StrStack
+	pointerStack *model.StrStack
+	rc           model.RunContext
 }
 
 func New() *Loader {
 	return &Loader{
-		errPath: model.NewStrStack(),
+		errStack:     model.NewStrStack(),
+		pointerStack: model.NewStrStack(),
 	}
 }
 
-func (t *Loader) Load(modelPath, configPath string) (model.RunContext, error) {
-	rc := model.RunContext{
-		ModelPath: modelPath,
-	}
+func (t *Loader) Load(modelPath string) (model.RunContext, error) {
+	t.rc = model.RunContext{}
 
-	t.errPath.Push("loader")
-
-	if err := t.loadModel(&rc); err != nil {
-		ep := strings.Join(t.errPath.S(), ".")
-		return rc, fmt.Errorf("%v: %w", ep, err)
-	}
-
-	return rc, nil
-}
-
-func (t *Loader) loadModel(rc *model.RunContext) error {
-	t.errPath.Push("model")
-
-	if rc.ModelPath == "" {
-		return model.CannotBeEmptyErr
-	}
-
-	if abs, ok := util.FileSearch(&rc.ModelPath); ok {
-		rc.ModelPath = abs
-		t.errPath.Pop()
-		t.errPath.Push(fmt.Sprintf("model[%v]", abs))
+	if abs, err := filepath.Abs(modelPath); err != nil {
+		return t.rc, err
 	} else {
-		return fmt.Errorf("%v not found", rc.ModelPath)
+		t.rc.Input = abs
 	}
 
-	var m model.OpenApiV310
-
-	if err := util.UnmarshalFromFile(rc.ModelPath, &m); err != nil {
-		return fmt.Errorf("load failed %w", err)
+	if err := util.UnmarshalFromFile(t.rc.Input, &t.rc.Model); err != nil {
+		return t.rc, err
 	}
 
-	rc.Model = m
+	if err := t.validate_Model(); err != nil {
+		ep := strings.Join(t.errStack.S(), ".")
+		return t.rc, fmt.Errorf("%v: %w", ep, err)
+	}
 
-	if err := t.loadGlobal(rc); err != nil {
+	return t.rc, nil
+}
+
+func (t *Loader) validate_Model() error {
+	t.errStack.Push("model")
+
+	{
+		t.errStack.Push("openapi")
+
+		if t.rc.Model.Openapi.IsEmpty() {
+			return model.CannotBeEmptyErr
+		}
+
+		t.errStack.Pop()
+	}
+
+	if err := t.validate_Model_Info(); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (t *Loader) loadGlobal(rc *model.RunContext) error {
-	t.errPath.Push("openapi")
-
-	if util.StrIsEmpty(rc.Model.Openapi) {
-		return model.CannotBeEmptyErr
-	}
-
-	t.errPath.Pop()
-
-	if err := t.loadInfo(rc); err != nil {
+	if err := t.validate_Model_Servers(); err != nil {
 		return err
 	}
 
-	if err := t.loadXbiGo(rc); err != nil {
+	if err := t.validate_Model_XBiGo(); err != nil {
 		return err
 	}
 
+	if err := t.validate_Model_Components(); err != nil {
+		return err
+	}
+
+	t.errStack.Pop()
 	return nil
 }
 
-func (t *Loader) loadInfo(rc *model.RunContext) error {
-	t.errPath.Push("info")
+func (t *Loader) validate_Model_XBiGo() error {
+	t.errStack.Push("x-bi-go")
 
-	if rc.Model.Info == nil {
-		return model.CannotBeEmptyErr
-	}
-
-	t.errPath.Push("version")
-	if util.StrIsEmpty(rc.Model.Info.Version) {
-		return model.CannotBeEmptyErr
-	}
-	t.errPath.Pop()
-
-	t.errPath.Push("title")
-	if util.StrIsEmpty(rc.Model.Info.Title) {
-		return model.CannotBeEmptyErr
-	}
-	t.errPath.Pop()
-
-	t.errPath.Push("description")
-	if util.StrIsEmpty(rc.Model.Info.Description) {
-		return model.CannotBeEmptyErr
-	}
-	t.errPath.Pop()
-
-	t.errPath.Pop()
-	return nil
-}
-
-func (t *Loader) loadXbiGo(rc *model.RunContext) error {
-	t.errPath.Push("x-bi-go")
-
-	if rc.Model.X_Bi_Go == nil {
+	if t.rc.Model.X_Bi_Go == nil {
 		return model.CannotBeEmptyErr
 	}
 
 	{
-		t.errPath.Push("module")
-		if util.StrIsEmpty(rc.Model.X_Bi_Go.Module) {
-			return model.CannotBeEmptyErr
-		}
-		t.errPath.Pop()
-	}
-
-	{
-		t.errPath.Push("version")
-		if util.StrIsEmpty(rc.Model.X_Bi_Go.Module) {
-			return model.CannotBeEmptyErr
-		}
-		t.errPath.Pop()
-	}
-
-	{
-		t.errPath.Push("input")
-
-		if rc.Model.X_Bi_Go.Input == nil {
+		t.errStack.Push("input")
+		if t.rc.Model.X_Bi_Go.Input.IsDefined() {
 			return model.CannotBeEmptyErr
 		}
 
-		if abs, ok := util.FileSearch(rc.Model.X_Bi_Go.Input, util.StrPrt(filepath.Dir(rc.ModelPath))); ok {
-			*rc.Model.X_Bi_Go.Input = abs
-			t.errPath.Pop()
-			t.errPath.Push(fmt.Sprintf("input[%v]", abs))
+		d := filepath.Dir(t.rc.Input)
+		if abs, ok := util.FileSearch(t.rc.Model.X_Bi_Go.Input, optional.NewStringValue(d)); ok {
+			t.rc.Model.X_Bi_Go.Input = optional.NewStringValue(abs)
 		} else {
-			return fmt.Errorf("%v not found", *rc.Model.X_Bi_Go.Input)
+			return fmt.Errorf("invalid path: %v", t.rc.Model.X_Bi_Go.Input.Get())
 		}
 
-		t.errPath.Pop()
+		t.errStack.Pop()
 	}
 
-	t.errPath.Pop()
+	{
+		t.errStack.Push("version")
+		if t.rc.Model.X_Bi_Go.Version.IsEmpty() {
+			return model.CannotBeEmptyErr
+		}
+		t.errStack.Pop()
+	}
+
+	{
+		t.errStack.Push("module")
+		if t.rc.Model.X_Bi_Go.Module.IsEmpty() {
+			return model.CannotBeEmptyErr
+		}
+		t.errStack.Pop()
+	}
+
+	{
+		t.errStack.Push("output")
+		if t.rc.Model.X_Bi_Go.Output.IsEmpty() {
+			return model.CannotBeEmptyErr
+		}
+		t.errStack.Pop()
+	}
+
+	if err := t.validate_Model_XBiGo_Templates(t.rc.Model.X_Bi_Go.Templates); err != nil {
+		return err
+	}
+
+	t.errStack.Pop()
 	return nil
 }
 
-// func (t *Loader) loadExtentions(rctx *model.RunContext) error {
-// 	if err := t.loadExtentionsGlobal(rctx); err != nil {
-// 		return model.NewXerr("x-bi-go", err)
-// 	}
+func (t *Loader) validate_Model_XBiGo_Templates(tmpls []model.XBiGoTemplate) error {
+	if tmpls == nil {
+		return nil
+	}
 
-// 	if err := t.loadExtentionsComponents(rctx); err != nil {
-// 		return model.NewXerr("x-bi-go", err)
-// 	}
+	for i, tmpl := range tmpls {
+		t.errStack.Push(fmt.Sprintf("templates[%v]", i))
 
-// 	return nil
-// }
+		{
+			t.errStack.Push("input")
 
-// func (t *Loader) loadExtentionsGlobal(rctx *model.RunContext) error {
-// 	if rctx.Model.X_Bi_Go == nil {
-// 		return errors.New("cannot be empty")
-// 	}
+			if tmpl.Input.IsEmpty() {
+				return model.CannotBeEmptyErr
+			}
 
-// 	if util.StrIsEmpty(rctx.Model.X_Bi_Go.Version) {
-// 		return model.XerrF("version", "cannot be emtpy")
-// 	}
+			if abs, ok := util.FileSearch(tmpl.Input, t.rc.Model.X_Bi_Go.Input); ok {
+				tmpl.Input = optional.NewStringValue(abs)
+			} else {
+				return fmt.Errorf("invalid path: %v", tmpl.Input.Get())
+			}
 
-// 	if util.StrIsEmpty(rctx.Model.X_Bi_Go.Module) {
-// 		return model.XerrF("module", "cannot be emtpy")
-// 	}
+			t.errStack.Pop()
+		}
 
-// 	if abs, ok := util.FileSearch(rctx.Model.X_Bi_Go.Input, util.StrPrt(filepath.Dir(rctx.ModelPath))); ok {
-// 		*rctx.Model.X_Bi_Go.Input = abs
-// 	} else {
-// 		return model.XerrF("model", "not found")
-// 	}
+		{
+			t.errStack.Push("package")
 
-// 	if rctx.Model.X_Bi_Go.Requires != nil {
-// 		for i, r := range rctx.Model.X_Bi_Go.Requires {
+			if tmpl.Package.IsEmpty() {
+				tmpl.Package = optional.NewStringValue("main")
+			} else {
+				p := tmpl.Package.Get()
+				p = strings.ReplaceAll(p, t.rc.Model.X_Bi_Go.Module.Get(), "")
+				p = strings.Replace(p, "/", "", 1)
 
-// 			if r.Package == "" {
-// 				errPath := fmt.Sprintf("requires[%v].package", i)
-// 				return model.XerrF(errPath, "cannot be empty")
-// 			}
+				if p == "" {
+					p = "main"
+				}
 
-// 			if r.Version == "" {
-// 				errPath := fmt.Sprintf("requires[%v].version", i)
-// 				return model.XerrF(errPath, "cannot be empty")
-// 			}
-// 		}
-// 	}
+				tmpl.Package = optional.NewStringValue(p)
+			}
 
-// 	return nil
-// }
+			t.errStack.Pop()
+		}
 
-// func (t *Loader) loadExtentionsComponents(rctx *model.RunContext) error {
-// 	if rctx.Model.Components == nil {
-// 		return nil
-// 	}
+		{
+			t.errStack.Push("output")
 
-// 	return nil
-// }
+			if tmpl.Output.IsEmpty() {
+				if tmpl.Package.IsEmpty() {
+					return model.CannotBeEmptyErr
+				} else {
+					if tmpl.Package.Get() == "main" {
+						tmpl.Package = optional.NewStringValue("")
+					} else {
+						tmpl.Output = optional.NewStringValue(tmpl.Package.Get())
+					}
+				}
+			}
+
+			p := filepath.Join(t.rc.Model.X_Bi_Go.Output.Get(), tmpl.Output.Get())
+
+			if abs, err := filepath.Abs(p); err != nil {
+				return err
+			} else {
+				tmpl.Output = optional.NewStringValue(abs)
+			}
+
+			t.errStack.Pop()
+		}
+
+		t.errStack.Pop()
+	}
+
+	return nil
+}
+
+func (t *Loader) validate_Model_Info() error {
+	if t.rc.Model.Info == nil {
+		return nil
+	}
+
+	t.errStack.Push("info")
+
+	{
+		t.errStack.Push("version")
+		if util.StrIsEmpty(t.rc.Model.Info.Version) {
+			return model.CannotBeEmptyErr
+		}
+		t.errStack.Pop()
+	}
+
+	{
+		t.errStack.Push("title")
+		if util.StrIsEmpty(t.rc.Model.Info.Title) {
+			return model.CannotBeEmptyErr
+		}
+		t.errStack.Pop()
+	}
+
+	{
+		t.errStack.Push("description")
+		if util.StrIsEmpty(t.rc.Model.Info.Description) {
+			return model.CannotBeEmptyErr
+		}
+		t.errStack.Pop()
+	}
+
+	t.errStack.Pop()
+	return nil
+}
+
+func (t *Loader) validate_Model_Servers() error {
+	if t.rc.Model.Servers == nil {
+		return nil
+	}
+
+	for i, s := range t.rc.Model.Servers {
+		t.errStack.Push(fmt.Sprintf("servers[%v]", i))
+
+		{
+			t.errStack.Push("url")
+			if util.StrIsEmpty(s.Url) {
+				return model.CannotBeEmptyErr
+			}
+			t.errStack.Pop()
+		}
+
+		t.errStack.Pop()
+	}
+
+	return nil
+
+}
+
+func (t *Loader) validate_Model_Components() error {
+	if t.rc.Model.Components == nil {
+		return nil
+	}
+
+	t.errStack.Push("components")
+
+	if err := t.validate_Model_Components_Schemas(); err != nil {
+		return err
+	}
+
+	t.errStack.Pop()
+	return nil
+}
+
+func (t *Loader) validate_Model_Components_Schemas() error {
+	if t.rc.Model.Components.Schemas == nil {
+		return nil
+	}
+
+	for k, v := range t.rc.Model.Components.Schemas {
+		t.errStack.Push(fmt.Sprintf("schemas[%v]", k))
+
+		if err := t.validate_Model_Components_Schema_XbiGo(v.X_Bi_Go); err != nil {
+			return err
+		}
+
+		t.errStack.Pop()
+	}
+
+	t.errStack.Pop()
+	return nil
+}
+
+func (t *Loader) validate_Model_Components_Schema_XbiGo(s *model.OpenApiV310ExtentionSchema) error {
+	if s == nil {
+		return nil
+	}
+
+	if err := t.validate_Model_XBiGo_Templates(s.Templates); err != nil {
+		return err
+	}
+
+	t.errStack.Pop()
+	return nil
+}

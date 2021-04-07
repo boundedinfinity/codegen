@@ -40,10 +40,10 @@ func peq(v1 *string, v2 string) bool {
 }
 
 func typeGo(v model.JsonSchema_Draft07) string {
-	if v.Ref != nil {
-		return ucFirst(path.Base(*v.Ref))
+	if v.Ref.IsDefined() {
+		return ucFirst(path.Base(v.Ref.Get()))
 	} else {
-		switch *v.Type {
+		switch v.Type.Get() {
 		case "string":
 			return "string"
 		case "integer":
@@ -53,10 +53,10 @@ func typeGo(v model.JsonSchema_Draft07) string {
 		case "boolean":
 			return "bool"
 		case "array":
-			if v.Items != nil && v.Items.Type != nil {
-				return fmt.Sprintf("[]%v", *v.Items.Type)
-			} else if v.Items != nil && v.Items.Ref != nil {
-				return fmt.Sprintf("[]%v", ucFirst(path.Base(*v.Items.Ref)))
+			if v.Items != nil && v.Items.Type.IsDefined() {
+				return fmt.Sprintf("[]%v", v.Items.Type.Get())
+			} else if v.Items != nil && v.Items.Ref.IsDefined() {
+				return fmt.Sprintf("[]%v", ucFirst(path.Base(v.Items.Ref.Get())))
 			}
 			return "array"
 		case "null":

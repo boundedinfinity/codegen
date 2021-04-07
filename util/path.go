@@ -6,6 +6,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/boundedinfinity/optional"
 )
 
 func FileExt(v string) (string, error) {
@@ -96,12 +98,12 @@ func AbsFromFilePath(r, p string) (string, error) {
 	return AbsFromDirPath(d, p)
 }
 
-func FileSearch(v *string, rs ...*string) (string, bool) {
-	if StrIsEmpty(v) {
+func FileSearch(v optional.StringOptional, rs ...optional.StringOptional) (string, bool) {
+	if v.IsEmpty() {
 		return "", false
 	}
 
-	abs, err := filepath.Abs(*v)
+	abs, err := filepath.Abs(v.Get())
 
 	if err == nil {
 		ok, err := PathExists(abs)
@@ -113,11 +115,11 @@ func FileSearch(v *string, rs ...*string) (string, bool) {
 
 	if rs != nil {
 		for _, r := range rs {
-			if StrIsEmpty(r) {
+			if r.IsEmpty() {
 				continue
 			}
 
-			p := filepath.Join(*r, *v)
+			p := filepath.Join(r.Get(), v.Get())
 			abs, err := filepath.Abs(p)
 
 			if err != nil {

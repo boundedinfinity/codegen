@@ -1,17 +1,18 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 )
 
-func RenderFile(tp, op string, v interface{}) error {
-	if tp == "" {
+func RenderFile(input, output string, v interface{}) error {
+	if input == "" {
 		return fmt.Errorf("render error: no template path")
 	}
 
-	if op == "" {
+	if output == "" {
 		return fmt.Errorf("render error: no output path")
 	}
 
@@ -19,7 +20,7 @@ func RenderFile(tp, op string, v interface{}) error {
 		return fmt.Errorf("render error: no type")
 	}
 
-	atp, err := filepath.Abs(tp)
+	atp, err := filepath.Abs(input)
 
 	if err != nil {
 		return fmt.Errorf("render err: %w", err)
@@ -31,10 +32,30 @@ func RenderFile(tp, op string, v interface{}) error {
 		return fmt.Errorf("render err: %w", err)
 	}
 
-	ext, err := FileExt(tp)
+	ext, err := FileExt(input)
 
 	if err != nil {
 		return fmt.Errorf("render err: %w", err)
+	}
+
+	aop, err := filepath.Abs(output)
+
+	if err != nil {
+		return fmt.Errorf("render err: %w", err)
+	}
+
+	if err := DirEnsure(aop); err != nil {
+		return fmt.Errorf("render err: %w", err)
+	}
+
+	aopCtx := fmt.Sprintf("%v.json", aop)
+
+	if ctxBs, err := json.MarshalIndent(v, "", "    "); err != nil {
+		return err
+	} else {
+		if err := ioutil.WriteFile(aopCtx, ctxBs, 0755); err != nil {
+			return fmt.Errorf("render error: %w", err)
+		}
 	}
 
 	var o string
@@ -50,16 +71,6 @@ func RenderFile(tp, op string, v interface{}) error {
 		}
 	default:
 		return fmt.Errorf("render error: unsupported extention %v", ext)
-	}
-
-	aop, err := filepath.Abs(op)
-
-	if err != nil {
-		return fmt.Errorf("render err: %w", err)
-	}
-
-	if err := DirEnsure(aop); err != nil {
-		return fmt.Errorf("render err: %w", err)
 	}
 
 	if err := ioutil.WriteFile(aop, []byte(o), 0755); err != nil {

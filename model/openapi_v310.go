@@ -1,6 +1,10 @@
 package model
 
-import "path"
+import (
+	"path"
+
+	"github.com/boundedinfinity/optional"
+)
 
 type DataModelType string
 
@@ -14,7 +18,7 @@ const (
 )
 
 type OpenApiV310 struct {
-	Openapi    *string                        `json:"openapi,omitempty" yaml:"openapi,omitempty"`
+	Openapi    optional.StringOptional        `json:"openapi,omitempty" yaml:"openapi,omitempty"`
 	Info       *OpenApiV310Info               `json:"info,omitempty" yaml:"info,omitempty"`
 	Servers    []OpenApiV310Server            `json:"servers,omitempty" yaml:"servers,omitempty"`
 	Components *OpenApiV310Components         `json:"components,omitempty" yaml:"components,omitempty"`

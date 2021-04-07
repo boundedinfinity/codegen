@@ -1,8 +1,8 @@
 package main
 
 import (
+	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
-	"boundedinfinity/codegen/util"
 	"fmt"
 	"os"
 )
@@ -10,25 +10,25 @@ import (
 func main() {
 	// config := "../openapi-parser-templates/go/server/echo/handlebars/project.yml"
 	// config := "../openapi-parser-templates/go/server/echo/go/project.yml"
-	schemaPath := "../openapi-parser-templates/openapi.yaml"
+	schemaPath := "../codegen-templates/openapi.yaml"
 
-	fmt.Println("=================================================================")
-	fmt.Println("=================================================================")
+	// fmt.Println("=================================================================")
+	// fmt.Println("=================================================================")
 
 	ldr := loader.New()
-	rctx, err := ldr.Load(schemaPath, "")
+	rc, err := ldr.Load(schemaPath)
 
 	if err != nil {
 		os.Exit(handleError(err))
 	}
 
-	fmt.Print(util.Jdump(rctx))
+	// fmt.Print(util.Jdump(rc))
 
-	// g := generator.New()
+	g := generator.New()
 
-	// if err := g.Generate(rctx); err != nil {
-	// 	os.Exit(handleError(err))
-	// }
+	if err := g.Generate(rc); err != nil {
+		os.Exit(handleError(err))
+	}
 }
 
 func handleError(err error) int {
