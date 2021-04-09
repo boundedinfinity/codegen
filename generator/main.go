@@ -3,8 +3,9 @@ package generator
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"encoding/json"
 	"fmt"
+
+	"github.com/boundedinfinity/optional"
 )
 
 type Generator struct {
@@ -33,7 +34,11 @@ func (t *Generator) generateGo(rc model.RunContext) error {
 
 	if rc.Model.X_Bi_Go != nil && rc.Model.X_Bi_Go.Templates != nil {
 		for _, tmpl := range rc.Model.X_Bi_Go.Templates {
-			if err := t.generateGoFile(rc, tmpl); err != nil {
+			ctx := model.GoLang{
+				Model:    rc.Model,
+				Template: *tmpl,
+			}
+			if err := t.generateGoFile(*tmpl, ctx); err != nil {
 				return err
 			}
 		}
@@ -41,11 +46,19 @@ func (t *Generator) generateGo(rc model.RunContext) error {
 
 	if rc.Model.Components != nil {
 		if rc.Model.Components.Schemas != nil {
-			if rc.Model.Components.X_Bi_Go_Schemas != nil {
-				if rc.Model.Components.X_Bi_Go_Schemas.Templates != nil {
-					for _, tmpl := range rc.Model.Components.X_Bi_Go_Schemas.Templates {
-						if err := t.generateGoFile(rc, tmpl); err != nil {
-							return err
+			for sn, sv := range rc.Model.Components.Schemas {
+				if sv.X_Bi_Go != nil {
+					if sv.X_Bi_Go.Templates != nil {
+						for _, tmpl := range sv.X_Bi_Go.Templates {
+							ctx := model.GoLang{
+								Model:    rc.Model,
+								Template: *tmpl,
+								Name:     optional.NewStringValue(sn),
+								Schema:   &sv,
+							}
+							if err := t.generateGoFile(*tmpl, ctx); err != nil {
+								return err
+							}
 						}
 					}
 				}
@@ -56,41 +69,11 @@ func (t *Generator) generateGo(rc model.RunContext) error {
 	return nil
 }
 
-func (t *Generator) generateGoFile(rc model.RunContext, tmpl model.XBiGoTemplate) error {
-	// ctx := model.TemplateContext{
-	// 	Model:    rc.Model,
-	// 	Template: tmpl,
-	// }
+func (t *Generator) generateGoFile(tmpl model.XBiGoTemplate, ctx model.GoLang) error {
 
-	ctxJson := `{
-		"package": "model",
-		"name": "tag",
-		"schema": {
-			"type": "object",
-			"properties": {
-				"id": { "type": "string" },
-				"text": { "type": "string" },
-				"description": { "type": "string" }
-			}
-		}
-	}
-	`
-
-	var ctx model.GoLang
-
-	if err := json.Unmarshal([]byte(ctxJson), &ctx); err != nil {
+	if err := util.RenderFile(tmpl.Input.Get(), tmpl.Output.Get(), ctx); err != nil {
 		return err
 	}
-
-	input := "/Users/bbabb200/dev/github.com/codegen-templates/go/server/echo/go/model.gotmpl"
-	output := "/tmp/generator/go/server/echo/go/model/tag.gen.go"
-
-	if err := util.RenderFile(input, output, ctx); err != nil {
-		return err
-	}
-	// if err := util.RenderFile(*tmpl.Input, *tmpl.Output, ctx); err != nil {
-	// 	return err
-	// }
 
 	return nil
 }

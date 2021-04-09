@@ -3,63 +3,48 @@ package main
 import (
 	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
-	"encoding/json"
 	"fmt"
 	"os"
-
-	playground "github.com/go-playground/validator/v10"
 )
 
-type Struct1 struct {
-	Astr    string `json:"astr" validate:"required,gte=5,lte=50"`
-	Abool   bool
-	AnInt   int
-	AStruct []Struct2          `json:"sStruct" validate:"required,dive"`
-	Amap    map[string]Struct2 `json:"amap" validate:"required,dive"`
-}
-
-type Struct2 struct {
-	Something string `json:"something" validate:"required,gte=5,lte=50"`
-}
-
 func main() {
-	struct1 := Struct1{
-		Astr: "xxxxxxx",
-		AStruct: []Struct2{
-			{Something: "1"},
-			{Something: "2"},
-		},
-		Amap: map[string]Struct2{
-			"A": {},
-			"B": {},
-		},
-	}
-
-	// if err := xxx.Validate(); err != nil {
-	// 	fmt.Printf("%v\n", err)
-	// 	ebs, _ := json.Marshal(err)
-	// 	fmt.Printf("%v\n", string(ebs))
+	// struct1 := Struct1{
+	// 	Astr: "xxxxxxx",
+	// 	AStruct: []Struct2{
+	// 		{Something: "1"},
+	// 		{Something: "2"},
+	// 	},
+	// 	Amap: map[string]Struct2{
+	// 		"A": {},
+	// 		"B": {},
+	// 	},
 	// }
 
-	validator := playground.New()
-	if err := validator.Struct(struct1); err != nil {
-		ebs, _ := json.Marshal(err)
-		fmt.Printf("%v\n", string(ebs))
+	// // if err := xxx.Validate(); err != nil {
+	// // 	fmt.Printf("%v\n", err)
+	// // 	ebs, _ := json.Marshal(err)
+	// // 	fmt.Printf("%v\n", string(ebs))
+	// // }
 
-		for _, err := range err.(playground.ValidationErrors) {
-			fmt.Println(err.Namespace()) // can differ when a custom TagNameFunc is registered or
-			fmt.Println(err.Field())     // by passing alt name to ReportError like below
-			fmt.Println(err.StructNamespace())
-			fmt.Println(err.StructField())
-			fmt.Println(err.Tag())
-			fmt.Println(err.ActualTag())
-			fmt.Println(err.Kind())
-			fmt.Println(err.Type())
-			fmt.Println(err.Value())
-			fmt.Println(err.Param())
-			fmt.Println()
-		}
-	}
+	// validator := playground.New()
+	// if err := validator.Struct(struct1); err != nil {
+	// 	ebs, _ := json.Marshal(err)
+	// 	fmt.Printf("%v\n", string(ebs))
+
+	// 	for _, err := range err.(playground.ValidationErrors) {
+	// 		fmt.Println(err.Namespace()) // can differ when a custom TagNameFunc is registered or
+	// 		fmt.Println(err.Field())     // by passing alt name to ReportError like below
+	// 		fmt.Println(err.StructNamespace())
+	// 		fmt.Println(err.StructField())
+	// 		fmt.Println(err.Tag())
+	// 		fmt.Println(err.ActualTag())
+	// 		fmt.Println(err.Kind())
+	// 		fmt.Println(err.Type())
+	// 		fmt.Println(err.Value())
+	// 		fmt.Println(err.Param())
+	// 		fmt.Println()
+	// 	}
+	// }
 
 	// config := "../openapi-parser-templates/go/server/echo/handlebars/project.yml"
 	// config := "../openapi-parser-templates/go/server/echo/go/project.yml"
@@ -74,8 +59,6 @@ func main() {
 	if err != nil {
 		os.Exit(handleError(err))
 	}
-
-	// fmt.Print(util.Jdump(rc))
 
 	g := generator.New()
 

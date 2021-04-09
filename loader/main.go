@@ -132,7 +132,7 @@ func (t *Loader) validate_Model_XBiGo() error {
 	return nil
 }
 
-func (t *Loader) validate_Model_XBiGo_Templates(tmpls []model.XBiGoTemplate) error {
+func (t *Loader) validate_Model_XBiGo_Templates(tmpls []*model.XBiGoTemplate) error {
 	if tmpls == nil {
 		return nil
 	}
