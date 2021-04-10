@@ -23,7 +23,7 @@ type OpenApiV310 struct {
 	Servers    []OpenApiV310Server            `json:"servers,omitempty" yaml:"servers,omitempty"`
 	Components *OpenApiV310Components         `json:"components,omitempty" yaml:"components,omitempty"`
 	Paths      map[string]OpenApiV310PathItem `json:"paths,omitempty" yaml:"paths,omitempty"`
-	X_Bi_Go    *OpenApiV310Extention          `json:"x-bi-go,omitempty" yaml:"x-bi-go,omitempty" xml:"x-bi-go,omitempty"`
+	X_Bi_Go    *X_Bi_GlobalExtention          `json:"x-bi-go,omitempty" yaml:"x-bi-go,omitempty" xml:"x-bi-go,omitempty"`
 }
 
 type OpenApiV310Info struct {
@@ -152,7 +152,6 @@ type OpenApiV310Link struct {
 
 type OpenApiV310Components struct {
 	Schemas         map[string]JsonSchema_Draft07        `json:"schemas,omitempty" yaml:"schemas,omitempty"`
-	X_Bi_Go_Schemas *OpenApiV310Extention                `json:"x-bi-go-schemas,omitempty" yaml:"x-bi-go-schemas,omitempty" xml:"x-bi-go-schemas,omitempty"`
 	Responses       map[string]OpenApiV310Response       `json:"responses,omitempty" yaml:"responses,omitempty"`
 	Parameters      map[string]OpenApiV310Parameter      `json:"parameters,omitempty" yaml:"parameters,omitempty"`
 	Examples        map[string]OpenApiV310Example        `json:"examples,omitempty" yaml:"examples,omitempty"`
@@ -162,6 +161,7 @@ type OpenApiV310Components struct {
 	Links           map[string]OpenApiV310Link           `json:"links,omitempty" yaml:"links,omitempty"`
 	Callbacks       map[string]OpenApiV310Callback       `json:"callbacks,omitempty" yaml:"callbacks,omitempty"`
 	PathItems       map[string]OpenApiV310PathItem       `json:"pathItems,omitempty" yaml:"pathItems,omitempty"`
+	X_Bi_Go         *X_Bi_GoComponents                   `json:"x-bi-go,omitempty" yaml:"x-bi-go,omitempty" xml:"x-bi-go,omitempty"`
 }
 
 func (t OpenApiV310Components) LookupSchema(p string) (string, JsonSchema_Draft07, bool, error) {

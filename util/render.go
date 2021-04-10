@@ -1,7 +1,6 @@
 package util
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -50,12 +49,8 @@ func RenderFile(input, output string, v interface{}) error {
 
 	aopCtx := fmt.Sprintf("%v.json", aop)
 
-	if ctxBs, err := json.MarshalIndent(v, "", "    "); err != nil {
+	if err := MarshalIndentToFile(aopCtx, v, "", "    "); err != nil {
 		return err
-	} else {
-		if err := ioutil.WriteFile(aopCtx, ctxBs, 0755); err != nil {
-			return fmt.Errorf("render error: %w", err)
-		}
 	}
 
 	var o string

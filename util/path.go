@@ -1,6 +1,7 @@
 package util
 
 import (
+	"boundedinfinity/codegen/model"
 	"fmt"
 	"os"
 	"path"
@@ -77,25 +78,29 @@ func IsDir(p string) (bool, error) {
 	return !ok, nil
 }
 
-func AbsFromDirPath(r, p string) (string, error) {
-	if filepath.IsAbs(p) {
+func AbsFromDirPath(r, p optional.StringOptional) (optional.StringOptional, error) {
+	if p.IsEmpty() {
+		return p, model.CannotBeEmptyErr
+	}
+
+	if filepath.IsAbs(p.Get()) {
 		return p, nil
 	}
 
-	a := filepath.Join(r, p)
+	a := filepath.Join(r.Get(), p.Get())
 
 	if x, err := filepath.Abs(a); err != nil {
-		return "", err
+		return p, err
 	} else {
 		a = x
 	}
 
-	return a, nil
+	return optional.NewStringValue(a), nil
 }
 
-func AbsFromFilePath(r, p string) (string, error) {
-	d := filepath.Dir(r)
-	return AbsFromDirPath(d, p)
+func AbsFromFilePath(r, p optional.StringOptional) (optional.StringOptional, error) {
+	d := filepath.Dir(r.Get())
+	return AbsFromDirPath(optional.NewStringValue(d), p)
 }
 
 func FileSearch(v optional.StringOptional, rs ...optional.StringOptional) (string, bool) {
