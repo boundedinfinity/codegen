@@ -1,27 +1,12 @@
 package model
 
 import (
-	"errors"
-
 	"github.com/boundedinfinity/optional"
 )
 
-type RunContext struct {
-	Input optional.StringOptional
-	Model OpenApiV310
-}
-
-func (t RunContext) Validate() error {
-	if t.Input.IsEmpty() {
-		return errors.New("modelPath is empty")
-	}
-
-	return nil
-}
-
 type XBiGoGlobalContext struct {
 	Package optional.StringOptional `json:"package,omitempty" yaml:"package,omitempty" xml:"package,omitempty"`
-	Model   OpenApiV310             `json:"model,omitempty" yaml:"model,omitempty" xml:"model,omitempty"`
+	Schema  OpenApiV310             `json:"schema,omitempty" yaml:"schema,omitempty" xml:"schema,omitempty"`
 }
 
 type XBiGoGlobalRuntime struct {

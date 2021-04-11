@@ -3,28 +3,85 @@ package generator
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/boundedinfinity/optional"
 )
 
+func (t *Generator) searchFromTemplateRoot(p optional.StringOptional) (optional.StringOptional, error) {
+	if abs, ok := util.FileSearch(p, t.schema.X_Bi_Go.TemplateRoot); !ok {
+		return p, model.CannotBeEmptyErr
+	} else {
+		return optional.NewStringValue(abs), nil
+	}
+}
+
+func (t *Generator) absFromGenerationRoot(p optional.StringOptional) (optional.StringOptional, error) {
+	if p.IsEmpty() {
+		return p, model.CannotBeEmptyErr
+	}
+
+	if filepath.IsAbs(p.Get()) {
+		return p, nil
+	}
+
+	p2 := filepath.Join(t.schema.X_Bi_Go.GenRoot.Get(), p.Get())
+	abs, err := filepath.Abs(p2)
+
+	if err != nil {
+		return p, err
+	}
+
+	return optional.NewStringValue(abs), nil
+}
+
 func (t *Generator) generateGo() error {
-	if t.rc.Model.X_Bi_Go == nil {
+	if util.IsNil(t.schema.X_Bi_Go) {
 		return nil
 	}
 
-	if t.rc.Model.X_Bi_Go.Module == nil {
-		return model.CannotBeEmptyErr
+	xbigo := t.schema.X_Bi_Go
+
+	if abs, err := t.searchFromSchemaPath(xbigo.TemplateRoot); err != nil {
+		return err
+	} else {
+		xbigo.TemplateRoot = abs
 	}
 
-	if t.rc.Model.X_Bi_Go.Templates != nil {
-		for _, tmpl := range t.rc.Model.X_Bi_Go.Templates {
+	if xbigo.GenRoot.IsDefined() {
+		genRoot := xbigo.GenRoot.Get()
+		if !filepath.IsAbs(genRoot) {
+			p1 := filepath.Join(t.path, genRoot)
+			if p2, err := filepath.Abs(p1); err != nil {
+				return t.generatorSchemaErr(err, "x-bi-go", "genRoot")
+			} else {
+				xbigo.GenRoot = optional.NewStringValue(p2)
+			}
+		}
+	} else {
+		return t.generatorSchemaErr(model.CannotBeEmptyErr, "x-bi-go", "genRoot")
+	}
+
+	if util.IsNil(xbigo.Module) {
+		return t.generatorSchemaErr(model.CannotBeEmptyErr, "x-bi-go", "module")
+	}
+
+	if xbigo.Module.Name.IsEmpty() {
+		return t.generatorSchemaErr(model.CannotBeEmptyErr, "x-bi-go", "module", "name")
+	}
+
+	if xbigo.Module.Version.IsEmpty() {
+		return t.generatorSchemaErr(model.CannotBeEmptyErr, "x-bi-go", "module", "version")
+	}
+
+	if util.IsDef(xbigo.Templates) {
+		for _, tmpl := range xbigo.Templates {
 			var rt model.XBiGoGlobalRuntime
 
-			if err := t.goNonGoTemplate2GoGlobalRuntime(tmpl, &rt); err != nil {
-				return nil
+			if err := t.createGlobalRuntime(&rt, *tmpl); err != nil {
+				return err
 			}
 
 			if err := util.RenderFile(rt.Input.Get(), rt.Output.Get(), rt.Context); err != nil {
@@ -33,126 +90,90 @@ func (t *Generator) generateGo() error {
 		}
 	}
 
-	if t.rc.Model.Components == nil || t.rc.Model.Components.Schemas == nil ||
-		t.rc.Model.Components.X_Bi_Go == nil ||
-		t.rc.Model.Components.X_Bi_Go.Schemas == nil ||
-		t.rc.Model.Components.X_Bi_Go.Schemas.Templates == nil {
-		return nil
-	}
+	if util.IsDef(xbigo.Components, xbigo.Components.Schemas, xbigo.Components.Schemas.Templates) {
+		// for _, tmpl := range xbigo.Components.Schemas.Templates {
+		//     var rt model.XBiGoSchemaRuntime
 
-	for sn, sv := range t.rc.Model.Components.Schemas {
-		for _, tmpl := range t.rc.Model.Components.X_Bi_Go.Schemas.Templates {
-			var rt model.XBiGoSchemaRuntime
-
-			if err := t.goSchema2GoContext(&rt, tmpl, sn, sv); err != nil {
-				return nil
-			}
-
-			if err := util.RenderFile(rt.Input.Get(), rt.Output.Get(), rt.Context); err != nil {
-				return err
-			}
-		}
+		// }
 	}
 
 	return nil
 }
 
-func (t *Generator) fullPkg2FilePkg(pkg optional.StringOptional) (optional.StringOptional, error) {
-	if pkg.IsEmpty() {
-		return pkg, model.CannotBeEmptyErr
-	}
+func (t *Generator) createGlobalRuntime(rt *model.XBiGoGlobalRuntime, tmpl model.X_Bi_Go_Template) error {
+	rt.Context.Schema = t.schema
 
-	var pkg2 string
-	mn := t.rc.Model.X_Bi_Go.Module.Name.Get()
-	pkg2 = pkg.Get()
-	pkg2 = strings.TrimPrefix(pkg2, mn)
-	pkg2 = strings.TrimPrefix(pkg2, "/")
-
-	if pkg2 == "" {
-		pkg2 = "main"
-	}
-
-	return optional.NewStringValue(pkg2), nil
-}
-
-func (t *Generator) goSchema2GoContext(r *model.XBiGoSchemaRuntime, tmpl *model.X_Bi_GoTemplate, sn string, sv model.JsonSchema_Draft07) error {
-	r.Context.Model = t.rc.Model
-	r.Context.Name = optional.NewStringValue(sn)
-	r.Context.Schema = sv
-
-	if abs, ok := util.FileSearch(tmpl.Input, t.rc.Model.X_Bi_Go.TemplateRoot); ok {
-		r.Input = optional.NewStringValue(abs)
+	if abs, err := t.searchFromTemplateRoot(tmpl.Input); err != nil {
+		return err
 	} else {
-		return model.CannotBeEmptyErr
+		rt.Input = abs
 	}
 
-	if sv.X_Bi_Go.Package.IsDefined() {
-		if pkg, err := t.fullPkg2FilePkg(sv.X_Bi_Go.Package); err != nil {
-			return err
-		} else {
-			r.Context.Package = pkg
-		}
-	} else if tmpl.Package.IsDefined() {
-		if pkg, err := t.fullPkg2FilePkg(tmpl.Package); err != nil {
-			return err
-		} else {
-			r.Context.Package = pkg
-		}
+	if tmpl.Package.IsEmpty() {
+		rt.Context.Package = t.goPkgBase(t.goTemplateFullPkg(tmpl))
 	}
 
-	var o string
-	o = tmpl.Input.Get()
-	o = filepath.Base(o)
-	o = strings.TrimSuffix(o, filepath.Ext(o))
-	o = fmt.Sprintf("%v.%v", sn, o)
-	o = filepath.Join(r.Context.Package.Get(), o)
-	o = filepath.Join(t.rc.Model.X_Bi_Go.GenRoot.Get(), o)
-
-	r.Output = optional.NewStringValue(o)
+	if abs, err := t.getOutput(tmpl); err != nil {
+		return err
+	} else {
+		rt.Output = abs
+	}
 
 	return nil
 }
 
-func (t *Generator) goNonGoTemplate2GoGlobalRuntime(tmpl *model.X_Bi_GoTemplate, r *model.XBiGoGlobalRuntime) error {
-	id := filepath.Dir(t.rc.Model.X_Bi_Go.TemplateRoot.Get())
-
-	if abs, ok := util.FileSearch(tmpl.Input, optional.NewStringValue(id)); ok {
-		r.Input = optional.NewStringValue(abs)
-	} else {
-		return model.CannotBeEmptyErr
-	}
-
-	if tmpl.Package.IsDefined() {
-		if pkg, err := t.fullPkg2FilePkg(tmpl.Package); err != nil {
-			return err
-		} else {
-			r.Context.Package = pkg
-		}
-	}
+func (t *Generator) getOutput(tmpl model.X_Bi_Go_Template) (optional.StringOptional, error) {
+	var output optional.StringOptional
 
 	if tmpl.Output.IsDefined() {
-		if abs, err := util.AbsFromDirPath(t.rc.Model.X_Bi_Go.GenRoot, tmpl.Output); err != nil {
-			return err
-		} else {
-			r.Output = abs
+		if !filepath.IsAbs(tmpl.Output.Get()) {
+			if abs, err := t.absFromGenerationRoot(tmpl.Output); err != nil {
+				return output, err
+			} else {
+				output = abs
+			}
 		}
 	} else {
 		var o string
-		var ie string
+		var e string
+		var p string
 
-		o = r.Input.Get()
+		o = tmpl.Input.Get()
 		o = filepath.Base(o)
-		ie = filepath.Ext(o)
-		o = strings.TrimSuffix(o, ie)
-		o = filepath.Join(t.rc.Model.X_Bi_Go.GenRoot.Get(), o)
+		e = filepath.Ext(o)
+		o = strings.TrimSuffix(o, e)
+		p = t.goTemplateFullPkg(tmpl).Get()
+		p = t.goPkgRelative(optional.NewStringValue(p)).Get()
+		o = filepath.Join(p, o)
 
-		if r.Context.Package.Get() != "main" {
-			o = filepath.Join(o, r.Context.Package.Get())
+		if abs, err := t.absFromGenerationRoot(optional.NewStringValue(o)); err != nil {
+			return output, err
+		} else {
+			output = abs
 		}
-
-		r.Output = optional.NewStringValue(o)
 	}
 
-	r.Context.Model = t.rc.Model
-	return nil
+	return output, nil
+}
+
+func (t *Generator) goTemplateFullPkg(tmpl model.X_Bi_Go_Template) optional.StringOptional {
+	if tmpl.Package.IsDefined() {
+		return tmpl.Package
+	} else {
+		return t.schema.X_Bi_Go.Module.Name
+	}
+}
+
+func (t *Generator) goPkgBase(pgk optional.StringOptional) optional.StringOptional {
+	var x string
+	x = pgk.Get()
+	x = path.Base(x)
+	return optional.NewStringValue(x)
+}
+
+func (t *Generator) goPkgRelative(pgk optional.StringOptional) optional.StringOptional {
+	var x string
+	x = strings.TrimPrefix(t.schema.X_Bi_Go.Module.Name.Get(), pgk.Get())
+	x = strings.TrimPrefix(x, "/")
+	return optional.NewStringValue(x)
 }

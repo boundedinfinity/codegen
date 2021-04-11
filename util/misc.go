@@ -3,11 +3,30 @@ package util
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"runtime"
 	"strings"
 
 	"github.com/blang/semver/v4"
 )
+
+func IsNil(vs ...interface{}) bool {
+	var isNil bool
+
+	for _, v := range vs {
+		isNil = reflect.ValueOf(v).IsNil()
+
+		if isNil {
+			break
+		}
+	}
+
+	return isNil
+}
+
+func IsDef(vs ...interface{}) bool {
+	return !IsNil(vs...)
+}
 
 func Jdump(v interface{}) string {
 	bs, _ := json.MarshalIndent(v, "", "    ")
