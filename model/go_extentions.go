@@ -6,9 +6,9 @@ type X_Bi_Go_Extention struct {
 	TemplateRoot optional.StringOptional    `json:"templateRoot,omitempty" yaml:"templateRoot,omitempty" xml:"templateRoot,omitempty"`
 	GenRoot      optional.StringOptional    `json:"genRoot,omitempty" yaml:"genRoot,omitempty" xml:"genRoot,omitempty"`
 	Module       *X_Bi_Go_Module            `json:"module,omitempty" yaml:"module,omitempty" xml:"module,omitempty"`
-	Templates    []*X_Bi_Go_Template        `json:"templates,omitempty" yaml:"templates,omitempty" xml:"templates,omitempty"`
+	Global       *X_Bi_Go_Templates         `json:"global,omitempty" yaml:"global,omitempty" xml:"global,omitempty"`
 	Components   *X_Bi_Go_Global_Components `json:"components,omitempty" yaml:"components,omitempty"`
-	Paths        *X_Bi_Go_Global_Paths      `json:"paths,omitempty" yaml:"paths,omitempty" xml:"paths,omitempty"`
+	Paths        *X_Bi_Go_Templates         `json:"paths,omitempty" yaml:"paths,omitempty" xml:"paths,omitempty"`
 }
 
 type X_Bi_Go_Module struct {
@@ -29,21 +29,16 @@ type X_Bi_Go_Template struct {
 }
 
 type X_Bi_Go_Global_Components struct {
-	Schemas *X_Bi_Go_Global_Components_Schema `json:"schemas,omitempty" yaml:"schemas,omitempty"`
+	Schemas *X_Bi_Go_Templates `json:"schemas,omitempty" yaml:"schemas,omitempty"`
 }
 
-type X_Bi_Go_Global_Components_Schema struct {
+type X_Bi_Go_Templates struct {
 	Package   optional.StringOptional `json:"package,omitempty" yaml:"package,omitempty" xml:"package,omitempty"`
 	Templates []*X_Bi_Go_Template     `json:"templates,omitempty" yaml:"templates,omitempty" xml:"templates,omitempty"`
 }
 
 type X_Bi_Go_Components struct {
 	Schemas *X_Bi_Go_Components_Schemas `json:"schemas,omitempty" yaml:"schemas,omitempty"`
-}
-
-type X_Bi_Go_Global_Paths struct {
-	Package   optional.StringOptional `json:"package,omitempty" yaml:"package,omitempty" xml:"package,omitempty"`
-	Templates []*X_Bi_Go_Template     `json:"templates,omitempty" yaml:"templates,omitempty" xml:"templates,omitempty"`
 }
 
 type X_Bi_Go_Components_Schemas struct {

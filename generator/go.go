@@ -76,8 +76,8 @@ func (t *Generator) generateGo() error {
 		return t.generatorSchemaErr(model.CannotBeEmptyErr, "x-bi-go", "module", "version")
 	}
 
-	if util.IsDef(xbigo.Templates) {
-		for _, tmpl := range xbigo.Templates {
+	if util.IsDef(xbigo.Global, xbigo.Global.Templates) {
+		for _, tmpl := range xbigo.Global.Templates {
 			var rt model.XBiGoGlobalRuntime
 
 			if err := t.createGlobalRuntime(&rt, *tmpl); err != nil {
