@@ -49,3 +49,7 @@ type X_Bi_Go_Components_Schemas struct {
 type X_Bi_Schema struct {
 	Package optional.StringOptional `json:"package,omitempty" yaml:"package,omitempty" xml:"package,omitempty"`
 }
+
+type X_Bi_PathItem struct {
+	Package optional.StringOptional `json:"package,omitempty" yaml:"package,omitempty" xml:"package,omitempty"`
+}

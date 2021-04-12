@@ -74,6 +74,7 @@ type OpenApiV310PathItem struct {
 	Trace       *OpenApiV310Operation   `json:"trace,omitempty" yaml:"trace,omitempty"`
 	Servers     []OpenApiV310Server     `json:"servers,omitempty" yaml:"servers,omitempty"`
 	Parameters  []OpenApiV310Parameter  `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	X_Bi_Go     *X_Bi_PathItem          `json:"x-bi-go,omitempty" yaml:"x-bi-go,omitempty" xml:"x-bi-go,omitempty"`
 }
 
 type OpenApiV310Operation struct {

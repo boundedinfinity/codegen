@@ -15,6 +15,7 @@ func renderGoTemplate(s string, d interface{}) (string, error) {
 		"peq":         peq,
 		"type_go":     typeGo,
 		"operationId": operationId,
+		"filename":    filename,
 	}
 
 	t, err := template.New("template").Funcs(fnm).Parse(s)

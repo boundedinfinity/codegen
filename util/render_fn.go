@@ -4,6 +4,7 @@ import (
 	"boundedinfinity/codegen/model"
 	"fmt"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/boundedinfinity/optional"
@@ -31,6 +32,14 @@ func lcFirst(v string) string {
 
 func basePath(v string) string {
 	return path.Base(v)
+}
+
+func filename(v string) string {
+	var fn string
+	fn = v
+	fn = filepath.Base(fn)
+	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
+	return fn
 }
 
 func peq(v1 optional.StringOptional, v2 string) bool {
