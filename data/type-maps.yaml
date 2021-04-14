@@ -1,0 +1,8 @@
+languages:
+    go:
+        string: string
+        number: float64
+        integer: int64
+        boolean: bool
+    typescript:
+        string: string 

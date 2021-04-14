@@ -9,7 +9,8 @@ import (
 func main() {
 	// config := "../openapi-parser-templates/go/server/echo/handlebars/project.yml"
 	// config := "../openapi-parser-templates/go/server/echo/go/project.yml"
-	schemaPath := "../codegen-templates/openapi.yaml"
+	// schemaPath := "../codegen-templates/openapi.yaml"
+	schemaPath := "../codegen-templates/spec.bi.yaml"
 	// schemaPath := ""
 
 	// fmt.Println("=================================================================")

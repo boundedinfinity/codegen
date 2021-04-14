@@ -5,15 +5,15 @@ import (
 )
 
 type Generator struct {
-	inputPath    string
+	specPath     string
 	templateRoot string
 	genRoot      string
-	model        model.OpenApiV310
+	spec         model.BiSpec
 }
 
-func New(inputPath string) *Generator {
+func New(specPath string) *Generator {
 	return &Generator{
-		inputPath: inputPath,
+		specPath: specPath,
 	}
 }
 
