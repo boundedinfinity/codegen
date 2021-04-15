@@ -1,7 +1,8 @@
-package util
+package generator
 
 import (
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/util"
 	"fmt"
 	"strings"
 
@@ -16,11 +17,11 @@ func init() {
 	raymond.RegisterHelper("basePath", basePath)
 	raymond.RegisterHelper("operationId", operationId)
 
-	raymond.RegisterHelper("type_go", typeGo)
-	raymond.RegisterHelper("jdump", Jdump)
+	// raymond.RegisterHelper("type_go", t)
+	raymond.RegisterHelper("jdump", util.Jdump)
 }
 
-func renderHandlebars(s string, d interface{}) (string, error) {
+func (t *Generator) renderHandlebars(s string, d interface{}) (string, error) {
 	o, err := raymond.Render(s, d)
 
 	if err != nil {

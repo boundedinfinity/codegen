@@ -11,7 +11,8 @@ func (t *Generator) generatorErr(err error, ps ...string) error {
 }
 
 func (t *Generator) generatorSchemaErr(err error, ps ...string) error {
-	tmp := []string{fmt.Sprintf("spec[%v]", t.specPath)}
+	// tmp := []string{fmt.Sprintf("spec[%v]", t.specPath)}
+	tmp := []string{fmt.Sprintf("spec[%v]", "X")}
 	tmp = append(tmp, ps...)
 	return t.generatorErr(err, tmp...)
 }

@@ -1,25 +1,11 @@
 package util
 
 import (
-	"fmt"
 	"os"
-	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/boundedinfinity/optional"
 )
-
-func FileExt(v string) (string, error) {
-	ext := path.Ext(v)
-	ext = strings.ReplaceAll(ext, ".", "")
-
-	if ext == "" {
-		return "", fmt.Errorf("no extention")
-	}
-
-	return ext, nil
-}
 
 func DirEnsure(v string) error {
 	ok, err := DirExists(v)

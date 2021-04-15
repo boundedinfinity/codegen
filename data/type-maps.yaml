@@ -2,7 +2,19 @@ languages:
     go:
         string: string
         number: float64
-        integer: int64
+        integer: int
+        biginteger: int64
+        smallinteger: int32
+        float: float32
+        smallfloat: float32
+        bigfloat: float64
         boolean: bool
     typescript:
-        string: string 
+        string: string
+        integer: number
+        biginteger: number
+        smallinteger: number
+        float: number
+        smallfloat: number
+        bigfloat: number
+        boolean: boolean

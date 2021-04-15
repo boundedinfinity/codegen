@@ -2,21 +2,22 @@ package main
 
 import (
 	"boundedinfinity/codegen/generator"
+	"boundedinfinity/codegen/loader"
 	"fmt"
 	"os"
 )
 
 func main() {
-	// config := "../openapi-parser-templates/go/server/echo/handlebars/project.yml"
-	// config := "../openapi-parser-templates/go/server/echo/go/project.yml"
-	// schemaPath := "../codegen-templates/openapi.yaml"
-	schemaPath := "../codegen-templates/spec.bi.yaml"
-	// schemaPath := ""
+	// schemaPath := "../codegen-templates/spec.bi.yaml"
+	schemaPath := os.Args[1]
 
-	// fmt.Println("=================================================================")
-	// fmt.Println("=================================================================")
+	l := loader.New()
 
-	g := generator.New(schemaPath)
+	if err := l.FromPath(schemaPath); err != nil {
+		os.Exit(handleError(err))
+	}
+
+	g := generator.New(l.Gen, l.Mapper)
 
 	if err := g.Generate(); err != nil {
 		os.Exit(handleError(err))

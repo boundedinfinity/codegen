@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -22,28 +23,24 @@ func MarshalIndentToFile(p string, v interface{}, prefix, indent string) error {
 		return wrapErr(errors.New("no  type"))
 	}
 
-	ext, err := FileExt(p)
-
-	if err != nil {
-		return wrapErr(err)
-	}
+	ext := filepath.Ext(p)
 
 	var bs []byte
 
 	switch ext {
-	case "json":
+	case ".json":
 		if x, err := json.MarshalIndent(v, prefix, indent); err != nil {
 			return wrapErr(err)
 		} else {
 			bs = x
 		}
-	case "yaml":
+	case ".yaml":
 		if x, err := yaml.Marshal(v); err != nil {
 			return wrapErr(err)
 		} else {
 			bs = x
 		}
-	case "yml":
+	case ".yml":
 		if x, err := yaml.Marshal(v); err != nil {
 			return wrapErr(err)
 		} else {
@@ -83,22 +80,18 @@ func UnmarshalFromFile(p string, v interface{}) error {
 		return wrapErr(err)
 	}
 
-	ext, err := FileExt(p)
-
-	if err != nil {
-		return wrapErr(err)
-	}
+	ext := filepath.Ext(p)
 
 	switch ext {
-	case "json":
+	case ".json":
 		if err := json.Unmarshal(bs, v); err != nil {
 			return wrapErr(err)
 		}
-	case "yaml":
+	case ".yaml":
 		if err := yaml.Unmarshal(bs, v); err != nil {
 			return wrapErr(err)
 		}
-	case "yml":
+	case ".yml":
 		if err := yaml.Unmarshal(bs, v); err != nil {
 			return wrapErr(err)
 		}
