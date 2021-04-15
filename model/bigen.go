@@ -14,6 +14,7 @@ type BiGen struct {
 	Info       BiGenInfo      `json:"info,omitempty" yaml:"info,omitempty"`
 	Models     BiGenModel     `json:"models,omitempty" yaml:"models,omitempty"`
 	Operations BiGenOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Lookup     map[string]BiGenType
 }
 
 type BiGenInfo struct {

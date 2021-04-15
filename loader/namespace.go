@@ -46,6 +46,7 @@ func (t *Loader) processNamespace(input model.BiSpecNamespace, tmpls []model.BiS
 			}
 
 			output.Types = append(output.Types, gtyp)
+			t.Gen.Lookup[name] = gtyp
 		}
 	}
 

@@ -2,6 +2,7 @@ package generator
 
 import (
 	"bytes"
+	"fmt"
 	"path"
 	"strings"
 	"text/template"
@@ -9,18 +10,18 @@ import (
 
 func (t *Generator) renderGoTemplate(s string, d interface{}) (string, error) {
 	fnm := template.FuncMap{
-		"basePath":     basePath,
-		"ucFirst":      ucFirst,
+		"base_path":    basePath,
+		"uc_first":     ucFirst,
 		"uc":           uc,
-		"lcFirst":      lcFirst,
+		"lc_first":     lcFirst,
 		"lc":           lc,
-		"peq":          peq,
+		"custom_type":  t.typeCustom,
 		"lang_type":    t.typeGo,
 		"lang_rel_pkg": t.goType2RelativePkg,
 		"lang_abs_pkg": t.goType2AbsolutePkg,
 		"operationId":  operationId,
 		"filename":     filename,
-		"camelCase":    camelCase,
+		"camel_case":   camelCase,
 	}
 
 	tmpl, err := template.New("template").Funcs(fnm).Parse(s)
@@ -38,21 +39,46 @@ func (t *Generator) renderGoTemplate(s string, d interface{}) (string, error) {
 	return o.String(), nil
 }
 
+const (
+	UNKNOWN_TYPE = "<UNKNOWN_TYPE>"
+)
+
+func (t *Generator) typeCustom(v string) bool {
+	if lang, ok := t.mapper.Language["go"]; ok {
+		for k := range lang {
+			v = strings.TrimSuffix(v, "[]")
+			if k == v {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 func (t *Generator) typeGo(v string) string {
-	var x string
+	x := UNKNOWN_TYPE
+	isArrary := false
+
+	if strings.HasSuffix(v, "[]") {
+		isArrary = true
+		v = strings.TrimSuffix(v, "[]")
+	}
 
 	if lang, ok := t.mapper.Language["go"]; ok {
-		if strings.HasSuffix(v, "[]") {
-
-		}
 
 		if typ, ok := lang[v]; ok {
 			x = typ
-		} else {
-			x = "<UNKNOWN_TYPE>"
+			if isArrary {
+				x = fmt.Sprintf("[]%v", x)
+			}
 		}
-	} else {
-		x = "<UNKNOWN_LANG>"
+	}
+
+	if x == UNKNOWN_TYPE {
+		if typ, ok := t.spec.Lookup[v]; ok {
+			x = typ.Name
+		}
 	}
 
 	return x

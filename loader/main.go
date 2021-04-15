@@ -20,6 +20,7 @@ func New() *Loader {
 	return &Loader{
 		typeMapPath: "data/type-maps.yaml",
 		Gen: model.BiGen{
+			Lookup: make(map[string]model.BiGenType),
 			Models: model.BiGenModel{
 				Namespaces: make([]model.BiGenNamespace, 0),
 			},
