@@ -9,8 +9,10 @@ type BiSpec struct {
 }
 
 type BiSpecInfo struct {
-	TemplateDir string `json:"templateDir,omitempty" yaml:"templateDir,omitempty"`
-	OutputDir   string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	TemplateDir string            `json:"templateDir,omitempty" yaml:"templateDir,omitempty"`
+	OutputDir   string            `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	DumpContext bool              `json:"dumpContext" yaml:"dumpContext"`
+	TypeMap     map[string]string `json:"typeMap" yaml:"typeMap"`
 }
 
 type BiSpecModel struct {

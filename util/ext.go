@@ -1,24 +1,11 @@
 package util
 
 import (
+	"boundedinfinity/codegen/model"
 	"path/filepath"
 	"strings"
 
 	"github.com/boundedinfinity/optional"
-)
-
-type RenderExt string
-
-const (
-	GoTmplExt     RenderExt = ".gotmpl"
-	HandlebarsExt RenderExt = ".handlebars"
-)
-
-var (
-	RenderExts = []RenderExt{
-		GoTmplExt,
-		HandlebarsExt,
-	}
 )
 
 func TrimTemplateExtO(s optional.StringOptional) optional.StringOptional {
@@ -33,11 +20,24 @@ func TrimTemplateExt(s string) string {
 	o := s
 	ext := filepath.Ext(o)
 
-	for _, x := range RenderExts {
+	for _, x := range model.TemplateExts {
 		if ext == string(x) {
 			o = strings.TrimSuffix(o, string(x))
 		}
 	}
 
 	return o
+}
+
+func GetTemplateExt(s string) model.TemplateExt {
+	o := s
+	ext := filepath.Ext(o)
+
+	for _, rext := range model.TemplateExts {
+		if ext == string(rext) {
+			return rext
+		}
+	}
+
+	return model.TemplateExt_Unkown
 }

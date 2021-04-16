@@ -4,11 +4,12 @@ import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 )
 
-func (t *Loader) processTemplate(name string, input model.BiSpecTemplate) (model.BiGenTemplate, error) {
+func (t *Loader) processTemplate(ns, name string, input model.BiSpecTemplate) (model.BiGenTemplate, error) {
 	var output model.BiGenTemplate
 
 	if input.Input == "" {
@@ -47,6 +48,7 @@ func (t *Loader) processTemplate(name string, input model.BiSpecTemplate) (model
 
 	var ext string
 	var abs string
+	var fn string
 
 	ext = output.Input
 	ext = filepath.Base(ext)
@@ -54,9 +56,12 @@ func (t *Loader) processTemplate(name string, input model.BiSpecTemplate) (model
 	ext = filepath.Ext(ext)
 	ext = strings.TrimPrefix(ext, ".")
 
-	abs = name
-	abs = fmt.Sprintf("%v.%v", abs, ext)
-	abs = filepath.Join(t.Gen.Info.OutputDir, abs)
+	fn = name
+	fn = fmt.Sprintf("%v.%v", fn, ext)
+
+	abs = t.Gen.Info.OutputDir
+	abs = path.Join(abs, t.relativeNamespace(ns))
+	abs = path.Join(abs, fn)
 
 	output.Output = abs
 	return output, nil

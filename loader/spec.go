@@ -56,9 +56,21 @@ func (t *Loader) processSpec() error {
 		t.Gen.Info.OutputDir = filepath.Join(t.specDir, t.spec.Info.OutputDir)
 	}
 
+	if t.spec.Info.TypeMap != nil {
+		for k, v := range t.spec.Info.TypeMap {
+			t.addMappedType(k, v)
+		}
+	}
+
 	if t.spec.Models.Namespaces != nil {
+		for _, ns := range t.spec.Models.Namespaces {
+			if err := t.processNamespace1(ns); err != nil {
+				return err
+			}
+		}
+
 		for _, sNamespace := range t.spec.Models.Namespaces {
-			gNamespace, err := t.processNamespace(sNamespace, t.spec.Models.Templates)
+			gNamespace, err := t.processNamespace2(sNamespace, t.spec.Models.Templates)
 
 			if err != nil {
 				return err
@@ -69,8 +81,14 @@ func (t *Loader) processSpec() error {
 	}
 
 	if t.spec.Operations.Namespaces != nil {
+		for _, ns := range t.spec.Operations.Namespaces {
+			if err := t.processNamespace1(ns); err != nil {
+				return err
+			}
+		}
+
 		for _, sNamespace := range t.spec.Operations.Namespaces {
-			gNamespace, err := t.processNamespace(sNamespace, t.spec.Operations.Templates)
+			gNamespace, err := t.processNamespace2(sNamespace, t.spec.Operations.Templates)
 
 			if err != nil {
 				return err

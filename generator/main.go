@@ -3,15 +3,12 @@ package generator
 import "boundedinfinity/codegen/model"
 
 type Generator struct {
-	// specPath string
-	spec   model.BiGen
-	mapper model.BiGenLangTypeMapper
+	spec model.BiGen
 }
 
-func New(spec model.BiGen, mapper model.BiGenLangTypeMapper) *Generator {
+func New(spec model.BiGen) *Generator {
 	return &Generator{
-		spec:   spec,
-		mapper: mapper,
+		spec: spec,
 	}
 }
 

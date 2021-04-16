@@ -17,7 +17,7 @@ func main() {
 		os.Exit(handleError(err))
 	}
 
-	g := generator.New(l.Gen, l.Mapper)
+	g := generator.New(l.Gen)
 
 	if err := g.Generate(); err != nil {
 		os.Exit(handleError(err))

@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"fmt"
 	"io/ioutil"
@@ -52,11 +53,11 @@ func (t *Generator) renderFile(input, output string, v interface{}) error {
 	var o string
 
 	switch ext {
-	case string(util.HandlebarsExt):
+	case string(model.TemplateExt_Handlebars):
 		if o, err = t.renderHandlebars(string(bs), v); err != nil {
 			return fmt.Errorf("render err: %w", err)
 		}
-	case string(util.GoTmplExt):
+	case string(model.TemplateExt_GoTmpl):
 		if o, err = t.renderGoTemplate(string(bs), v); err != nil {
 			return fmt.Errorf("render err: %w", err)
 		}
