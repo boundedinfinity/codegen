@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-func (t *Loader) processTemplate(ns, name string, input model.BiInput_Template_Info) (model.BiGenTemplate, error) {
-	var output model.BiGenTemplate
+func (t *Loader) processTemplate(ns, name string, input model.BiInput_Template_Info) (model.BiOutput_Template, error) {
+	var output model.BiOutput_Template
 
 	if input.Input == "" {
 		return output, fmt.Errorf("template.input cannot be empty")

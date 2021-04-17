@@ -6,20 +6,20 @@ import (
 	"path"
 )
 
-func (t *Loader) specType2genType(ns model.BiOutput_Model_Namespace, styp model.BiInput_Model) (model.BiOutput_Model, error) {
+func (t *Loader) specModel2genModel(ns model.BiOutput_Model_Namespace, styp model.BiInput_Model) (model.BiOutput_Model, error) {
 	gtyp := model.BiOutput_Model{
 		Name:       styp.Name,
 		Type:       styp.Type,
 		Namespace:  ns.Name,
 		Imports:    make([]string, 0),
-		Properties: make([]model.BiGenTypeProperty, 0),
-		Templates:  make([]model.BiGenTemplate, 0),
+		Properties: make([]model.BiOutput_TypeProperty, 0),
+		Templates:  make([]model.BiOutput_Template, 0),
 	}
 
 	return gtyp, nil
 }
 
-func (t *Loader) genTypeImports(gtyp *model.BiOutput_Model) error {
+func (t *Loader) genModelImports(gtyp *model.BiOutput_Model) error {
 	if gtyp.Properties != nil {
 		ptyps := make(map[string]bool)
 
@@ -39,8 +39,8 @@ func (t *Loader) genTypeImports(gtyp *model.BiOutput_Model) error {
 	return nil
 }
 
-func (t *Loader) specProperty2genProperty(ns model.BiOutput_Model_Namespace, gtyp model.BiOutput_Model, sprop model.BiInput_Model_Property) (model.BiGenTypeProperty, error) {
-	gprop := model.BiGenTypeProperty{
+func (t *Loader) specProperty2genProperty(ns model.BiOutput_Model_Namespace, gtyp model.BiOutput_Model, sprop model.BiInput_Model_Property) (model.BiOutput_TypeProperty, error) {
+	gprop := model.BiOutput_TypeProperty{
 		Name: sprop.Name,
 	}
 

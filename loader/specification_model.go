@@ -84,7 +84,7 @@ func (t *Loader) processInput_Specification_Model_Namepace2(i int, ins model.BiI
 		for i, styp := range ins.Models {
 			t.reportStack.Push(fmt.Sprintf("model[%v]", i))
 
-			gtyp, err := t.specType2genType(gns, styp)
+			gtyp, err := t.specModel2genModel(gns, styp)
 
 			if err != nil {
 				return gns, err
@@ -106,7 +106,7 @@ func (t *Loader) processInput_Specification_Model_Namepace2(i int, ins model.BiI
 				}
 			}
 
-			if err := t.genTypeImports(&gtyp); err != nil {
+			if err := t.genModelImports(&gtyp); err != nil {
 				return gns, err
 			}
 

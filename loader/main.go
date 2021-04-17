@@ -31,7 +31,7 @@ func New() *Loader {
 				Namespaces: make([]model.BiOutput_Model_Namespace, 0),
 			},
 			Operations: model.BiGenOperation{
-				Namespaces: make([]model.BiOutput_Model_Namespace, 0),
+				Namespaces: make([]model.BiOutput_Operation_Namespace, 0),
 			},
 		},
 	}

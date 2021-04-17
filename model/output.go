@@ -27,10 +27,10 @@ type BiGenModel struct {
 }
 
 type BiGenOperation struct {
-	Namespaces []BiOutput_Model_Namespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
+	Namespaces []BiOutput_Operation_Namespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 }
 
-type BiGenTemplate struct {
+type BiOutput_Template struct {
 	Input          string `json:"input,omitempty" yaml:"input,omitempty"`
 	Output         string `json:"output,omitempty" yaml:"output,omitempty"`
 	InputLanguage  string `json:"inputLanguage,omitempty" yaml:"inputLanguage,omitempty"`
@@ -50,22 +50,24 @@ type BiOutput_Operation_Namespace struct {
 }
 
 type BiOutput_Operation struct {
-	Name      string   `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace string   `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Inputs    []string `json:"inputs,omitempty" yaml:"inputs,omitempty"`
-	Output    []string `json:"outputs,omitempty" yaml:"outputs,omitempty"`
+	Name      string                  `json:"name,omitempty" yaml:"name,omitempty"`
+	Namespace string                  `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Imports   []string                `json:"imports,omitempty" yaml:"imports,omitempty"`
+	Inputs    []BiOutput_TypeProperty `json:"inputs,omitempty" yaml:"inputs,omitempty"`
+	Outputs   []BiOutput_TypeProperty `json:"outputs,omitempty" yaml:"outputs,omitempty"`
+	Templates []BiOutput_Template     `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 type BiOutput_Model struct {
-	Name       string              `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace  string              `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Type       string              `json:"type,omitempty" yaml:"type,omitempty"`
-	Imports    []string            `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Properties []BiGenTypeProperty `json:"properties,omitempty" yaml:"properties,omitempty"`
-	Templates  []BiGenTemplate     `json:"templates,omitempty" yaml:"templates,omitempty"`
+	Name       string                  `json:"name,omitempty" yaml:"name,omitempty"`
+	Namespace  string                  `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Type       string                  `json:"type,omitempty" yaml:"type,omitempty"`
+	Imports    []string                `json:"imports,omitempty" yaml:"imports,omitempty"`
+	Properties []BiOutput_TypeProperty `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Templates  []BiOutput_Template     `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
-type BiGenTypeProperty struct {
+type BiOutput_TypeProperty struct {
 	Name      string `json:"name,omitempty" yaml:"name,omitempty"`
 	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 	Type      string `json:"type,omitempty" yaml:"type,omitempty"`

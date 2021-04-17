@@ -25,7 +25,7 @@ func (t *Loader) processInput_Specification_Operation() error {
 				return nil
 			}
 
-			t.Output.Models.Namespaces = append(t.Output.Models.Namespaces, ons)
+			t.Output.Operations.Namespaces = append(t.Output.Operations.Namespaces, ons)
 		}
 	}
 
@@ -71,72 +71,87 @@ func (t *Loader) processInput_Specification_Operation_Namepace1(i int, ins model
 	return nil
 }
 
-func (t *Loader) processInput_Specification_Operation_Namepace2(i int, ins model.BiInput_Specification_Namespace_Operation, tmpls []model.BiInput_Template_Info) (model.BiOutput_Model_Namespace, error) {
+func (t *Loader) processInput_Specification_Operation_Namepace2(i int, ins model.BiInput_Specification_Namespace_Operation, tmpls []model.BiInput_Template_Info) (model.BiOutput_Operation_Namespace, error) {
 	t.modelStack.Push(ins.Name)
 
-	gns := model.BiOutput_Model_Namespace{
+	gns := model.BiOutput_Operation_Namespace{
 		Name:       t.currentNamespace(),
-		Models:     make([]model.BiOutput_Model, 0),
-		Namespaces: make([]model.BiOutput_Model_Namespace, 0),
+		Operations: make([]model.BiOutput_Operation, 0),
+		Namespaces: make([]model.BiOutput_Operation_Namespace, 0),
 	}
 
-	// if ins.Operations != nil {
-	// 	for i, styp := range ins.Operations {
-	// 		t.reportStack.Push(fmt.Sprintf("model[%v]", i))
+	if ins.Operations != nil {
+		for i, sop := range ins.Operations {
+			t.reportStack.Push(fmt.Sprintf("operation[%v]", i))
 
-	// 		gtyp, err := t.specType2genType(gns, styp)
+			gop, err := t.specOperation2genOperation(gns, sop)
 
-	// 		if err != nil {
-	// 			return gns, err
-	// 		}
+			if err != nil {
+				return gns, err
+			}
 
-	// 		if styp.Properties != nil {
-	// 			for i, sprop := range styp.Properties {
-	// 				t.reportStack.Push(fmt.Sprintf("properties[%v]", i))
+			if sop.Inputs != nil {
+				for i, sprop := range sop.Inputs {
+					t.reportStack.Push(fmt.Sprintf("inputs[%v]", i))
 
-	// 				gprop, err := t.specProperty2genProperty(gns, gtyp, sprop)
+					gprop, err := t.specIO2genProperty(gns, gop, sprop)
 
-	// 				if err != nil {
-	// 					return gns, err
-	// 				}
+					if err != nil {
+						return gns, err
+					}
 
-	// 				gtyp.Properties = append(gtyp.Properties, gprop)
+					gop.Inputs = append(gop.Inputs, gprop)
 
-	// 				t.reportStack.Pop()
-	// 			}
-	// 		}
+					t.reportStack.Pop()
+				}
+			}
 
-	// 		if err := t.genTypeImports(&gtyp); err != nil {
-	// 			return gns, err
-	// 		}
+			if sop.Outputs != nil {
+				for i, sprop := range sop.Outputs {
+					t.reportStack.Push(fmt.Sprintf("outputs[%v]", i))
 
-	// 		if tmpls != nil {
-	// 			for _, stmpl := range tmpls {
-	// 				gtmpl, err := t.processTemplate(gtyp.Namespace, gtyp.Name, stmpl)
+					gprop, err := t.specIO2genProperty(gns, gop, sprop)
 
-	// 				if err != nil {
-	// 					return gns, err
-	// 				}
+					if err != nil {
+						return gns, err
+					}
 
-	// 				gtyp.Templates = append(gtyp.Templates, gtmpl)
-	// 			}
-	// 		}
+					gop.Outputs = append(gop.Outputs, gprop)
 
-	// 		gns.Models = append(gns.Models, gtyp)
+					t.reportStack.Pop()
+				}
+			}
 
-	// 		t.reportStack.Pop()
-	// 	}
-	// }
+			if err := t.genOperationImports(&gop); err != nil {
+				return gns, err
+			}
 
-	// if ins.Namespaces != nil {
-	// 	for i, cns := range ins.Namespaces {
-	// 		if gen, err := t.processInput_Specification_Model_Namepace2(i, cns, tmpls); err != nil {
-	// 			return gen, err
-	// 		} else {
-	// 			gns.Namespaces = append(gns.Namespaces, gen)
-	// 		}
-	// 	}
-	// }
+			if tmpls != nil {
+				for _, stmpl := range tmpls {
+					gtmpl, err := t.processTemplate(gop.Namespace, gop.Name, stmpl)
+
+					if err != nil {
+						return gns, err
+					}
+
+					gop.Templates = append(gop.Templates, gtmpl)
+				}
+			}
+
+			gns.Operations = append(gns.Operations, gop)
+			t.reportStack.Pop()
+		}
+	}
+
+	if ins.Namespaces != nil {
+		for i, cns := range ins.Namespaces {
+			if gen, err := t.processInput_Specification_Operation_Namepace2(i, cns, tmpls); err != nil {
+				return gen, err
+			} else {
+				gns.Namespaces = append(gns.Namespaces, gen)
+			}
+		}
+	}
 
 	t.modelStack.Pop()
 	return gns, nil
