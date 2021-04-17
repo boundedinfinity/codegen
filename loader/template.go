@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (t *Loader) processTemplate(ns, name string, input model.BiSpecTemplate) (model.BiGenTemplate, error) {
+func (t *Loader) processTemplate(ns, name string, input model.BiInput_Template_Info) (model.BiGenTemplate, error) {
 	var output model.BiGenTemplate
 
 	if input.Input == "" {
@@ -27,8 +27,7 @@ func (t *Loader) processTemplate(ns, name string, input model.BiSpecTemplate) (m
 	}
 
 	if !ok {
-		relPath := filepath.Join(t.specDir, input.Input)
-
+		relPath := filepath.Join(t.inputDir, input.Input)
 		ok, err := util.PathExists(relPath)
 
 		if err != nil {
@@ -59,7 +58,7 @@ func (t *Loader) processTemplate(ns, name string, input model.BiSpecTemplate) (m
 	fn = name
 	fn = fmt.Sprintf("%v.%v", fn, ext)
 
-	abs = t.Gen.Info.OutputDir
+	abs = t.Output.Info.OutputDir
 	abs = path.Join(abs, t.relativeNamespace(ns))
 	abs = path.Join(abs, fn)
 

@@ -7,41 +7,46 @@ import (
 )
 
 type Loader struct {
-	specPath    string
-	specDir     string
+	inputPath   string
+	inputDir    string
+	input       model.BiInput
+	modelStack  model.StrStack
+	reportStack model.StrStack
 	typeMapPath string
-	stack       model.StrStack
-	spec        model.BiSpec
-	Gen         model.BiGen
-	typeMap     map[string]string
-	rtypeMap    map[string]string
+	typeMap     map[string]TypeInfo
+	Output      model.BiOutput
+}
+
+type TypeInfo struct {
+	InNamespace  string
+	OutNamespace string
+	Namespace    string
 }
 
 func New() *Loader {
 	return &Loader{
-		typeMap:  make(map[string]string),
-		rtypeMap: make(map[string]string),
-		Gen: model.BiGen{
+		typeMap: make(map[string]TypeInfo),
+		Output: model.BiOutput{
 			Models: model.BiGenModel{
-				Namespaces: make([]model.BiGenNamespace, 0),
+				Namespaces: make([]model.BiOutput_Model_Namespace, 0),
 			},
 			Operations: model.BiGenOperation{
-				Namespaces: make([]model.BiGenNamespace, 0),
+				Namespaces: make([]model.BiOutput_Model_Namespace, 0),
 			},
 		},
 	}
 }
 
 func (t *Loader) FromPath(input string) error {
-	if err := util.UnmarshalFromFile(input, &t.spec); err != nil {
+	if err := util.UnmarshalFromFile(input, &t.input); err != nil {
 		return err
 	}
 
-	t.specPath = input
-	t.specDir = filepath.Dir(t.specPath)
+	t.inputPath = input
+	t.inputDir = filepath.Dir(t.inputPath)
 
-	if err := t.processSpec(); err != nil {
-		return err
+	if err := t.processInput(); err != nil {
+		return t.wrapError(err)
 	}
 
 	return nil

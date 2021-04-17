@@ -59,3 +59,16 @@ func StrSliceMap(i []string, fn func(string) string) []string {
 
 	return o
 }
+
+func SummerySuffix(str string, size int) string {
+	o := str
+	l := len(o)
+
+	if l > size {
+		x := l - size + 3
+		o = o[x:]
+		o = "..." + o
+	}
+
+	return o
+}

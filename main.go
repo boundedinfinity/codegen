@@ -17,7 +17,7 @@ func main() {
 		os.Exit(handleError(err))
 	}
 
-	g := generator.New(l.Gen)
+	g := generator.New(l.Output)
 
 	if err := g.Generate(); err != nil {
 		os.Exit(handleError(err))

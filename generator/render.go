@@ -44,10 +44,12 @@ func (t *Generator) renderFile(input, output string, v interface{}) error {
 		return fmt.Errorf("render err: %w", err)
 	}
 
-	aopCtx := fmt.Sprintf("%v.json", aop)
+	if t.spec.Info.DumpContext {
+		aopCtx := fmt.Sprintf("%v.json", aop)
 
-	if err := util.MarshalIndentToFile(aopCtx, v, "", "    "); err != nil {
-		return err
+		if err := util.MarshalIndentToFile(aopCtx, v, "", "    "); err != nil {
+			return err
+		}
 	}
 
 	var o string

@@ -25,7 +25,7 @@ var _ = Describe("Smoke Test", func() {
 
 		Expect(err).To(BeNil())
 
-		err = util.MarshalIndentToFile("output.json", loader.Gen, "", "    ")
+		err = util.MarshalIndentToFile("output.json", loader.Output, "", "    ")
 
 		Expect(err).To(BeNil())
 	})
