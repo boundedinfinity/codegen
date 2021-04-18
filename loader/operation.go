@@ -20,10 +20,11 @@ func (t Loader) processOperation2(si int, input model.BiInput_Operation) (model.
 
 	ns := t.currentNamespace()
 	output := model.BiOutput_Operation{
-		Name:      input.Name,
-		Namespace: ns,
-		Imports:   make([]string, 0),
-		Templates: make([]model.BiOutput_Template, 0),
+		Name:        input.Name,
+		Description: input.Description,
+		Namespace:   ns,
+		Imports:     make([]string, 0),
+		Templates:   make([]model.BiOutput_Template, 0),
 	}
 
 	{

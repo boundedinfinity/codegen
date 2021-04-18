@@ -20,11 +20,12 @@ func (t Loader) processModel2(si int, input model.BiInput_Model) (model.BiOutput
 
 	ns := t.currentNamespace()
 	output := model.BiOutput_Model{
-		Name:       input.Name,
-		Namespace:  ns,
-		Imports:    make([]string, 0),
-		Properties: make([]model.BiOutput_TypeProperty, 0),
-		Templates:  make([]model.BiOutput_Template, 0),
+		Name:        input.Name,
+		Description: input.Description,
+		Namespace:   ns,
+		Imports:     make([]string, 0),
+		Properties:  make([]model.BiOutput_TypeProperty, 0),
+		Templates:   make([]model.BiOutput_Template, 0),
 	}
 
 	if input.Properties != nil {
@@ -37,8 +38,20 @@ func (t Loader) processModel2(si int, input model.BiInput_Model) (model.BiOutput
 			}
 
 			op := model.BiOutput_TypeProperty{
-				Name:      ip.Name,
-				Namespace: tf.Namespace,
+				Name:        ip.Name,
+				Description: ip.Description,
+				Namespace:   tf.Namespace,
+				Validations: make([]model.BiOutput_Validation, 0),
+			}
+
+			if ip.Validations != nil {
+				for _, val := range ip.Validations {
+					op.Validations = append(op.Validations, model.BiOutput_Validation{
+						Minimum:  val.Minimum,
+						Maximum:  val.Maximum,
+						Required: val.Required,
+					})
+				}
 			}
 
 			if ns == op.Namespace {
