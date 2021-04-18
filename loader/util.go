@@ -54,19 +54,19 @@ func (t *Loader) addMappedType(k string, v TypeInfo) {
 }
 
 func (t *Loader) getMappedType(typ string) (TypeInfo, bool) {
-	if tf, ok := t.getMappedType(typ); ok {
+	if tf, ok := t.typeMap[typ]; ok {
 		return tf, ok
 	}
 
 	n1 := path.Join(t.rootPackage(), typ)
 
-	if tf, ok := t.getMappedType(n1); ok {
+	if tf, ok := t.typeMap[n1]; ok {
 		return tf, ok
 	}
 
 	n2 := path.Join(t.currentNamespace(), typ)
 
-	if tf, ok := t.getMappedType(n2); ok {
+	if tf, ok := t.typeMap[n2]; ok {
 		return tf, ok
 	}
 

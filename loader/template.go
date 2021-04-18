@@ -53,28 +53,7 @@ func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 	return nil
 }
 
-func (t *Loader) processTemplate2(si int, v model.BiInput_Template) error {
-	t.reportStack.Push("template[%v]", si)
-
-	if v.Path == "" {
-		return nil
-	}
-
-	ns := t.currentNamespace()
-
-	tmpls, err := t.getTemplates(ns, model.TemplateType_MODEL)
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("%v", tmpls)
-
-	t.reportStack.Pop()
-	return nil
-}
-
-func (t *Loader) processTemplate(ns, name string, input model.BiInput_Template) (model.BiOutput_Template, error) {
+func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template) (model.BiOutput_Template, error) {
 	var output model.BiOutput_Template
 
 	if input.Path == "" {

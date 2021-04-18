@@ -21,7 +21,7 @@ func (t Loader) processOperation2(si int, input model.BiInput_Operation) (model.
 	ns := t.currentNamespace()
 	output := model.BiOutput_Operation{
 		Name:      input.Name,
-		Namespace: t.currentNamespace(),
+		Namespace: ns,
 		Imports:   make([]string, 0),
 		Templates: make([]model.BiOutput_Template, 0),
 	}
@@ -88,7 +88,7 @@ func (t Loader) processOperation2(si int, input model.BiInput_Operation) (model.
 	}
 
 	for _, itmpl := range tmpls {
-		otmpl, err := t.processTemplate(ns, "", itmpl)
+		otmpl, err := t.processTemplate2(ns, output.Name, itmpl)
 
 		if err != nil {
 			return output, err
