@@ -82,7 +82,8 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 	}
 
 	if ns.Name != "" {
-		tmpls, err := t.getTemplates(t.currentNamespace(), model.TemplateType_NAMESPACE)
+		qns := t.currentNamespace()
+		tmpls, err := t.getTemplates(qns, model.TemplateType_NAMESPACE)
 
 		if err != nil {
 			return err
@@ -91,7 +92,7 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 		nstmpls := make([]model.BiOutput_Template, 0)
 
 		for _, itmpl := range tmpls {
-			otmpl, err := t.processTemplate2(ns.Name, "", itmpl)
+			otmpl, err := t.processTemplate2(qns, "", itmpl)
 
 			if err != nil {
 				return err
@@ -101,7 +102,7 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 		}
 
 		t.Output.Namespaces = append(t.Output.Namespaces, model.BiOutput_Namespace{
-			Namespace: ns.Name,
+			Namespace: qns,
 			Templates: nstmpls,
 		})
 	}
