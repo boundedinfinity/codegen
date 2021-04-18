@@ -9,6 +9,8 @@ import (
 )
 
 func (t *Generator) renderFile(tmpl model.BiOutput_Template, v interface{}) error {
+	fmt.Printf("rendering: %v\n", tmpl.Output)
+
 	if tmpl.Input == "" {
 		return fmt.Errorf("render error: no template path")
 	}

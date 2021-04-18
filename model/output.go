@@ -15,8 +15,9 @@ type BiOutput_TemplateOperationContext struct {
 }
 
 type BiOutput_TemplateNamespaceContext struct {
-	Namespace string   `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Spec      BiOutput `json:"spec,omitempty" yaml:"spec,omitempty"`
+	Namespace         string   `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	RelativeNamespace string   `json:"relativeNamespace,omitempty" yaml:"relativeNamespace,omitempty"`
+	Spec              BiOutput `json:"spec,omitempty" yaml:"spec,omitempty"`
 }
 
 type BiOutput struct {
@@ -41,8 +42,9 @@ type BiOutput_Template struct {
 }
 
 type BiOutput_Namespace struct {
-	Namespace string              `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Templates []BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
+	Namespace         string              `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	RelativeNamespace string              `json:"relativeNamespace,omitempty" yaml:"relativeNamespace,omitempty"`
+	Templates         []BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 type BiOutput_Operation struct {

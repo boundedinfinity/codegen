@@ -8,7 +8,7 @@ const (
 	NAMESPACE_BUILTIN = "builtin"
 	NAMESPACE_UNKNOWN = "UNKNOWN"
 	COLLECTION_SUFFIX = "[]"
-	SUMMERY_SIZE      = 25
+	SUMMERY_SIZE      = 35
 )
 
 type TemplateExt string

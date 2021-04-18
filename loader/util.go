@@ -49,8 +49,8 @@ func (t *Loader) addMappedType(k string, v TypeInfo) {
 	t.typeMap[k] = v
 	t.typeMap[kc] = vc
 
-	t.report("mapping %v -> %v", util.SummerySuffix(k, model.SUMMERY_SIZE), v)
-	t.report("mapping %v -> %v", util.SummerySuffix(kc, model.SUMMERY_SIZE), vc)
+	t.report("mapping %v -> %v", util.SummerySuffix(k, model.SUMMERY_SIZE), v.ImportName)
+	t.report("mapping %v -> %v", util.SummerySuffix(kc, model.SUMMERY_SIZE), vc.ImportName)
 }
 
 func (t *Loader) getMappedType(typ string) (TypeInfo, bool) {
@@ -126,6 +126,7 @@ func (t *Loader) relativeNamespace(ns string) string {
 
 	name = ns
 	name = strings.TrimPrefix(name, t.Output.Name)
+	name = strings.TrimPrefix(name, "/")
 
 	return name
 }

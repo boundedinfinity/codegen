@@ -23,6 +23,14 @@ func ucFirst(v string) string {
 	return strings.ToUpper(f) + r
 }
 
+func path2CamelCase(v string) string {
+	ss := strings.Split(v, "/")
+	s := strings.Join(ss, " ")
+	s = strings.Title(s)
+	s = strings.ReplaceAll(s, " ", "")
+	return lcFirst(strutil.ToCamelCase(v))
+}
+
 func camelCase(v string) string {
 	return lcFirst(strutil.ToCamelCase(v))
 }

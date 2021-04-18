@@ -102,8 +102,9 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 		}
 
 		t.Output.Namespaces = append(t.Output.Namespaces, model.BiOutput_Namespace{
-			Namespace: qns,
-			Templates: nstmpls,
+			Namespace:         qns,
+			RelativeNamespace: t.relativeNamespace(qns),
+			Templates:         nstmpls,
 		})
 	}
 
