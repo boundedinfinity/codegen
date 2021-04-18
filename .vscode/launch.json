@@ -2,12 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "codegen ../codegen-templates/spec.bi.yaml",
+            "name": "codegen codegen-spec.yaml",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}", 
-            "args": ["../codegen-templates/spec.bi.yaml"],
+            "args": ["${env:HOME}/codegen-project/spec.yaml"],
         }
     ]
 }

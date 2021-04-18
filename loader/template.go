@@ -105,26 +105,29 @@ func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template)
 		Input: input.Path,
 	}
 
-	var ext string
+	var tmplExt string
+	var tmplName string
 	var abs string
 	var fn string
 
-	ext = output.Input
-	ext = filepath.Base(ext)
-	ext = util.TrimTemplateExt(ext)
-	ext = filepath.Ext(ext)
-	ext = strings.TrimPrefix(ext, ".")
+	tmplName = output.Input
+	tmplName = filepath.Base(tmplName)
+	tmplName = util.TrimTemplateExt(tmplName)
+	tmplExt = filepath.Ext(tmplName)
+	tmplName = strings.TrimSuffix(tmplName, tmplExt)
+	tmplExt = strings.TrimPrefix(tmplExt, ".")
 
 	if name == "" {
-		var tmplNameOnly string
-		tmplNameOnly = output.Input
-		tmplNameOnly = filepath.Base(tmplNameOnly)
-		tmplNameOnly = util.TrimTemplateExt(tmplNameOnly)
-		fn = tmplNameOnly
+		fn = tmplName
 	} else {
 		fn = name
-		fn = fmt.Sprintf("%v.%v", fn, ext)
 	}
+
+	if t.input.Info.FilenameMarker != "" {
+		fn = fmt.Sprintf("%v.%v", fn, t.input.Info.FilenameMarker)
+	}
+
+	fn = fmt.Sprintf("%v.%v", fn, tmplExt)
 
 	abs = t.Output.Info.OutputDir
 	abs = path.Join(abs, t.relativeNamespace(ns))

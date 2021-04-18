@@ -3,8 +3,6 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"errors"
-	"fmt"
 	"path/filepath"
 )
 
@@ -19,6 +17,12 @@ func (t *Loader) processInput_Info() error {
 	{
 		t.reportStack.Push("dumpContext")
 		t.report("%v", output.DumpContext)
+		t.reportStack.Pop()
+	}
+
+	{
+		t.reportStack.Push("filenameMarker")
+		t.report("%v", input.FilenameMarker)
 		t.reportStack.Pop()
 	}
 
@@ -47,11 +51,11 @@ func (t *Loader) processInput_Info() error {
 					ok, err := util.PathExists(abs)
 
 					if err != nil {
-						return fmt.Errorf("info.templateDir error: %w", err)
+						return err
 					}
 
 					if !ok {
-						return errors.New("info.templateDir not found")
+						return model.NotFoundErr
 					} else {
 						output.InputDir = abs
 					}

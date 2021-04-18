@@ -28,7 +28,7 @@ func path2CamelCase(v string) string {
 	s := strings.Join(ss, " ")
 	s = strings.Title(s)
 	s = strings.ReplaceAll(s, " ", "")
-	return lcFirst(strutil.ToCamelCase(v))
+	return s
 }
 
 func camelCase(v string) string {
