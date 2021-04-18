@@ -19,6 +19,14 @@ const (
 	TemplateExt_Handlebars TemplateExt = ".handlebars"
 )
 
+type TemplateType string
+
+const (
+	TemplateType_MODEL     TemplateType = "model"
+	TemplateType_OPERATION TemplateType = "operation"
+	TemplateType_NAMESPACE TemplateType = "namespace"
+)
+
 func (t TemplateExt) String() string {
 	return string(t)
 }

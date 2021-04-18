@@ -21,27 +21,13 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	if err := t.processInput_Specification(); err != nil {
+	if err := t.processNamespace1(-1, t.input.Specification); err != nil {
 		return err
 	}
 
-	// if t.spec.Operations.Namespaces != nil {
-	// 	for _, ns := range t.spec.Operations.Namespaces {
-	// 		if err := t.processNamespace1(ns); err != nil {
-	// 			return err
-	// 		}
-	// 	}
-
-	// 	for _, sNamespace := range t.spec.Operations.Namespaces {
-	// 		gNamespace, err := t.processNamespace2(sNamespace, t.spec.Operations.Templates)
-
-	// 		if err != nil {
-	// 			return err
-	// 		}
-
-	// 		t.Gen.Operations.Namespaces = append(t.Gen.Operations.Namespaces, gNamespace)
-	// 	}
-	// }
+	if err := t.processNamespace2(-1, t.input.Specification); err != nil {
+		return err
+	}
 
 	t.reportStack.Pop()
 	return nil

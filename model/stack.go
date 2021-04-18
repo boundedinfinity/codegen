@@ -1,5 +1,7 @@
 package model
 
+import "fmt"
+
 type StrStack struct {
 	s []string
 }
@@ -10,8 +12,8 @@ func NewStrStack() *StrStack {
 	}
 }
 
-func (t *StrStack) Push(v ...string) {
-	t.s = append(t.s, v...)
+func (t *StrStack) Push(format string, i ...interface{}) {
+	t.s = append(t.s, fmt.Sprintf(format, i...))
 }
 
 func (t *StrStack) Pop() {

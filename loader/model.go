@@ -2,63 +2,77 @@ package loader
 
 import (
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/util"
 	"fmt"
-	"path"
 )
 
-func (t *Loader) specModel2genModel(ns model.BiOutput_Model_Namespace, styp model.BiInput_Model) (model.BiOutput_Model, error) {
-	gtyp := model.BiOutput_Model{
-		Name:       styp.Name,
-		Type:       styp.Type,
-		Namespace:  ns.Name,
+func (t Loader) processModel1(si int, m model.BiInput_Model) error {
+	t.reportStack.Push("model[%v]", si)
+
+	t.addUserMappedType(m.Name)
+
+	t.reportStack.Pop()
+	return nil
+}
+
+func (t Loader) processModel2(si int, im model.BiInput_Model) (model.BiOutput_Model, error) {
+	t.reportStack.Push("model[%v]", si)
+
+	ns := t.currentNamespace()
+	om := model.BiOutput_Model{
+		Name:       im.Name,
+		Namespace:  ns,
 		Imports:    make([]string, 0),
 		Properties: make([]model.BiOutput_TypeProperty, 0),
 		Templates:  make([]model.BiOutput_Template, 0),
 	}
 
-	return gtyp, nil
-}
+	if im.Properties != nil {
+		for i, ip := range im.Properties {
+			t.reportStack.Push("properties[%v]", i)
+			tf, ok := t.getMappedType(ip.Type)
 
-func (t *Loader) genModelImports(gtyp *model.BiOutput_Model) error {
-	if gtyp.Properties != nil {
-		ptyps := make(map[string]bool)
-
-		for _, prop := range gtyp.Properties {
-			if prop.Namespace != model.NAMESPACE_BUILTIN && gtyp.Namespace != prop.Namespace {
-				if ok := ptyps[prop.Namespace]; !ok {
-					ptyps[prop.Namespace] = true
-				}
+			if !ok {
+				return om, fmt.Errorf("%v %w", ip.Type, model.NotFoundErr)
 			}
+
+			op := model.BiOutput_TypeProperty{
+				Name:      tf.BaseName,
+				Namespace: tf.Namespace,
+			}
+
+			if ns == op.Namespace {
+				op.Type = tf.BaseName
+			} else {
+				op.Type = tf.ImportName
+			}
+
+			if op.Namespace != ns && op.Namespace != model.NAMESPACE_BUILTIN {
+				om.Imports = append(om.Imports, op.Namespace)
+			}
+
+			om.Imports = util.StrSliceDedup(om.Imports)
+			om.Properties = append(om.Properties, op)
+			t.reportStack.Pop()
+		}
+	}
+
+	tmpls, err := t.getTemplates(ns, model.TemplateType_MODEL)
+
+	if err != nil {
+		return om, err
+	}
+
+	for _, itmpl := range tmpls {
+		otmpl, err := t.processTemplate(ns, "", itmpl)
+
+		if err != nil {
+			return om, err
 		}
 
-		for k := range ptyps {
-			gtyp.Imports = append(gtyp.Imports, k)
-		}
+		om.Templates = append(om.Templates, otmpl)
 	}
 
-	return nil
-}
-
-func (t *Loader) specProperty2genProperty(ns model.BiOutput_Model_Namespace, gtyp model.BiOutput_Model, sprop model.BiInput_Model_Property) (model.BiOutput_TypeProperty, error) {
-	gprop := model.BiOutput_TypeProperty{
-		Name: sprop.Name,
-	}
-
-	if typ, ok := t.getMappedType(ns.Name, sprop.Type); ok {
-		gprop.Type = typ
-	} else {
-		return gprop, fmt.Errorf("type not found %v", sprop.Type)
-	}
-
-	if tns, ok := t.getMappedNamespace(sprop.Type); ok {
-		if tns != model.NAMESPACE_BUILTIN {
-			gprop.Namespace = path.Dir(tns)
-		} else {
-			gprop.Namespace = tns
-		}
-	} else {
-		return gprop, fmt.Errorf("namespace not found %v", sprop.Type)
-	}
-
-	return gprop, nil
+	t.reportStack.Pop()
+	return om, nil
 }

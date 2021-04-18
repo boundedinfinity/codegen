@@ -88,9 +88,11 @@ func (t *Loader) processInput_Info() error {
 		if input.TypeMap != nil {
 			for k, v := range input.TypeMap {
 				t.addMappedType(k, TypeInfo{
-					InNamespace:  v,
-					OutNamespace: v,
-					Namespace:    model.NAMESPACE_BUILTIN,
+					BaseName:   v,
+					ImportName: v,
+					QName:      v,
+					Namespace:  model.NAMESPACE_BUILTIN,
+					BuiltIn:    true,
 				})
 			}
 		}

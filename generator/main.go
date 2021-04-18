@@ -23,11 +23,11 @@ func (t *Generator) Generate() error {
 
 func (t *Generator) run() error {
 
-	for _, ns := range t.spec.Models.Namespaces {
-		if err := t.runNamespace(ns); err != nil {
-			return err
-		}
-	}
+	// for _, ns := range t.spec.Models.Namespaces {
+	// 	if err := t.runNamespace(ns); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }

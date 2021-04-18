@@ -60,6 +60,25 @@ func StrSliceMap(i []string, fn func(string) string) []string {
 	return o
 }
 
+func StrSliceDedup(ss []string) []string {
+	var o []string
+	var m map[string]bool
+
+	if ss == nil {
+		for _, s := range ss {
+			if ok := m[s]; !ok {
+				m[s] = true
+			}
+		}
+
+		for k := range m {
+			o = append(o, k)
+		}
+	}
+
+	return o
+}
+
 func SummerySuffix(str string, size int) string {
 	o := str
 	l := len(o)

@@ -2,60 +2,101 @@ package loader
 
 import (
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/util"
 	"fmt"
-	"path"
 )
 
-func (t *Loader) specOperation2genOperation(ns model.BiOutput_Operation_Namespace, styp model.BiInput_Operation) (model.BiOutput_Operation, error) {
-	gtyp := model.BiOutput_Operation{
-		Name:      styp.Name,
-		Namespace: ns.Name,
-		Inputs:    make([]model.BiOutput_TypeProperty, 0),
-		Outputs:   make([]model.BiOutput_TypeProperty, 0),
-		Templates: make([]model.BiOutput_Template, 0),
-	}
+func (t Loader) processOperation1(si int, m model.BiInput_Operation) error {
+	t.reportStack.Push("operation[%v]", si)
 
-	return gtyp, nil
-}
+	t.addUserMappedType(m.Name)
 
-func (t *Loader) genOperationImports(gtyp *model.BiOutput_Operation) error {
-	ptyps := make(map[string]bool)
-
-	if gtyp.Inputs != nil {
-		for _, input := range gtyp.Inputs {
-			if input.Namespace != model.NAMESPACE_BUILTIN && input.Namespace != gtyp.Namespace {
-				if ok := ptyps[input.Namespace]; !ok {
-					ptyps[input.Namespace] = true
-				}
-			}
-		}
-	}
-
-	for k := range ptyps {
-		gtyp.Imports = append(gtyp.Imports, k)
-	}
-
+	t.reportStack.Pop()
 	return nil
 }
 
-func (t *Loader) specIO2genProperty(ns model.BiOutput_Operation_Namespace, gtyp model.BiOutput_Operation, io string) (model.BiOutput_TypeProperty, error) {
-	gprop := model.BiOutput_TypeProperty{}
+func (t Loader) processOperation2(si int, input model.BiInput_Operation) (model.BiOutput_Operation, error) {
+	t.reportStack.Push("operation[%v]", si)
 
-	if typ, ok := t.getMappedType(ns.Name, sprop.Type); ok {
-		gprop.Type = typ
-	} else {
-		return gprop, fmt.Errorf("type not found %v", sprop.Type)
+	ns := t.currentNamespace()
+	output := model.BiOutput_Operation{
+		Name:      input.Name,
+		Namespace: t.currentNamespace(),
+		Imports:   make([]string, 0),
+		Templates: make([]model.BiOutput_Template, 0),
 	}
 
-	if tns, ok := t.getMappedNamespace(sprop.Type); ok {
-		if tns != model.NAMESPACE_BUILTIN {
-			gprop.Namespace = path.Dir(tns)
-		} else {
-			gprop.Namespace = tns
+	{
+		t.reportStack.Push("input")
+		inputType, ok := t.getMappedType(input.Input.Type)
+
+		if !ok {
+			return output, fmt.Errorf("%v %w", input.Input, model.NotFoundErr)
 		}
-	} else {
-		return gprop, fmt.Errorf("namespace not found %v", sprop.Type)
+
+		output.Input = model.BiOutput_TypeProperty{
+			Name:      input.Input.Name,
+			Namespace: inputType.Namespace,
+			Type:      inputType.BaseName,
+		}
+
+		if inputType.Namespace == ns {
+			output.Input.Type = inputType.BaseName
+		} else {
+			output.Input.Type = inputType.ImportName
+
+			if !inputType.BuiltIn {
+				output.Imports = append(output.Imports, inputType.Namespace)
+			}
+		}
+
+		t.reportStack.Pop()
 	}
 
-	return gprop, nil
+	{
+		t.reportStack.Push("output")
+		outputType, ok := t.getMappedType(input.Output.Type)
+
+		if !ok {
+			return output, fmt.Errorf("%v %w", input.Output, model.NotFoundErr)
+		}
+
+		output.Output = model.BiOutput_TypeProperty{
+			Name:      input.Output.Name,
+			Namespace: outputType.Namespace,
+			Type:      outputType.BaseName,
+		}
+
+		if outputType.Namespace == ns {
+			output.Input.Type = outputType.BaseName
+		} else {
+			output.Input.Type = outputType.ImportName
+
+			if !outputType.BuiltIn {
+				output.Imports = append(output.Imports, outputType.Namespace)
+			}
+		}
+
+		output.Imports = util.StrSliceDedup(output.Imports)
+		t.reportStack.Pop()
+	}
+
+	tmpls, err := t.getTemplates(ns, model.TemplateType_OPERATION)
+
+	if err != nil {
+		return output, err
+	}
+
+	for _, itmpl := range tmpls {
+		otmpl, err := t.processTemplate(ns, "", itmpl)
+
+		if err != nil {
+			return output, err
+		}
+
+		output.Templates = append(output.Templates, otmpl)
+	}
+
+	t.reportStack.Pop()
+	return output, nil
 }

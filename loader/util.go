@@ -19,12 +19,32 @@ func (t *Loader) wrapError(err error) error {
 	return fmt.Errorf("%v: %w", stack, err)
 }
 
+func (t *Loader) addUserMappedType(bname string) {
+	ns := t.currentNamespace()
+	qname := path.Join(ns, bname)
+
+	iname := qname
+	iname = path.Dir(iname)
+	iname = path.Base(iname)
+	iname = fmt.Sprintf("%v.%v", iname, bname)
+
+	t.addMappedType(qname, TypeInfo{
+		BaseName:   bname,
+		QName:      qname,
+		ImportName: iname,
+		Namespace:  ns,
+		BuiltIn:    false,
+	})
+}
+
 func (t *Loader) addMappedType(k string, v TypeInfo) {
 	kc := fmt.Sprintf("%v[]", k)
 	vc := TypeInfo{
-		InNamespace:  fmt.Sprintf("[]%v", v.InNamespace),
-		OutNamespace: fmt.Sprintf("[]%v", v.OutNamespace),
-		Namespace:    v.Namespace,
+		BaseName:   fmt.Sprintf("[]%v", v.BaseName),
+		ImportName: fmt.Sprintf("[]%v", v.ImportName),
+		QName:      fmt.Sprintf("[]%v", v.QName),
+		Namespace:  v.Namespace,
+		BuiltIn:    v.BuiltIn,
 	}
 	t.typeMap[k] = v
 	t.typeMap[kc] = vc
@@ -33,28 +53,24 @@ func (t *Loader) addMappedType(k string, v TypeInfo) {
 	t.report("mapping %v -> %v", util.SummerySuffix(kc, model.SUMMERY_SIZE), vc)
 }
 
-func (t *Loader) getMappedType(ns, typ string) (string, bool) {
-	v, ok := t.typeMap[typ]
-
-	if ok {
-		if ns == v.Namespace {
-			return v.InNamespace, ok
-		} else {
-			return v.OutNamespace, ok
-		}
+func (t *Loader) getMappedType(typ string) (TypeInfo, bool) {
+	if tf, ok := t.getMappedType(typ); ok {
+		return tf, ok
 	}
 
-	for x, v := range t.typeMap {
-		if strings.HasSuffix(x, typ) {
-			if v.Namespace == ns {
-				return v.InNamespace, true
-			} else {
-				return v.OutNamespace, true
-			}
-		}
+	n1 := path.Join(t.rootPackage(), typ)
+
+	if tf, ok := t.getMappedType(n1); ok {
+		return tf, ok
 	}
 
-	return "", false
+	n2 := path.Join(t.currentNamespace(), typ)
+
+	if tf, ok := t.getMappedType(n2); ok {
+		return tf, ok
+	}
+
+	return TypeInfo{}, false
 }
 
 func (t *Loader) getMappedNamespace(k string) (string, bool) {
@@ -75,7 +91,7 @@ func (t *Loader) getMappedNamespace(k string) (string, bool) {
 
 	if ns != model.NAMESPACE_UNKNOWN {
 		f = true
-		if !strings.HasPrefix(ns, t.input.Name) {
+		if !strings.HasPrefix(ns, t.rootPackage()) {
 			ns = model.NAMESPACE_BUILTIN
 		}
 	}
@@ -83,20 +99,15 @@ func (t *Loader) getMappedNamespace(k string) (string, bool) {
 	return ns, f
 }
 
+func (t *Loader) rootPackage() string {
+	return t.input.Name
+}
+
 func (t *Loader) currentNamespace() string {
 	var name string
 
-	name = t.input.Name
+	name = t.rootPackage()
 	name = path.Join(name, path.Join(t.modelStack.S()...))
-
-	return name
-}
-
-func (t *Loader) currentModelName(m model.BiInput_Model) string {
-	var name string
-
-	name = t.currentNamespace()
-	name = path.Join(name, m.Name)
 
 	return name
 }

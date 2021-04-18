@@ -14,25 +14,25 @@ type Loader struct {
 	reportStack model.StrStack
 	typeMapPath string
 	typeMap     map[string]TypeInfo
+	templateMap map[string][]model.BiInput_Template
 	Output      model.BiOutput
 }
 
 type TypeInfo struct {
-	InNamespace  string
-	OutNamespace string
-	Namespace    string
+	BaseName   string
+	ImportName string
+	QName      string
+	Namespace  string
+	BuiltIn    bool
 }
 
 func New() *Loader {
 	return &Loader{
-		typeMap: make(map[string]TypeInfo),
+		typeMap:     make(map[string]TypeInfo),
+		templateMap: make(map[string][]model.BiInput_Template),
 		Output: model.BiOutput{
-			Models: model.BiGenModel{
-				Namespaces: make([]model.BiOutput_Model_Namespace, 0),
-			},
-			Operations: model.BiGenOperation{
-				Namespaces: make([]model.BiOutput_Operation_Namespace, 0),
-			},
+			Models:     make([]model.BiOutput_Model, 0),
+			Operations: make([]model.BiOutput_Operation, 0),
 		},
 	}
 }
