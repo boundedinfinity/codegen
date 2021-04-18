@@ -37,7 +37,7 @@ func (t Loader) processModel2(si int, input model.BiInput_Model) (model.BiOutput
 			}
 
 			op := model.BiOutput_TypeProperty{
-				Name:      tf.BaseName,
+				Name:      ip.Name,
 				Namespace: tf.Namespace,
 			}
 

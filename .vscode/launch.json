@@ -2,12 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "openapi_parser",
+            "name": "codegen ../codegen-templates/spec.bi.yaml",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}", 
-            "args": [],
+            "args": ["../codegen-templates/spec.bi.yaml"],
+        },
+        {
+            "name": "codegen rubicon-specer/specification2/spec.yaml",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}", 
+            "args": ["/Users/bbabb200/dev/github.comcast.com/rubicon-specer/specification2/spec2.yaml"],
         }
     ]
 }

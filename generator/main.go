@@ -14,20 +14,20 @@ func New(spec model.BiOutput) *Generator {
 }
 
 func (t *Generator) Generate() error {
-	if err := t.run(); err != nil {
+	t.reportStack.Push("generator")
+
+	if err := t.runModels(); err != nil {
 		return err
 	}
 
-	return nil
-}
+	if err := t.runOperations(); err != nil {
+		return err
+	}
 
-func (t *Generator) run() error {
+	if err := t.runNamespaces(); err != nil {
+		return err
+	}
 
-	// for _, ns := range t.spec.Models.Namespaces {
-	// 	if err := t.runNamespace(ns); err != nil {
-	// 		return err
-	// 	}
-	// }
-
+	t.reportStack.Pop()
 	return nil
 }

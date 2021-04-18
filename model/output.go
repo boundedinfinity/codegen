@@ -9,11 +9,22 @@ type BiOutput_TemplateModelContext struct {
 	Spec  BiOutput       `json:"spec,omitempty" yaml:"spec,omitempty"`
 }
 
+type BiOutput_TemplateOperationContext struct {
+	Operation BiOutput_Operation `json:"operation,omitempty" yaml:"operation,omitempty"`
+	Spec      BiOutput           `json:"spec,omitempty" yaml:"spec,omitempty"`
+}
+
+type BiOutput_TemplateNamespaceContext struct {
+	Namespace string   `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Spec      BiOutput `json:"spec,omitempty" yaml:"spec,omitempty"`
+}
+
 type BiOutput struct {
 	Name       string               `json:"name,omitempty" yaml:"name,omitempty"`
 	Info       BiOutput_Info        `json:"info,omitempty" yaml:"info,omitempty"`
 	Models     []BiOutput_Model     `json:"models,omitempty" yaml:"models,omitempty"`
 	Operations []BiOutput_Operation `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Namespaces []BiOutput_Namespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 }
 
 type BiOutput_Info struct {
@@ -27,6 +38,11 @@ type BiOutput_Template struct {
 	Output         string `json:"output,omitempty" yaml:"output,omitempty"`
 	InputLanguage  string `json:"inputLanguage,omitempty" yaml:"inputLanguage,omitempty"`
 	OutputLanguage string `json:"outputLanguage,omitempty" yaml:"outputLanguage,omitempty"`
+}
+
+type BiOutput_Namespace struct {
+	Namespace string              `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Templates []BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 type BiOutput_Operation struct {

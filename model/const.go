@@ -19,14 +19,6 @@ const (
 	TemplateExt_Handlebars TemplateExt = ".handlebars"
 )
 
-type TemplateType string
-
-const (
-	TemplateType_MODEL     TemplateType = "model"
-	TemplateType_OPERATION TemplateType = "operation"
-	TemplateType_NAMESPACE TemplateType = "namespace"
-)
-
 func (t TemplateExt) String() string {
 	return string(t)
 }
@@ -39,6 +31,38 @@ func IsTemplateExt(v string) bool {
 	}
 
 	return false
+}
+
+type TemplateType string
+
+const (
+	TemplateType_MODEL     TemplateType = "model"
+	TemplateType_OPERATION TemplateType = "operation"
+	TemplateType_NAMESPACE TemplateType = "namespace"
+)
+
+func (t TemplateType) String() string {
+	return string(t)
+}
+
+func IsTemplateType(v string) bool {
+	for _, e := range TemplateTypes {
+		if v == e.String() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func TemplateTypeStrings() []string {
+	ss := make([]string, 0)
+
+	for _, s := range TemplateTypes {
+		ss = append(ss, s.String())
+	}
+
+	return ss
 }
 
 type LanguageExt string
@@ -71,6 +95,12 @@ var (
 	TemplateExts = []TemplateExt{
 		TemplateExt_GoTmpl,
 		TemplateExt_Handlebars,
+	}
+
+	TemplateTypes = []TemplateType{
+		TemplateType_MODEL,
+		TemplateType_NAMESPACE,
+		TemplateType_OPERATION,
 	}
 
 	LanguageExts = []LanguageExt{

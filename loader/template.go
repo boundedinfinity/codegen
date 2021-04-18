@@ -18,7 +18,7 @@ func (t *Loader) getTemplates(ns string, typ model.TemplateType) ([]model.BiInpu
 			if tmpls != nil {
 				for _, tmpl := range tmpls {
 					if tmpl.Type == string(typ) {
-						outTmpls = append(outTmpls, tmpls...)
+						outTmpls = append(outTmpls, tmpl)
 					}
 				}
 			}
@@ -33,8 +33,59 @@ func (t *Loader) getTemplates(ns string, typ model.TemplateType) ([]model.BiInpu
 func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 	t.reportStack.Push("template[%v]", si)
 
-	if v.Path == "" {
-		return nil
+	{
+		t.reportStack.Push("input")
+
+		if v.Path == "" {
+			return model.CannotBeEmptyErr
+		}
+
+		if filepath.IsAbs(v.Path) {
+			ok, err := util.PathExists(v.Path)
+
+			if err != nil {
+				return err
+			}
+
+			if !ok {
+				return model.NotFoundErr
+			}
+		} else {
+			relPath := filepath.Join(t.inputDir, v.Path)
+			abs, err := filepath.Abs(relPath)
+
+			if err != nil {
+				return err
+			}
+
+			ok, err := util.PathExists(abs)
+
+			if err != nil {
+				return err
+			}
+
+			if !ok {
+				return model.NotFoundErr
+			} else {
+				v.Path = abs
+			}
+		}
+
+		t.reportStack.Pop()
+	}
+
+	{
+		t.reportStack.Push("type")
+
+		if v.Type == "" {
+			return model.CannotBeEmptyErr
+		}
+
+		if !model.IsTemplateType(v.Type) {
+			return model.InvalidateType(model.TemplateTypeStrings())
+		}
+
+		t.reportStack.Pop()
 	}
 
 	ns := t.currentNamespace()
@@ -43,50 +94,15 @@ func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 		t.templateMap[ns] = make([]model.BiInput_Template, 0)
 	}
 
-	var found bool
-
-	if !found {
-		t.templateMap[ns] = append(t.templateMap[ns], v)
-	}
+	t.templateMap[ns] = append(t.templateMap[ns], v)
 
 	t.reportStack.Pop()
 	return nil
 }
 
 func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template) (model.BiOutput_Template, error) {
-	var output model.BiOutput_Template
-
-	if input.Path == "" {
-		return output, fmt.Errorf("template.input cannot be empty")
-	}
-
-	if filepath.IsAbs(input.Path) {
-		output.Input = input.Path
-	}
-
-	ok, err := util.PathExists(output.Input)
-
-	if err != nil {
-		return output, err
-	}
-
-	if !ok {
-		relPath := filepath.Join(t.inputDir, input.Path)
-		ok, err := util.PathExists(relPath)
-
-		if err != nil {
-			return output, err
-		}
-
-		if !ok {
-			return output, fmt.Errorf("template.input not found")
-		} else {
-			output.Input = relPath
-		}
-	}
-
-	if name == "" {
-		return output, fmt.Errorf("template.ouput cannot be empty")
+	output := model.BiOutput_Template{
+		Input: input.Path,
 	}
 
 	var ext string
@@ -99,8 +115,16 @@ func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template)
 	ext = filepath.Ext(ext)
 	ext = strings.TrimPrefix(ext, ".")
 
-	fn = name
-	fn = fmt.Sprintf("%v.%v", fn, ext)
+	if name == "" {
+		var tmplNameOnly string
+		tmplNameOnly = output.Input
+		tmplNameOnly = filepath.Base(tmplNameOnly)
+		tmplNameOnly = util.TrimTemplateExt(tmplNameOnly)
+		fn = tmplNameOnly
+	} else {
+		fn = name
+		fn = fmt.Sprintf("%v.%v", fn, ext)
+	}
 
 	abs = t.Output.Info.OutputDir
 	abs = path.Join(abs, t.relativeNamespace(ns))

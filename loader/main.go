@@ -33,6 +33,7 @@ func New() *Loader {
 		Output: model.BiOutput{
 			Models:     make([]model.BiOutput_Model, 0),
 			Operations: make([]model.BiOutput_Operation, 0),
+			Namespaces: make([]model.BiOutput_Namespace, 0),
 		},
 	}
 }

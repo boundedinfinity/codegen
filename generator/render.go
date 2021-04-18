@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 )
 
-func (t *Generator) renderFile(input, output string, v interface{}) error {
-	if input == "" {
+func (t *Generator) renderFile(tmpl model.BiOutput_Template, v interface{}) error {
+	if tmpl.Input == "" {
 		return fmt.Errorf("render error: no template path")
 	}
 
-	if output == "" {
+	if tmpl.Output == "" {
 		return fmt.Errorf("render error: no output path")
 	}
 
@@ -21,7 +21,7 @@ func (t *Generator) renderFile(input, output string, v interface{}) error {
 		return fmt.Errorf("render error: no type")
 	}
 
-	atp, err := filepath.Abs(input)
+	atp, err := filepath.Abs(tmpl.Input)
 
 	if err != nil {
 		return fmt.Errorf("render err: %w", err)
@@ -33,8 +33,8 @@ func (t *Generator) renderFile(input, output string, v interface{}) error {
 		return fmt.Errorf("render err: %w", err)
 	}
 
-	ext := filepath.Ext(input)
-	aop, err := filepath.Abs(output)
+	ext := filepath.Ext(tmpl.Input)
+	aop, err := filepath.Abs(tmpl.Output)
 
 	if err != nil {
 		return fmt.Errorf("render err: %w", err)
