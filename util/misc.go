@@ -62,9 +62,9 @@ func StrSliceMap(i []string, fn func(string) string) []string {
 
 func StrSliceDedup(ss []string) []string {
 	var o []string
-	var m map[string]bool
+	m := make(map[string]bool)
 
-	if ss == nil {
+	if ss != nil {
 		for _, s := range ss {
 			if ok := m[s]; !ok {
 				m[s] = true

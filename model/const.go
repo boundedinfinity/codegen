@@ -7,6 +7,7 @@ const (
 	TYPE_BUILTIN      = "<builtin>"
 	NAMESPACE_BUILTIN = "builtin"
 	NAMESPACE_UNKNOWN = "UNKNOWN"
+	NAMESPACE_CUSTOM  = "CUSTOM"
 	COLLECTION_SUFFIX = "[]"
 	SUMMERY_SIZE      = 35
 )

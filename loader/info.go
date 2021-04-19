@@ -3,6 +3,7 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
+	"path"
 	"path/filepath"
 )
 
@@ -89,8 +90,10 @@ func (t *Loader) processInput_Info() error {
 	{
 		t.reportStack.Push("typeMap")
 
-		if input.TypeMap != nil {
-			for k, v := range input.TypeMap {
+		if input.TypeMap.BuiltIn != nil {
+			t.report("importing %v builtin type mappings", len(input.TypeMap.BuiltIn))
+
+			for k, v := range input.TypeMap.BuiltIn {
 				t.addMappedType(k, TypeInfo{
 					BaseName:   v,
 					ImportName: v,
@@ -101,7 +104,22 @@ func (t *Loader) processInput_Info() error {
 			}
 		}
 
-		t.report("read %v type mappings", len(input.TypeMap))
+		if input.TypeMap.Custom != nil {
+			t.report("importing %v custom type mappings", len(input.TypeMap.Custom))
+
+			for k, v := range input.TypeMap.Custom {
+				qname := path.Join(t.rootPackage(), k)
+				ns := path.Dir(qname)
+
+				t.addMappedType(k, TypeInfo{
+					BaseName:   v,
+					ImportName: v,
+					QName:      qname,
+					Namespace:  ns,
+					BuiltIn:    false,
+				})
+			}
+		}
 
 		t.reportStack.Pop()
 	}
