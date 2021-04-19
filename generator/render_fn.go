@@ -1,11 +1,11 @@
 package generator
 
 import (
+	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
 
-	"github.com/boundedinfinity/optional"
 	"github.com/ozgio/strutil"
 )
 
@@ -57,10 +57,20 @@ func filename(v string) string {
 	return fn
 }
 
-func peq(v1 optional.StringOptional, v2 string) bool {
-	if v1.IsEmpty() {
-		return false
-	}
+// func goModelComment(m model.BiOutput_Model) string {
 
-	return v1.Get() == v2
+// 	return strings.Join(ls2, "\n")
+// }
+
+func linePrefix(v, p string) string {
+	var ls2 []string
+	var l2 string
+
+	l2 = strings.TrimSuffix(v, "\n")
+	ls1 := strings.Split(l2, "\n")
+
+	for _, l := range ls1 {
+		ls2 = append(ls2, fmt.Sprintf("%v %v", p, l))
+	}
+	return strings.Join(ls2, "\n")
 }

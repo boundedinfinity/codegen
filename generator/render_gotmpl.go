@@ -14,6 +14,7 @@ func (t *Generator) renderGoTemplate(s string, d interface{}) (string, error) {
 		"lc":                lc,
 		"camel_case":        camelCase,
 		"path_2_camel_case": path2CamelCase,
+		"line_prefix":       linePrefix,
 	}
 
 	tmpl, err := template.New("template").Funcs(fnm).Parse(s)

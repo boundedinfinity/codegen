@@ -21,7 +21,7 @@ func (t Loader) processOperation2(si int, input model.BiInput_Operation) (model.
 	ns := t.currentNamespace()
 	output := model.BiOutput_Operation{
 		Name:        input.Name,
-		Description: input.Description,
+		Description: t.splitDescription(input.Description),
 		Namespace:   ns,
 		Imports:     make([]string, 0),
 		Templates:   make([]model.BiOutput_Template, 0),

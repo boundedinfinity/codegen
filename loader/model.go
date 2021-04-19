@@ -21,7 +21,7 @@ func (t Loader) processModel2(si int, input model.BiInput_Model) (model.BiOutput
 	ns := t.currentNamespace()
 	output := model.BiOutput_Model{
 		Name:        input.Name,
-		Description: input.Description,
+		Description: t.splitDescription(input.Description),
 		Namespace:   ns,
 		Imports:     make([]string, 0),
 		Properties:  make([]model.BiOutput_TypeProperty, 0),
@@ -39,7 +39,7 @@ func (t Loader) processModel2(si int, input model.BiInput_Model) (model.BiOutput
 
 			op := model.BiOutput_TypeProperty{
 				Name:        ip.Name,
-				Description: ip.Description,
+				Description: t.splitDescription(ip.Description),
 				Namespace:   tf.Namespace,
 				Validations: make([]model.BiOutput_Validation, 0),
 			}

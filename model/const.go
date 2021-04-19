@@ -3,13 +3,14 @@ package model
 import "strings"
 
 const (
-	TYPE_UNKNOWN      = "<UNKNOWN_TYPE>"
-	TYPE_BUILTIN      = "<builtin>"
-	NAMESPACE_BUILTIN = "builtin"
-	NAMESPACE_UNKNOWN = "UNKNOWN"
-	NAMESPACE_CUSTOM  = "CUSTOM"
-	COLLECTION_SUFFIX = "[]"
-	SUMMERY_SIZE      = 35
+	TYPE_UNKNOWN                        = "<UNKNOWN_TYPE>"
+	TYPE_BUILTIN                        = "<builtin>"
+	NAMESPACE_BUILTIN                   = "builtin"
+	NAMESPACE_UNKNOWN                   = "UNKNOWN"
+	NAMESPACE_CUSTOM                    = "CUSTOM"
+	COLLECTION_SUFFIX                   = "[]"
+	SUMMERY_SIZE                        = 35
+	DEFAULT_DESCRIPTION_SPLIT_CHARACTER = "\n"
 )
 
 type TemplateExt string

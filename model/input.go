@@ -42,12 +42,13 @@ type BiInput_Operation struct {
 }
 
 type BiInput_Info struct {
-	InputDir       string          `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
-	OutputDir      string          `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
-	DumpContext    bool            `json:"dumpContext" yaml:"dumpContext"`
-	FilenameMarker string          `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
-	TemplateHeader string          `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
-	TypeMap        BiInput_TypeMap `json:"typeMap" yaml:"typeMap"`
+	InputDir                  string          `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
+	OutputDir                 string          `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	DumpContext               bool            `json:"dumpContext" yaml:"dumpContext"`
+	FilenameMarker            string          `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
+	TemplateHeader            string          `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
+	DescriptionSplitCharacter string          `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
+	TypeMap                   BiInput_TypeMap `json:"typeMap" yaml:"typeMap"`
 }
 
 type BiInput_TypeMap struct {
