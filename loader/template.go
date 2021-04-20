@@ -37,7 +37,7 @@ func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 		t.reportStack.Push("input")
 
 		if v.Path == "" {
-			return model.CannotBeEmptyErr
+			return t.CannotBeEmpty()
 		}
 
 		if filepath.IsAbs(v.Path) {
@@ -48,7 +48,7 @@ func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 			}
 
 			if !ok {
-				return model.NotFoundErr
+				return t.NotFound()
 			}
 		} else {
 			relPath := filepath.Join(t.inputDir, v.Path)
@@ -65,7 +65,7 @@ func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 			}
 
 			if !ok {
-				return model.NotFoundErr
+				return t.NotFound()
 			} else {
 				v.Path = abs
 			}
@@ -78,11 +78,11 @@ func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
 		t.reportStack.Push("type")
 
 		if v.Type == "" {
-			return model.CannotBeEmptyErr
+			return t.NotFound()
 		}
 
 		if !model.IsTemplateType(v.Type) {
-			return model.InvalidateType(model.TemplateTypeStrings())
+			return t.MustBeOneOf(model.TemplateTypeStrings())
 		}
 
 		t.reportStack.Pop()

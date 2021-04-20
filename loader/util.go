@@ -2,7 +2,6 @@ package loader
 
 import (
 	"boundedinfinity/codegen/model"
-	"boundedinfinity/codegen/util"
 	"fmt"
 	"path"
 	"strings"
@@ -39,69 +38,15 @@ func (t *Loader) wrapError(err error) error {
 	return fmt.Errorf("%v: %w", stack, err)
 }
 
-func (t *Loader) addUserMappedType(bname string) {
-	ns := t.currentNamespace()
-	qname := path.Join(ns, bname)
-
-	iname := qname
-	iname = path.Dir(iname)
-	iname = path.Base(iname)
-	iname = fmt.Sprintf("%v.%v", iname, bname)
-
-	t.addMappedType(qname, TypeInfo{
-		BaseName:   bname,
-		QName:      qname,
-		ImportName: iname,
-		Namespace:  ns,
-		BuiltIn:    false,
-	})
-}
-
-func (t *Loader) addMappedType(k string, v TypeInfo) {
-	kc := fmt.Sprintf("%v[]", k)
-	vc := TypeInfo{
-		BaseName:   fmt.Sprintf("[]%v", v.BaseName),
-		ImportName: fmt.Sprintf("[]%v", v.ImportName),
-		QName:      fmt.Sprintf("[]%v", v.QName),
-		Namespace:  v.Namespace,
-		BuiltIn:    v.BuiltIn,
-	}
-	t.typeMap[k] = v
-	t.typeMap[kc] = vc
-
-	t.report("mapping %v -> %v", util.SummerySuffix(k, model.SUMMERY_SIZE), v.ImportName)
-	t.report("mapping %v -> %v", util.SummerySuffix(kc, model.SUMMERY_SIZE), vc.ImportName)
-}
-
-func (t *Loader) getMappedType(typ string) (TypeInfo, bool) {
-	if tf, ok := t.typeMap[typ]; ok {
-		return tf, ok
-	}
-
-	n1 := path.Join(t.rootPackage(), typ)
-
-	if tf, ok := t.typeMap[n1]; ok {
-		return tf, ok
-	}
-
-	n2 := path.Join(t.currentNamespace(), typ)
-
-	if tf, ok := t.typeMap[n2]; ok {
-		return tf, ok
-	}
-
-	return TypeInfo{}, false
-}
-
 func (t *Loader) getMappedNamespace(k string) (string, bool) {
 	var f bool
 	ns := model.NAMESPACE_UNKNOWN
-	_, ok := t.typeMap[k]
+	_, ok := t.customTypeMap[k]
 
 	if ok {
 		ns = k
 	} else {
-		for x := range t.typeMap {
+		for x := range t.customTypeMap {
 			if strings.HasSuffix(x, k) {
 				ns = x
 				break

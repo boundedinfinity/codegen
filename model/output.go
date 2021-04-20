@@ -49,30 +49,33 @@ type BiOutput_Namespace struct {
 }
 
 type BiOutput_Operation struct {
-	Name        string                `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace   string                `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Description []string              `json:"description,omitempty" yaml:"description,omitempty"`
-	Imports     []string              `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Input       BiOutput_TypeProperty `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      BiOutput_TypeProperty `json:"output,omitempty" yaml:"output,omitempty"`
-	Templates   []BiOutput_Template   `json:"templates,omitempty" yaml:"templates,omitempty"`
+	Name        string              `json:"name,omitempty" yaml:"name,omitempty"`
+	Namespace   string              `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Description []string            `json:"description,omitempty" yaml:"description,omitempty"`
+	Imports     []string            `json:"imports,omitempty" yaml:"imports,omitempty"`
+	Input       BiOutput_Property   `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      BiOutput_Property   `json:"output,omitempty" yaml:"output,omitempty"`
+	Templates   []BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 type BiOutput_Model struct {
-	Name        string                  `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace   string                  `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Description []string                `json:"description,omitempty" yaml:"description,omitempty"`
-	Imports     []string                `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Properties  []BiOutput_TypeProperty `json:"properties,omitempty" yaml:"properties,omitempty"`
-	Templates   []BiOutput_Template     `json:"templates,omitempty" yaml:"templates,omitempty"`
+	Name         string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	Namespace    string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Description  []string               `json:"description,omitempty" yaml:"description,omitempty"`
+	Imports      []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
+	JsonStruture map[string]interface{} `json:"jsonStruture,omitempty" yaml:"jsonStruture,omitempty"`
+	Properties   []BiOutput_Property    `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Templates    []BiOutput_Template    `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
-type BiOutput_TypeProperty struct {
-	Name        string                `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace   string                `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Type        string                `json:"type,omitempty" yaml:"type,omitempty"`
-	Description []string              `json:"description,omitempty" yaml:"description,omitempty"`
-	Validations []BiOutput_Validation `json:"validations,omitempty" yaml:"validations,omitempty"`
+type BiOutput_Property struct {
+	Name         string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	Namespace    string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Type         string                 `json:"type,omitempty" yaml:"type,omitempty"`
+	JsonPath     string                 `json:"jsonPath,omitempty" yaml:"jsonPath,omitempty"`
+	JsonStruture map[string]interface{} `json:"jsonStruture,omitempty" yaml:"jsonStruture,omitempty"`
+	Description  []string               `json:"description,omitempty" yaml:"description,omitempty"`
+	Validations  []BiOutput_Validation  `json:"validations,omitempty" yaml:"validations,omitempty"`
 }
 
 type BiOutput_Validation struct {

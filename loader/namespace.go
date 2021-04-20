@@ -9,7 +9,10 @@ func (t *Loader) processNamespace1(si int, ns model.BiInput_Namespace) error {
 		t.reportStack.Push("namespace[%v]", si)
 	}
 
+	defer t.reportStack.Pop()
+
 	t.modelStack.Push(ns.Name)
+	defer t.modelStack.Pop()
 
 	if ns.Models != nil {
 		for i, m := range ns.Models {
@@ -19,21 +22,21 @@ func (t *Loader) processNamespace1(si int, ns model.BiInput_Namespace) error {
 		}
 	}
 
-	if ns.Operations != nil {
-		for i, o := range ns.Operations {
-			if err := t.processOperation1(i, o); err != nil {
-				return err
-			}
-		}
-	}
+	// if ns.Operations != nil {
+	// 	for i, o := range ns.Operations {
+	// 		if err := t.processOperation1(i, o); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 
-	if ns.Templates != nil {
-		for i, tmpl := range ns.Templates {
-			if err := t.processTemplate1(i, tmpl); err != nil {
-				return err
-			}
-		}
-	}
+	// if ns.Templates != nil {
+	// 	for i, tmpl := range ns.Templates {
+	// 		if err := t.processTemplate1(i, tmpl); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 
 	if ns.Namespaces != nil {
 		for i, child := range ns.Namespaces {
@@ -43,8 +46,6 @@ func (t *Loader) processNamespace1(si int, ns model.BiInput_Namespace) error {
 		}
 	}
 
-	t.modelStack.Pop()
-	t.reportStack.Pop()
 	return nil
 }
 
@@ -55,13 +56,60 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 		t.reportStack.Push("namespace[%v]", si)
 	}
 
+	defer t.reportStack.Pop()
+
+	t.modelStack.Push(ns.Name)
+	defer t.modelStack.Pop()
+
+	if ns.Models != nil {
+		for i, m := range ns.Models {
+			if err := t.processModel2(i, m); err != nil {
+				return err
+			}
+		}
+	}
+
+	// if ns.Operations != nil {
+	// 	for i, o := range ns.Operations {
+	// 		if err := t.processOperation1(i, o); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
+
+	// if ns.Templates != nil {
+	// 	for i, tmpl := range ns.Templates {
+	// 		if err := t.processTemplate1(i, tmpl); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
+
+	if ns.Namespaces != nil {
+		for i, child := range ns.Namespaces {
+			if err := t.processNamespace2(i, child); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (t *Loader) processNamespace3(si int, ns model.BiInput_Namespace) error {
+	if si < 0 {
+		t.reportStack.Push("specification")
+	} else {
+		t.reportStack.Push("namespace[%v]", si)
+	}
+
 	t.modelStack.Push(ns.Name)
 
 	if ns.Models != nil {
 		for i, input := range ns.Models {
-			output, err := t.processModel2(i, input)
+			var output model.BiOutput_Model
 
-			if err != nil {
+			if err := t.processModel3(i, input, &output); err != nil {
 				return err
 			}
 
@@ -71,9 +119,9 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 
 	if ns.Operations != nil {
 		for i, input := range ns.Operations {
-			output, err := t.processOperation2(i, input)
+			var output model.BiOutput_Operation
 
-			if err != nil {
+			if err := t.processOperation3(i, input, &output); err != nil {
 				return err
 			}
 
@@ -110,7 +158,7 @@ func (t *Loader) processNamespace2(si int, ns model.BiInput_Namespace) error {
 
 	if ns.Namespaces != nil {
 		for i, child := range ns.Namespaces {
-			if err := t.processNamespace2(i, child); err != nil {
+			if err := t.processNamespace3(i, child); err != nil {
 				return err
 			}
 		}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
 	"fmt"
 	"os"
@@ -9,19 +8,19 @@ import (
 
 func main() {
 	// schemaPath := "../codegen-templates/spec.bi.yaml"
-	schemaPath := os.Args[1]
+	schemaPaths := os.Args[1:]
 
 	l := loader.New()
 
-	if err := l.FromPath(schemaPath); err != nil {
+	if err := l.FromPath(schemaPaths); err != nil {
 		os.Exit(handleError(err))
 	}
 
-	g := generator.New(l.Output)
+	// g := generator.New(l.Output)
 
-	if err := g.Generate(); err != nil {
-		os.Exit(handleError(err))
-	}
+	// if err := g.Generate(); err != nil {
+	// 	os.Exit(handleError(err))
+	// }
 }
 
 func handleError(err error) int {

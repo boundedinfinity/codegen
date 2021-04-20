@@ -11,10 +11,10 @@ import (
 )
 
 func init() {
-	raymond.RegisterHelper("uc", uc)
-	raymond.RegisterHelper("ucFirst", ucFirst)
+	raymond.RegisterHelper("uc", util.Uc)
+	raymond.RegisterHelper("ucFirst", util.UcFirst)
 	raymond.RegisterHelper("ifeq", ifeq)
-	raymond.RegisterHelper("basePath", basePath)
+	raymond.RegisterHelper("basePath", util.BasePath)
 	raymond.RegisterHelper("operationId", operationId)
 
 	// raymond.RegisterHelper("type_go", t)

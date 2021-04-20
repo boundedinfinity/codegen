@@ -25,6 +25,7 @@ type BiInput_Property struct {
 	Name        string               `json:"name,omitempty" yaml:"name,omitempty"`
 	Type        string               `json:"type,omitempty" yaml:"type,omitempty"`
 	Description string               `json:"description,omitempty" yaml:"description,omitempty"`
+	Example     interface{}          `json:"example,omitempty" yaml:"example,omitempty"`
 	Validations []BiInput_Validation `json:"validations,omitempty" yaml:"validations,omitempty"`
 }
 

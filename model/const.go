@@ -11,6 +11,8 @@ const (
 	COLLECTION_SUFFIX                   = "[]"
 	SUMMERY_SIZE                        = 35
 	DEFAULT_DESCRIPTION_SPLIT_CHARACTER = "\n"
+	JSON_DEFAULT_STRING                 = "a string"
+	JSON_DEFAULT_NUMBER                 = 1
 )
 
 type TemplateExt string

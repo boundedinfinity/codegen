@@ -3,18 +3,29 @@ package loader
 func (t *Loader) processInput() error {
 	// t.reportStack.Push(fmt.Sprintf("input[%v]", util.SummerySuffix(t.inputPath, model.SUMMERY_SIZE)))
 	t.reportStack.Push("loader")
+	defer t.reportStack.Pop()
 
-	{
+	checkName := func() error {
 		t.reportStack.Push("name")
+		defer t.reportStack.Pop()
+
 		t.Output.Name = t.input.Name
-		// t.modelStack.Push(t.Output.Name)
-		t.reportStack.Pop()
+		return nil
 	}
 
-	{
+	checkVersion := func() error {
 		t.reportStack.Push("version")
-		// TODO
-		t.reportStack.Pop()
+		defer t.reportStack.Pop()
+
+		return nil
+	}
+
+	if err := checkName(); err != nil {
+		return err
+	}
+
+	if err := checkVersion(); err != nil {
+		return err
 	}
 
 	if err := t.processInput_Info(); err != nil {
@@ -29,6 +40,9 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	t.reportStack.Pop()
+	// if err := t.processNamespace3(-1, t.input.Specification); err != nil {
+	// 	return err
+	// }
+
 	return nil
 }
