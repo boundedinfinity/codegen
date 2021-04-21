@@ -130,7 +130,7 @@ func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template)
 	fn = fmt.Sprintf("%v.%v", fn, tmplExt)
 
 	abs = t.Output.Info.OutputDir
-	abs = path.Join(abs, t.relativeNamespace(ns))
+	// abs = path.Join(abs, t.relativeNamespace(ns))
 	abs = path.Join(abs, fn)
 
 	output.Output = abs

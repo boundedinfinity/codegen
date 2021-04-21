@@ -4,6 +4,7 @@ import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"fmt"
+	"path"
 	"path/filepath"
 )
 
@@ -128,14 +129,21 @@ func (t *Loader) processInput_Info_TypeMap(input model.BiInput_Info, output *mod
 		defer t.reportStack.Pop()
 
 		if input.TypeMap.BuiltIn != nil {
-			for k, v := range input.TypeMap.BuiltIn {
-				if _, ok := t.builtInTypeMap[k]; !ok {
-					t.builtInTypeMap[k] = v
-					t.builtInTypeMap[fmt.Sprintf("%v[]", k)] = fmt.Sprintf("%v[]", v)
-					t.report("mapping %v -> %v", util.SummerySuffix(k, model.SUMMERY_SIZE), v)
-				} else {
-					return t.DuplicateType(k)
+			for specType, langType := range input.TypeMap.BuiltIn {
+				namespace := path.Join(model.NAMESPACE_BUILTIN, specType)
+
+				if _, ok := t.typeMap[namespace]; ok {
+					return t.DuplicateType(specType)
 				}
+
+				typeInfo := model.TypeInfo{
+					SpecType:           specType,
+					InNamespaceType:    langType,
+					OutOfNamespaceType: langType,
+					Namespace:          namespace,
+				}
+
+				t.typeMap[namespace] = &typeInfo
 			}
 		}
 
@@ -147,15 +155,25 @@ func (t *Loader) processInput_Info_TypeMap(input model.BiInput_Info, output *mod
 		defer t.reportStack.Pop()
 
 		if input.TypeMap.Custom != nil {
-			for sk, v := range input.TypeMap.Custom {
-				k := t.absoluteNamespace(sk)
-				if _, ok := t.customTypeMap[k]; !ok {
-					t.customTypeMap[k] = v
-					t.customTypeMap[fmt.Sprintf("%v[]", k)] = fmt.Sprintf("%v[]", v)
-					t.report("mapping %v -> %v", util.SummerySuffix(k, model.SUMMERY_SIZE), v)
-				} else {
-					return t.DuplicateType(k)
+			for specType := range input.TypeMap.Custom {
+				namespace := path.Join(t.rootNamespace(), specType)
+				in := path.Base(namespace)
+				out := path.Dir(specType)
+				out = path.Base(out)
+				out = fmt.Sprintf("%v.%v", out, in)
+
+				if _, ok := t.typeMap[namespace]; ok {
+					return t.DuplicateType(specType)
 				}
+
+				typeInfo := model.TypeInfo{
+					SpecType:           specType,
+					InNamespaceType:    in,
+					OutOfNamespaceType: out,
+					Namespace:          namespace,
+				}
+
+				t.typeMap[namespace] = &typeInfo
 			}
 		}
 

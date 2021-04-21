@@ -13,8 +13,7 @@ type Loader struct {
 	namespaceStack model.StrStack
 	reportStack    model.StrStack
 	depNodes       map[string]*Node
-	builtInTypeMap map[string]string
-	customTypeMap  map[string]string
+	typeMap        map[string]*model.TypeInfo
 	templateMap    map[string][]model.BiInput_Template
 	namespaceMap   map[string]*model.BiOutput_Namespace
 	modelMap       map[string]*model.BiOutput_Model
@@ -25,15 +24,14 @@ type Loader struct {
 
 func New() *Loader {
 	return &Loader{
-		customTypeMap:  make(map[string]string),
-		builtInTypeMap: make(map[string]string),
-		templateMap:    make(map[string][]model.BiInput_Template),
-		namespaceMap:   make(map[string]*model.BiOutput_Namespace),
-		modelMap:       make(map[string]*model.BiOutput_Model),
-		propertyMap:    make(map[string]*model.BiOutput_Property),
-		operationMap:   make(map[string]*model.BiOutput_Operation),
-		depNodes:       make(map[string]*Node),
-		Output:         model.New_BiOutput(),
+		typeMap:      make(map[string]*model.TypeInfo),
+		namespaceMap: make(map[string]*model.BiOutput_Namespace),
+		modelMap:     make(map[string]*model.BiOutput_Model),
+		propertyMap:  make(map[string]*model.BiOutput_Property),
+		operationMap: make(map[string]*model.BiOutput_Operation),
+		templateMap:  make(map[string][]model.BiInput_Template),
+		depNodes:     make(map[string]*Node),
+		Output:       model.New_BiOutput(),
 	}
 }
 

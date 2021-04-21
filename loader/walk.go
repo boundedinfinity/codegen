@@ -46,13 +46,14 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 		for modelIndex, inputModel := range inputNamespace.Models {
 			var outputModel *model.BiOutput_Model
 
-			modelName := t.absoluteNamespace(inputModel.Name)
+			modelName := path.Join(t.currentNamespace(), inputModel.Name)
 
 			if m, ok := t.modelMap[modelName]; ok {
 				outputModel = m
 			} else {
 				outputModel = model.New_BiOutput_Model()
 				outputModel.Name = inputModel.Name
+				outputModel.SpecName = modelName
 				t.modelMap[modelName] = outputModel
 			}
 
@@ -83,7 +84,9 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 						outputProperty = v
 					} else {
 						outputProperty = model.New_BiOutput_Property()
+						outputProperty.SpecName = propertyName
 						t.propertyMap[propertyName] = outputProperty
+						outputModel.Properties = append(outputModel.Properties, outputProperty)
 					}
 
 					propertyWrap := func() error {
@@ -101,7 +104,6 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 						return err
 					}
 				}
-				return nil
 			}
 		}
 	}

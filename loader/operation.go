@@ -22,8 +22,6 @@ func (t Loader) processOperation3(si int, input model.BiInput_Operation, output 
 	output.Name = input.Name
 	output.Description = t.splitDescription(input.Description)
 	output.Namespace = ns
-	output.Imports = make([]string, 0)
-	output.Templates = make([]model.BiOutput_Template, 0)
 
 	checkInput := func() error {
 		// 	t.reportStack.Push("input")
@@ -85,21 +83,21 @@ func (t Loader) processOperation3(si int, input model.BiInput_Operation, output 
 	}
 
 	checkTemplates := func() error {
-		tmpls, err := t.getTemplates(ns, model.TemplateType_OPERATION)
+		// tmpls, err := t.getTemplates(ns, model.TemplateType_OPERATION)
 
-		if err != nil {
-			return err
-		}
+		// if err != nil {
+		// 	return err
+		// }
 
-		for _, itmpl := range tmpls {
-			otmpl, err := t.processTemplate2(ns, output.Name, itmpl)
+		// for _, itmpl := range tmpls {
+		// 	otmpl, err := t.processTemplate2(ns, output.Name, itmpl)
 
-			if err != nil {
-				return err
-			}
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			output.Templates = append(output.Templates, otmpl)
-		}
+		// 	output.Templates = append(output.Templates, otmpl)
+		// }
 		return nil
 	}
 
