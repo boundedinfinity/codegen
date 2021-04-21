@@ -24,6 +24,6 @@ func main() {
 }
 
 func handleError(err error) int {
-	fmt.Printf("%v", err.Error())
+	fmt.Printf("%v\n", err.Error())
 	return 1
 }

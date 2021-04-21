@@ -33,65 +33,61 @@ func (t *Loader) report(format string, a ...interface{}) {
 	fmt.Printf(reportFormat, a...)
 }
 
-func (t *Loader) wrapError(err error) error {
-	stack := strings.Join(t.reportStack.S(), ".")
-	return fmt.Errorf("%v: %w", stack, err)
-}
-
-func (t *Loader) getMappedNamespace(k string) (string, bool) {
-	var f bool
-	ns := model.NAMESPACE_UNKNOWN
-	_, ok := t.customTypeMap[k]
-
-	if ok {
-		ns = k
-	} else {
-		for x := range t.customTypeMap {
-			if strings.HasSuffix(x, k) {
-				ns = x
-				break
-			}
-		}
-	}
-
-	if ns != model.NAMESPACE_UNKNOWN {
-		f = true
-		if !strings.HasPrefix(ns, t.rootPackage()) {
-			ns = model.NAMESPACE_BUILTIN
-		}
-	}
-
-	return ns, f
-}
-
-func (t *Loader) rootPackage() string {
+func (t *Loader) rootNamespace() string {
 	return t.input.Name
 }
 
 func (t *Loader) currentNamespace() string {
 	var name string
 
-	name = t.rootPackage()
-	name = path.Join(name, path.Join(t.modelStack.S()...))
+	name = t.rootNamespace()
+	name = path.Join(name, path.Join(t.namespaceStack.S()...))
 
 	return name
 }
 
-func (t *Loader) currentOperationName(m model.BiInput_Operation) string {
-	var name string
+func (t *Loader) isBuiltInType(typ string) bool {
+	v := strings.TrimSuffix(typ, model.COLLECTION_SUFFIX)
 
-	name = t.currentNamespace()
-	name = path.Join(name, m.Name)
+	for k := range t.builtInTypeMap {
+		if k == v {
+			return true
+		}
+	}
 
-	return name
+	return false
 }
 
-func (t *Loader) relativeNamespace(ns string) string {
-	var name string
+func (t *Loader) isCustomType(typ string) bool {
+	_, ok := t.customTypeMap[typ]
+	return ok
+}
 
-	name = ns
-	name = strings.TrimPrefix(name, t.Output.Name)
-	name = strings.TrimPrefix(name, "/")
+func (t *Loader) absoluteNamespace(typ string) string {
+	if t.isBuiltInType(typ) {
+		return model.NAMESPACE_BUILTIN
+	}
 
-	return name
+	var ns string
+
+	if strings.HasPrefix(typ, "$") {
+		ns = typ
+	}
+
+	if strings.HasPrefix(typ, "/") {
+		ns = path.Join(t.rootNamespace(), typ)
+	} else {
+		ns = path.Join(t.currentNamespace(), typ)
+	}
+
+	return ns
+}
+
+func (t *Loader) relativeNamespace(name string) string {
+	var ns string
+
+	ns = t.absoluteNamespace(name)
+	ns = strings.TrimPrefix(ns, t.rootNamespace())
+
+	return ns
 }

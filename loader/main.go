@@ -10,13 +10,15 @@ type Loader struct {
 	inputPath      string
 	inputDir       string
 	input          model.BiInput
-	modelStack     model.StrStack
+	namespaceStack model.StrStack
 	reportStack    model.StrStack
+	depNodes       map[string]*Node
 	builtInTypeMap map[string]string
 	customTypeMap  map[string]string
 	templateMap    map[string][]model.BiInput_Template
-	modelMap       map[string]*model.BiOutput_Model
 	namespaceMap   map[string]*model.BiOutput_Namespace
+	modelMap       map[string]*model.BiOutput_Model
+	propertyMap    map[string]*model.BiOutput_Property
 	operationMap   map[string]*model.BiOutput_Operation
 	Output         model.BiOutput
 }
@@ -26,14 +28,12 @@ func New() *Loader {
 		customTypeMap:  make(map[string]string),
 		builtInTypeMap: make(map[string]string),
 		templateMap:    make(map[string][]model.BiInput_Template),
-		modelMap:       make(map[string]*model.BiOutput_Model),
 		namespaceMap:   make(map[string]*model.BiOutput_Namespace),
+		modelMap:       make(map[string]*model.BiOutput_Model),
+		propertyMap:    make(map[string]*model.BiOutput_Property),
 		operationMap:   make(map[string]*model.BiOutput_Operation),
-		Output: model.BiOutput{
-			Models:     make([]model.BiOutput_Model, 0),
-			Operations: make([]model.BiOutput_Operation, 0),
-			Namespaces: make([]model.BiOutput_Namespace, 0),
-		},
+		depNodes:       make(map[string]*Node),
+		Output:         model.New_BiOutput(),
 	}
 }
 
@@ -46,7 +46,7 @@ func (t *Loader) FromPath(inputs []string) error {
 	t.inputDir = filepath.Dir(t.inputPath)
 
 	if err := t.processInput(); err != nil {
-		return t.wrapError(err)
+		t.report("%v", err.Error())
 	}
 
 	return nil

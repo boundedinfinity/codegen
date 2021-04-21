@@ -28,6 +28,14 @@ type BiOutput struct {
 	Namespaces []BiOutput_Namespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 }
 
+func New_BiOutput() BiOutput {
+	return BiOutput{
+		Models:     make([]BiOutput_Model, 0),
+		Operations: make([]BiOutput_Operation, 0),
+		Namespaces: make([]BiOutput_Namespace, 0),
+	}
+}
+
 type BiOutput_Info struct {
 	InputDir    string `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
 	OutputDir   string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
@@ -48,6 +56,12 @@ type BiOutput_Namespace struct {
 	Templates         []BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
+func New_BiOutput_Namespace() *BiOutput_Namespace {
+	return &BiOutput_Namespace{
+		Templates: make([]BiOutput_Template, 0),
+	}
+}
+
 type BiOutput_Operation struct {
 	Name        string              `json:"name,omitempty" yaml:"name,omitempty"`
 	Namespace   string              `json:"namespace,omitempty" yaml:"namespace,omitempty"`
@@ -56,6 +70,14 @@ type BiOutput_Operation struct {
 	Input       BiOutput_Property   `json:"input,omitempty" yaml:"input,omitempty"`
 	Output      BiOutput_Property   `json:"output,omitempty" yaml:"output,omitempty"`
 	Templates   []BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
+}
+
+func New_BiOutput_Operation() BiOutput_Operation {
+	return BiOutput_Operation{
+		Description: make([]string, 0),
+		Imports:     make([]string, 0),
+		Templates:   make([]BiOutput_Template, 0),
+	}
 }
 
 type BiOutput_Model struct {
@@ -68,6 +90,16 @@ type BiOutput_Model struct {
 	Templates    []BiOutput_Template    `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
+func New_BiOutput_Model() *BiOutput_Model {
+	return &BiOutput_Model{
+		Description:  make([]string, 0),
+		Imports:      make([]string, 0),
+		JsonStruture: make(map[string]interface{}),
+		Properties:   make([]BiOutput_Property, 0),
+		Templates:    make([]BiOutput_Template, 0),
+	}
+}
+
 type BiOutput_Property struct {
 	Name         string                 `json:"name,omitempty" yaml:"name,omitempty"`
 	Namespace    string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
@@ -76,6 +108,14 @@ type BiOutput_Property struct {
 	JsonStruture map[string]interface{} `json:"jsonStruture,omitempty" yaml:"jsonStruture,omitempty"`
 	Description  []string               `json:"description,omitempty" yaml:"description,omitempty"`
 	Validations  []BiOutput_Validation  `json:"validations,omitempty" yaml:"validations,omitempty"`
+}
+
+func New_BiOutput_Property() *BiOutput_Property {
+	return &BiOutput_Property{
+		JsonStruture: make(map[string]interface{}),
+		Description:  make([]string, 0),
+		Validations:  make([]BiOutput_Validation, 0),
+	}
 }
 
 type BiOutput_Validation struct {

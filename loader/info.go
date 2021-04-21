@@ -147,7 +147,8 @@ func (t *Loader) processInput_Info_TypeMap(input model.BiInput_Info, output *mod
 		defer t.reportStack.Pop()
 
 		if input.TypeMap.Custom != nil {
-			for k, v := range input.TypeMap.Custom {
+			for sk, v := range input.TypeMap.Custom {
+				k := t.absoluteNamespace(sk)
 				if _, ok := t.customTypeMap[k]; !ok {
 					t.customTypeMap[k] = v
 					t.customTypeMap[fmt.Sprintf("%v[]", k)] = fmt.Sprintf("%v[]", v)
