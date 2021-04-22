@@ -37,7 +37,7 @@ func (t *Loader) rootNamespace() string {
 	return t.input.Name
 }
 
-func (t *Loader) currentNamespace() string {
+func (t *Loader) currentNamespace2() string {
 	var name string
 
 	name = t.rootNamespace()

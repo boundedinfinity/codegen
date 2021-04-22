@@ -31,72 +31,72 @@ func (t *Loader) getTemplates(ns string, typ model.TemplateType) ([]model.BiInpu
 }
 
 func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
-	t.reportStack.Push("template[%v]", si)
+	// t.reportStack.Push("template[%v]", si)
 
-	{
-		t.reportStack.Push("input")
+	// {
+	// 	t.reportStack.Push("input")
 
-		if v.Path == "" {
-			return t.CannotBeEmpty()
-		}
+	// 	if v.Path == "" {
+	// 		return t.CannotBeEmpty()
+	// 	}
 
-		if filepath.IsAbs(v.Path) {
-			ok, err := util.PathExists(v.Path)
+	// 	if filepath.IsAbs(v.Path) {
+	// 		ok, err := util.PathExists(v.Path)
 
-			if err != nil {
-				return err
-			}
+	// 		if err != nil {
+	// 			return err
+	// 		}
 
-			if !ok {
-				return t.NotFound()
-			}
-		} else {
-			relPath := filepath.Join(t.inputDir, v.Path)
-			abs, err := filepath.Abs(relPath)
+	// 		if !ok {
+	// 			return t.NotFound()
+	// 		}
+	// 	} else {
+	// 		relPath := filepath.Join(t.inputDir, v.Path)
+	// 		abs, err := filepath.Abs(relPath)
 
-			if err != nil {
-				return err
-			}
+	// 		if err != nil {
+	// 			return err
+	// 		}
 
-			ok, err := util.PathExists(abs)
+	// 		ok, err := util.PathExists(abs)
 
-			if err != nil {
-				return err
-			}
+	// 		if err != nil {
+	// 			return err
+	// 		}
 
-			if !ok {
-				return t.NotFound()
-			} else {
-				v.Path = abs
-			}
-		}
+	// 		if !ok {
+	// 			return t.NotFound()
+	// 		} else {
+	// 			v.Path = abs
+	// 		}
+	// 	}
 
-		t.reportStack.Pop()
-	}
+	// 	t.reportStack.Pop()
+	// }
 
-	{
-		t.reportStack.Push("type")
+	// {
+	// 	t.reportStack.Push("type")
 
-		if v.Type == "" {
-			return t.NotFound()
-		}
+	// 	if v.Type == "" {
+	// 		return t.NotFound()
+	// 	}
 
-		if !model.IsTemplateType(v.Type) {
-			return t.MustBeOneOf(model.TemplateTypeStrings())
-		}
+	// 	if !model.IsTemplateType(v.Type) {
+	// 		return t.MustBeOneOf(model.TemplateTypeStrings())
+	// 	}
 
-		t.reportStack.Pop()
-	}
+	// 	t.reportStack.Pop()
+	// }
 
-	ns := t.currentNamespace()
+	// ns := t.currentNamespace()
 
-	if _, ok := t.templateMap[ns]; !ok {
-		t.templateMap[ns] = make([]model.BiInput_Template, 0)
-	}
+	// if _, ok := t.templateMap[ns]; !ok {
+	// 	t.templateMap[ns] = make([]model.BiInput_Template, 0)
+	// }
 
-	t.templateMap[ns] = append(t.templateMap[ns], v)
+	// t.templateMap[ns] = append(t.templateMap[ns], v)
 
-	t.reportStack.Pop()
+	// t.reportStack.Pop()
 	return nil
 }
 

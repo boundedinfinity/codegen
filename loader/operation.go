@@ -16,61 +16,51 @@ func (t Loader) processOperation6(namespace model.BiOutput_Namespace, input mode
 	inputBuiltin := path.Join(model.NAMESPACE_BUILTIN, input.Input.Type)
 	inputAbs := path.Join(t.rootNamespace(), input.Input.Type)
 	inputRel := path.Join(namespace.Namespace, input.Input.Type)
+	var inputInfo *model.TypeInfo
 
 	if info, ok := t.typeMap[inputBuiltin]; ok {
-		output.Input.SpecType = inputBuiltin
-		output.Input.Namespace = info.Namespace
-		output.Input.Type = info.InNamespaceType
+		inputInfo = info
 	} else if info, ok := t.typeMap[inputAbs]; ok {
-		output.Input.SpecType = inputAbs
-		output.Input.Namespace = info.Namespace
-
-		if namespace.Namespace == inputAbs {
-			output.Input.Type = info.InNamespaceType
-		} else {
-			output.Input.Type = info.OutOfNamespaceType
-		}
+		inputInfo = info
 	} else if info, ok := t.typeMap[inputRel]; ok {
-		output.Input.SpecType = inputRel
-		output.Input.Namespace = info.Namespace
-
-		if namespace.Namespace == inputRel {
-			output.Input.Type = info.InNamespaceType
-		} else {
-			output.Input.Type = info.OutOfNamespaceType
-		}
+		inputInfo = info
 	} else {
 		return t.NotFound()
+	}
+
+	output.Input.SpecName = path.Join(output.SpecName, output.Input.Name)
+	output.Input.Namespace = inputInfo.Namespace
+	output.Input.SpecType = inputInfo.SpecType
+
+	if namespace.Namespace == inputInfo.Namespace {
+		output.Input.Type = inputInfo.InNamespaceType
+	} else {
+		output.Input.Type = inputInfo.OutOfNamespaceType
 	}
 
 	outputBuiltin := path.Join(model.NAMESPACE_BUILTIN, input.Output.Type)
 	outputAbs := path.Join(t.rootNamespace(), input.Output.Type)
 	outputRel := path.Join(namespace.Namespace, input.Output.Type)
+	var outputInfo *model.TypeInfo
 
 	if info, ok := t.typeMap[outputBuiltin]; ok {
-		output.Output.SpecType = outputBuiltin
-		output.Output.Namespace = info.Namespace
-		output.Output.Type = info.InNamespaceType
+		outputInfo = info
 	} else if info, ok := t.typeMap[outputAbs]; ok {
-		output.Output.SpecType = outputAbs
-		output.Output.Namespace = info.Namespace
-
-		if namespace.Namespace == outputAbs {
-			output.Output.Type = info.InNamespaceType
-		} else {
-			output.Output.Type = info.OutOfNamespaceType
-		}
+		outputInfo = info
 	} else if info, ok := t.typeMap[outputRel]; ok {
-		output.Output.SpecType = outputRel
-		output.Namespace = info.Namespace
-
-		if namespace.Namespace == outputRel {
-			output.Output.Type = info.InNamespaceType
-		} else {
-			output.Output.Type = info.OutOfNamespaceType
-		}
+		outputInfo = info
 	} else {
 		return t.NotFound()
+	}
+
+	output.Output.SpecName = path.Join(output.SpecName, output.Output.Name)
+	output.Output.Namespace = outputInfo.Namespace
+	output.Output.SpecType = outputInfo.SpecType
+
+	if namespace.Namespace == outputInfo.Namespace {
+		output.Output.Type = outputInfo.InNamespaceType
+	} else {
+		output.Output.Type = outputInfo.OutOfNamespaceType
 	}
 
 	return nil

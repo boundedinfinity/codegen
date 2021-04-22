@@ -26,7 +26,7 @@ func (t *Loader) propertyProcessor2(namespace model.BiOutput_Namespace, model1 *
 
 	builtIn := path.Join(model.NAMESPACE_BUILTIN, typ)
 	abs := path.Join(t.rootNamespace(), typ)
-	rel := path.Join(t.currentNamespace(), typ)
+	rel := path.Join(namespace.Namespace, typ)
 
 	if info, ok := t.typeMap[builtIn]; ok {
 		output.SpecType = builtIn
