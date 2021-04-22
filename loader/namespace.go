@@ -2,7 +2,6 @@ package loader
 
 import (
 	"boundedinfinity/codegen/model"
-	"fmt"
 	"path"
 )
 
@@ -47,37 +46,119 @@ func (t Loader) namespaceProcssor1(input model.BiInput_Namespace, output *model.
 	return nil
 }
 
+func filterModels(m map[string]*model.BiOutput_Model, fn func(model.BiOutput_Model) bool) []*model.BiOutput_Model {
+	var output []*model.BiOutput_Model
+
+	for _, v := range m {
+		if fn(*v) {
+			output = append(output, v)
+		}
+	}
+
+	return output
+}
+
+func filterOperations(m map[string]*model.BiOutput_Operation, fn func(model.BiOutput_Operation) bool) []*model.BiOutput_Operation {
+	var output []*model.BiOutput_Operation
+
+	for _, v := range m {
+		if fn(*v) {
+			output = append(output, v)
+		}
+	}
+
+	return output
+}
+
+func filterNamespace(m map[string]*model.BiOutput_Namespace, fn func(model.BiOutput_Namespace) bool) []*model.BiOutput_Namespace {
+	var output []*model.BiOutput_Namespace
+
+	for _, v := range m {
+		if fn(*v) {
+			output = append(output, v)
+		}
+	}
+
+	return output
+}
+
 func (t Loader) namespaceProcssor7(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
-	if tmpls, ok := t.templateMap[output.Namespace]; ok {
-		for _, v := range tmpls {
-			switch v.Type {
-			case string(model.TemplateType_NAMESPACE):
-				if _, ok := t.namespaceMap[output.Namespace]; ok {
-					fmt.Printf("namespace: %v\n", v)
-				}
-			case string(model.TemplateType_MODEL):
-				for _, m := range t.modelMap {
-					if m.Namespace == output.Namespace {
-						for _, inputTemplate := range tmpls {
-							outputTemplate := model.New_BiOutput_Template()
+	tmpls, ok := t.templateMap[output.Namespace]
 
-							if err := t.processTemplate2(*output, m.Name, inputTemplate, outputTemplate); err != nil {
-								return err
-							}
+	if !ok {
+		return nil
+	}
 
-							m.Templates = append(m.Templates, outputTemplate)
-						}
-					}
-				}
-			case string(model.TemplateType_OPERATION):
-				for _, o := range t.operationMap {
-					if o.Namespace == output.Namespace {
-						fmt.Printf("operation: %v\n", v)
-					}
-				}
-			default:
-				return t.InvalidateType()
+	namespaceTemplates := func(inputTemplate model.BiInput_Template) error {
+		namespaces := filterNamespace(t.namespaceMap, func(v model.BiOutput_Namespace) bool {
+			return v.Namespace == output.Namespace
+		})
+
+		for _, namescape := range namespaces {
+			outputTemplate := model.New_BiOutput_Template()
+
+			if err := t.processTemplate2(*output, "namespace", inputTemplate, outputTemplate); err != nil {
+				return err
 			}
+
+			namescape.Templates = append(namescape.Templates, outputTemplate)
+		}
+
+		return nil
+	}
+
+	operationTemplates := func(inputTemplate model.BiInput_Template) error {
+		operations := filterOperations(t.operationMap, func(v model.BiOutput_Operation) bool {
+			return v.Namespace == output.Namespace
+		})
+
+		for _, operation := range operations {
+			outputTemplate := model.New_BiOutput_Template()
+
+			if err := t.processTemplate2(*output, operation.Name, inputTemplate, outputTemplate); err != nil {
+				return err
+			}
+
+			operation.Templates = append(operation.Templates, outputTemplate)
+		}
+
+		return nil
+	}
+
+	modelTemplates := func(inputTemplate model.BiInput_Template) error {
+		models := filterModels(t.modelMap, func(v model.BiOutput_Model) bool {
+			return v.Namespace == output.Namespace
+		})
+
+		for _, model1 := range models {
+			outputTemplate := model.New_BiOutput_Template()
+
+			if err := t.processTemplate2(*output, model1.Name, inputTemplate, outputTemplate); err != nil {
+				return err
+			}
+
+			model1.Templates = append(model1.Templates, outputTemplate)
+		}
+
+		return nil
+	}
+
+	for _, tmpl := range tmpls {
+		switch tmpl.Type {
+		case string(model.TemplateType_NAMESPACE):
+			if err := namespaceTemplates(tmpl); err != nil {
+				return err
+			}
+		case string(model.TemplateType_MODEL):
+			if err := modelTemplates(tmpl); err != nil {
+				return err
+			}
+		case string(model.TemplateType_OPERATION):
+			if err := operationTemplates(tmpl); err != nil {
+				return err
+			}
+		default:
+			return t.InvalidateType()
 		}
 	}
 

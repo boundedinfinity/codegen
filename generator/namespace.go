@@ -24,9 +24,8 @@ func (t *Generator) runNamespace(i int, v model.BiOutput_Namespace) error {
 	if v.Templates != nil && v.Namespace != "" {
 		for _, tmpl := range v.Templates {
 			ctx := model.BiOutput_TemplateNamespaceContext{
-				Namespace: v.Namespace,
-				// RelativeNamespace: v.RelativeNamespace,
-				Spec: t.spec,
+				Namespace: v,
+				Spec:      t.spec,
 			}
 
 			if err := t.renderFile(*tmpl, ctx); err != nil {
