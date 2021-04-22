@@ -9,108 +9,78 @@ import (
 	"strings"
 )
 
-func (t *Loader) getTemplates(ns string, typ model.TemplateType) ([]model.BiInput_Template, error) {
-	var outTmpls []model.BiInput_Template
-	cns := ns
+func (t *Loader) processTemplate1(namespace model.BiOutput_Namespace, input model.BiInput_Template, output *model.BiInput_Template) error {
+	{
+		t.reportStack.Push("input")
 
-	for cns != "." {
-		if tmpls, ok := t.templateMap[cns]; ok {
-			if tmpls != nil {
-				for _, tmpl := range tmpls {
-					if tmpl.Type == string(typ) {
-						outTmpls = append(outTmpls, tmpl)
-					}
-				}
+		if input.Path == "" {
+			return t.CannotBeEmpty()
+		}
+
+		if filepath.IsAbs(input.Path) {
+			if ok, err := util.PathExists(input.Path); err != nil {
+				return err
+			} else if !ok {
+				return t.NotFound()
+			} else {
+				output.Path = input.Path
+			}
+		} else {
+			relPath := filepath.Join(t.inputDir, input.Path)
+			abs, err := filepath.Abs(relPath)
+
+			if err != nil {
+				return err
+			}
+
+			if ok, err := util.PathExists(abs); err != nil {
+				return err
+			} else if !ok {
+				return t.NotFound()
+			} else {
+				output.Path = abs
 			}
 		}
 
-		cns = path.Dir(cns)
+		t.reportStack.Pop()
 	}
 
-	return outTmpls, nil
-}
+	{
+		t.reportStack.Push("type")
 
-func (t *Loader) processTemplate1(si int, v model.BiInput_Template) error {
-	// t.reportStack.Push("template[%v]", si)
+		if input.Type == "" {
+			return t.NotFound()
+		}
 
-	// {
-	// 	t.reportStack.Push("input")
+		if !model.IsTemplateType(input.Type) {
+			return t.MustBeOneOf(model.TemplateTypeStrings())
+		}
 
-	// 	if v.Path == "" {
-	// 		return t.CannotBeEmpty()
-	// 	}
+		output.Type = input.Type
+		t.reportStack.Pop()
+	}
 
-	// 	if filepath.IsAbs(v.Path) {
-	// 		ok, err := util.PathExists(v.Path)
+	{
+		t.reportStack.Push("header")
+		output.Header = input.Header
+		t.reportStack.Pop()
+	}
 
-	// 		if err != nil {
-	// 			return err
-	// 		}
-
-	// 		if !ok {
-	// 			return t.NotFound()
-	// 		}
-	// 	} else {
-	// 		relPath := filepath.Join(t.inputDir, v.Path)
-	// 		abs, err := filepath.Abs(relPath)
-
-	// 		if err != nil {
-	// 			return err
-	// 		}
-
-	// 		ok, err := util.PathExists(abs)
-
-	// 		if err != nil {
-	// 			return err
-	// 		}
-
-	// 		if !ok {
-	// 			return t.NotFound()
-	// 		} else {
-	// 			v.Path = abs
-	// 		}
-	// 	}
-
-	// 	t.reportStack.Pop()
-	// }
-
-	// {
-	// 	t.reportStack.Push("type")
-
-	// 	if v.Type == "" {
-	// 		return t.NotFound()
-	// 	}
-
-	// 	if !model.IsTemplateType(v.Type) {
-	// 		return t.MustBeOneOf(model.TemplateTypeStrings())
-	// 	}
-
-	// 	t.reportStack.Pop()
-	// }
-
-	// ns := t.currentNamespace()
-
-	// if _, ok := t.templateMap[ns]; !ok {
-	// 	t.templateMap[ns] = make([]model.BiInput_Template, 0)
-	// }
-
-	// t.templateMap[ns] = append(t.templateMap[ns], v)
-
-	// t.reportStack.Pop()
 	return nil
 }
 
-func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template) (model.BiOutput_Template, error) {
-	output := model.BiOutput_Template{
-		Input: input.Path,
-	}
-
+func (t *Loader) processTemplate2(namespace model.BiOutput_Namespace, name string, input model.BiInput_Template, output *model.BiOutput_Template) error {
 	var tmplExt string
 	var tmplName string
+	var relPath string
 	var abs string
 	var fn string
 
-	tmplName = output.Input
+	relPath = namespace.Namespace
+	relPath = strings.TrimPrefix(relPath, t.rootNamespace())
+	relPath = strings.TrimPrefix(relPath, "/")
+
+	tmplName = input.Path
 	tmplName = filepath.Base(tmplName)
 	tmplName = util.TrimTemplateExt(tmplName)
 	tmplExt = filepath.Ext(tmplName)
@@ -128,11 +98,10 @@ func (t *Loader) processTemplate2(ns, name string, input model.BiInput_Template)
 	}
 
 	fn = fmt.Sprintf("%v.%v", fn, tmplExt)
+	abs = path.Join(t.Output.Info.OutputDir, relPath, fn)
 
-	abs = t.Output.Info.OutputDir
-	// abs = path.Join(abs, t.relativeNamespace(ns))
-	abs = path.Join(abs, fn)
-
+	output.Input = input.Path
 	output.Output = abs
-	return output, nil
+	output.Header = t.splitDescription(input.Header)
+	return nil
 }

@@ -44,7 +44,7 @@ func (t *Loader) FromPath(inputs []string) error {
 	t.inputDir = filepath.Dir(t.inputPath)
 
 	if err := t.processInput(); err != nil {
-		t.report("%v", err.Error())
+		t.reportErr(err)
 	}
 
 	return nil

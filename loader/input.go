@@ -1,10 +1,5 @@
 package loader
 
-import (
-	"boundedinfinity/codegen/util"
-	"fmt"
-)
-
 func (t *Loader) processInput() error {
 	// t.reportStack.Push(fmt.Sprintf("input[%v]", util.SummerySuffix(t.inputPath, model.SUMMERY_SIZE)))
 	t.reportStack.Push("loader")
@@ -37,15 +32,15 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	if err := t.walk(-1, t.input.Specification, t.namespaceProcssor1, t.modelProcessor1, t.propertyProcessor1, nil); err != nil {
+	if err := t.walk(-1, t.input.Specification, t.namespaceProcssor1, t.modelProcessor1, t.propertyProcessor1, nil, nil); err != nil {
 		return err
 	}
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor2, nil); err != nil {
+	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor2, nil, nil); err != nil {
 		return err
 	}
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor3, nil); err != nil {
+	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor3, nil, nil); err != nil {
 		return err
 	}
 
@@ -62,22 +57,28 @@ func (t *Loader) processInput() error {
 	}
 
 	for _, node := range solvedGraph {
-		t.report("processing node %v", node.name)
+		t.report(t.reportStack.S(), "processing node %v", node.name)
 
-		if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor4(node.name), nil); err != nil {
+		if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor4(node.name), nil, nil); err != nil {
 			return err
 		}
 	}
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessorJson, nil); err != nil {
+	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessorJson, nil, nil); err != nil {
 		return err
 	}
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, nil, t.processOperation6); err != nil {
+	if err := t.walk(-1, t.input.Specification, nil, nil, nil, t.processOperation6, nil); err != nil {
 		return err
 	}
 
-	fmt.Println(util.Jdump(t.modelMap))
+	if err := t.walk(-1, t.input.Specification, t.namespaceProcssor7, nil, nil, nil, nil); err != nil {
+		return err
+	}
+
+	if err := t.walk(-1, t.input.Specification, nil, t.modelProcessor8, nil, t.processOperation8, nil); err != nil {
+		return err
+	}
 
 	return nil
 }

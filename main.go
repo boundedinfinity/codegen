@@ -1,6 +1,7 @@
 package main
 
 import (
+	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
 	"fmt"
 	"os"
@@ -16,11 +17,11 @@ func main() {
 		os.Exit(handleError(err))
 	}
 
-	// g := generator.New(l.Output)
+	g := generator.New(l.Output)
 
-	// if err := g.Generate(); err != nil {
-	// 	os.Exit(handleError(err))
-	// }
+	if err := g.Generate(); err != nil {
+		os.Exit(handleError(err))
+	}
 }
 
 func handleError(err error) int {

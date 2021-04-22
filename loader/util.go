@@ -1,7 +1,9 @@
 package loader
 
 import (
+	"boundedinfinity/codegen/errutil"
 	"boundedinfinity/codegen/model"
+	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -27,8 +29,19 @@ func (t *Loader) splitDescription(s string) []string {
 	return d
 }
 
-func (t *Loader) report(format string, a ...interface{}) {
-	stack := strings.Join(t.reportStack.S(), ".")
+func (t *Loader) reportErr(err error) {
+	var path []string
+	var cerr errutil.CodeGenError
+
+	if errors.As(err, &cerr) {
+		path = append(path, cerr.Path...)
+	}
+
+	t.report(path, err.Error())
+}
+
+func (t *Loader) report(path []string, format string, a ...interface{}) {
+	stack := strings.Join(path, ".")
 	reportFormat := fmt.Sprintf("%v: %v\n", stack, format)
 	fmt.Printf(reportFormat, a...)
 }

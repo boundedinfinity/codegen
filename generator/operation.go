@@ -10,7 +10,7 @@ func (t *Generator) runOperations() error {
 	t.reportStack.Pop()
 
 	for i, v := range t.spec.Operations {
-		if err := t.runOperation(i, v); err != nil {
+		if err := t.runOperation(i, *v); err != nil {
 			return err
 		}
 	}
@@ -28,7 +28,7 @@ func (t *Generator) runOperation(i int, v model.BiOutput_Operation) error {
 				Spec:      t.spec,
 			}
 
-			if err := t.renderFile(tmpl, ctx); err != nil {
+			if err := t.renderFile(*tmpl, ctx); err != nil {
 				return err
 			}
 		}

@@ -1,9 +1,5 @@
 package model
 
-type BiOutput_TypeMap struct {
-	Types map[string]string `json:"types,omitempty" yaml:"types,omitempty"`
-}
-
 type BiOutput_TemplateModelContext struct {
 	Model BiOutput_Model `json:"model,omitempty" yaml:"model,omitempty"`
 	Spec  BiOutput       `json:"spec,omitempty" yaml:"spec,omitempty"`
@@ -43,11 +39,17 @@ type BiOutput_Info struct {
 }
 
 type BiOutput_Template struct {
-	Input          string `json:"input,omitempty" yaml:"input,omitempty"`
-	Output         string `json:"output,omitempty" yaml:"output,omitempty"`
-	InputLanguage  string `json:"inputLanguage,omitempty" yaml:"inputLanguage,omitempty"`
-	OutputLanguage string `json:"outputLanguage,omitempty" yaml:"outputLanguage,omitempty"`
-	Header         string `json:"header,omitempty" yaml:"header,omitempty"`
+	Input          string   `json:"input,omitempty" yaml:"input,omitempty"`
+	Output         string   `json:"output,omitempty" yaml:"output,omitempty"`
+	InputLanguage  string   `json:"inputLanguage,omitempty" yaml:"inputLanguage,omitempty"`
+	OutputLanguage string   `json:"outputLanguage,omitempty" yaml:"outputLanguage,omitempty"`
+	Header         []string `json:"header,omitempty" yaml:"header,omitempty"`
+}
+
+func New_BiOutput_Template() *BiOutput_Template {
+	return &BiOutput_Template{
+		Header: make([]string, 0),
+	}
 }
 
 type BiOutput_Namespace struct {

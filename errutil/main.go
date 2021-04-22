@@ -6,15 +6,15 @@ import (
 )
 
 type CodeGenError struct {
-	path    []string
+	Path    []string
 	message string
 }
 
 func (t CodeGenError) Error() string {
 	var s string
 
-	if t.path == nil && len(t.path) > 0 {
-		s = strings.Join(t.path, ".")
+	if t.Path == nil && len(t.Path) > 0 {
+		s = strings.Join(t.Path, ".")
 		s = fmt.Sprintf("%v : ", s)
 	}
 
@@ -25,7 +25,7 @@ func (t CodeGenError) Error() string {
 
 func Errorf(path []string, format string, a ...interface{}) error {
 	return CodeGenError{
-		path:    path,
+		Path:    path,
 		message: fmt.Sprintf(format, a...),
 	}
 }

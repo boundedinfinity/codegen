@@ -21,7 +21,7 @@ func (t *Loader) processInput_Info() error {
 		t.reportStack.Push("dumpContext")
 		defer t.reportStack.Pop()
 
-		t.report("%v", output.DumpContext)
+		t.report(t.reportStack.S(), "%v", output.DumpContext)
 
 		return nil
 	}
@@ -29,7 +29,7 @@ func (t *Loader) processInput_Info() error {
 	checkFilenameMarker := func() error {
 		t.reportStack.Push("filenameMarker")
 		defer t.reportStack.Pop()
-		t.report("%v", input.FilenameMarker)
+		t.report(t.reportStack.S(), "%v", input.FilenameMarker)
 		return nil
 	}
 
@@ -96,7 +96,7 @@ func (t *Loader) processInput_Info_inputDir(input model.BiInput_Info, output *mo
 		}
 	}
 
-	t.report(output.InputDir)
+	t.report(t.reportStack.S(), output.InputDir)
 
 	return nil
 }
@@ -115,7 +115,7 @@ func (t *Loader) processInput_Info_outputDir(input model.BiInput_Info, output *m
 		input.OutputDir = filepath.Join(t.inputDir, input.OutputDir)
 	}
 
-	t.report(output.OutputDir)
+	t.report(t.reportStack.S(), output.OutputDir)
 
 	return nil
 }

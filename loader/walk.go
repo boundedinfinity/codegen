@@ -9,13 +9,14 @@ type NamespaceProcessor func(model.BiInput_Namespace, *model.BiOutput_Namespace)
 type ModelProcessor func(model.BiOutput_Namespace, model.BiInput_Model, *model.BiOutput_Model) error
 type PropertyProcessor func(model.BiOutput_Namespace, *model.BiOutput_Model, model.BiInput_Property, *model.BiOutput_Property) error
 type OperationProcessor func(model.BiOutput_Namespace, model.BiInput_Operation, *model.BiOutput_Operation) error
-type TemplateProcessor func(model.BiOutput_Namespace, model.BiInput_Operation, *model.BiOutput_Operation) error
+type TemplateProcessor func(*model.BiOutput_Namespace, *model.BiOutput_Model, *model.BiOutput_Operation) error
 
 func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 	namespaceProcessor NamespaceProcessor,
 	modelProcessor ModelProcessor,
 	propertyProcessor PropertyProcessor,
-	osp OperationProcessor,
+	operationProcessor OperationProcessor,
+	templateProcessor TemplateProcessor,
 ) error {
 	if i < 0 {
 		t.reportStack.Push("specification")
@@ -37,6 +38,7 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 		outputNamesapce = model.New_BiOutput_Namespace()
 		outputNamesapce.Namespace = namespaceName
 		t.namespaceMap[namespaceName] = outputNamesapce
+		t.Output.Namespaces = append(t.Output.Namespaces, outputNamesapce)
 	}
 
 	if namespaceProcessor != nil {
@@ -58,23 +60,19 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 				outputModel.Name = inputModel.Name
 				outputModel.SpecName = modelName
 				t.modelMap[modelName] = outputModel
+				t.Output.Models = append(t.Output.Models, outputModel)
 			}
 
 			modelWrap := func() error {
 				t.reportStack.Push("model[%v (%v)]", modelIndex, inputModel.Name)
 				defer t.reportStack.Pop()
-
-				if modelProcessor != nil {
-					if err := modelProcessor(*outputNamesapce, inputModel, outputModel); err != nil {
-						return err
-					}
-				}
-
-				return nil
+				return modelProcessor(*outputNamesapce, inputModel, outputModel)
 			}
 
-			if err := modelWrap(); err != nil {
-				return err
+			if modelProcessor != nil {
+				if err := modelWrap(); err != nil {
+					return err
+				}
 			}
 
 			if inputModel.Properties != nil && propertyProcessor != nil {
@@ -95,12 +93,7 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 					propertyWrap := func() error {
 						t.reportStack.Push("property[%v (%v)]", properyIndex, inputPropery.Name)
 						defer t.reportStack.Pop()
-
-						if err := propertyProcessor(*outputNamesapce, outputModel, inputPropery, outputProperty); err != nil {
-							return err
-						}
-
-						return nil
+						return propertyProcessor(*outputNamesapce, outputModel, inputPropery, outputProperty)
 					}
 
 					if err := propertyWrap(); err != nil {
@@ -111,7 +104,7 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 		}
 	}
 
-	if inputNamespace.Operations != nil && osp != nil {
+	if inputNamespace.Operations != nil && operationProcessor != nil {
 		for operationIndex, inputOperation := range inputNamespace.Operations {
 			var outputOperation *model.BiOutput_Operation
 
@@ -125,17 +118,13 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 				outputOperation.SpecName = operationName
 				outputOperation.Namespace = namespaceName
 				t.operationMap[operationName] = outputOperation
+				t.Output.Operations = append(t.Output.Operations, outputOperation)
 			}
 
 			operationWrap := func() error {
 				t.reportStack.Push("operation[%v (%v)]", operationIndex, inputOperation.Name)
 				defer t.reportStack.Pop()
-
-				if err := osp(*outputNamesapce, inputOperation, outputOperation); err != nil {
-					return err
-				}
-
-				return nil
+				return operationProcessor(*outputNamesapce, inputOperation, outputOperation)
 			}
 
 			if err := operationWrap(); err != nil {
@@ -146,7 +135,7 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 
 	if inputNamespace.Namespaces != nil {
 		for ci, cns := range inputNamespace.Namespaces {
-			if err := t.walk(ci, cns, namespaceProcessor, modelProcessor, propertyProcessor, osp); err != nil {
+			if err := t.walk(ci, cns, namespaceProcessor, modelProcessor, propertyProcessor, operationProcessor, templateProcessor); err != nil {
 				return err
 			}
 		}
