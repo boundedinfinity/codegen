@@ -67,7 +67,7 @@ func New_BiOutput_Namespace() *BiOutput_Namespace {
 type BiOutput_Operation struct {
 	Name        string               `json:"name,omitempty" yaml:"name,omitempty"`
 	Namespace   string               `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	SpecType    string               `json:"specType,omitempty" yaml:"specType,omitempty"`
+	SpecName    string               `json:"specName,omitempty" yaml:"specName,omitempty"`
 	Description []string             `json:"description,omitempty" yaml:"description,omitempty"`
 	Imports     []string             `json:"imports,omitempty" yaml:"imports,omitempty"`
 	Input       BiOutput_Property    `json:"input,omitempty" yaml:"input,omitempty"`
@@ -75,8 +75,8 @@ type BiOutput_Operation struct {
 	Templates   []*BiOutput_Template `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
-func New_BiOutput_Operation() BiOutput_Operation {
-	return BiOutput_Operation{
+func New_BiOutput_Operation() *BiOutput_Operation {
+	return &BiOutput_Operation{
 		Description: make([]string, 0),
 		Imports:     make([]string, 0),
 		Templates:   make([]*BiOutput_Template, 0),

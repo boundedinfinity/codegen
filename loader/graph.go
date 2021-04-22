@@ -41,13 +41,9 @@ func NewNode(name string, deps ...string) *Node {
 type Graph []*Node
 
 func resolveGraph(graph Graph) (Graph, error) {
-	// A map containing the node names and the actual node object
 	nodeNames := make(map[string]*Node)
-
-	// A map containing the nodes and their dependencies
 	nodeDependencies := make(map[string]mapset.Set)
 
-	// Populate the maps
 	for _, node := range graph {
 		nodeNames[node.name] = node
 
@@ -58,20 +54,16 @@ func resolveGraph(graph Graph) (Graph, error) {
 		nodeDependencies[node.name] = dependencySet
 	}
 
-	// Iteratively find and remove nodes from the graph which have no dependencies.
-	// If at some point there are still nodes in the graph and we cannot find
-	// nodes without dependencies, that means we have a circular dependency
 	var resolved Graph
 	for len(nodeDependencies) != 0 {
-		// Get all nodes from the graph which have no dependencies
 		readySet := mapset.NewSet()
+
 		for name, deps := range nodeDependencies {
 			if deps.Cardinality() == 0 {
 				readySet.Add(name)
 			}
 		}
 
-		// If there aren't any ready nodes, then we have a cicular dependency
 		if readySet.Cardinality() == 0 {
 			var g Graph
 			for name := range nodeDependencies {
@@ -81,14 +73,11 @@ func resolveGraph(graph Graph) (Graph, error) {
 			return g, errors.New("Circular dependency found")
 		}
 
-		// Remove the ready nodes and add them to the resolved graph
 		for name := range readySet.Iter() {
 			delete(nodeDependencies, name.(string))
 			resolved = append(resolved, nodeNames[name.(string)])
 		}
 
-		// Also make sure to remove the ready nodes from the
-		// remaining node dependencies as well
 		for name, deps := range nodeDependencies {
 			diff := deps.Difference(readySet)
 			nodeDependencies[name] = diff

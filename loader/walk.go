@@ -7,7 +7,7 @@ import (
 
 type NamespaceProcessor func(model.BiInput_Namespace, *model.BiOutput_Namespace) error
 type ModelProcessor func(model.BiOutput_Namespace, model.BiInput_Model, *model.BiOutput_Model) error
-type PropertyProcessor func(model.BiOutput_Namespace, model.BiOutput_Model, model.BiInput_Property, *model.BiOutput_Property) error
+type PropertyProcessor func(model.BiOutput_Namespace, *model.BiOutput_Model, model.BiInput_Property, *model.BiOutput_Property) error
 type OperationProcessor func(model.BiOutput_Namespace, model.BiInput_Operation, *model.BiOutput_Operation) error
 
 func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
@@ -93,7 +93,7 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 						t.reportStack.Push("property[%v (%v)]", properyIndex, inputPropery.Name)
 						defer t.reportStack.Pop()
 
-						if err := propertyProcessor(*outputNamesapce, *outputModel, inputPropery, outputProperty); err != nil {
+						if err := propertyProcessor(*outputNamesapce, outputModel, inputPropery, outputProperty); err != nil {
 							return err
 						}
 
@@ -108,27 +108,37 @@ func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
 		}
 	}
 
-	// if inputNamespace.Operations != nil && osp != nil {
-	// 	for oi, o := range inputNamespace.Operations {
-	// 		operationWrap := func() error {
-	// 			t.reportStack.Push("operation[%v (%v)]", oi, o.Name)
-	// 			defer t.reportStack.Pop()
+	if inputNamespace.Operations != nil && osp != nil {
+		for operationIndex, inputOperation := range inputNamespace.Operations {
+			var outputOperation *model.BiOutput_Operation
 
-	// 			t.namespaceStack.Push(o.Name)
-	// 			defer t.namespaceStack.Pop()
+			operationName := path.Join(t.currentNamespace(), inputOperation.Name)
 
-	// 			if err := osp(o); err != nil {
-	// 				return err
-	// 			}
+			if o, ok := t.operationMap[operationName]; ok {
+				outputOperation = o
+			} else {
+				outputOperation = model.New_BiOutput_Operation()
+				outputOperation.Name = inputOperation.Name
+				outputOperation.SpecName = operationName
+				t.operationMap[operationName] = outputOperation
+			}
 
-	// 			return nil
-	// 		}
+			operationWrap := func() error {
+				t.reportStack.Push("operation[%v (%v)]", operationIndex, inputOperation.Name)
+				defer t.reportStack.Pop()
 
-	// 		if err := operationWrap(); err != nil {
-	// 			return err
-	// 		}
-	// 	}
-	// }
+				if err := osp(*outputNamesapce, inputOperation, outputOperation); err != nil {
+					return err
+				}
+
+				return nil
+			}
+
+			if err := operationWrap(); err != nil {
+				return err
+			}
+		}
+	}
 
 	if inputNamespace.Namespaces != nil {
 		for ci, cns := range inputNamespace.Namespaces {

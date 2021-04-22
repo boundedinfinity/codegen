@@ -62,7 +62,7 @@ func (t *Loader) processInput() error {
 	}
 
 	for _, node := range solvedGraph {
-		t.report(node.name)
+		t.report("processing node %v", node.name)
 
 		if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor4(node.name), nil); err != nil {
 			return err
@@ -73,7 +73,7 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	if err := t.walk(-1, t.input.Specification, nil, t.modelProcessor5, nil, nil); err != nil {
+	if err := t.walk(-1, t.input.Specification, nil, nil, nil, t.processOperation6); err != nil {
 		return err
 	}
 
@@ -81,29 +81,3 @@ func (t *Loader) processInput() error {
 
 	return nil
 }
-
-// RubiconStatus := NewNode("github.comcast.com/BusinessServices/mercury-client/model/RubiconStatus")
-// Rubicon_Adtran_Msp_Neighbor := NewNode("github.comcast.com/BusinessServices/mercury-client/adtran/v2/Rubicon_Adtran_Msp_Neighbor")
-// Rubicon_Adtran_Msp := NewNode("github.comcast.com/BusinessServices/mercury-client/adtran/v2/Rubicon_Adtran_Msp")
-// Rubicon_Adtran_Msp.Add(RubiconStatus.name)
-// Rubicon_Adtran_Msp.Add(Rubicon_Adtran_Msp_Neighbor.name)
-// Rubicon_Broadsoft_Cdr_Filename_Store_Filename := NewNode("github.comcast.com/BusinessServices/mercury-client/bcd/v1/store/cdr/filename/Rubicon_Broadsoft_Cdr_Filename_Store_Filename")
-// Rubicon_Broadsoft_Cdr_Filename_Store_Filename.Add(RubiconStatus.name)
-
-// var workingGraph Graph
-// // workingGraph = append(workingGraph, nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH, nodeI, nodeJ, nodeK)
-// workingGraph = append(workingGraph, RubiconStatus, Rubicon_Adtran_Msp_Neighbor, Rubicon_Adtran_Msp, Rubicon_Broadsoft_Cdr_Filename_Store_Filename)
-// fmt.Printf(">>> A working dependency graph\n")
-// t.displayGraph(workingGraph)
-
-// resolved, err := resolveGraph(workingGraph)
-// if err != nil {
-// 	fmt.Printf("Failed to resolve dependency graph: %s\n", err)
-// } else {
-// 	fmt.Println("The dependency graph resolved successfully")
-// }
-// for _, node := range resolved {
-// 	fmt.Println(node.name)
-// }
-// fmt.Printf(">>> A working dependency graph\n")
-// t.displayGraph(resolved)

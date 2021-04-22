@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-func (t *Loader) propertyProcessor1(namespace model.BiOutput_Namespace, model1 model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+func (t *Loader) propertyProcessor1(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
 	output.Name = input.Name
 	output.Description = t.splitDescription(input.Description)
 
 	return nil
 }
 
-func (t *Loader) propertyProcessor2(namespace model.BiOutput_Namespace, model1 model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+func (t *Loader) propertyProcessor2(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
 	typ := input.Type
 	var isCollection bool
 
@@ -61,7 +61,7 @@ func (t *Loader) propertyProcessor2(namespace model.BiOutput_Namespace, model1 m
 	return nil
 }
 
-func (t *Loader) propertyProcessor3(namespace model.BiOutput_Namespace, model1 model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+func (t *Loader) propertyProcessor3(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
 	if strings.HasPrefix(output.Namespace, model.NAMESPACE_BUILTIN) {
 		return nil
 	}
@@ -90,7 +90,7 @@ func (t *Loader) propertyProcessor3(namespace model.BiOutput_Namespace, model1 m
 }
 
 func (t *Loader) propertyProcessor4(specName string) PropertyProcessor {
-	return func(namespace model.BiOutput_Namespace, model1 model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+	return func(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
 		if specName != model1.SpecName {
 			return nil
 		}
@@ -99,7 +99,7 @@ func (t *Loader) propertyProcessor4(specName string) PropertyProcessor {
 	}
 }
 
-func (t *Loader) propertyProcessorJson(namespace model.BiOutput_Namespace, model1 model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+func (t *Loader) propertyProcessorJson(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
 	if output.JsonPath != "" {
 		return nil
 	}
@@ -170,6 +170,10 @@ func (t *Loader) propertyProcessorJson(namespace model.BiOutput_Namespace, model
 		} else {
 			return t.NotFound()
 		}
+	}
+
+	for k, v := range output.JsonStruture {
+		model1.JsonStruture[k] = v
 	}
 
 	return nil
