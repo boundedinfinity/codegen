@@ -2,144 +2,185 @@ package loader
 
 import (
 	"boundedinfinity/codegen/model"
-	"path"
+	"boundedinfinity/codegen/util"
+	"fmt"
 )
 
-type NamespaceProcessor func(model.BiInput_Namespace, *model.BiOutput_Namespace) error
-type ModelProcessor func(model.BiOutput_Namespace, model.BiInput_Model, *model.BiOutput_Model) error
-type PropertyProcessor func(model.BiOutput_Namespace, *model.BiOutput_Model, model.BiInput_Property, *model.BiOutput_Property) error
-type OperationProcessor func(model.BiOutput_Namespace, model.BiInput_Operation, *model.BiOutput_Operation) error
-type TemplateProcessor func(*model.BiOutput_Namespace, *model.BiOutput_Model, *model.BiOutput_Operation) error
-
-func (t *Loader) walk(i int, inputNamespace model.BiInput_Namespace,
-	namespaceProcessor NamespaceProcessor,
-	modelProcessor ModelProcessor,
-	propertyProcessor PropertyProcessor,
-	operationProcessor OperationProcessor,
-	templateProcessor TemplateProcessor,
-) error {
-	if i < 0 {
-		t.reportStack.Push("specification")
-	} else {
-		t.reportStack.Push("namespace[%v (%v)]", i, inputNamespace.Name)
+func (t Loader) walkSpec(fn WalkFunc, ws ...WalkType) error {
+	ctx := &WalkContext{
+		Namespace: &WalkContextNamespace{
+			Input: t.inputSpec.Specification,
+		},
 	}
 
-	defer t.reportStack.Pop()
-
-	t.namespaceStack.Push(inputNamespace.Name)
-	defer t.namespaceStack.Pop()
-
-	namespaceName := t.currentNamespace2()
-	var outputNamesapce *model.BiOutput_Namespace
-
-	if v, ok := t.namespaceMap[namespaceName]; ok {
-		outputNamesapce = v
-	} else {
-		outputNamesapce = model.New_BiOutput_Namespace()
-		outputNamesapce.Namespace = namespaceName
-		t.namespaceMap[namespaceName] = outputNamesapce
-		t.Output.Namespaces = append(t.Output.Namespaces, outputNamesapce)
+	if err := t.walkNamespace(ctx, fn, ws...); err != nil {
+		return err
 	}
 
-	if namespaceProcessor != nil {
-		if err := namespaceProcessor(inputNamespace, outputNamesapce); err != nil {
+	return nil
+}
+
+func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) error {
+	nsSpecPath := t.appendNamespace(ctx.Namespace.Input.Name)
+	var outputNamespace *model.OutputNamespace
+
+	if v, ok := t.namespaceMap[nsSpecPath]; ok {
+		outputNamespace = v
+	} else {
+		outputNamespace = model.NewOutputNamespace()
+		outputNamespace.SpecPath = nsSpecPath
+		outputNamespace.Namespace = nsSpecPath
+		t.namespaceMap[nsSpecPath] = outputNamespace
+		t.OutputSpec.Namespaces = append(t.OutputSpec.Namespaces, outputNamespace)
+	}
+
+	ctx.Namespace.Output = outputNamespace
+
+	if fn != nil && ctx.Namespace.Input.Models != nil {
+		for _, inputModel := range ctx.Namespace.Input.Models {
+			wrapper1 := func() error {
+				modelSpecPath := t.appendNamespace(inputModel.Name)
+				defer t.namespaceStack.Pop()
+				var outputModel *model.OutputModel
+
+				if v, ok := t.modelMap[modelSpecPath]; ok {
+					outputModel = v
+				} else {
+					outputModel = model.NewOutputModel()
+					outputModel.SpecPath = modelSpecPath
+					outputModel.Namespace = outputNamespace.Namespace
+					t.modelMap[modelSpecPath] = outputModel
+					t.OutputSpec.Models = append(t.OutputSpec.Models, outputModel)
+				}
+
+				modelCtx := &WalkContext{
+					Namespace: ctx.Namespace,
+					Model: &WalkContextModel{
+						Input:  inputModel,
+						Output: outputModel,
+					},
+				}
+
+				if ContainsWalkType(WALKTYPE_MODEL, ws...) {
+					if err := fn(modelCtx); err != nil {
+						return err
+					}
+				}
+
+				if ContainsWalkType(WALKTYPE_PROPERTY, ws...) && inputModel.Properties != nil {
+					for _, inputProperty := range inputModel.Properties {
+						wrapper2 := func() error {
+							propertySpecPath := t.appendNamespace(inputProperty.Name)
+							defer t.namespaceStack.Pop()
+							var outputProperty *model.OutputProperty
+
+							if v, ok := t.propertyMap[propertySpecPath]; ok {
+								outputProperty = v
+							} else {
+								outputProperty = model.NewOutputProperty()
+								outputProperty.SpecPath = propertySpecPath
+								outputProperty.Namespace = outputNamespace.Namespace
+								t.propertyMap[modelSpecPath] = outputProperty
+								outputModel.Properties = append(outputModel.Properties, outputProperty)
+							}
+
+							propertyCtx := &WalkContext{
+								Namespace: modelCtx.Namespace,
+								Model:     modelCtx.Model,
+								Property: &WalkContextProperty{
+									Input:  inputProperty,
+									Output: outputProperty,
+								},
+							}
+
+							if err := fn(propertyCtx); err != nil {
+								return err
+							}
+
+							return nil
+						}
+
+						if err := wrapper2(); err != nil {
+							return err
+						}
+					}
+
+				}
+
+				return nil
+			}
+
+			if err := wrapper1(); err != nil {
+				return err
+			}
+		}
+	}
+
+	if ContainsWalkType(WALKTYPE_NAMESPACE, ws...) && fn != nil {
+		if err := fn(ctx); err != nil {
 			return err
 		}
 	}
 
-	if inputNamespace.Models != nil {
-		for modelIndex, inputModel := range inputNamespace.Models {
-			var outputModel *model.BiOutput_Model
-
-			modelName := path.Join(namespaceName, inputModel.Name)
-
-			if m, ok := t.modelMap[modelName]; ok {
-				outputModel = m
-			} else {
-				outputModel = model.New_BiOutput_Model()
-				outputModel.Name = inputModel.Name
-				outputModel.SpecName = modelName
-				t.modelMap[modelName] = outputModel
-				t.Output.Models = append(t.Output.Models, outputModel)
+	if ctx.Namespace.Input.Namespaces != nil {
+		for _, input := range ctx.Namespace.Input.Namespaces {
+			nctx := &WalkContext{
+				Namespace: &WalkContextNamespace{
+					Input: input,
+				},
 			}
 
-			modelWrap := func() error {
-				t.reportStack.Push("model[%v (%v)]", modelIndex, inputModel.Name)
-				defer t.reportStack.Pop()
-				return modelProcessor(*outputNamesapce, inputModel, outputModel)
-			}
-
-			if modelProcessor != nil {
-				if err := modelWrap(); err != nil {
-					return err
-				}
-			}
-
-			if inputModel.Properties != nil && propertyProcessor != nil {
-				for properyIndex, inputPropery := range inputModel.Properties {
-					propertyName := path.Join(modelName, inputPropery.Name)
-
-					var outputProperty *model.BiOutput_Property
-
-					if v, ok := t.propertyMap[propertyName]; ok {
-						outputProperty = v
-					} else {
-						outputProperty = model.New_BiOutput_Property()
-						outputProperty.SpecName = propertyName
-						t.propertyMap[propertyName] = outputProperty
-						outputModel.Properties = append(outputModel.Properties, outputProperty)
-					}
-
-					propertyWrap := func() error {
-						t.reportStack.Push("property[%v (%v)]", properyIndex, inputPropery.Name)
-						defer t.reportStack.Pop()
-						return propertyProcessor(*outputNamesapce, outputModel, inputPropery, outputProperty)
-					}
-
-					if err := propertyWrap(); err != nil {
-						return err
-					}
-				}
-			}
-		}
-	}
-
-	if inputNamespace.Operations != nil && operationProcessor != nil {
-		for operationIndex, inputOperation := range inputNamespace.Operations {
-			var outputOperation *model.BiOutput_Operation
-
-			operationName := path.Join(namespaceName, inputOperation.Name)
-
-			if o, ok := t.operationMap[operationName]; ok {
-				outputOperation = o
-			} else {
-				outputOperation = model.New_BiOutput_Operation()
-				outputOperation.Name = inputOperation.Name
-				outputOperation.SpecName = operationName
-				outputOperation.Namespace = namespaceName
-				t.operationMap[operationName] = outputOperation
-				t.Output.Operations = append(t.Output.Operations, outputOperation)
-			}
-
-			operationWrap := func() error {
-				t.reportStack.Push("operation[%v (%v)]", operationIndex, inputOperation.Name)
-				defer t.reportStack.Pop()
-				return operationProcessor(*outputNamesapce, inputOperation, outputOperation)
-			}
-
-			if err := operationWrap(); err != nil {
+			if err := t.walkNamespace(nctx, fn, ws...); err != nil {
 				return err
 			}
 		}
 	}
 
-	if inputNamespace.Namespaces != nil {
-		for ci, cns := range inputNamespace.Namespaces {
-			if err := t.walk(ci, cns, namespaceProcessor, modelProcessor, propertyProcessor, operationProcessor, templateProcessor); err != nil {
-				return err
-			}
+	return nil
+}
+
+type WalkType string
+
+const (
+	WALKTYPE_NAMESPACE WalkType = "namespace"
+	WALKTYPE_MODEL     WalkType = "model"
+	WALKTYPE_PROPERTY  WalkType = "property"
+	WALKTYPE_OPERATION WalkType = "operation"
+)
+
+func ContainsWalkType(v WalkType, vs ...WalkType) bool {
+	for _, x := range vs {
+		if v == x {
+			return true
 		}
 	}
+	return false
+}
 
+type WalkFunc func(ctx *WalkContext) error
+
+type WalkContext struct {
+	Namespace *WalkContextNamespace
+	Model     *WalkContextModel
+	Property  *WalkContextProperty
+}
+
+type WalkContextNamespace struct {
+	Input  model.InputNamespace
+	Output *model.OutputNamespace
+}
+
+type WalkContextModel struct {
+	Input  model.InputModel
+	Output *model.OutputModel
+}
+
+type WalkContextProperty struct {
+	Input  model.InputProperty
+	Output *model.OutputProperty
+}
+
+func (t *Loader) dumpCtx(ctx *WalkContext) error {
+	fmt.Println(util.Jdump(ctx))
 	return nil
 }

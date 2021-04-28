@@ -6,4 +6,5 @@ type TypeInfo struct {
 	OutOfNamespaceType string
 	Namespace          string
 	JsonStructure      map[string]interface{}
+	Example            string
 }

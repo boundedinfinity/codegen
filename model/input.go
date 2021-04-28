@@ -1,63 +1,60 @@
 package model
 
-type BiInput struct {
-	Name          string            `json:"name,omitempty" yaml:"name,omitempty"`
-	Version       string            `json:"version,omitempty" yaml:"version,omitempty"`
-	Info          BiInput_Info      `json:"info,omitempty" yaml:"info,omitempty"`
-	Specification BiInput_Namespace `json:"specification,omitempty" yaml:"specification,omitempty"`
+type InputSpec struct {
+	Name          string         `json:"name,omitempty" yaml:"name,omitempty"`
+	Version       string         `json:"version,omitempty" yaml:"version,omitempty"`
+	Specification InputNamespace `json:"specification,omitempty" yaml:"specification,omitempty"`
 }
 
-type BiInput_Namespace struct {
-	Name       string              `json:"name,omitempty" yaml:"name,omitempty"`
-	Models     []BiInput_Model     `json:"models,omitempty" yaml:"models,omitempty"`
-	Operations []BiInput_Operation `json:"operations,omitempty" yaml:"operations,omitempty"`
-	Namespaces []BiInput_Namespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
-	Templates  []BiInput_Template  `json:"templates,omitempty" yaml:"templates,omitempty"`
+func (t InputSpec) RootPackage() string {
+	return t.Name
 }
 
-type BiInput_Model struct {
-	Name        string `json:"name,omitempty" yaml:"name,omitempty"`
-	Description string `json:"description,omitempty" yaml:"description,omitempty"`
-	Properties  []BiInput_Property
+type InputModel struct {
+	Name        string          `json:"name,omitempty" yaml:"name,omitempty"`
+	Type        string          `json:"type,omitempty" yaml:"type,omitempty"`
+	Description string          `json:"description,omitempty" yaml:"description,omitempty"`
+	Example     interface{}     `json:"example,omitempty" yaml:"example,omitempty"`
+	Properties  []InputProperty `json:"properties,omitempty" yaml:"properties,omitempty"`
 }
 
-type BiInput_Property struct {
-	Name        string               `json:"name,omitempty" yaml:"name,omitempty"`
-	Type        string               `json:"type,omitempty" yaml:"type,omitempty"`
-	Description string               `json:"description,omitempty" yaml:"description,omitempty"`
-	Example     interface{}          `json:"example,omitempty" yaml:"example,omitempty"`
-	Validations []BiInput_Validation `json:"validations,omitempty" yaml:"validations,omitempty"`
+type InputProperty struct {
+	Name        string            `json:"name,omitempty" yaml:"name,omitempty"`
+	Type        string            `json:"type,omitempty" yaml:"type,omitempty"`
+	Description string            `json:"description,omitempty" yaml:"description,omitempty"`
+	Example     interface{}       `json:"example,omitempty" yaml:"example,omitempty"`
+	Validations []InputValidation `json:"validations,omitempty" yaml:"validations,omitempty"`
 }
 
-type BiInput_Validation struct {
+type InputValidation struct {
 	Minimum  int  `json:"minimum,omitempty" yaml:"minimum,omitempty"`
 	Maximum  int  `json:"maximum,omitempty" yaml:"maximum,omitempty"`
 	Required bool `json:"required,omitempty" yaml:"required,omitempty"`
 }
 
-type BiInput_Operation struct {
-	Name        string           `json:"name,omitempty" yaml:"name,omitempty"`
-	Input       BiInput_Property `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      BiInput_Property `json:"output,omitempty" yaml:"output,omitempty"`
-	Description string           `json:"description,omitempty" yaml:"description,omitempty"`
+type InputNamespace struct {
+	Name       string           `json:"name,omitempty" yaml:"name,omitempty"`
+	Models     []InputModel     `json:"models,omitempty" yaml:"models,omitempty"`
+	Namespaces []InputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 }
 
-type BiInput_Info struct {
-	InputDir                  string          `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
-	OutputDir                 string          `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
-	DumpContext               bool            `json:"dumpContext" yaml:"dumpContext"`
-	FilenameMarker            string          `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
-	TemplateHeader            string          `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
-	DescriptionSplitCharacter string          `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
-	TypeMap                   BiInput_TypeMap `json:"typeMap" yaml:"typeMap"`
+type InputOperation struct {
+	Name        string        `json:"name,omitempty" yaml:"name,omitempty"`
+	Input       InputProperty `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      InputProperty `json:"output,omitempty" yaml:"output,omitempty"`
+	Description string        `json:"description,omitempty" yaml:"description,omitempty"`
 }
 
-type BiInput_TypeMap struct {
-	BuiltIn map[string]string `json:"builtIn,omitempty" yaml:"builtIn,omitempty"`
-	Custom  map[string]string `json:"custom,omitempty" yaml:"custom,omitempty"`
+type InputInfo struct {
+	InputDir                  string `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
+	OutputDir                 string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	DumpContext               bool   `json:"dumpContext" yaml:"dumpContext"`
+	FilenameMarker            string `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
+	TemplateHeader            string `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
+	DescriptionSplitCharacter string `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
 }
 
-type BiInput_Template struct {
+type InputTemplate struct {
 	Header string `json:"header,omitempty" yaml:"header,omitempty"`
 	Path   string `json:"path,omitempty" yaml:"path,omitempty"`
 	Type   string `json:"type,omitempty" yaml:"type,omitempty"`

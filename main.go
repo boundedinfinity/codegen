@@ -1,8 +1,8 @@
 package main
 
 import (
-	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
+	"boundedinfinity/codegen/util"
 	"fmt"
 	"os"
 )
@@ -17,11 +17,13 @@ func main() {
 		os.Exit(handleError(err))
 	}
 
-	g := generator.New(l.Output)
+	fmt.Println(util.Jdump(l.OutputSpec))
 
-	if err := g.Generate(); err != nil {
-		os.Exit(handleError(err))
-	}
+	// g := generator.New(l.Output)
+
+	// if err := g.Generate(); err != nil {
+	// 	os.Exit(handleError(err))
+	// }
 }
 
 func handleError(err error) int {

@@ -1,166 +1,141 @@
 package loader
 
-import (
-	"boundedinfinity/codegen/model"
-	"path"
-)
-
-func (t Loader) namespaceProcssor1(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
-	if input.Namespaces != nil {
-		for _, child := range input.Namespaces {
-			output.Children = append(output.Children, child.Name)
-		}
-	}
-
-	pns := path.Dir(output.Namespace)
-
-	if tmpls, ok := t.templateMap[pns]; ok {
-		for _, tmpl := range tmpls {
-			t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], tmpl)
-		}
-	}
-
-	if input.Templates != nil {
-		for tmplIndex, tmpl := range input.Templates {
-			templateWrapper := func() error {
-				t.reportStack.Push("template[%v]", tmplIndex)
-				defer t.reportStack.Pop()
-
-				var processed model.BiInput_Template
-
-				if err := t.processTemplate1(*output, tmpl, &processed); err != nil {
-					return err
-				}
-
-				t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], processed)
-
-				return nil
-			}
-
-			if err := templateWrapper(); err != nil {
-				return err
-			}
+func (t *Loader) processNamespace1(ctx *WalkContext) error {
+	if ctx.Namespace.Input.Namespaces != nil {
+		for _, child := range ctx.Namespace.Input.Namespaces {
+			ctx.Namespace.Output.Children = append(ctx.Namespace.Output.Children, child.Name)
 		}
 	}
 
 	return nil
 }
 
-func filterModels(m map[string]*model.BiOutput_Model, fn func(model.BiOutput_Model) bool) []*model.BiOutput_Model {
-	var output []*model.BiOutput_Model
+func (t *Loader) processNamespace2(ctx *WalkContext) error {
+	// specPath := ctx.Namespace.Output.SpecPath
 
-	for _, v := range m {
-		if fn(*v) {
-			output = append(output, v)
-		}
-	}
-
-	return output
-}
-
-func filterOperations(m map[string]*model.BiOutput_Operation, fn func(model.BiOutput_Operation) bool) []*model.BiOutput_Operation {
-	var output []*model.BiOutput_Operation
-
-	for _, v := range m {
-		if fn(*v) {
-			output = append(output, v)
-		}
-	}
-
-	return output
-}
-
-func filterNamespace(m map[string]*model.BiOutput_Namespace, fn func(model.BiOutput_Namespace) bool) []*model.BiOutput_Namespace {
-	var output []*model.BiOutput_Namespace
-
-	for _, v := range m {
-		if fn(*v) {
-			output = append(output, v)
-		}
-	}
-
-	return output
-}
-
-func (t Loader) namespaceProcssor7(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
-	tmpls, ok := t.templateMap[output.Namespace]
-
-	if !ok {
-		return nil
-	}
-
-	namespaceTemplates := func(inputTemplate model.BiInput_Template) error {
-		namespaces := filterNamespace(t.namespaceMap, func(v model.BiOutput_Namespace) bool {
-			return v.Namespace == output.Namespace
-		})
-
-		for _, namescape := range namespaces {
-			outputTemplate := model.New_BiOutput_Template()
-
-			if err := t.processTemplate2(*output, "namespace", inputTemplate, outputTemplate); err != nil {
-				return err
-			}
-
-			namescape.Templates = append(namescape.Templates, outputTemplate)
-		}
-
-		return nil
-	}
-
-	operationTemplates := func(inputTemplate model.BiInput_Template) error {
-		operations := filterOperations(t.operationMap, func(v model.BiOutput_Operation) bool {
-			return v.Namespace == output.Namespace
-		})
-
-		for _, operation := range operations {
-			outputTemplate := model.New_BiOutput_Template()
-
-			if err := t.processTemplate2(*output, operation.Name, inputTemplate, outputTemplate); err != nil {
-				return err
-			}
-
-			operation.Templates = append(operation.Templates, outputTemplate)
-		}
-
-		return nil
-	}
-
-	modelTemplates := func(inputTemplate model.BiInput_Template) error {
-		models := filterModels(t.modelMap, func(v model.BiOutput_Model) bool {
-			return v.Namespace == output.Namespace
-		})
-
-		for _, model1 := range models {
-			outputTemplate := model.New_BiOutput_Template()
-
-			if err := t.processTemplate2(*output, model1.Name, inputTemplate, outputTemplate); err != nil {
-				return err
-			}
-
-			model1.Templates = append(model1.Templates, outputTemplate)
-		}
-
-		return nil
-	}
-
-	for _, tmpl := range tmpls {
-		switch tmpl.Type {
-		case string(model.TemplateType_NAMESPACE):
-			if err := namespaceTemplates(tmpl); err != nil {
-				return err
-			}
-		case string(model.TemplateType_MODEL):
-			if err := modelTemplates(tmpl); err != nil {
-				return err
-			}
-		case string(model.TemplateType_OPERATION):
-			if err := operationTemplates(tmpl); err != nil {
-				return err
-			}
-		default:
-			return t.InvalidateType()
-		}
-	}
+	// if tmpls, ok := t.templateMap[specPath]; ok {
+	// 	for _, tmpl := range tmpls {
+	// 		t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], tmpl)
+	// 	}
+	// }
 
 	return nil
 }
+
+// func (t Loader) namespaceProcssor1(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
+// 	pns := path.Dir(output.Namespace)
+
+// 	if tmpls, ok := t.templateMap[pns]; ok {
+// 		for _, tmpl := range tmpls {
+// 			t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], tmpl)
+// 		}
+// 	}
+
+// 	if input.Templates != nil {
+// 		for tmplIndex, tmpl := range input.Templates {
+// 			templateWrapper := func() error {
+// 				t.reportStack.Push("template[%v]", tmplIndex)
+// 				defer t.reportStack.Pop()
+
+// 				var processed model.BiInput_Template
+
+// 				if err := t.processTemplate1(*output, tmpl, &processed); err != nil {
+// 					return err
+// 				}
+
+// 				t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], processed)
+
+// 				return nil
+// 			}
+
+// 			if err := templateWrapper(); err != nil {
+// 				return err
+// 			}
+// 		}
+// 	}
+
+// 	return nil
+// }
+
+// func (t Loader) namespaceProcssor7(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
+// 	// tmpls, ok := t.templateMap[output.Namespace]
+
+// 	// if !ok {
+// 	// 	return nil
+// 	// }
+
+// 	// namespaceTemplates := func(inputTemplate model.BiInput_Template) error {
+// 	// 	namespaces := filterNamespace(t.namespaceMap, func(v model.BiOutput_Namespace) bool {
+// 	// 		return v.Namespace == output.Namespace
+// 	// 	})
+
+// 	// 	for _, namescape := range namespaces {
+// 	// 		outputTemplate := model.New_BiOutput_Template()
+
+// 	// 		if err := t.processTemplate2(*output, "namespace", inputTemplate, outputTemplate); err != nil {
+// 	// 			return err
+// 	// 		}
+
+// 	// 		namescape.Templates = append(namescape.Templates, outputTemplate)
+// 	// 	}
+
+// 	// 	return nil
+// 	// }
+
+// 	// operationTemplates := func(inputTemplate model.BiInput_Template) error {
+// 	// 	operations := filterOperations(t.operationMap, func(v model.BiOutput_Operation) bool {
+// 	// 		return v.Namespace == output.Namespace
+// 	// 	})
+
+// 	// 	for _, operation := range operations {
+// 	// 		outputTemplate := model.New_BiOutput_Template()
+
+// 	// 		if err := t.processTemplate2(*output, operation.Name, inputTemplate, outputTemplate); err != nil {
+// 	// 			return err
+// 	// 		}
+
+// 	// 		operation.Templates = append(operation.Templates, outputTemplate)
+// 	// 	}
+
+// 	// 	return nil
+// 	// }
+
+// 	// modelTemplates := func(inputTemplate model.BiInput_Template) error {
+// 	// 	models := filterModels(t.modelMap, func(v model.BiOutput_Model) bool {
+// 	// 		return v.Namespace == output.Namespace
+// 	// 	})
+
+// 	// 	for _, model1 := range models {
+// 	// 		outputTemplate := model.New_BiOutput_Template()
+
+// 	// 		if err := t.processTemplate2(*output, model1.Name, inputTemplate, outputTemplate); err != nil {
+// 	// 			return err
+// 	// 		}
+
+// 	// 		model1.Templates = append(model1.Templates, outputTemplate)
+// 	// 	}
+
+// 	// 	return nil
+// 	// }
+
+// 	// for _, tmpl := range tmpls {
+// 	// 	switch tmpl.Type {
+// 	// 	case string(model.TemplateType_NAMESPACE):
+// 	// 		if err := namespaceTemplates(tmpl); err != nil {
+// 	// 			return err
+// 	// 		}
+// 	// 	case string(model.TemplateType_MODEL):
+// 	// 		if err := modelTemplates(tmpl); err != nil {
+// 	// 			return err
+// 	// 		}
+// 	// 	case string(model.TemplateType_OPERATION):
+// 	// 		if err := operationTemplates(tmpl); err != nil {
+// 	// 			return err
+// 	// 		}
+// 	// 	default:
+// 	// 		return t.InvalidateType()
+// 	// 	}
+// 	// }
+
+// 	return nil
+// }

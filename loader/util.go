@@ -2,7 +2,6 @@ package loader
 
 import (
 	"boundedinfinity/codegen/errutil"
-	"boundedinfinity/codegen/model"
 	"errors"
 	"fmt"
 	"path"
@@ -10,23 +9,23 @@ import (
 )
 
 func (t *Loader) splitDescription(s string) []string {
-	var d []string
-	var splitChar string
+	var ss []string
+	// var splitChar string
 
-	if s == "" {
-		return d
-	}
+	// if s == "" {
+	// 	return ss
+	// }
 
-	if t.input.Info.DescriptionSplitCharacter != "" {
-		splitChar = t.input.Info.DescriptionSplitCharacter
-	} else {
-		splitChar = model.DEFAULT_DESCRIPTION_SPLIT_CHARACTER
-	}
+	// if t.inputSpec.Info.DescriptionSplitCharacter != "" {
+	// 	splitChar = t.inputSpec.Info.DescriptionSplitCharacter
+	// } else {
+	// 	splitChar = model.DEFAULT_DESCRIPTION_SPLIT_CHARACTER
+	// }
 
-	s2 := strings.TrimSuffix(s, splitChar)
-	d = strings.Split(s2, splitChar)
+	// s2 := strings.TrimSuffix(s, splitChar)
+	// ss = strings.Split(s2, splitChar)
 
-	return d
+	return ss
 }
 
 func (t *Loader) reportErr(err error) {
@@ -46,15 +45,24 @@ func (t *Loader) report(path []string, format string, a ...interface{}) {
 	fmt.Printf(reportFormat, a...)
 }
 
-func (t *Loader) rootNamespace() string {
-	return t.input.Name
-}
-
-func (t *Loader) currentNamespace2() string {
+func (t *Loader) rootName() string {
 	var name string
 
-	name = t.rootNamespace()
-	name = path.Join(name, path.Join(t.namespaceStack.S()...))
+	// name = t.inputSpec.Name
 
 	return name
+}
+
+func (t *Loader) appendNamespace(name string) string {
+	t.namespaceStack.Push(name)
+	return t.getNamespace()
+}
+
+func (t *Loader) getNamespace() string {
+	var namespace string
+
+	namespace = t.inputSpec.RootPackage()
+	namespace = path.Join(namespace, path.Join(t.namespaceStack.S()...))
+
+	return namespace
 }

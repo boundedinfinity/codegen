@@ -1,84 +1,117 @@
 package loader
 
-func (t *Loader) processInput() error {
-	// t.reportStack.Push(fmt.Sprintf("input[%v]", util.SummerySuffix(t.inputPath, model.SUMMERY_SIZE)))
-	t.reportStack.Push("loader")
+import (
+	"boundedinfinity/codegen/model"
+)
+
+func (t *Loader) processType(input model.InputModel, output *model.OutputModel) error {
+	t.reportStack.Push("type")
 	defer t.reportStack.Pop()
 
-	checkName := func() error {
-		t.reportStack.Push("name")
-		defer t.reportStack.Pop()
+	// spath := t.appendNamespace()
 
-		t.Output.Name = t.input.Name
-		return nil
-	}
+	return nil
+}
 
-	checkVersion := func() error {
-		t.reportStack.Push("version")
-		defer t.reportStack.Pop()
+func (t *Loader) processInput() error {
+	// input := t.inputSpec.Type
+	// var output *model.OutputModel
+	// output = model.NewOutputModel()
 
-		return nil
-	}
+	// if err := t.processType(input, output); err != nil {
+	// 	return err
+	// }
 
-	if err := checkName(); err != nil {
+	// t.reportStack.Push(fmt.Sprintf("input[%v]", util.SummerySuffix(t.inputPath, model.SUMMERY_SIZE)))
+	// t.reportStack.Push("loader")
+	// defer t.reportStack.Pop()
+
+	// checkName := func() error {
+	// 	t.reportStack.Push("name")
+	// 	defer t.reportStack.Pop()
+
+	// 	t.Output.Name = t.input.Name
+	// 	return nil
+	// }
+
+	// checkVersion := func() error {
+	// 	t.reportStack.Push("version")
+	// 	defer t.reportStack.Pop()
+
+	// 	return nil
+	// }
+
+	// if err := checkName(); err != nil {
+	// 	return err
+	// }
+
+	// if err := checkVersion(); err != nil {
+	// 	return err
+	// }
+
+	// if err := t.processInput_Info(); err != nil {
+	// 	return err
+	// }
+
+	if err := t.walkSpec(t.processNamespace1, WALKTYPE_NAMESPACE); err != nil {
 		return err
 	}
 
-	if err := checkVersion(); err != nil {
+	if err := t.walkSpec(t.processModel1, WALKTYPE_MODEL); err != nil {
 		return err
 	}
 
-	if err := t.processInput_Info(); err != nil {
+	if err := t.walkSpec(t.processProperty1, WALKTYPE_PROPERTY); err != nil {
 		return err
 	}
 
-	if err := t.walk(-1, t.input.Specification, t.namespaceProcssor1, t.modelProcessor1, t.propertyProcessor1, nil, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, t.namespaceProcssor1, t.modelProcessor1, t.propertyProcessor1, nil, nil); err != nil {
+	// 	return err
+	// }
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor2, nil, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor2, nil, nil); err != nil {
+	// 	return err
+	// }
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor3, nil, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor3, nil, nil); err != nil {
+	// 	return err
+	// }
 
-	var brokenGraph Graph
+	// var brokenGraph Graph
 
-	for _, g := range t.depNodes {
-		brokenGraph = append(brokenGraph, g)
-	}
+	// for _, g := range t.depNodes {
+	// 	brokenGraph = append(brokenGraph, g)
+	// }
 
-	solvedGraph, err := resolveGraph(brokenGraph)
+	// solvedGraph, err := resolveGraph(brokenGraph)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	for _, node := range solvedGraph {
-		t.report(t.reportStack.S(), "processing node %v", node.name)
+	// for _, node := range solvedGraph {
+	// 	t.report(t.reportStack.S(), "processing node %v", node.name)
 
-		if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor4(node.name), nil, nil); err != nil {
-			return err
-		}
-	}
+	// 	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessor4(node.name), nil, nil); err != nil {
+	// 		return err
+	// 	}
+	// }
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessorJson, nil, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, nil, nil, t.propertyProcessorJson, nil, nil); err != nil {
+	// 	return err
+	// }
 
-	if err := t.walk(-1, t.input.Specification, nil, nil, nil, t.processOperation6, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, nil, nil, nil, t.processOperation6, nil); err != nil {
+	// 	return err
+	// }
 
-	if err := t.walk(-1, t.input.Specification, t.namespaceProcssor7, nil, nil, nil, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, t.namespaceProcssor7, nil, nil, nil, nil); err != nil {
+	// 	return err
+	// }
 
-	if err := t.walk(-1, t.input.Specification, nil, t.modelProcessor8, nil, t.processOperation8, nil); err != nil {
-		return err
-	}
+	// if err := t.walk(-1, t.input.Specification, nil, t.modelProcessor8, nil, t.processOperation8, nil); err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

@@ -1,180 +1,176 @@
 package loader
 
-import (
-	"boundedinfinity/codegen/model"
-	"boundedinfinity/codegen/util"
-	"fmt"
-	"path"
-	"strings"
-)
-
-func (t *Loader) propertyProcessor1(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
-	output.Name = input.Name
-	output.Description = t.splitDescription(input.Description)
+func (t *Loader) processProperty1(ctx *WalkContext) error {
 
 	return nil
 }
 
-func (t *Loader) propertyProcessor2(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
-	typ := input.Type
-	var isCollection bool
+// func (t *Loader) propertyProcessor2(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+// 	// typ := input.Type
+// 	// var isCollection bool
 
-	if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
-		isCollection = true
-		typ = strings.TrimSuffix(typ, model.COLLECTION_SUFFIX)
-	}
+// 	// if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
+// 	// 	isCollection = true
+// 	// 	typ = strings.TrimSuffix(typ, model.COLLECTION_SUFFIX)
+// 	// }
 
-	builtIn := path.Join(model.NAMESPACE_BUILTIN, typ)
-	abs := path.Join(t.rootNamespace(), typ)
-	rel := path.Join(namespace.Namespace, typ)
+// 	// builtIn := path.Join(model.NAMESPACE_BUILTIN, typ)
+// 	// abs := path.Join(t.rootName(), typ)
+// 	// rel := path.Join(namespace.Namespace, typ)
 
-	if info, ok := t.typeMap[builtIn]; ok {
-		output.SpecType = builtIn
-		output.Namespace = info.Namespace
-		output.Type = info.InNamespaceType
-	} else if info, ok := t.typeMap[abs]; ok {
-		output.SpecType = abs
-		output.Namespace = info.Namespace
+// 	// if info, ok := t.typeMap[builtIn]; ok {
+// 	// 	output.SpecType = builtIn
+// 	// 	output.Namespace = info.Namespace
+// 	// 	output.Type = info.InNamespaceType
+// 	// } else if info, ok := t.typeMap[abs]; ok {
+// 	// 	output.SpecType = abs
+// 	// 	output.Namespace = info.Namespace
 
-		if namespace.Namespace == abs {
-			output.Type = info.InNamespaceType
-		} else {
-			output.Type = info.OutOfNamespaceType
-		}
-	} else if info, ok := t.typeMap[rel]; ok {
-		output.SpecType = rel
-		output.Namespace = info.Namespace
+// 	// 	if namespace.Namespace == abs {
+// 	// 		output.Type = info.InNamespaceType
+// 	// 	} else {
+// 	// 		output.Type = info.OutOfNamespaceType
+// 	// 	}
+// 	// } else if info, ok := t.typeMap[rel]; ok {
+// 	// 	output.SpecType = rel
+// 	// 	output.Namespace = info.Namespace
 
-		if namespace.Namespace == rel {
-			output.Type = info.InNamespaceType
-		} else {
-			output.Type = info.OutOfNamespaceType
-		}
-	} else {
-		return t.NotFound()
-	}
+// 	// 	if namespace.Namespace == info.Namespace {
+// 	// 		output.Type = info.InNamespaceType
+// 	// 	} else {
+// 	// 		output.Type = info.OutOfNamespaceType
+// 	// 	}
+// 	// } else {
+// 	// 	return t.NotFound()
+// 	// }
 
-	if isCollection {
-		output.Type = strings.Join([]string{model.COLLECTION_SUFFIX, output.Type}, "")
-	}
+// 	// if isCollection {
+// 	// 	output.Type = strings.Join([]string{model.COLLECTION_SUFFIX, output.Type}, "")
+// 	// }
 
-	return nil
-}
+// 	return nil
+// }
 
-func (t *Loader) propertyProcessor3(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
-	if strings.HasPrefix(output.Namespace, model.NAMESPACE_BUILTIN) {
-		return nil
-	}
+// func (t *Loader) propertyProcessor3(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+// 	// if strings.HasPrefix(output.Namespace, model.NAMESPACE_BUILTIN) {
+// 	// 	return nil
+// 	// }
 
-	if _, ok := t.modelMap[output.SpecType]; !ok {
-		return nil
-	}
+// 	// if _, ok := t.modelMap[output.SpecType]; !ok {
+// 	// 	return nil
+// 	// }
 
-	extNode, ok := t.depNodes[output.SpecType]
+// 	// extNode, ok := t.depNodes[output.SpecType]
 
-	if !ok {
-		extNode = NewNode(output.SpecType)
-		t.depNodes[extNode.name] = extNode
-	}
+// 	// if !ok {
+// 	// 	extNode = NewNode(output.SpecType)
+// 	// 	t.depNodes[extNode.name] = extNode
+// 	// }
 
-	thisNode, ok := t.depNodes[model1.SpecName]
+// 	// thisNode, ok := t.depNodes[model1.SpecName]
 
-	if !ok {
-		thisNode = NewNode(model1.SpecName)
-		t.depNodes[thisNode.name] = thisNode
-	}
+// 	// if !ok {
+// 	// 	thisNode = NewNode(model1.SpecName)
+// 	// 	t.depNodes[thisNode.name] = thisNode
+// 	// }
 
-	thisNode.Add(extNode.name)
+// 	// thisNode.Add(extNode.name)
 
-	return nil
-}
+// 	return nil
+// }
 
-func (t *Loader) propertyProcessor4(specName string) PropertyProcessor {
-	return func(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
-		if specName != model1.SpecName {
-			return nil
-		}
+// func (t *Loader) propertyProcessor4(specName string) PropertyProcessor {
+// 	return func(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+// 		if specName != model1.SpecName {
+// 			return nil
+// 		}
 
-		return t.propertyProcessorJson(namespace, model1, input, output)
-	}
-}
+// 		return t.propertyProcessorJson(namespace, model1, input, output)
+// 	}
+// }
 
-func (t *Loader) propertyProcessorJson(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
-	if output.JsonPath != "" {
-		return nil
-	}
+// func (t *Loader) propertyProcessorJson(namespace model.BiOutput_Namespace, model1 *model.BiOutput_Model, input model.BiInput_Property, output *model.BiOutput_Property) error {
+// 	// if output.JsonPath != "" {
+// 	// 	return nil
+// 	// }
 
-	output.JsonPath = util.CamelCase(output.Name)
+// 	// output.JsonPath = util.CamelCase(output.Name)
 
-	switch output.Namespace {
-	case "builtin/biginteger":
-		if v, err := json2Int64(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	case "builtin/smallinteger":
-		if v, err := json2Int64(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	case "builtin/integer":
-		if v, err := json2Int64(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
+// 	// switch output.Namespace {
+// 	// case "builtin/biginteger":
+// 	// 	if v, err := json2Int64(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/smallinteger":
+// 	// 	if v, err := json2Int64(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/integer":
+// 	// 	if v, err := json2Int64(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/float":
+// 	// 	if v, err := json2Float64(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/bigfloat":
+// 	// 	if v, err := json2Float64(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/smallfloat":
+// 	// 	if v, err := json2Float64(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/boolean":
+// 	// 	if v, err := json2Boolean(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// case "builtin/string":
+// 	// 	if v, err := json2Str(input.Example); err != nil {
+// 	// 		return err
+// 	// 	} else {
+// 	// 		output.JsonStructure[output.JsonPath] = v
+// 	// 		output.Example = fmt.Sprintf("%v", v)
+// 	// 	}
+// 	// default:
+// 	// 	_, typeInfoOk := t.typeMap[output.SpecType]
+// 	// 	_, modelOk := t.modelMap[output.SpecType]
 
-	case "builtin/float":
-		if v, err := json2Float64(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	case "builtin/bigfloat":
-		if v, err := json2Float64(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	case "builtin/smallfloat":
-		if v, err := json2Float64(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	case "builtin/boolean":
-		if v, err := json2Boolean(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	case "builtin/string":
-		if v, err := json2Str(input.Example); err != nil {
-			return err
-		} else {
-			output.JsonStruture[output.JsonPath] = v
-			output.Example = fmt.Sprintf("%v", v)
-		}
-	default:
-		if v, ok := t.modelMap[output.SpecType]; ok {
-			output.JsonStruture[output.JsonPath] = v.JsonStruture
-		} else {
-			return t.NotFound()
-		}
-	}
+// 	// 	if !typeInfoOk && !modelOk {
+// 	// 		return t.CustomTypeNotFound(output.SpecType)
+// 	// 	}
 
-	for k, v := range output.JsonStruture {
-		model1.JsonStruture[k] = v
-	}
+// 	// 	// if v, ok := t.typeMap[output.SpecType]; ok {
+// 	// 	// 	output.JsonStructure[output.JsonPath] = v.JsonStructure
+// 	// 	// } else {
+// 	// 	// 	return t.CustomTypeNotFound(output.SpecType)
+// 	// 	// }
+// 	// }
 
-	return nil
-}
+// 	// for k, v := range output.JsonStructure {
+// 	// 	model1.JsonStructure[k] = v
+// 	// }
+
+// 	return nil
+// }
