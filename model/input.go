@@ -11,20 +11,21 @@ func (t InputSpec) RootPackage() string {
 }
 
 type InputModel struct {
-	Name        string          `json:"name,omitempty" yaml:"name,omitempty"`
-	Type        string          `json:"type,omitempty" yaml:"type,omitempty"`
-	Description string          `json:"description,omitempty" yaml:"description,omitempty"`
-	Example     interface{}     `json:"example,omitempty" yaml:"example,omitempty"`
-	Properties  []InputProperty `json:"properties,omitempty" yaml:"properties,omitempty"`
-}
-
-type InputProperty struct {
 	Name        string            `json:"name,omitempty" yaml:"name,omitempty"`
 	Type        string            `json:"type,omitempty" yaml:"type,omitempty"`
 	Description string            `json:"description,omitempty" yaml:"description,omitempty"`
 	Example     interface{}       `json:"example,omitempty" yaml:"example,omitempty"`
+	Properties  []InputModel      `json:"properties,omitempty" yaml:"properties,omitempty"`
 	Validations []InputValidation `json:"validations,omitempty" yaml:"validations,omitempty"`
 }
+
+// type InputProperty struct {
+// 	Name        string            `json:"name,omitempty" yaml:"name,omitempty"`
+// 	Type        string            `json:"type,omitempty" yaml:"type,omitempty"`
+// 	Description string            `json:"description,omitempty" yaml:"description,omitempty"`
+// 	Example     interface{}       `json:"example,omitempty" yaml:"example,omitempty"`
+// 	Validations []InputValidation `json:"validations,omitempty" yaml:"validations,omitempty"`
+// }
 
 type InputValidation struct {
 	Minimum  int  `json:"minimum,omitempty" yaml:"minimum,omitempty"`
@@ -39,10 +40,10 @@ type InputNamespace struct {
 }
 
 type InputOperation struct {
-	Name        string        `json:"name,omitempty" yaml:"name,omitempty"`
-	Input       InputProperty `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      InputProperty `json:"output,omitempty" yaml:"output,omitempty"`
-	Description string        `json:"description,omitempty" yaml:"description,omitempty"`
+	Name        string     `json:"name,omitempty" yaml:"name,omitempty"`
+	Input       InputModel `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      InputModel `json:"output,omitempty" yaml:"output,omitempty"`
+	Description string     `json:"description,omitempty" yaml:"description,omitempty"`
 }
 
 type InputInfo struct {

@@ -38,8 +38,8 @@ func NotFound(path []string) error {
 	return Errorf(path, "not found")
 }
 
-func InvalidateType(path []string) error {
-	return Errorf(path, "invalid type")
+func InvalidType(path []string, typ string) error {
+	return Errorf(path, "invalid type: '%v'", typ)
 }
 
 func MustBeOneOf(path []string, oneOf []string) error {

@@ -36,10 +36,10 @@ func (t *Loader) reportErr(err error) {
 		path = append(path, cerr.Path...)
 	}
 
-	t.report(path, err.Error())
+	t.reportf(path, err.Error())
 }
 
-func (t *Loader) report(path []string, format string, a ...interface{}) {
+func (t *Loader) reportf(path []string, format string, a ...interface{}) {
 	stack := strings.Join(path, ".")
 	reportFormat := fmt.Sprintf("%v: %v\n", stack, format)
 	fmt.Printf(reportFormat, a...)

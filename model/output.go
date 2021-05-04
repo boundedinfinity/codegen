@@ -31,11 +31,13 @@ type OutputModel struct {
 	SpecPath      string                 `json:"specPath,omitempty" yaml:"specPath,omitempty"`
 	Namespace     string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 	Name          string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	Type          string                 `json:"type,omitempty" yaml:"type,omitempty"`
 	Description   []string               `json:"description,omitempty" yaml:"description,omitempty"`
 	Example       interface{}            `json:"example,omitempty" yaml:"example,omitempty"`
 	Imports       []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
 	JsonStructure map[string]interface{} `json:"jsonStructure,omitempty" yaml:"JsonStructure,omitempty"`
-	Properties    []*OutputProperty      `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Properties    []*OutputModel         `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Validations   []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`
 	Templates     []*OutputTemplate      `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
@@ -44,31 +46,31 @@ func NewOutputModel() *OutputModel {
 		Description:   make([]string, 0),
 		Imports:       make([]string, 0),
 		JsonStructure: make(map[string]interface{}),
-		Properties:    make([]*OutputProperty, 0),
+		Properties:    make([]*OutputModel, 0),
 		Templates:     make([]*OutputTemplate, 0),
 	}
 }
 
-type OutputProperty struct {
-	Name          string                 `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace     string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	SpecPath      string                 `json:"specPath,omitempty" yaml:"specPath,omitempty"`
-	Type          string                 `json:"type,omitempty" yaml:"type,omitempty"`
-	SpecType      string                 `json:"specType,omitempty" yaml:"specType,omitempty"`
-	JsonPath      string                 `json:"jsonPath,omitempty" yaml:"jsonPath,omitempty"`
-	JsonStructure map[string]interface{} `json:"jsonStructure,omitempty" yaml:"JsonStructure,omitempty"`
-	Example       string                 `json:"example,omitempty" yaml:"example,omitempty"`
-	Description   []string               `json:"description,omitempty" yaml:"description,omitempty"`
-	Validations   []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`
-}
+// type OutputProperty struct {
+// 	Name          string                 `json:"name,omitempty" yaml:"name,omitempty"`
+// 	Namespace     string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+// 	SpecPath      string                 `json:"specPath,omitempty" yaml:"specPath,omitempty"`
+// 	Type          string                 `json:"type,omitempty" yaml:"type,omitempty"`
+// 	SpecType      string                 `json:"specType,omitempty" yaml:"specType,omitempty"`
+// 	JsonPath      string                 `json:"jsonPath,omitempty" yaml:"jsonPath,omitempty"`
+// 	JsonStructure map[string]interface{} `json:"jsonStructure,omitempty" yaml:"JsonStructure,omitempty"`
+// 	Example       string                 `json:"example,omitempty" yaml:"example,omitempty"`
+// 	Description   []string               `json:"description,omitempty" yaml:"description,omitempty"`
+// 	Validations   []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`
+// }
 
-func NewOutputProperty() *OutputProperty {
-	return &OutputProperty{
-		JsonStructure: make(map[string]interface{}),
-		Description:   make([]string, 0),
-		Validations:   make([]*OutputValidation, 0),
-	}
-}
+// func NewOutputProperty() *OutputProperty {
+// 	return &OutputProperty{
+// 		JsonStructure: make(map[string]interface{}),
+// 		Description:   make([]string, 0),
+// 		Validations:   make([]*OutputValidation, 0),
+// 	}
+// }
 
 type OutputValidation struct {
 	Minimum  int  `json:"minimum,omitempty" yaml:"minimum,omitempty"`
@@ -102,8 +104,8 @@ type OutputOperation struct {
 	SpecName    string            `json:"specName,omitempty" yaml:"specName,omitempty"`
 	Description []string          `json:"description,omitempty" yaml:"description,omitempty"`
 	Imports     []string          `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Input       OutputProperty    `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      OutputProperty    `json:"output,omitempty" yaml:"output,omitempty"`
+	Input       OutputModel       `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      OutputModel       `json:"output,omitempty" yaml:"output,omitempty"`
 	Templates   []*OutputTemplate `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 

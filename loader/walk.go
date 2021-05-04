@@ -38,7 +38,7 @@ func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) err
 
 	if fn != nil && ctx.Namespace.Input.Models != nil {
 		for _, inputModel := range ctx.Namespace.Input.Models {
-			wrapper1 := func() error {
+			modelWrapper := func() error {
 				modelSpecPath := t.appendNamespace(inputModel.Name)
 				defer t.namespaceStack.Pop()
 				var outputModel *model.OutputModel
@@ -69,18 +69,17 @@ func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) err
 
 				if ContainsWalkType(WALKTYPE_PROPERTY, ws...) && inputModel.Properties != nil {
 					for _, inputProperty := range inputModel.Properties {
-						wrapper2 := func() error {
+						propertyWrapper := func() error {
 							propertySpecPath := t.appendNamespace(inputProperty.Name)
 							defer t.namespaceStack.Pop()
-							var outputProperty *model.OutputProperty
+							var outputProperty *model.OutputModel
 
-							if v, ok := t.propertyMap[propertySpecPath]; ok {
+							if v, ok := t.modelMap[propertySpecPath]; ok {
 								outputProperty = v
 							} else {
-								outputProperty = model.NewOutputProperty()
+								outputProperty = model.NewOutputModel()
 								outputProperty.SpecPath = propertySpecPath
-								outputProperty.Namespace = outputNamespace.Namespace
-								t.propertyMap[modelSpecPath] = outputProperty
+								t.modelMap[propertySpecPath] = outputProperty
 								outputModel.Properties = append(outputModel.Properties, outputProperty)
 							}
 
@@ -100,7 +99,7 @@ func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) err
 							return nil
 						}
 
-						if err := wrapper2(); err != nil {
+						if err := propertyWrapper(); err != nil {
 							return err
 						}
 					}
@@ -110,7 +109,7 @@ func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) err
 				return nil
 			}
 
-			if err := wrapper1(); err != nil {
+			if err := modelWrapper(); err != nil {
 				return err
 			}
 		}
@@ -176,8 +175,8 @@ type WalkContextModel struct {
 }
 
 type WalkContextProperty struct {
-	Input  model.InputProperty
-	Output *model.OutputProperty
+	Input  model.InputModel
+	Output *model.OutputModel
 }
 
 func (t *Loader) dumpCtx(ctx *WalkContext) error {

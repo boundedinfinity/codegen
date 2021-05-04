@@ -90,7 +90,7 @@ func resolveGraph(graph Graph) (Graph, error) {
 func (t *Loader) displayGraph(graph Graph) {
 	for _, node := range graph {
 		for _, dep := range node.deps {
-			t.report(t.reportStack.S(), "%s -> %s\n", node.name, dep)
+			t.reportf(t.reportStack.S(), "%s -> %s\n", node.name, dep)
 		}
 	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"boundedinfinity/codegen/loader"
-	"boundedinfinity/codegen/util"
 	"fmt"
 	"os"
 )
@@ -16,8 +15,6 @@ func main() {
 	if err := l.FromPath(schemaPaths); err != nil {
 		os.Exit(handleError(err))
 	}
-
-	fmt.Println(util.Jdump(l.OutputSpec))
 
 	// g := generator.New(l.Output)
 

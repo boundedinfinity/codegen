@@ -1,39 +1,88 @@
 package loader
 
-func (t *Loader) processModel1(ctx *WalkContext) error {
-	ctx.Model.Output.Name = ctx.Model.Input.Name
-	ctx.Model.Output.Description = t.splitDescription(ctx.Model.Input.Description)
+import (
+	"boundedinfinity/codegen/util"
+	"path"
+	"strings"
+)
 
-	if _, ok := t.dependencies[ctx.Model.Output.SpecPath]; !ok {
-		t.dependencies[ctx.Model.Output.SpecPath] = NewNode(ctx.Model.Output.SpecPath)
+func (t *Loader) processModel1(ctx *WalkContext) error {
+	input := ctx.Model.Input
+	output := ctx.Model.Output
+
+	output.Name = input.Name
+	output.Description = t.splitDescription(input.Description)
+
+	if strings.Contains(input.Type, "/") {
+		output.Type = path.Join(t.rootName(), input.Type)
+	} else {
+		output.Type = input.Type
+	}
+
+	if _, ok := t.dependencies[output.SpecPath]; !ok {
+		t.dependencies[output.SpecPath] = NewNode(output.SpecPath)
 	}
 
 	return nil
 }
 
-func (t *Loader) processModel2(ctx *WalkContext) error {
+func (t *Loader) processModel2(specPath string) WalkFunc {
+	return func(ctx *WalkContext) error {
+		if specPath != ctx.Model.Output.SpecPath {
+			return nil
+		}
+
+		if ctx.Model.Input.Properties == nil {
+			if err := t.processModelBuiltinType(ctx); err != nil {
+				return nil
+			}
+		} else {
+			if err := t.processModelComplexType(ctx); err != nil {
+				return nil
+			}
+		}
+
+		return nil
+	}
+}
+
+func (t *Loader) processModelBuiltinType(ctx *WalkContext) error {
+	switch ctx.Model.Input.Type {
+	case "string":
+		if v, err := json2Str(ctx.Model.Input.Example); err != nil {
+			return err
+		} else {
+			ctx.Model.Output.JsonStructure[ctx.Model.Input.Name] = v
+		}
+	case "int":
+		if v, err := json2Int64(ctx.Model.Input.Example); err != nil {
+			return err
+		} else {
+			ctx.Model.Output.JsonStructure[ctx.Model.Input.Name] = v
+		}
+	default:
+		return t.ErrInvalidType(ctx.Model.Input.Type)
+	}
 
 	return nil
 }
 
-// func (t *Loader) modelProcessor8(namespace model.BiOutput_Namespace, input model.BiInput_Model, output *model.BiOutput_Model) error {
-// 	if output.Properties == nil {
-// 		return nil
-// 	}
+func (t *Loader) processModelComplexType(ctx *WalkContext) error {
+	for _, property := range ctx.Model.Output.Properties {
+		pv, ok := t.modelMap[property.Type]
 
-// 	m := make(map[string]bool)
+		if !ok {
+			return t.ErrCustomTypeNotFound(property.Type)
+		}
 
-// 	for _, property := range output.Properties {
-// 		if !strings.HasPrefix(property.Namespace, model.NAMESPACE_BUILTIN) && property.Namespace != namespace.Namespace {
-// 			if _, ok := m[property.Namespace]; !ok {
-// 				m[property.Namespace] = true
-// 			}
-// 		}
-// 	}
+		if len(pv.JsonStructure) > 1 {
+			ctx.Model.Output.JsonStructure[util.CamelCase(property.Name)] = pv.JsonStructure
+		} else {
+			for _, ev := range pv.JsonStructure {
+				ctx.Model.Output.JsonStructure[util.CamelCase(property.Name)] = ev
+			}
+		}
+	}
 
-// 	for k := range m {
-// 		output.Imports = append(output.Imports, k)
-// 	}
-
-// 	return nil
-// }
+	return nil
+}
