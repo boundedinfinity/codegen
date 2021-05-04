@@ -15,6 +15,7 @@ type Loader struct {
 	dependencies   map[string]*Node
 	namespaceMap   map[string]*model.OutputNamespace
 	modelMap       map[string]*model.OutputModel
+	operationMap   map[string]*model.OutputOperation
 	OutputSpec     *model.OutputSpec
 }
 
@@ -22,6 +23,7 @@ func New() *Loader {
 	return &Loader{
 		namespaceMap: make(map[string]*model.OutputNamespace),
 		modelMap:     make(map[string]*model.OutputModel),
+		operationMap: make(map[string]*model.OutputOperation),
 		dependencies: make(map[string]*Node),
 		OutputSpec:   model.NewOutputSpec(),
 	}

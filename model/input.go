@@ -19,14 +19,6 @@ type InputModel struct {
 	Validations []InputValidation `json:"validations,omitempty" yaml:"validations,omitempty"`
 }
 
-// type InputProperty struct {
-// 	Name        string            `json:"name,omitempty" yaml:"name,omitempty"`
-// 	Type        string            `json:"type,omitempty" yaml:"type,omitempty"`
-// 	Description string            `json:"description,omitempty" yaml:"description,omitempty"`
-// 	Example     interface{}       `json:"example,omitempty" yaml:"example,omitempty"`
-// 	Validations []InputValidation `json:"validations,omitempty" yaml:"validations,omitempty"`
-// }
-
 type InputValidation struct {
 	Minimum  int  `json:"minimum,omitempty" yaml:"minimum,omitempty"`
 	Maximum  int  `json:"maximum,omitempty" yaml:"maximum,omitempty"`
@@ -36,6 +28,7 @@ type InputValidation struct {
 type InputNamespace struct {
 	Name       string           `json:"name,omitempty" yaml:"name,omitempty"`
 	Models     []InputModel     `json:"models,omitempty" yaml:"models,omitempty"`
+	Operations []InputOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
 	Namespaces []InputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 }
 

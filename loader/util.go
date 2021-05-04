@@ -48,7 +48,7 @@ func (t *Loader) reportf(path []string, format string, a ...interface{}) {
 func (t *Loader) rootName() string {
 	var name string
 
-	// name = t.inputSpec.Name
+	name = t.inputSpec.RootPackage()
 
 	return name
 }

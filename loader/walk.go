@@ -21,6 +21,10 @@ func (t Loader) walkSpec(fn WalkFunc, ws ...WalkType) error {
 }
 
 func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) error {
+	if fn == nil {
+		return nil
+	}
+
 	nsSpecPath := t.appendNamespace(ctx.Namespace.Input.Name)
 	var outputNamespace *model.OutputNamespace
 
@@ -36,7 +40,7 @@ func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) err
 
 	ctx.Namespace.Output = outputNamespace
 
-	if fn != nil && ctx.Namespace.Input.Models != nil {
+	if ctx.Namespace.Input.Models != nil {
 		for _, inputModel := range ctx.Namespace.Input.Models {
 			modelWrapper := func() error {
 				modelSpecPath := t.appendNamespace(inputModel.Name)
@@ -115,7 +119,47 @@ func (t Loader) walkNamespace(ctx *WalkContext, fn WalkFunc, ws ...WalkType) err
 		}
 	}
 
-	if ContainsWalkType(WALKTYPE_NAMESPACE, ws...) && fn != nil {
+	if ctx.Namespace.Input.Operations != nil {
+		for _, inputOperation := range ctx.Namespace.Input.Operations {
+			operationWrapper := func() error {
+				operationSpecPath := t.appendNamespace(inputOperation.Name)
+				defer t.namespaceStack.Pop()
+				var outputOperation *model.OutputOperation
+
+				if v, ok := t.operationMap[operationSpecPath]; ok {
+					outputOperation = v
+				} else {
+					outputOperation = model.NewOutputOperation()
+					outputOperation.SpecPath = operationSpecPath
+					outputOperation.Namespace = outputNamespace.Namespace
+					t.operationMap[operationSpecPath] = outputOperation
+					t.OutputSpec.Operations = append(t.OutputSpec.Operations, outputOperation)
+				}
+
+				operationCtx := &WalkContext{
+					Namespace: ctx.Namespace,
+					Operation: &WalkContextOperation{
+						Input:  inputOperation,
+						Output: outputOperation,
+					},
+				}
+
+				if ContainsWalkType(WALKTYPE_OPERATION, ws...) {
+					if err := fn(operationCtx); err != nil {
+						return err
+					}
+				}
+
+				return nil
+			}
+
+			if err := operationWrapper(); err != nil {
+				return err
+			}
+		}
+	}
+
+	if ContainsWalkType(WALKTYPE_NAMESPACE, ws...) {
 		if err := fn(ctx); err != nil {
 			return err
 		}
@@ -162,6 +206,7 @@ type WalkContext struct {
 	Namespace *WalkContextNamespace
 	Model     *WalkContextModel
 	Property  *WalkContextProperty
+	Operation *WalkContextOperation
 }
 
 type WalkContextNamespace struct {
@@ -177,6 +222,11 @@ type WalkContextModel struct {
 type WalkContextProperty struct {
 	Input  model.InputModel
 	Output *model.OutputModel
+}
+
+type WalkContextOperation struct {
+	Input  model.InputOperation
+	Output *model.OutputOperation
 }
 
 func (t *Loader) dumpCtx(ctx *WalkContext) error {

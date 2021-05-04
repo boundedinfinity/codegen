@@ -1,6 +1,7 @@
 package loader
 
 import (
+	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"path"
 	"strings"
@@ -12,6 +13,10 @@ func (t *Loader) processModel1(ctx *WalkContext) error {
 
 	output.Name = input.Name
 	output.Description = t.splitDescription(input.Description)
+
+	if strings.HasSuffix(input.Type, model.COLLECTION_SUFFIX) {
+
+	}
 
 	if strings.Contains(input.Type, "/") {
 		output.Type = path.Join(t.rootName(), input.Type)

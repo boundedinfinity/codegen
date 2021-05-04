@@ -71,6 +71,10 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
+	if err := t.walkSpec(t.processOperation1, WALKTYPE_OPERATION); err != nil {
+		return err
+	}
+
 	if err := t.walkSpec(t.processProperty2, WALKTYPE_PROPERTY); err != nil {
 		return err
 	}

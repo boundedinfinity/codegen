@@ -2,6 +2,7 @@ package loader
 
 import (
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/util"
 	"fmt"
 	"path"
 	"strings"
@@ -52,6 +53,8 @@ func (t *Loader) processProperty2(ctx *WalkContext) error {
 	} else {
 		output.Type = pm.Name
 	}
+
+	ctx.Model.Output.Imports = util.StrSliceDedup(ctx.Model.Output.Imports)
 
 	return nil
 }
