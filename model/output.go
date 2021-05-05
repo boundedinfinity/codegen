@@ -4,6 +4,7 @@ type OutputSpec struct {
 	Models     []*OutputModel     `json:"models,omitempty" yaml:"models,omitempty"`
 	Namespaces []*OutputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 	Operations []*OutputOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Info       OutputInfo         `json:"info,omitempty" yaml:"info,omitempty"`
 }
 
 func NewOutputSpec() *OutputSpec {
@@ -59,9 +60,10 @@ type OutputValidation struct {
 }
 
 type OutputInfo struct {
-	InputDir    string `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
-	OutputDir   string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
-	DumpContext bool   `json:"dumpContext" yaml:"dumpContext"`
+	InputDir       string `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
+	OutputDir      string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	DumpContext    bool   `json:"dumpContext" yaml:"dumpContext"`
+	FilenameMarker string `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
 }
 
 type OutputTemplate struct {
@@ -95,4 +97,19 @@ func NewOutputOperation() *OutputOperation {
 		Imports:     make([]string, 0),
 		Templates:   make([]*OutputTemplate, 0),
 	}
+}
+
+type OutputTemplateModelContext struct {
+	Model OutputModel `json:"model,omitempty" yaml:"model,omitempty"`
+	Spec  OutputSpec  `json:"spec,omitempty" yaml:"spec,omitempty"`
+}
+
+type OutputTemplateOperationContext struct {
+	Operation OutputOperation `json:"operation,omitempty" yaml:"operation,omitempty"`
+	Spec      OutputSpec      `json:"spec,omitempty" yaml:"spec,omitempty"`
+}
+
+type OutputTemplateNamespaceContext struct {
+	Namespace OutputNamespace `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Spec      OutputSpec      `json:"spec,omitempty" yaml:"spec,omitempty"`
 }

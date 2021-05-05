@@ -18,12 +18,12 @@ func (t *Generator) runModels() error {
 	return nil
 }
 
-func (t *Generator) runModel(i int, m model.BiOutput_Model) error {
+func (t *Generator) runModel(i int, m model.OutputModel) error {
 	t.reportStack.Push("models[%v]", i)
 
 	if m.Templates != nil {
 		for _, tmpl := range m.Templates {
-			ctx := model.BiOutput_TemplateModelContext{
+			ctx := model.OutputTemplateModelContext{
 				Model: m,
 				Spec:  t.spec,
 			}

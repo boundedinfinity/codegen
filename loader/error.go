@@ -32,6 +32,6 @@ func (t *Loader) ErrInvalidType(v string) error {
 	return errutil.InvalidType(t.reportStack.S(), v)
 }
 
-func (t *Loader) MustBeOneOf(oneOf []string) error {
+func (t *Loader) ErrMustBeOneOf(oneOf []string) error {
 	return errutil.MustBeOneOf(t.reportStack.S(), oneOf)
 }

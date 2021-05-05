@@ -18,12 +18,12 @@ func (t *Generator) runNamespaces() error {
 	return nil
 }
 
-func (t *Generator) runNamespace(i int, v model.BiOutput_Namespace) error {
+func (t *Generator) runNamespace(i int, v model.OutputNamespace) error {
 	t.reportStack.Push("namespaces[%v]", i)
 
 	if v.Templates != nil && v.Namespace != "" {
 		for _, tmpl := range v.Templates {
-			ctx := model.BiOutput_TemplateNamespaceContext{
+			ctx := model.OutputTemplateNamespaceContext{
 				Namespace: v,
 				Spec:      t.spec,
 			}

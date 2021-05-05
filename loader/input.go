@@ -1,31 +1,17 @@
 package loader
 
 import (
-	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"fmt"
+	"path/filepath"
 )
 
-func (t *Loader) processType(input model.InputModel, output *model.OutputModel) error {
-	t.reportStack.Push("type")
-	defer t.reportStack.Pop()
-
-	// spath := t.appendNamespace()
-
-	return nil
-}
-
 func (t *Loader) processInput() error {
-	// input := t.inputSpec.Type
-	// var output *model.OutputModel
-	// output = model.NewOutputModel()
-
-	// if err := t.processType(input, output); err != nil {
-	// 	return err
-	// }
-
 	// t.reportStack.Push(fmt.Sprintf("input[%v]", util.SummerySuffix(t.inputPath, model.SUMMERY_SIZE)))
 	t.reportStack.Push("loader")
+	defer t.reportStack.Pop()
+
+	t.reportStack.Push(`"%v"`, filepath.Base(t.inputPath))
 	defer t.reportStack.Pop()
 
 	// checkName := func() error {
@@ -51,9 +37,9 @@ func (t *Loader) processInput() error {
 	// 	return err
 	// }
 
-	// if err := t.processInput_Info(); err != nil {
-	// 	return err
-	// }
+	if err := t.processInput_Info(); err != nil {
+		return err
+	}
 
 	if err := t.walkSpec(t.processNamespace1, WALKTYPE_NAMESPACE); err != nil {
 		return err
@@ -80,6 +66,18 @@ func (t *Loader) processInput() error {
 	}
 
 	if err := t.walkSpec(t.processNamespace2, WALKTYPE_NAMESPACE); err != nil {
+		return err
+	}
+
+	if err := t.walkSpec(t.processNamespace3, WALKTYPE_NAMESPACE); err != nil {
+		return err
+	}
+
+	if err := t.walkSpec(t.processModel3, WALKTYPE_MODEL); err != nil {
+		return err
+	}
+
+	if err := t.walkSpec(t.processOperation2, WALKTYPE_OPERATION); err != nil {
 		return err
 	}
 

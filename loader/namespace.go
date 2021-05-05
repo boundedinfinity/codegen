@@ -3,6 +3,7 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"path"
+	"strings"
 )
 
 func (t *Loader) processNamespace1(ctx *WalkContext) error {
@@ -20,7 +21,9 @@ func (t *Loader) processNamespace2(ctx *WalkContext) error {
 
 	if ctx.Namespace.Input.Templates != nil {
 		for _, tmpl := range ctx.Namespace.Input.Templates {
-			tmpls = append(tmpls, tmpl)
+			if err := t.processTemplate1(ctx, &tmpls, tmpl); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -35,7 +38,9 @@ func (t *Loader) processNamespace2(ctx *WalkContext) error {
 
 		if vs, ok := t.templateMap[ns]; ok {
 			for _, v := range vs {
-				tmpls = append(tmpls, v)
+				if err := t.processTemplate1(ctx, &tmpls, v); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -45,85 +50,25 @@ func (t *Loader) processNamespace2(ctx *WalkContext) error {
 	return nil
 }
 
-// func (t Loader) namespaceProcssor7(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
-// 	// tmpls, ok := t.templateMap[output.Namespace]
+func (t *Loader) processNamespace3(ctx *WalkContext) error {
+	output := ctx.Namespace.Output
+	namespace := output.Namespace
 
-// 	// if !ok {
-// 	// 	return nil
-// 	// }
+	if strings.HasSuffix(namespace, model.NAMESPACE_BUILTIN) {
+		return nil
+	}
 
-// 	// namespaceTemplates := func(inputTemplate model.BiInput_Template) error {
-// 	// 	namespaces := filterNamespace(t.namespaceMap, func(v model.BiOutput_Namespace) bool {
-// 	// 		return v.Namespace == output.Namespace
-// 	// 	})
+	vs := t.getTemplates(namespace, model.TemplateType_NAMESPACE)
 
-// 	// 	for _, namescape := range namespaces {
-// 	// 		outputTemplate := model.New_BiOutput_Template()
+	for _, v := range vs {
+		outputTemplate := model.NewOutputTemplate()
 
-// 	// 		if err := t.processTemplate2(*output, "namespace", inputTemplate, outputTemplate); err != nil {
-// 	// 			return err
-// 	// 		}
+		if err := t.processTemplate2(ctx, "", v, outputTemplate); err != nil {
+			return err
+		}
 
-// 	// 		namescape.Templates = append(namescape.Templates, outputTemplate)
-// 	// 	}
+		output.Templates = append(output.Templates, outputTemplate)
+	}
 
-// 	// 	return nil
-// 	// }
-
-// 	// operationTemplates := func(inputTemplate model.BiInput_Template) error {
-// 	// 	operations := filterOperations(t.operationMap, func(v model.BiOutput_Operation) bool {
-// 	// 		return v.Namespace == output.Namespace
-// 	// 	})
-
-// 	// 	for _, operation := range operations {
-// 	// 		outputTemplate := model.New_BiOutput_Template()
-
-// 	// 		if err := t.processTemplate2(*output, operation.Name, inputTemplate, outputTemplate); err != nil {
-// 	// 			return err
-// 	// 		}
-
-// 	// 		operation.Templates = append(operation.Templates, outputTemplate)
-// 	// 	}
-
-// 	// 	return nil
-// 	// }
-
-// 	// modelTemplates := func(inputTemplate model.BiInput_Template) error {
-// 	// 	models := filterModels(t.modelMap, func(v model.BiOutput_Model) bool {
-// 	// 		return v.Namespace == output.Namespace
-// 	// 	})
-
-// 	// 	for _, model1 := range models {
-// 	// 		outputTemplate := model.New_BiOutput_Template()
-
-// 	// 		if err := t.processTemplate2(*output, model1.Name, inputTemplate, outputTemplate); err != nil {
-// 	// 			return err
-// 	// 		}
-
-// 	// 		model1.Templates = append(model1.Templates, outputTemplate)
-// 	// 	}
-
-// 	// 	return nil
-// 	// }
-
-// 	// for _, tmpl := range tmpls {
-// 	// 	switch tmpl.Type {
-// 	// 	case string(model.TemplateType_NAMESPACE):
-// 	// 		if err := namespaceTemplates(tmpl); err != nil {
-// 	// 			return err
-// 	// 		}
-// 	// 	case string(model.TemplateType_MODEL):
-// 	// 		if err := modelTemplates(tmpl); err != nil {
-// 	// 			return err
-// 	// 		}
-// 	// 	case string(model.TemplateType_OPERATION):
-// 	// 		if err := operationTemplates(tmpl); err != nil {
-// 	// 			return err
-// 	// 		}
-// 	// 	default:
-// 	// 		return t.InvalidateType()
-// 	// 	}
-// 	// }
-
-// 	return nil
-// }
+	return nil
+}

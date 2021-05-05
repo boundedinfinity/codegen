@@ -18,12 +18,12 @@ func (t *Generator) runOperations() error {
 	return nil
 }
 
-func (t *Generator) runOperation(i int, v model.BiOutput_Operation) error {
+func (t *Generator) runOperation(i int, v model.OutputOperation) error {
 	t.reportStack.Push("operations[%v]", i)
 
 	if v.Templates != nil {
 		for _, tmpl := range v.Templates {
-			ctx := model.BiOutput_TemplateOperationContext{
+			ctx := model.OutputTemplateOperationContext{
 				Operation: v,
 				Spec:      t.spec,
 			}

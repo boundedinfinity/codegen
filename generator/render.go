@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func (t *Generator) renderFile(tmpl model.BiOutput_Template, v interface{}) error {
+func (t *Generator) renderFile(tmpl model.OutputTemplate, v interface{}) error {
 	fmt.Printf("rendering: %v\n", tmpl.Output)
 
 	if tmpl.Input == "" {

@@ -1,98 +1,127 @@
 package loader
 
-// func (t *Loader) processTemplate1(namespace model.BiOutput_Namespace, input model.BiInput_Template, output *model.BiInput_Template) error {
-// 	{
-// 		t.reportStack.Push("input")
+import (
+	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/util"
+	"fmt"
+	"path"
+	"path/filepath"
+	"strings"
+)
 
-// 		if input.Path == "" {
-// 			return t.CannotBeEmpty()
-// 		}
+func (t *Loader) getTemplates(namespace string, typ model.TemplateType) (tmpls []model.InputTemplate) {
+	if namespace == "" || typ == "" {
+		return tmpls
+	}
 
-// 		if filepath.IsAbs(input.Path) {
-// 			if ok, err := util.PathExists(input.Path); err != nil {
-// 				return err
-// 			} else if !ok {
-// 				return t.NotFound()
-// 			} else {
-// 				output.Path = input.Path
-// 			}
-// 		} else {
-// 			relPath := filepath.Join(t.inputDir, input.Path)
-// 			abs, err := filepath.Abs(relPath)
+	if vs, ok := t.templateMap[namespace]; !ok {
+		return tmpls
+	} else {
+		for _, v := range vs {
+			if v.Type == string(typ) {
+				tmpls = append(tmpls, v)
+			}
+		}
+	}
 
-// 			if err != nil {
-// 				return err
-// 			}
+	return tmpls
+}
 
-// 			if ok, err := util.PathExists(abs); err != nil {
-// 				return err
-// 			} else if !ok {
-// 				return t.NotFound()
-// 			} else {
-// 				output.Path = abs
-// 			}
-// 		}
+func (t *Loader) processTemplate1(ctx *WalkContext, tmpls *[]model.InputTemplate, input model.InputTemplate) error {
+	if input.Path == "" {
+		return t.ErrCannotBeEmpty()
+	}
 
-// 		t.reportStack.Pop()
-// 	}
+	if input.Type == "" {
+		return t.ErrCannotBeEmpty()
+	}
 
-// 	{
-// 		t.reportStack.Push("type")
+	if !model.IsTemplateType(input.Type) {
+		return t.ErrMustBeOneOf(model.TemplateTypeStrings())
+	}
 
-// 		if input.Type == "" {
-// 			return t.NotFound()
-// 		}
+	for _, v := range *tmpls {
+		if v.Path == input.Path && v.Type == input.Type {
+			return nil
+		}
+	}
 
-// 		if !model.IsTemplateType(input.Type) {
-// 			return t.MustBeOneOf(model.TemplateTypeStrings())
-// 		}
+	var output model.InputTemplate
 
-// 		output.Type = input.Type
-// 		t.reportStack.Pop()
-// 	}
+	if filepath.IsAbs(input.Path) {
+		if ok, err := util.PathExists(input.Path); err != nil {
+			return err
+		} else if !ok {
+			return t.ErrNotFound()
+		} else {
+			output.Path = input.Path
+		}
+	} else {
+		relPath := filepath.Join(t.OutputSpec.Info.InputDir, input.Path)
+		abs, err := filepath.Abs(relPath)
 
-// 	{
-// 		t.reportStack.Push("header")
-// 		output.Header = input.Header
-// 		t.reportStack.Pop()
-// 	}
+		if err != nil {
+			return err
+		}
 
-// 	return nil
-// }
+		if ok, err := util.PathExists(abs); err != nil {
+			return err
+		} else if !ok {
+			return t.ErrNotFound()
+		} else {
+			output.Path = abs
+		}
+	}
 
-// func (t *Loader) processTemplate2(namespace model.BiOutput_Namespace, name string, input model.BiInput_Template, output *model.BiOutput_Template) error {
-// 	// var tmplExt string
-// 	// var tmplName string
-// 	// var relPath string
-// 	// var abs string
-// 	// var fn string
+	output.Header = input.Header
+	output.Type = input.Type
 
-// 	// relPath = namespace.Namespace
-// 	// relPath = strings.TrimPrefix(relPath, t.rootName())
-// 	// relPath = strings.TrimPrefix(relPath, "/")
+	for _, v := range *tmpls {
+		if v.Path == output.Path && v.Type == output.Type {
+			return nil
+		}
+	}
 
-// 	// tmplName = input.Path
-// 	// tmplName = filepath.Base(tmplName)
-// 	// tmplName = util.TrimTemplateExt(tmplName)
-// 	// tmplExt = filepath.Ext(tmplName)
-// 	// tmplName = strings.TrimSuffix(tmplName, tmplExt)
-// 	// tmplExt = strings.TrimPrefix(tmplExt, ".")
+	*tmpls = append(*tmpls, output)
 
-// 	// if name == "" {
-// 	// 	fn = tmplName
-// 	// } else {
-// 	// 	fn = name
-// 	// }
+	return nil
+}
 
-// 	// if t.inputSpec.Info.FilenameMarker != "" {
-// 	// 	fn = fmt.Sprintf("%v.%v", fn, t.inputSpec.Info.FilenameMarker)
-// 	// }
+func (t *Loader) processTemplate2(ctx *WalkContext, name string, input model.InputTemplate, output *model.OutputTemplate) error {
+	var tmplExt string
+	var tmplName string
+	var relPath string
+	var abs string
+	var fn string
 
-// 	// fn = fmt.Sprintf("%v.%v", fn, tmplExt)
-// 	// abs = path.Join(t.OutputSpec.Info.OutputDir, relPath, fn)
+	info := t.OutputSpec.Info
 
-// 	// output.Input = input.Path
-// 	// output.Output = abs
-// 	// output.Header = t.splitDescription(input.Header)
-// 	return nil
-// }
+	relPath = ctx.Namespace.Output.Namespace
+	relPath = strings.TrimPrefix(relPath, t.rootName())
+	relPath = strings.TrimPrefix(relPath, "/")
+
+	tmplName = input.Path
+	tmplName = filepath.Base(tmplName)
+	tmplName = util.TrimTemplateExt(tmplName)
+	tmplExt = filepath.Ext(tmplName)
+	tmplName = strings.TrimSuffix(tmplName, tmplExt)
+	tmplExt = strings.TrimPrefix(tmplExt, ".")
+
+	if name == "" {
+		fn = tmplName
+	} else {
+		fn = name
+	}
+
+	if info.FilenameMarker != "" && info.FilenameMarker != model.DEFAULT_FILENAME_DISABLE {
+		fn = fmt.Sprintf("%v.%v", fn, info.FilenameMarker)
+	}
+
+	fn = fmt.Sprintf("%v.%v", fn, tmplExt)
+	abs = path.Join(info.OutputDir, relPath, fn)
+
+	output.Input = input.Path
+	output.Output = abs
+	output.Header = t.splitDescription(input.Header)
+	return nil
+}

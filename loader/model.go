@@ -113,3 +113,26 @@ func (t *Loader) processModelComplexType(ctx *WalkContext) error {
 
 	return nil
 }
+
+func (t *Loader) processModel3(ctx *WalkContext) error {
+	output := ctx.Model.Output
+	namespace := output.Namespace
+
+	if strings.HasSuffix(namespace, model.NAMESPACE_BUILTIN) {
+		return nil
+	}
+
+	vs := t.getTemplates(namespace, model.TemplateType_MODEL)
+
+	for _, v := range vs {
+		outputTemplate := model.NewOutputTemplate()
+
+		if err := t.processTemplate2(ctx, output.Name, v, outputTemplate); err != nil {
+			return err
+		}
+
+		output.Templates = append(output.Templates, outputTemplate)
+	}
+
+	return nil
+}

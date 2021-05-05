@@ -61,5 +61,24 @@ func (t *Loader) processOperation1(ctx *WalkContext) error {
 }
 
 func (t *Loader) processOperation2(ctx *WalkContext) error {
+	output := ctx.Operation.Output
+	namespace := output.Namespace
+
+	if strings.HasSuffix(namespace, model.NAMESPACE_BUILTIN) {
+		return nil
+	}
+
+	vs := t.getTemplates(namespace, model.TemplateType_OPERATION)
+
+	for _, v := range vs {
+		outputTemplate := model.NewOutputTemplate()
+
+		if err := t.processTemplate2(ctx, output.Name, v, outputTemplate); err != nil {
+			return err
+		}
+
+		output.Templates = append(output.Templates, outputTemplate)
+	}
+
 	return nil
 }

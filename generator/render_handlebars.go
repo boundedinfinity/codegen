@@ -1,13 +1,9 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"fmt"
-	"strings"
 
 	"github.com/aymerick/raymond"
-	"github.com/ozgio/strutil"
 )
 
 func init() {
@@ -15,7 +11,7 @@ func init() {
 	raymond.RegisterHelper("ucFirst", util.UcFirst)
 	raymond.RegisterHelper("ifeq", ifeq)
 	raymond.RegisterHelper("basePath", util.BasePath)
-	raymond.RegisterHelper("operationId", operationId)
+	// raymond.RegisterHelper("operationId", operationId)
 
 	// raymond.RegisterHelper("type_go", t)
 	raymond.RegisterHelper("jdump", util.Jdump)
@@ -31,17 +27,17 @@ func (t *Generator) renderHandlebars(s string, d interface{}) (string, error) {
 	return o, nil
 }
 
-func operationId(path string, operation string, v model.OpenApiV310Operation) string {
-	var operationId string
+// func operationId(path string, operation string, v model.OpenApiV310Operation) string {
+// 	var operationId string
 
-	if v.OperationId.IsDefined() {
-		operationId = v.OperationId.Get()
-	} else {
+// 	if v.OperationId.IsDefined() {
+// 		operationId = v.OperationId.Get()
+// 	} else {
 
-		operationId = strings.Join(strings.Split(path, "/"), " ")
-		operationId = fmt.Sprintf("%v %v", operationId, strings.ToLower(operation))
-		operationId = strutil.ToCamelCase(operationId)
-	}
+// 		operationId = strings.Join(strings.Split(path, "/"), " ")
+// 		operationId = fmt.Sprintf("%v %v", operationId, strings.ToLower(operation))
+// 		operationId = strutil.ToCamelCase(operationId)
+// 	}
 
-	return operationId
-}
+// 	return operationId
+// }

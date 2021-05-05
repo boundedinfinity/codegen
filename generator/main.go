@@ -3,11 +3,11 @@ package generator
 import "boundedinfinity/codegen/model"
 
 type Generator struct {
-	spec        model.BiOutput
+	spec        model.OutputSpec
 	reportStack model.StrStack
 }
 
-func New(spec model.BiOutput) *Generator {
+func New(spec model.OutputSpec) *Generator {
 	return &Generator{
 		spec: spec,
 	}

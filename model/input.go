@@ -3,6 +3,7 @@ package model
 type InputSpec struct {
 	Name          string         `json:"name,omitempty" yaml:"name,omitempty"`
 	Version       string         `json:"version,omitempty" yaml:"version,omitempty"`
+	Info          InputInfo      `json:"info,omitempty" yaml:"info,omitempty"`
 	Specification InputNamespace `json:"specification,omitempty" yaml:"specification,omitempty"`
 }
 
