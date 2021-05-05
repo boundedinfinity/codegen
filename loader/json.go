@@ -20,7 +20,9 @@ var (
 	}
 )
 
-func json2Str(example interface{}) (string, error) {
+type ExampleExtractor func(example interface{}) (interface{}, error)
+
+func json2Str(example interface{}) (interface{}, error) {
 	if example == nil {
 		return model.JSON_DEFAULT_STRING, nil
 	}
@@ -36,7 +38,7 @@ func json2Str(example interface{}) (string, error) {
 	return v, nil
 }
 
-func json2Boolean(example interface{}) (bool, error) {
+func json2Boolean(example interface{}) (interface{}, error) {
 	if example == nil {
 		return false, nil
 	}
@@ -52,7 +54,7 @@ func json2Boolean(example interface{}) (bool, error) {
 	return v, nil
 }
 
-func json2Int64(example interface{}) (int64, error) {
+func json2Int64(example interface{}) (interface{}, error) {
 	if example == nil {
 		return model.JSON_DEFAULT_NUMBER, nil
 	}
@@ -68,7 +70,7 @@ func json2Int64(example interface{}) (int64, error) {
 	return v, nil
 }
 
-func json2Float64(example interface{}) (float64, error) {
+func json2Float64(example interface{}) (interface{}, error) {
 	if example == nil {
 		return model.JSON_DEFAULT_NUMBER, nil
 	}

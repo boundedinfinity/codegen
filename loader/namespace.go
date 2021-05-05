@@ -1,5 +1,10 @@
 package loader
 
+import (
+	"boundedinfinity/codegen/model"
+	"path"
+)
+
 func (t *Loader) processNamespace1(ctx *WalkContext) error {
 	if ctx.Namespace.Input.Namespaces != nil {
 		for _, child := range ctx.Namespace.Input.Namespaces {
@@ -11,51 +16,34 @@ func (t *Loader) processNamespace1(ctx *WalkContext) error {
 }
 
 func (t *Loader) processNamespace2(ctx *WalkContext) error {
-	// specPath := ctx.Namespace.Output.SpecPath
+	tmpls := make([]model.InputTemplate, 0)
 
-	// if tmpls, ok := t.templateMap[specPath]; ok {
-	// 	for _, tmpl := range tmpls {
-	// 		t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], tmpl)
-	// 	}
-	// }
+	if ctx.Namespace.Input.Templates != nil {
+		for _, tmpl := range ctx.Namespace.Input.Templates {
+			tmpls = append(tmpls, tmpl)
+		}
+	}
+
+	ns := ctx.Namespace.Output.Namespace
+
+	for {
+		if ns == t.rootName() || ns == "." {
+			break
+		}
+
+		ns = path.Dir(ns)
+
+		if vs, ok := t.templateMap[ns]; ok {
+			for _, v := range vs {
+				tmpls = append(tmpls, v)
+			}
+		}
+	}
+
+	t.templateMap[ctx.Namespace.Output.Namespace] = tmpls
 
 	return nil
 }
-
-// func (t Loader) namespaceProcssor1(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
-// 	pns := path.Dir(output.Namespace)
-
-// 	if tmpls, ok := t.templateMap[pns]; ok {
-// 		for _, tmpl := range tmpls {
-// 			t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], tmpl)
-// 		}
-// 	}
-
-// 	if input.Templates != nil {
-// 		for tmplIndex, tmpl := range input.Templates {
-// 			templateWrapper := func() error {
-// 				t.reportStack.Push("template[%v]", tmplIndex)
-// 				defer t.reportStack.Pop()
-
-// 				var processed model.BiInput_Template
-
-// 				if err := t.processTemplate1(*output, tmpl, &processed); err != nil {
-// 					return err
-// 				}
-
-// 				t.templateMap[output.Namespace] = append(t.templateMap[output.Namespace], processed)
-
-// 				return nil
-// 			}
-
-// 			if err := templateWrapper(); err != nil {
-// 				return err
-// 			}
-// 		}
-// 	}
-
-// 	return nil
-// }
 
 // func (t Loader) namespaceProcssor7(input model.BiInput_Namespace, output *model.BiOutput_Namespace) error {
 // 	// tmpls, ok := t.templateMap[output.Namespace]

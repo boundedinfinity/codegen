@@ -79,6 +79,10 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
+	if err := t.walkSpec(t.processNamespace2, WALKTYPE_NAMESPACE); err != nil {
+		return err
+	}
+
 	fmt.Println(util.Jdump(t.OutputSpec))
 	return nil
 }

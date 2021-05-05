@@ -5,11 +5,19 @@ import (
 	"boundedinfinity/codegen/util"
 	"fmt"
 	"path"
+	"strings"
 )
 
 func (t *Loader) processOperationModel(op *model.OutputOperation, input model.InputModel, output *model.OutputModel) error {
 	output.Name = input.Name
-	output.Type = path.Join(t.rootName(), input.Type)
+	typ := path.Join(t.rootName(), input.Type)
+
+	if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
+		output.Collection = true
+		typ = strings.ReplaceAll(typ, model.COLLECTION_SUFFIX, "")
+	}
+
+	output.Type = typ
 
 	if mt, ok := t.modelMap[output.Type]; !ok {
 		return t.ErrCustomTypeNotFound(output.Type)
@@ -22,6 +30,10 @@ func (t *Loader) processOperationModel(op *model.OutputOperation, input model.In
 			output.Type = fmt.Sprintf("%v.%v", path.Base(mt.Namespace), mt.Name)
 		} else {
 			output.Type = mt.Name
+		}
+
+		if output.Collection {
+			output.Type = fmt.Sprintf("%v%v", model.COLLECTION_SUFFIX, output.Type)
 		}
 	}
 

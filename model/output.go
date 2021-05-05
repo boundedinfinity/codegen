@@ -35,7 +35,7 @@ type OutputModel struct {
 	Description   []string               `json:"description,omitempty" yaml:"description,omitempty"`
 	Example       interface{}            `json:"example,omitempty" yaml:"example,omitempty"`
 	Imports       []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Array         bool                   `json:"array,omitempty" yaml:"array,omitempty"`
+	Collection    bool                   `json:"collection,omitempty" yaml:"collection,omitempty"`
 	JsonStructure map[string]interface{} `json:"jsonStructure,omitempty" yaml:"JsonStructure,omitempty"`
 	Properties    []*OutputModel         `json:"properties,omitempty" yaml:"properties,omitempty"`
 	Validations   []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`

@@ -30,6 +30,7 @@ type InputNamespace struct {
 	Models     []InputModel     `json:"models,omitempty" yaml:"models,omitempty"`
 	Operations []InputOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
 	Namespaces []InputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
+	Templates  []InputTemplate  `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 type InputOperation struct {

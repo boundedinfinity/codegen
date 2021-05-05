@@ -14,14 +14,17 @@ func (t *Loader) processModel1(ctx *WalkContext) error {
 	output.Name = input.Name
 	output.Description = t.splitDescription(input.Description)
 
-	if strings.HasSuffix(input.Type, model.COLLECTION_SUFFIX) {
+	typ := input.Type
 
+	if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
+		output.Collection = true
+		typ = strings.ReplaceAll(typ, model.COLLECTION_SUFFIX, "")
 	}
 
 	if strings.Contains(input.Type, "/") {
-		output.Type = path.Join(t.rootName(), input.Type)
+		output.Type = path.Join(t.rootName(), typ)
 	} else {
-		output.Type = input.Type
+		output.Type = typ
 	}
 
 	if _, ok := t.dependencies[output.SpecPath]; !ok {
@@ -52,39 +55,58 @@ func (t *Loader) processModel2(specPath string) WalkFunc {
 }
 
 func (t *Loader) processModelBuiltinType(ctx *WalkContext) error {
-	switch ctx.Model.Input.Type {
-	case "string":
-		if v, err := json2Str(ctx.Model.Input.Example); err != nil {
+	input := ctx.Model.Input
+	output := ctx.Model.Output
+
+	extract := func(fn ExampleExtractor) error {
+		jname := util.CamelCase(ctx.Model.Input.Name)
+		if v, err := fn(input.Example); err != nil {
 			return err
 		} else {
-			ctx.Model.Output.JsonStructure[ctx.Model.Input.Name] = v
+			if output.Collection {
+				output.JsonStructure[jname] = []interface{}{v}
+			} else {
+				output.JsonStructure[jname] = v
+			}
 		}
-	case "int":
-		if v, err := json2Int64(ctx.Model.Input.Example); err != nil {
-			return err
-		} else {
-			ctx.Model.Output.JsonStructure[ctx.Model.Input.Name] = v
-		}
-	default:
-		return t.ErrInvalidType(ctx.Model.Input.Type)
+
+		return nil
 	}
 
-	return nil
+	switch input.Type {
+	case "string":
+		return extract(json2Str)
+	case "int":
+		return extract(json2Int64)
+	default:
+		return t.ErrInvalidType(input.Type)
+	}
 }
 
 func (t *Loader) processModelComplexType(ctx *WalkContext) error {
+	output := ctx.Model.Output
+
 	for _, property := range ctx.Model.Output.Properties {
 		pv, ok := t.modelMap[property.Type]
+		jname := util.CamelCase(property.Name)
 
 		if !ok {
 			return t.ErrCustomTypeNotFound(property.Type)
 		}
 
 		if len(pv.JsonStructure) > 1 {
-			ctx.Model.Output.JsonStructure[util.CamelCase(property.Name)] = pv.JsonStructure
+			if property.Collection {
+				output.JsonStructure[jname] = []interface{}{pv.JsonStructure}
+			} else {
+				output.JsonStructure[jname] = pv.JsonStructure
+			}
 		} else {
 			for _, ev := range pv.JsonStructure {
-				ctx.Model.Output.JsonStructure[util.CamelCase(property.Name)] = ev
+				if property.Collection {
+					output.JsonStructure[jname] = []interface{}{ev}
+				} else {
+					output.JsonStructure[jname] = ev
+				}
 			}
 		}
 	}
