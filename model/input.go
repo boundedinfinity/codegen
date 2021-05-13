@@ -1,14 +1,10 @@
 package model
 
-type InputSpec struct {
-	Name          string         `json:"name,omitempty" yaml:"name,omitempty"`
-	Version       string         `json:"version,omitempty" yaml:"version,omitempty"`
-	Info          InputInfo      `json:"info,omitempty" yaml:"info,omitempty"`
-	Specification InputNamespace `json:"specification,omitempty" yaml:"specification,omitempty"`
-}
-
-func (t InputSpec) RootPackage() string {
-	return t.Name
+type InputFile struct {
+	Name          string             `json:"name,omitempty" yaml:"name,omitempty"`
+	Version       string             `json:"version,omitempty" yaml:"version,omitempty"`
+	Info          InputInfo          `json:"info,omitempty" yaml:"info,omitempty"`
+	Specification InputSpecification `json:"specification,omitempty" yaml:"specification,omitempty"`
 }
 
 type InputModel struct {
@@ -17,6 +13,7 @@ type InputModel struct {
 	Description string            `json:"description,omitempty" yaml:"description,omitempty"`
 	Example     interface{}       `json:"example,omitempty" yaml:"example,omitempty"`
 	Properties  []InputModel      `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Symbols     []string          `json:"symbols,omitempty" yaml:"symbols,omitempty"`
 	Validations []InputValidation `json:"validations,omitempty" yaml:"validations,omitempty"`
 }
 
@@ -26,11 +23,9 @@ type InputValidation struct {
 	Required bool `json:"required,omitempty" yaml:"required,omitempty"`
 }
 
-type InputNamespace struct {
-	Name       string           `json:"name,omitempty" yaml:"name,omitempty"`
+type InputSpecification struct {
 	Models     []InputModel     `json:"models,omitempty" yaml:"models,omitempty"`
 	Operations []InputOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
-	Namespaces []InputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 	Templates  []InputTemplate  `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
@@ -42,12 +37,13 @@ type InputOperation struct {
 }
 
 type InputInfo struct {
-	InputDir                  string `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
-	OutputDir                 string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
-	DumpContext               bool   `json:"dumpContext" yaml:"dumpContext"`
-	FilenameMarker            string `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
-	TemplateHeader            string `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
-	DescriptionSplitCharacter string `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
+	InputDir                  string            `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
+	OutputDir                 string            `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	DumpContext               bool              `json:"dumpContext" yaml:"dumpContext"`
+	FilenameMarker            string            `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
+	TemplateHeader            string            `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
+	DescriptionSplitCharacter string            `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
+	Primitives                map[string]string `json:"primitives,omitempty" yaml:"primitives,omitempty"`
 }
 
 type InputTemplate struct {

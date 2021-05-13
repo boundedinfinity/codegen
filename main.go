@@ -13,7 +13,7 @@ func main() {
 
 	l := loader.New()
 
-	if err := l.FromPath(schemaPaths); err != nil {
+	if err := l.FromPaths(schemaPaths); err != nil {
 		os.Exit(handleError(err))
 	}
 

@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestBcd(t *testing.T) {
+func TestLoader(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Model suite")
 }

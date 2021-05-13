@@ -7,34 +7,33 @@ import (
 )
 
 type Node struct {
-	name string
-	deps []string
+	Name string   `json:"name,omitempty" yaml:"name,omitempty"`
+	Deps []string `json:"deps,omitempty" yaml:"deps,omitempty"`
 }
 
-func (t *Node) Add(dep ...string) {
-	for _, x := range dep {
+func (t *Node) Add(deps ...*Node) {
+	for _, dep := range deps {
 		var found bool
 
-		for _, n := range t.deps {
-			if x == n {
+		for _, n := range t.Deps {
+			if dep.Name == n {
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			t.deps = append(t.deps, x)
+			t.Deps = append(t.Deps, dep.Name)
 		}
 	}
 }
 
-func NewNode(name string, deps ...string) *Node {
+func NewNode(name string) *Node {
 	n := &Node{
-		name: name,
-		deps: make([]string, 0),
+		Name: name,
+		Deps: make([]string, 0),
 	}
 
-	n.Add(deps...)
 	return n
 }
 
@@ -45,13 +44,13 @@ func resolveGraph(graph Graph) (Graph, error) {
 	nodeDependencies := make(map[string]mapset.Set)
 
 	for _, node := range graph {
-		nodeNames[node.name] = node
+		nodeNames[node.Name] = node
 
 		dependencySet := mapset.NewSet()
-		for _, dep := range node.deps {
+		for _, dep := range node.Deps {
 			dependencySet.Add(dep)
 		}
-		nodeDependencies[node.name] = dependencySet
+		nodeDependencies[node.Name] = dependencySet
 	}
 
 	var resolved Graph
@@ -89,8 +88,8 @@ func resolveGraph(graph Graph) (Graph, error) {
 
 func (t *Loader) displayGraph(graph Graph) {
 	for _, node := range graph {
-		for _, dep := range node.deps {
-			t.reportf(t.reportStack.S(), "%s -> %s\n", node.name, dep)
+		for _, dep := range node.Deps {
+			t.reportf([]string{}, "%s -> %s\n", node.Name, dep)
 		}
 	}
 }

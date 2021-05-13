@@ -1,5 +1,7 @@
 package model
 
+import "github.com/iancoleman/orderedmap"
+
 type OutputSpec struct {
 	Models     []*OutputModel     `json:"models,omitempty" yaml:"models,omitempty"`
 	Namespaces []*OutputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
@@ -15,41 +17,38 @@ func NewOutputSpec() *OutputSpec {
 }
 
 type OutputNamespace struct {
-	SpecPath  string            `json:"specPath,omitempty" yaml:"specPath,omitempty"`
-	Namespace string            `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Children  []string          `json:"children,omitempty" yaml:"children,omitempty"`
+	Name      string            `json:"name,omitempty" yaml:"name,omitempty"`
 	Templates []*OutputTemplate `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 func NewOutputNamespace() *OutputNamespace {
 	return &OutputNamespace{
-		Children:  make([]string, 0),
 		Templates: make([]*OutputTemplate, 0),
 	}
 }
 
 type OutputModel struct {
-	SpecPath      string                 `json:"specPath,omitempty" yaml:"specPath,omitempty"`
-	Namespace     string                 `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	Name          string                 `json:"name,omitempty" yaml:"name,omitempty"`
-	Type          string                 `json:"type,omitempty" yaml:"type,omitempty"`
-	Description   []string               `json:"description,omitempty" yaml:"description,omitempty"`
-	Example       interface{}            `json:"example,omitempty" yaml:"example,omitempty"`
-	Imports       []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Collection    bool                   `json:"collection,omitempty" yaml:"collection,omitempty"`
-	JsonStructure map[string]interface{} `json:"jsonStructure,omitempty" yaml:"JsonStructure,omitempty"`
-	Properties    []*OutputModel         `json:"properties,omitempty" yaml:"properties,omitempty"`
-	Validations   []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`
-	Templates     []*OutputTemplate      `json:"templates,omitempty" yaml:"templates,omitempty"`
+	Name        string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	Type        string                 `json:"type,omitempty" yaml:"type,omitempty"`
+	Description []string               `json:"description,omitempty" yaml:"description,omitempty"`
+	Example     interface{}            `json:"example,omitempty" yaml:"example,omitempty"`
+	Imports     []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
+	Collection  bool                   `json:"collection,omitempty" yaml:"collection,omitempty"`
+	JsonStr     *orderedmap.OrderedMap `json:"jsonStr,omitempty" yaml:"jsonStr,omitempty"`
+	JsonDocs    *orderedmap.OrderedMap `json:"jsonDocs,omitempty" yaml:"jsonDocs,omitempty"`
+	Properties  []*OutputModel         `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Validations []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`
+	Templates   []*OutputTemplate      `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 func NewOutputModel() *OutputModel {
 	return &OutputModel{
-		Description:   make([]string, 0),
-		Imports:       make([]string, 0),
-		JsonStructure: make(map[string]interface{}),
-		Properties:    make([]*OutputModel, 0),
-		Templates:     make([]*OutputTemplate, 0),
+		Description: make([]string, 0),
+		Imports:     make([]string, 0),
+		JsonStr:     orderedmap.New(),
+		JsonDocs:    orderedmap.New(),
+		Properties:  make([]*OutputModel, 0),
+		Templates:   make([]*OutputTemplate, 0),
 	}
 }
 

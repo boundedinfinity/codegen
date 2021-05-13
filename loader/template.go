@@ -3,13 +3,10 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"fmt"
-	"path"
 	"path/filepath"
-	"strings"
 )
 
-func (t *Loader) getTemplates(namespace string, typ model.TemplateType) (tmpls []model.InputTemplate) {
+func (t *Loader) getTemplates(namespace string, typ model.TemplateTypeEnum) (tmpls []model.InputTemplate) {
 	if namespace == "" || typ == "" {
 		return tmpls
 	}
@@ -27,7 +24,7 @@ func (t *Loader) getTemplates(namespace string, typ model.TemplateType) (tmpls [
 	return tmpls
 }
 
-func (t *Loader) processTemplate1(ctx *WalkContext, tmpls *[]model.InputTemplate, input model.InputTemplate) error {
+func (t *Loader) processTemplate1(ctx *model.WalkContext, tmpls *[]model.InputTemplate, input model.InputTemplate) error {
 	if input.Path == "" {
 		return t.ErrCannotBeEmpty()
 	}
@@ -36,8 +33,8 @@ func (t *Loader) processTemplate1(ctx *WalkContext, tmpls *[]model.InputTemplate
 		return t.ErrCannotBeEmpty()
 	}
 
-	if !model.IsTemplateType(input.Type) {
-		return t.ErrMustBeOneOf(model.TemplateTypeStrings())
+	if _, err := model.TemplateTypeEnumParse(input.Type); err != nil {
+		return err
 	}
 
 	for _, v := range *tmpls {
@@ -87,41 +84,41 @@ func (t *Loader) processTemplate1(ctx *WalkContext, tmpls *[]model.InputTemplate
 	return nil
 }
 
-func (t *Loader) processTemplate2(ctx *WalkContext, name string, input model.InputTemplate, output *model.OutputTemplate) error {
-	var tmplExt string
-	var tmplName string
-	var relPath string
-	var abs string
-	var fn string
+func (t *Loader) processTemplate2(ctx *model.WalkContext, name string, input model.InputTemplate, output *model.OutputTemplate) error {
+	// var tmplExt string
+	// var tmplName string
+	// var relPath string
+	// var abs string
+	// var fn string
 
-	info := t.OutputSpec.Info
+	// info := t.OutputSpec.Info
 
-	relPath = ctx.Namespace.Output.Namespace
-	relPath = strings.TrimPrefix(relPath, t.rootName())
-	relPath = strings.TrimPrefix(relPath, "/")
+	// relPath = ctx.Namespace.Output.Namespace
+	// relPath = strings.TrimPrefix(relPath, t.rootName())
+	// relPath = strings.TrimPrefix(relPath, "/")
 
-	tmplName = input.Path
-	tmplName = filepath.Base(tmplName)
-	tmplName = util.TrimTemplateExt(tmplName)
-	tmplExt = filepath.Ext(tmplName)
-	tmplName = strings.TrimSuffix(tmplName, tmplExt)
-	tmplExt = strings.TrimPrefix(tmplExt, ".")
+	// tmplName = input.Path
+	// tmplName = filepath.Base(tmplName)
+	// tmplName = util.TrimTemplateExt(tmplName)
+	// tmplExt = filepath.Ext(tmplName)
+	// tmplName = strings.TrimSuffix(tmplName, tmplExt)
+	// tmplExt = strings.TrimPrefix(tmplExt, ".")
 
-	if name == "" {
-		fn = tmplName
-	} else {
-		fn = name
-	}
+	// if name == "" {
+	// 	fn = tmplName
+	// } else {
+	// 	fn = name
+	// }
 
-	if info.FilenameMarker != "" && info.FilenameMarker != model.DEFAULT_FILENAME_DISABLE {
-		fn = fmt.Sprintf("%v.%v", fn, info.FilenameMarker)
-	}
+	// if info.FilenameMarker != "" && info.FilenameMarker != model.DEFAULT_FILENAME_DISABLE {
+	// 	fn = fmt.Sprintf("%v.%v", fn, info.FilenameMarker)
+	// }
 
-	fn = fmt.Sprintf("%v.%v", fn, tmplExt)
-	abs = path.Join(info.OutputDir, relPath, fn)
+	// fn = fmt.Sprintf("%v.%v", fn, tmplExt)
+	// abs = path.Join(info.OutputDir, relPath, fn)
 
-	output.Input = input.Path
-	output.Output = abs
-	output.Header = t.splitDescription(input.Header)
+	// output.Input = input.Path
+	// output.Output = abs
+	// output.Header = t.splitDescription(input.Header)
 	return nil
 }

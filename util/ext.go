@@ -20,7 +20,7 @@ func TrimTemplateExt(s string) string {
 	o := s
 	ext := filepath.Ext(o)
 
-	for _, x := range model.TemplateExts {
+	for _, x := range model.TemplateExtEnums {
 		if ext == string(x) {
 			o = strings.TrimSuffix(o, string(x))
 		}
@@ -29,15 +29,15 @@ func TrimTemplateExt(s string) string {
 	return o
 }
 
-func GetTemplateExt(s string) model.TemplateExt {
+func GetTemplateExt(s string) model.TemplateExtEnum {
 	o := s
 	ext := filepath.Ext(o)
 
-	for _, rext := range model.TemplateExts {
+	for _, rext := range model.TemplateExtEnums {
 		if ext == string(rext) {
 			return rext
 		}
 	}
 
-	return model.TemplateExt_Unkown
+	return model.TemplateExt_Unknown
 }

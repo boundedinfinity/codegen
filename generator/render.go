@@ -61,7 +61,7 @@ func (t *Generator) renderFile(tmpl model.OutputTemplate, v interface{}) error {
 		if o, err = t.renderHandlebars(string(bs), v); err != nil {
 			return fmt.Errorf("render err: %w", err)
 		}
-	case string(model.TemplateExt_GoTmpl):
+	case string(model.TemplateExt_Gotmpl):
 		if o, err = t.renderGoTemplate(string(bs), v); err != nil {
 			return fmt.Errorf("render err: %w", err)
 		}

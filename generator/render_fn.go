@@ -43,9 +43,13 @@ func linePrefix(v, p string) string {
 func to_json(v interface{}) string {
 	var s string
 	indent_spaces := strings.Repeat(" ", 4)
-	if bs, err := json.MarshalIndent(v, "", indent_spaces); err != nil {
-		s = string(bs)
+	bs, err := json.MarshalIndent(v, "", indent_spaces)
+
+	if err != nil {
+		fmt.Println(err.Error())
 	}
+
+	s = string(bs)
 
 	return s
 }

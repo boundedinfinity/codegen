@@ -21,7 +21,7 @@ func (t *Generator) runNamespaces() error {
 func (t *Generator) runNamespace(i int, v model.OutputNamespace) error {
 	t.reportStack.Push("namespaces[%v]", i)
 
-	if v.Templates != nil && v.Namespace != "" {
+	if v.Templates != nil && v.Name != "" {
 		for _, tmpl := range v.Templates {
 			ctx := model.OutputTemplateNamespaceContext{
 				Namespace: v,

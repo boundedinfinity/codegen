@@ -5,7 +5,7 @@ import (
 )
 
 func (t *Loader) Errorf(format string, a ...interface{}) error {
-	return errutil.Errorf(t.namespaceStack.S(), format, a...)
+	return errutil.Errorf(t.reportStack.S(), format, a...)
 }
 
 func (t *Loader) ErrCannotBeEmpty() error {
@@ -26,6 +26,14 @@ func (t *Loader) ErrCustomTypeNotFound(v string) error {
 
 func (t *Loader) ErrDuplicateType(v string) error {
 	return errutil.Errorf(t.reportStack.S(), "duplicate type %v", v)
+}
+
+func (t *Loader) ErrDuplicatePrimitive(v string) error {
+	return errutil.Errorf(t.reportStack.S(), "duplicate primitive %v", v)
+}
+
+func (t *Loader) ErrInvalidPrimitive(v string) error {
+	return errutil.Errorf(t.reportStack.S(), "invalid primitive %v", v)
 }
 
 func (t *Loader) ErrInvalidType(v string) error {

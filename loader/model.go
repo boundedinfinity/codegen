@@ -3,135 +3,154 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"path"
-	"strings"
+	"fmt"
 )
 
-func (t *Loader) processModel1(ctx *WalkContext) error {
-	input := ctx.Model.Input
-	output := ctx.Model.Output
+func (t *Loader) processModel1() error {
+	for n := range t.inputModels {
+		_, ok := t.dependencies[n]
 
-	output.Name = input.Name
-	output.Description = t.splitDescription(input.Description)
+		if ok {
+			return t.ErrDuplicateType(n)
+		}
 
-	typ := input.Type
-
-	if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
-		output.Collection = true
-		typ = strings.ReplaceAll(typ, model.COLLECTION_SUFFIX, "")
-	}
-
-	if strings.Contains(input.Type, "/") {
-		output.Type = path.Join(t.rootName(), typ)
-	} else {
-		output.Type = typ
-	}
-
-	if _, ok := t.dependencies[output.SpecPath]; !ok {
-		t.dependencies[output.SpecPath] = NewNode(output.SpecPath)
+		t.dependencies[n] = NewNode(n)
 	}
 
 	return nil
 }
 
-func (t *Loader) processModel2(specPath string) WalkFunc {
-	return func(ctx *WalkContext) error {
-		if specPath != ctx.Model.Output.SpecPath {
-			return nil
-		}
-
-		if ctx.Model.Input.Properties == nil {
-			if err := t.processModelBuiltinType(ctx); err != nil {
-				return nil
-			}
-		} else {
-			if err := t.processModelComplexType(ctx); err != nil {
-				return nil
-			}
-		}
-
-		return nil
-	}
-}
-
-func (t *Loader) processModelBuiltinType(ctx *WalkContext) error {
-	input := ctx.Model.Input
-	output := ctx.Model.Output
-
-	extract := func(fn ExampleExtractor) error {
-		jname := util.CamelCase(ctx.Model.Input.Name)
-		if v, err := fn(input.Example); err != nil {
-			return err
-		} else {
-			if output.Collection {
-				output.JsonStructure[jname] = []interface{}{v}
-			} else {
-				output.JsonStructure[jname] = v
-			}
-		}
-
-		return nil
-	}
-
-	switch input.Type {
-	case "string":
-		return extract(json2Str)
-	case "int":
-		return extract(json2Int64)
-	default:
-		return t.ErrInvalidType(input.Type)
-	}
-}
-
-func (t *Loader) processModelComplexType(ctx *WalkContext) error {
-	output := ctx.Model.Output
-
-	for _, property := range ctx.Model.Output.Properties {
-		pv, ok := t.modelMap[property.Type]
-		jname := util.CamelCase(property.Name)
+func (t *Loader) processModel2() error {
+	for n, m := range t.inputModels {
+		mNode, ok := t.dependencies[n]
 
 		if !ok {
-			return t.ErrCustomTypeNotFound(property.Type)
+			return t.ErrInvalidType(n)
 		}
 
-		if len(pv.JsonStructure) > 1 {
-			if property.Collection {
-				output.JsonStructure[jname] = []interface{}{pv.JsonStructure}
-			} else {
-				output.JsonStructure[jname] = pv.JsonStructure
+		if util.IsSchemaPrimitive(m) || util.IsSchemaRef(m) {
+			dn := util.TrimSchemaArray(m)
+			dNode, ok := t.dependencies[dn]
+
+			if !ok {
+				return t.ErrInvalidType(dn)
 			}
-		} else {
-			for _, ev := range pv.JsonStructure {
-				if property.Collection {
-					output.JsonStructure[jname] = []interface{}{ev}
-				} else {
-					output.JsonStructure[jname] = ev
+
+			mNode.Add(dNode)
+		} else if util.IsSchemaRecord(m) {
+			for _, property := range m.Properties {
+				if util.IsSchemaPrimitive(property) || util.IsSchemaRef(property) {
+					dn := util.TrimSchemaArray(property)
+					dNode, ok := t.dependencies[dn]
+
+					if !ok {
+						return t.ErrInvalidType(dn)
+					}
+
+					mNode.Add(dNode)
 				}
 			}
+		} else if util.IsSchemaEnum(m) {
+			// Nothing to do here
+		} else {
+			return t.ErrInvalidType(n)
 		}
 	}
 
 	return nil
 }
 
-func (t *Loader) processModel3(ctx *WalkContext) error {
-	output := ctx.Model.Output
-	namespace := output.Namespace
+func (t *Loader) processModel3() error {
+	t.reportf(t.reportStack.S(), "resolving model dependencies")
 
-	if strings.HasSuffix(namespace, model.NAMESPACE_BUILTIN) {
-		return nil
+	var brokenGraph Graph
+
+	for _, g := range t.dependencies {
+		brokenGraph = append(brokenGraph, g)
 	}
 
-	vs := t.getTemplates(namespace, model.TemplateType_MODEL)
+	solvedGraph, err := resolveGraph(brokenGraph)
 
-	for _, v := range vs {
-		outputTemplate := model.NewOutputTemplate()
+	if err != nil {
+		return err
+	}
 
-		if err := t.processTemplate2(ctx, output.Name, v, outputTemplate); err != nil {
-			return err
+	t.solvedDependencies = solvedGraph
+
+	return nil
+}
+
+func (t *Loader) processModel4() error {
+	for _, node := range t.solvedDependencies {
+		if model.IsSchemaTypeEnum(node.Name) {
+			continue
 		}
 
-		output.Templates = append(output.Templates, outputTemplate)
+		t.reportf(t.reportStack.S(), "processing %v", node.Name)
+		inputModel, ok := t.inputModels[node.Name]
+
+		if !ok {
+			return t.ErrInvalidType(node.Name)
+		}
+
+		outputModel := model.NewOutputModel()
+		t.modelMap[node.Name] = outputModel
+		outputModel.Name = node.Name
+		outputModel.Description = t.splitDescription(inputModel.Description)
+
+		if util.IsSchemaPrimitive(inputModel) {
+			if err := t.processPrimitive(inputModel, outputModel); err != nil {
+				return err
+			}
+		} else {
+			fmt.Printf("missed %v\n", inputModel.Name)
+		}
+	}
+
+	return nil
+}
+
+func (t *Loader) processPrimitive(inputModel model.InputModel, outputModel *model.OutputModel) error {
+	isArray := util.IsSchemaArray(inputModel)
+	typStr := util.TrimSchemaArray(inputModel)
+	typ, err := model.SchemaTypeEnumParse(typStr)
+
+	if err != nil {
+		return err
+	}
+
+	switch typ {
+	case model.SchemaType_String:
+		if isArray {
+			var v []string
+			if err := json2Interface(inputModel.Example, &v, `"%v"`); err != nil {
+				return err
+			} else {
+				outputModel.Example = v
+			}
+		} else {
+			var v string
+			if err := json2Interface(inputModel.Example, &v, `"%v"`); err != nil {
+				return err
+			} else {
+				outputModel.Example = v
+			}
+		}
+	case model.SchemaType_Int:
+		if isArray {
+			fmt.Print("processing int array")
+		} else {
+			fmt.Print("processing int")
+		}
+	case model.SchemaType_Double:
+		if isArray {
+			fmt.Print("processing double array")
+		} else {
+			fmt.Print("processing double")
+		}
+	default:
+		fmt.Printf("missed primitive %v", typ)
+		// t.ErrInvalidPrimitive(typ.String())
 	}
 
 	return nil

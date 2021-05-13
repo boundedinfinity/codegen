@@ -2,12 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug TestTypes",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/model/types_test.go",
+            "args": [
+                "-test.run",
+                "TestTypes"
+            ]
+        },
+        {
             "name": "codegen codegen-spec.yaml",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}", 
-            "args": ["${env:HOME}/codegen-project/spec.yaml"],
+            "args": [
+                "${env:HOME}/codegen-project/model.yaml",
+                "${env:HOME}/codegen-project/ping.yaml"
+            ],
         }
     ]
 }
