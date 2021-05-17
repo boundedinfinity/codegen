@@ -46,6 +46,14 @@ func (t *Loader) processInput() error {
 				t.inputModels[m.Name] = m
 			}
 		}
+
+		for _, o := range input.Specification.Operations {
+			if _, ok := t.inputOperations[o.Name]; ok {
+				return t.ErrorDuplicateOperation(o.Name)
+			} else {
+				t.inputOperations[o.Name] = o
+			}
+		}
 	}
 
 	// t.reportStack.Push(`"%v"`, filepath.Base(t.inputPath))
@@ -94,7 +102,15 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	fmt.Println(util.Jdump(t.modelMap))
+	if err := t.processModel5(); err != nil {
+		return err
+	}
+
+	if err := t.processOperation1(); err != nil {
+		return err
+	}
+
+	fmt.Println(util.Jdump(t.outputModels))
 	// fmt.Println(util.Jdump(t.OutputSpec))
 	return nil
 }

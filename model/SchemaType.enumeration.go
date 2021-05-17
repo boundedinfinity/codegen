@@ -14,29 +14,29 @@ type SchemaTypeEnum string
 
 const (
 	SchemaType_Boolean SchemaTypeEnum = "boolean"
+	SchemaType_Byte    SchemaTypeEnum = "byte"
+	SchemaType_Complex SchemaTypeEnum = "complex"
+	SchemaType_Double  SchemaTypeEnum = "double"
+	SchemaType_Enum    SchemaTypeEnum = "enum"
+	SchemaType_Float   SchemaTypeEnum = "float"
 	SchemaType_Int     SchemaTypeEnum = "int"
 	SchemaType_Long    SchemaTypeEnum = "long"
-	SchemaType_Float   SchemaTypeEnum = "float"
-	SchemaType_Double  SchemaTypeEnum = "double"
-	SchemaType_Byte    SchemaTypeEnum = "byte"
-	SchemaType_String  SchemaTypeEnum = "string"
-	SchemaType_Complex SchemaTypeEnum = "complex"
-	SchemaType_Enum    SchemaTypeEnum = "enum"
 	SchemaType_Ref     SchemaTypeEnum = "ref"
+	SchemaType_String  SchemaTypeEnum = "string"
 )
 
 var (
 	SchemaTypeEnums = []SchemaTypeEnum{
 		SchemaType_Boolean,
+		SchemaType_Byte,
+		SchemaType_Complex,
+		SchemaType_Double,
+		SchemaType_Enum,
+		SchemaType_Float,
 		SchemaType_Int,
 		SchemaType_Long,
-		SchemaType_Float,
-		SchemaType_Double,
-		SchemaType_Byte,
-		SchemaType_String,
-		SchemaType_Complex,
-		SchemaType_Enum,
 		SchemaType_Ref,
+		SchemaType_String,
 	}
 )
 

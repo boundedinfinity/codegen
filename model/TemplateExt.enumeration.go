@@ -13,16 +13,16 @@ import (
 type TemplateExtEnum string
 
 const (
-	TemplateExt_Unknown    TemplateExtEnum = "unknown"
 	TemplateExt_Gotmpl     TemplateExtEnum = "gotmpl"
 	TemplateExt_Handlebars TemplateExtEnum = "handlebars"
+	TemplateExt_Unknown    TemplateExtEnum = "unknown"
 )
 
 var (
 	TemplateExtEnums = []TemplateExtEnum{
-		TemplateExt_Unknown,
 		TemplateExt_Gotmpl,
 		TemplateExt_Handlebars,
+		TemplateExt_Unknown,
 	}
 )
 

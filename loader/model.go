@@ -118,14 +118,45 @@ func (t *Loader) processModel4() error {
 		}
 
 		outputModel := model.NewOutputModel()
-		t.modelMap[node.Name] = outputModel
+		t.outputModels[node.Name] = outputModel
 		outputModel.Name = node.Name
 		outputModel.Description = t.splitDescription(inputModel.Description)
+		outputModel.Type = string(inputModel.Type)
 
 		if example, err := t.buildExample(inputModel); err != nil {
 			return err
 		} else {
 			outputModel.Example = example
+		}
+	}
+
+	return nil
+}
+
+func (t *Loader) processModel5() error {
+	for name, inputModel := range t.inputModels {
+		if inputModel.Type != model.SchemaType_Complex {
+			continue
+		}
+
+		outputModel, ok := t.outputModels[name]
+
+		if !ok {
+			return t.ErrInvalidModel(name)
+		}
+
+		modelNamespace := path.Dir(name)
+
+		for _, property := range inputModel.Complex.Properties {
+			if property.Type != model.SchemaType_Ref {
+				continue
+			}
+
+			propertyNamespace := path.Dir(property.Ref.Ref)
+
+			if modelNamespace != propertyNamespace {
+				outputModel.Imports = append(outputModel.Imports, property.Ref.Ref)
+			}
 		}
 	}
 
@@ -209,7 +240,7 @@ func (t *Loader) buildExample(inputModel model.InputModel) (map[string]interface
 		return combined, nil
 	case model.SchemaType_Ref:
 		combined := make(map[string]interface{})
-		ref, ok := t.modelMap[inputModel.Ref.Ref]
+		ref, ok := t.outputModels[inputModel.Ref.Ref]
 
 		if !ok {
 			t.ErrInvalidType(inputModel.Ref.Ref)

@@ -9,24 +9,26 @@ type Loader struct {
 	reportStack        model.StrStack
 	primitiveMap       map[string]string
 	inputModels        map[string]model.InputModel
+	outputModels       map[string]*model.OutputModel
 	dependencies       map[string]*Node
 	solvedDependencies Graph
-	modelMap           map[string]*model.OutputModel
-	operationMap       map[string]*model.OutputOperation
+	inputOperations    map[string]model.InputOperation
+	outputOperations   map[string]*model.OutputOperation
 	templateMap        map[string][]model.InputTemplate
 	OutputSpec         *model.OutputSpec
 }
 
 func New() *Loader {
 	return &Loader{
-		inputPaths:   make([]string, 0),
-		primitiveMap: make(map[string]string),
-		inputModels:  make(map[string]model.InputModel),
-		modelMap:     make(map[string]*model.OutputModel),
-		operationMap: make(map[string]*model.OutputOperation),
-		dependencies: make(map[string]*Node),
-		templateMap:  make(map[string][]model.InputTemplate),
-		OutputSpec:   model.NewOutputSpec(),
+		inputPaths:       make([]string, 0),
+		primitiveMap:     make(map[string]string),
+		inputModels:      make(map[string]model.InputModel),
+		outputModels:     make(map[string]*model.OutputModel),
+		inputOperations:  make(map[string]model.InputOperation),
+		outputOperations: make(map[string]*model.OutputOperation),
+		dependencies:     make(map[string]*Node),
+		templateMap:      make(map[string][]model.InputTemplate),
+		OutputSpec:       model.NewOutputSpec(),
 	}
 }
 

@@ -19,8 +19,8 @@ type InputFile struct {
 }
 
 type InputSpecification struct {
-	Models []InputModel `json:"models,omitempty" yaml:"models,omitempty"`
-	// Operations []InputOperation          `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Models     []InputModel     `json:"models,omitempty" yaml:"models,omitempty"`
+	Operations []InputOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
 	// Templates  []InputTemplate           `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
@@ -260,10 +260,10 @@ type InputValidation struct {
 }
 
 type InputOperation struct {
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
-	// Input       InputModel `json:"input,omitempty" yaml:"input,omitempty"`
-	// Output      InputModel `json:"output,omitempty" yaml:"output,omitempty"`
-	Description string `json:"description,omitempty" yaml:"description,omitempty"`
+	Name        string     `json:"name,omitempty" yaml:"name,omitempty"`
+	Input       InputModel `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      InputModel `json:"output,omitempty" yaml:"output,omitempty"`
+	Description string     `json:"description,omitempty" yaml:"description,omitempty"`
 }
 
 type InputInfo struct {

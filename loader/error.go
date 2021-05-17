@@ -29,6 +29,14 @@ func (t *Loader) ErrDuplicateType(v string) error {
 	return errutil.Errorf(t.reportStack.S(), "duplicate type %v", v)
 }
 
+func (t *Loader) ErrorDuplicateOperation(v string) error {
+	return errutil.Errorf(t.reportStack.S(), "duplicate operation %v", v)
+}
+
+func (t *Loader) ErrInvalidOperation(v string) error {
+	return errutil.Errorf(t.reportStack.S(), "invalide operation %v", v)
+}
+
 func (t *Loader) ErrDuplicatePrimitive(v string) error {
 	return errutil.Errorf(t.reportStack.S(), "duplicate primitive %v", v)
 }
@@ -38,6 +46,10 @@ func (t *Loader) ErrInvalidPrimitive(v string) error {
 }
 
 func (t *Loader) ErrInvalidType(v string) error {
+	return errutil.InvalidType(t.reportStack.S(), v)
+}
+
+func (t *Loader) ErrInvalidModel(v string) error {
 	return errutil.InvalidType(t.reportStack.S(), v)
 }
 

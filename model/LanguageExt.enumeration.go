@@ -13,24 +13,24 @@ import (
 type LanguageExtEnum string
 
 const (
-	LanguageExt_Unknown LanguageExtEnum = "unknown"
+	LanguageExt_Css     LanguageExtEnum = "css"
 	LanguageExt_Go      LanguageExtEnum = "go"
+	LanguageExt_Html    LanguageExtEnum = "html"
+	LanguageExt_Js      LanguageExtEnum = "js"
 	LanguageExt_Mod     LanguageExtEnum = "mod"
 	LanguageExt_Ts      LanguageExtEnum = "ts"
-	LanguageExt_Js      LanguageExtEnum = "js"
-	LanguageExt_Html    LanguageExtEnum = "html"
-	LanguageExt_Css     LanguageExtEnum = "css"
+	LanguageExt_Unknown LanguageExtEnum = "unknown"
 )
 
 var (
 	LanguageExtEnums = []LanguageExtEnum{
-		LanguageExt_Unknown,
+		LanguageExt_Css,
 		LanguageExt_Go,
+		LanguageExt_Html,
+		LanguageExt_Js,
 		LanguageExt_Mod,
 		LanguageExt_Ts,
-		LanguageExt_Js,
-		LanguageExt_Html,
-		LanguageExt_Css,
+		LanguageExt_Unknown,
 	}
 )
 

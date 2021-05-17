@@ -13,16 +13,16 @@ import (
 type InputSourceEnum string
 
 const (
+	InputSource_Json    InputSourceEnum = "json"
 	InputSource_Unknown InputSourceEnum = "unknown"
 	InputSource_Yaml    InputSourceEnum = "yaml"
-	InputSource_Json    InputSourceEnum = "json"
 )
 
 var (
 	InputSourceEnums = []InputSourceEnum{
+		InputSource_Json,
 		InputSource_Unknown,
 		InputSource_Yaml,
-		InputSource_Json,
 	}
 )
 

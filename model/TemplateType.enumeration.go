@@ -14,15 +14,15 @@ type TemplateTypeEnum string
 
 const (
 	TemplateType_Model     TemplateTypeEnum = "model"
-	TemplateType_Operation TemplateTypeEnum = "operation"
 	TemplateType_Namespace TemplateTypeEnum = "namespace"
+	TemplateType_Operation TemplateTypeEnum = "operation"
 )
 
 var (
 	TemplateTypeEnums = []TemplateTypeEnum{
 		TemplateType_Model,
-		TemplateType_Operation,
 		TemplateType_Namespace,
+		TemplateType_Operation,
 	}
 )
 
