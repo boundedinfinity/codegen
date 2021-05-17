@@ -12,6 +12,6 @@ const (
 type WalkFunc func(ctx *WalkContext) error
 
 type WalkContext struct {
-	Model     InputModel
+	// Model     InputModel
 	Operation InputOperation
 }

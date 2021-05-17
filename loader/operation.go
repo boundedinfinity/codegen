@@ -4,37 +4,37 @@ import (
 	"boundedinfinity/codegen/model"
 )
 
-func (t *Loader) processOperationModel(op *model.OutputOperation, input model.InputModel, output *model.OutputModel) error {
-	// output.Name = input.Name
-	// typ := path.Join(t.rootName(), input.Type)
+// func (t *Loader) processOperationModel(op *model.OutputOperation, input model.InputModel, output *model.OutputModel) error {
+// 	// output.Name = input.Name
+// 	// typ := path.Join(t.rootName(), input.Type)
 
-	// if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
-	// 	output.Collection = true
-	// 	typ = strings.ReplaceAll(typ, model.COLLECTION_SUFFIX, "")
-	// }
+// 	// if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
+// 	// 	output.Collection = true
+// 	// 	typ = strings.ReplaceAll(typ, model.COLLECTION_SUFFIX, "")
+// 	// }
 
-	// output.Type = typ
+// 	// output.Type = typ
 
-	// if mt, ok := t.modelMap[output.Type]; !ok {
-	// 	return t.ErrCustomTypeNotFound(output.Type)
-	// } else {
-	// 	output.Namespace = mt.Namespace
-	// 	output.JsonStr = mt.JsonStr
+// 	// if mt, ok := t.modelMap[output.Type]; !ok {
+// 	// 	return t.ErrCustomTypeNotFound(output.Type)
+// 	// } else {
+// 	// 	output.Namespace = mt.Namespace
+// 	// 	output.JsonStr = mt.JsonStr
 
-	// 	if output.Namespace != mt.Namespace {
-	// 		op.Imports = append(op.Imports, mt.Namespace)
-	// 		output.Type = fmt.Sprintf("%v.%v", path.Base(mt.Namespace), mt.Name)
-	// 	} else {
-	// 		output.Type = mt.Name
-	// 	}
+// 	// 	if output.Namespace != mt.Namespace {
+// 	// 		op.Imports = append(op.Imports, mt.Namespace)
+// 	// 		output.Type = fmt.Sprintf("%v.%v", path.Base(mt.Namespace), mt.Name)
+// 	// 	} else {
+// 	// 		output.Type = mt.Name
+// 	// 	}
 
-	// 	if output.Collection {
-	// 		output.Type = fmt.Sprintf("%v%v", model.COLLECTION_SUFFIX, output.Type)
-	// 	}
-	// }
+// 	// 	if output.Collection {
+// 	// 		output.Type = fmt.Sprintf("%v%v", model.COLLECTION_SUFFIX, output.Type)
+// 	// 	}
+// 	// }
 
-	return nil
-}
+// 	return nil
+// }
 
 func (t *Loader) processOperation1(ctx *model.WalkContext) error {
 	// input := ctx.Operation.Input

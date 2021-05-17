@@ -2,6 +2,7 @@ package loader
 
 import (
 	"boundedinfinity/codegen/errutil"
+	"boundedinfinity/codegen/model"
 )
 
 func (t *Loader) Errorf(format string, a ...interface{}) error {
@@ -38,6 +39,10 @@ func (t *Loader) ErrInvalidPrimitive(v string) error {
 
 func (t *Loader) ErrInvalidType(v string) error {
 	return errutil.InvalidType(t.reportStack.S(), v)
+}
+
+func (t *Loader) ErrInvalidSource(v model.InputSourceEnum) error {
+	return errutil.Errorf(t.reportStack.S(), "invalid source type %v", v)
 }
 
 func (t *Loader) ErrMustBeOneOf(oneOf []string) error {

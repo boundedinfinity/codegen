@@ -5,52 +5,21 @@ import (
 )
 
 func (t *Loader) processProperty1(ctx *model.WalkContext) error {
-	for _, property := range ctx.Model.Properties {
-		if model.IsSchemaTypeEnum(property.Type) {
-			pType, err := model.SchemaTypeEnumParse(property.Type)
+	// for _, property := range ctx.Model.Properties {
+	// 	if model.IsSchemaTypeEnum(property.Type) {
+	// 		pType, err := model.SchemaTypeEnumParse(property.Type)
 
-			if err != nil {
-				return err
-			}
+	// 		if err != nil {
+	// 			return err
+	// 		}
 
-			switch pType {
-			case model.SchemaType_Boolean:
+	// 		switch pType {
+	// 		case model.SchemaType_Boolean:
 
-			}
-		}
+	// 		}
+	// 	}
 
-		// pType := t.getModelType(property.Type)
-	}
-
-	// input := ctx.Property.Input
-	// output := ctx.Property.Output
-
-	// output.Name = input.Name
-	// output.Description = t.splitDescription(input.Description)
-	// typ := input.Type
-
-	// if strings.HasSuffix(typ, model.COLLECTION_SUFFIX) {
-	// 	output.Collection = true
-	// 	typ = strings.ReplaceAll(typ, model.COLLECTION_SUFFIX, "")
-	// }
-
-	// output.Type = path.Join(typ)
-	// mt, ok := t.modelMap[output.Type]
-
-	// if !ok {
-	// 	return t.Errorf("dependency not found : %v", output.Type)
-	// }
-
-	// output.Namespace = mt.Namespace
-
-	// if _, ok := t.modelMap[ctx.Model.Output.SpecPath]; !ok {
-	// 	return t.Errorf("model not found : %v", ctx.Model.Output.SpecPath)
-	// }
-
-	// if mdep, ok := t.dependencies[ctx.Model.Output.SpecPath]; !ok {
-	// 	return t.Errorf("model not found : %v", ctx.Model.Output.SpecPath)
-	// } else {
-	// 	mdep.Add(output.Type)
+	// 	// pType := t.getModelType(property.Type)
 	// }
 
 	return nil

@@ -1,43 +1,37 @@
 package loader
 
 import (
-	"encoding/json"
-	"fmt"
+	"boundedinfinity/codegen/model"
 )
 
 type ExampleExtractor func(example interface{}) (interface{}, error)
 
-func json2Interface(example, v interface{}, format string) error {
-	if example == nil {
-		return nil
-	}
+func (t *Loader) json2Interface(inputModel model.InputModel, outputModel *model.OutputModel, v interface{}) error {
+	// if inputModel.Model.Example == nil {
+	// 	return nil
+	// }
 
-	str := fmt.Sprintf(format, example)
-	bs := []byte(str)
+	// if v == nil {
+	// 	return nil
+	// }
 
-	if err := json.Unmarshal(bs, v); err != nil {
-		return err
-	}
+	// s := fmt.Sprintf("%v", inputModel.Model.Example)
+	// bs := []byte(s)
+
+	// switch inputModel.Source {
+	// case model.InputSource_Yaml:
+	// 	if err := yaml.Unmarshal(bs, v); err != nil {
+	// 		return err
+	// 	}
+	// case model.InputSource_Json:
+	// 	if err := json.Unmarshal(bs, v); err != nil {
+	// 		return err
+	// 	}
+	// default:
+	// 	return t.ErrInvalidSource(inputModel.Source)
+	// }
+
+	// outputModel.Example = v
 
 	return nil
-}
-
-func json2Str(example interface{}) (interface{}, error) {
-	var v string
-	return v, json2Interface(example, &v, `"%v"`)
-}
-
-func json2Boolean(example interface{}) (interface{}, error) {
-	var v bool
-	return v, json2Interface(example, &v, `"%v"`)
-}
-
-func json2Int64(example interface{}) (interface{}, error) {
-	var v int64
-	return v, json2Interface(example, &v, "%v")
-}
-
-func json2Float64(example interface{}) (interface{}, error) {
-	var v float64
-	return v, json2Interface(example, &v, "%v")
 }
