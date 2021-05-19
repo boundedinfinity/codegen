@@ -77,7 +77,7 @@ func (t TemplateExtEnum) String() string {
 }
 
 func (t TemplateExtEnum) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]byte(t))
+	return json.Marshal(string(t))
 }
 
 func (t *TemplateExtEnum) UnmarshalJSON(data []byte) error {

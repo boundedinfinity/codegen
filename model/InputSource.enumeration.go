@@ -77,7 +77,7 @@ func (t InputSourceEnum) String() string {
 }
 
 func (t InputSourceEnum) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]byte(t))
+	return json.Marshal(string(t))
 }
 
 func (t *InputSourceEnum) UnmarshalJSON(data []byte) error {

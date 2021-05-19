@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 )
 
 func (t *Generator) renderFile(tmpl model.OutputTemplate, v interface{}) error {
@@ -36,6 +37,7 @@ func (t *Generator) renderFile(tmpl model.OutputTemplate, v interface{}) error {
 	}
 
 	ext := filepath.Ext(tmpl.Input)
+	ext = strings.TrimPrefix(ext, ".")
 	aop, err := filepath.Abs(tmpl.Output)
 
 	if err != nil {

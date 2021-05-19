@@ -85,7 +85,7 @@ func (t JsonSchemaType) String() string {
 }
 
 func (t JsonSchemaType) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]byte(t))
+	return json.Marshal(string(t))
 }
 
 func (t *JsonSchemaType) UnmarshalJSON(data []byte) error {

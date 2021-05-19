@@ -17,6 +17,10 @@ func (t *Loader) ErrNotFound() error {
 	return errutil.NotFound(t.reportStack.S())
 }
 
+func (t *Loader) ErrTemplatePathNotFound(v string) error {
+	return errutil.Errorf(t.reportStack.S(), "template path not found %v", v)
+}
+
 func (t *Loader) ErrCustomTypeDuplicate(v string) error {
 	return errutil.Errorf(t.reportStack.S(), "duplicate %v", v)
 }

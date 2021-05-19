@@ -13,6 +13,7 @@ import (
 type SchemaTypeEnum string
 
 const (
+	SchemaType_Array   SchemaTypeEnum = "array"
 	SchemaType_Boolean SchemaTypeEnum = "boolean"
 	SchemaType_Byte    SchemaTypeEnum = "byte"
 	SchemaType_Complex SchemaTypeEnum = "complex"
@@ -27,6 +28,7 @@ const (
 
 var (
 	SchemaTypeEnums = []SchemaTypeEnum{
+		SchemaType_Array,
 		SchemaType_Boolean,
 		SchemaType_Byte,
 		SchemaType_Complex,
@@ -91,7 +93,7 @@ func (t SchemaTypeEnum) String() string {
 }
 
 func (t SchemaTypeEnum) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]byte(t))
+	return json.Marshal(string(t))
 }
 
 func (t *SchemaTypeEnum) UnmarshalJSON(data []byte) error {

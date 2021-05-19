@@ -13,13 +13,24 @@ func (t *Loader) processOperation1() error {
 		outputOperation.Description = t.splitDescription(inputOperation.Description)
 		outputOperation.Name = inputOperation.Name
 
-		if _, ok := t.outputModels[inputOperation.Input.Type.String()]; !ok {
+		switch inputOperation.Input.Type {
+		// case model.SchemaType_Ref:
+		// 	if _, ok := t.outputModels[inputOperation.Input.Ref.Ref]; !ok {
+		// 		return t.ErrInvalidModel(inputOperation.Input.Name)
+		// 	}
+		default:
 			return t.ErrInvalidModel(inputOperation.Input.Name)
 		}
 
-		if _, ok := t.outputModels[inputOperation.Output.Type.String()]; !ok {
-			return t.ErrInvalidModel(inputOperation.Input.Name)
+		switch inputOperation.Output.Type {
+		// case model.SchemaType_Ref:
+		// 	if _, ok := t.outputModels[inputOperation.Output.Ref.Ref]; !ok {
+		// 		return t.ErrInvalidModel(inputOperation.Output.Name)
+		// 	}
+		default:
+			return t.ErrInvalidModel(inputOperation.Output.Name)
 		}
+
 	}
 
 	return nil

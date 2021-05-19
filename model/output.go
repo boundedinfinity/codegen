@@ -1,12 +1,15 @@
 package model
 
-import "github.com/iancoleman/orderedmap"
+import (
+	"github.com/iancoleman/orderedmap"
+)
 
 type OutputSpec struct {
-	Models     []*OutputModel     `json:"models,omitempty" yaml:"models,omitempty"`
-	Namespaces []*OutputNamespace `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
-	Operations []*OutputOperation `json:"operations,omitempty" yaml:"operations,omitempty"`
-	Info       OutputInfo         `json:"info,omitempty" yaml:"info,omitempty"`
+	Models     []*OutputModel          `json:"models,omitempty" yaml:"models,omitempty"`
+	Namespaces []*OutputNamespace      `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
+	Operations []*OutputOperation      `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Info       OutputInfo              `json:"info,omitempty" yaml:"info,omitempty"`
+	ModelMap   map[string]*OutputModel `json:"-" yaml:"-"`
 }
 
 func NewOutputSpec() *OutputSpec {
@@ -29,27 +32,49 @@ func NewOutputNamespace() *OutputNamespace {
 
 type OutputModel struct {
 	Name        string                 `json:"name,omitempty" yaml:"name,omitempty"`
-	Type        string                 `json:"type,omitempty" yaml:"type,omitempty"`
+	Type        SchemaTypeEnum         `json:"type,omitempty" yaml:"type,omitempty"`
 	Description []string               `json:"description,omitempty" yaml:"description,omitempty"`
+	Items       *OutputModel           `json:"items,omitempty" yaml:"items,omitempty"`
+	Properties  []OutputModel          `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Symbols     []string               `json:"symbols,omitempty" yaml:"symbols,omitempty"`
+	Ref         string                 `json:"ref,omitempty" yaml:"ref,omitempty"`
 	Example     interface{}            `json:"example,omitempty" yaml:"example,omitempty"`
+	Json        *orderedmap.OrderedMap `json:"json,omitempty" yaml:"json,omitempty"`
 	Imports     []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Collection  bool                   `json:"collection,omitempty" yaml:"collection,omitempty"`
-	JsonStr     *orderedmap.OrderedMap `json:"jsonStr,omitempty" yaml:"jsonStr,omitempty"`
-	JsonDocs    *orderedmap.OrderedMap `json:"jsonDocs,omitempty" yaml:"jsonDocs,omitempty"`
-	Properties  []*OutputModel         `json:"properties,omitempty" yaml:"properties,omitempty"`
-	Validations []*OutputValidation    `json:"validations,omitempty" yaml:"validations,omitempty"`
 	Templates   []*OutputTemplate      `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 func NewOutputModel() *OutputModel {
 	return &OutputModel{
 		Description: make([]string, 0),
-		Imports:     make([]string, 0),
-		JsonStr:     orderedmap.New(),
-		JsonDocs:    orderedmap.New(),
-		Properties:  make([]*OutputModel, 0),
+		Properties:  make([]OutputModel, 0),
 		Templates:   make([]*OutputTemplate, 0),
+		Symbols:     make([]string, 0),
+		Imports:     make([]string, 0),
+		Json:        orderedmap.New(),
 	}
+}
+
+func NewOutputModelWithInput(input *InputModel) *OutputModel {
+	m := NewOutputModel()
+
+	if input == nil {
+		return m
+	}
+
+	for _, property := range input.Properties {
+		m.Properties = append(m.Properties, *NewOutputModelWithInput(&property))
+	}
+
+	m.Name = input.Name
+	m.Type = input.Type
+	m.Description = splitDescription(input.Description)
+	m.Items = NewOutputModelWithInput(input.Items)
+	m.Symbols = append(m.Symbols, input.Symbols...)
+	m.Example = input.Example
+	m.Ref = input.Ref
+
+	return m
 }
 
 type OutputValidation struct {
@@ -59,21 +84,29 @@ type OutputValidation struct {
 }
 
 type OutputInfo struct {
-	InputDir       string `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
-	OutputDir      string `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
-	DumpContext    bool   `json:"dumpContext" yaml:"dumpContext"`
-	FilenameMarker string `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
+	InputDir       string            `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
+	OutputDir      string            `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
+	DumpContext    bool              `json:"dumpContext" yaml:"dumpContext"`
+	FilenameMarker string            `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
+	Primitives     map[string]string `json:"primitives,omitempty" yaml:"primitives,omitempty"`
 }
 
 type OutputTemplate struct {
-	Input          string   `json:"input,omitempty" yaml:"input,omitempty"`
-	Output         string   `json:"output,omitempty" yaml:"output,omitempty"`
-	InputLanguage  string   `json:"inputLanguage,omitempty" yaml:"inputLanguage,omitempty"`
-	OutputLanguage string   `json:"outputLanguage,omitempty" yaml:"outputLanguage,omitempty"`
-	Header         []string `json:"header,omitempty" yaml:"header,omitempty"`
+	Type           TemplateTypeEnum `json:"type,omitempty" yaml:"type,omitempty"`
+	Input          string           `json:"input,omitempty" yaml:"input,omitempty"`
+	Output         string           `json:"output,omitempty" yaml:"output,omitempty"`
+	InputLanguage  string           `json:"inputLanguage,omitempty" yaml:"inputLanguage,omitempty"`
+	OutputLanguage string           `json:"outputLanguage,omitempty" yaml:"outputLanguage,omitempty"`
+	Header         []string         `json:"header,omitempty" yaml:"header,omitempty"`
 }
 
 func NewOutputTemplate() *OutputTemplate {
+	return &OutputTemplate{
+		Header: make([]string, 0),
+	}
+}
+
+func NewOutputTemplateWithInput() *OutputTemplate {
 	return &OutputTemplate{
 		Header: make([]string, 0),
 	}

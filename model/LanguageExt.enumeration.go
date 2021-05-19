@@ -85,7 +85,7 @@ func (t LanguageExtEnum) String() string {
 }
 
 func (t LanguageExtEnum) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]byte(t))
+	return json.Marshal(string(t))
 }
 
 func (t *LanguageExtEnum) UnmarshalJSON(data []byte) error {

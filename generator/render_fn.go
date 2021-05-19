@@ -1,8 +1,6 @@
 package generator
 
 import (
-	"encoding/json"
-	"fmt"
 	"path/filepath"
 	"strings"
 )
@@ -25,31 +23,4 @@ func filename(v string) string {
 	fn = filepath.Base(fn)
 	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
 	return fn
-}
-
-func linePrefix(v, p string) string {
-	var ls2 []string
-	var l2 string
-
-	l2 = strings.TrimSuffix(v, "\n")
-	ls1 := strings.Split(l2, "\n")
-
-	for _, l := range ls1 {
-		ls2 = append(ls2, fmt.Sprintf("%v %v", p, l))
-	}
-	return strings.Join(ls2, "\n")
-}
-
-func to_json(v interface{}) string {
-	var s string
-	indent_spaces := strings.Repeat(" ", 4)
-	bs, err := json.MarshalIndent(v, "", indent_spaces)
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	s = string(bs)
-
-	return s
 }

@@ -101,7 +101,7 @@ func (t JsonSchemaStringFormat) String() string {
 }
 
 func (t JsonSchemaStringFormat) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]byte(t))
+	return json.Marshal(string(t))
 }
 
 func (t *JsonSchemaStringFormat) UnmarshalJSON(data []byte) error {

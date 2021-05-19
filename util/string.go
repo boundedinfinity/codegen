@@ -1,11 +1,20 @@
 package util
 
 import (
+	"boundedinfinity/codegen/model"
 	"path"
 	"strings"
 
 	"github.com/ozgio/strutil"
 )
+
+func IsSchemaInt(v *model.OutputModel) bool {
+	return v.Type == model.SchemaType_Int
+}
+
+func IsSchemaString(v *model.OutputModel) bool {
+	return v.Type == model.SchemaType_String
+}
 
 func Uc(v string) string {
 	return strings.ToUpper(v)
@@ -31,6 +40,14 @@ func CamelCase(v string) string {
 	return LcFirst(strutil.ToCamelCase(v))
 }
 
-func BasePath(v string) string {
+func NsBase(v string) string {
 	return path.Base(v)
+}
+
+func NsDir(v string) string {
+	return path.Dir(v)
+}
+
+func SameNamespace(a, b model.OutputModel) bool {
+	return path.Dir(a.Name) == path.Dir(b.Name)
 }

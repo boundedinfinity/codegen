@@ -18,6 +18,13 @@ func (t *Loader) processInput() error {
 			return err
 		}
 
+		if input.Info.OutputDir != "" {
+			t.OutputSpec.Info.OutputDir = input.Info.OutputDir
+		}
+
+		t.OutputSpec.Info.DumpContext = input.Info.DumpContext
+		t.OutputSpec.Info.Primitives = input.Info.Primitives
+
 		for _, p := range util.SchemaTypePrimitives {
 			t.primitiveMap[string(p)] = ""
 			t.dependencies[string(p)] = NewNode(string(p))
@@ -53,6 +60,10 @@ func (t *Loader) processInput() error {
 			} else {
 				t.inputOperations[o.Name] = o
 			}
+		}
+
+		for _, inputTemplate := range input.Specification.Templates {
+			t.appendInfoTemplate(inputTemplate)
 		}
 	}
 
@@ -110,7 +121,24 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	fmt.Println(util.Jdump(t.outputModels))
-	// fmt.Println(util.Jdump(t.OutputSpec))
+	if err := t.processTemplate1(); err != nil {
+		return err
+	}
+
+	if err := t.processTemplate2(); err != nil {
+		return err
+	}
+
+	if err := t.processTemplate3(); err != nil {
+		return err
+	}
+
+	if err := t.processTemplate4(); err != nil {
+		return err
+	}
+
+	fmt.Println(util.Jdump(t.OutputSpec))
+
+	t.OutputSpec.ModelMap = t.outputModels
 	return nil
 }
