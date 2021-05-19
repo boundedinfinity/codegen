@@ -22,12 +22,20 @@ func (t *Loader) processInput() error {
 			t.OutputSpec.Info.OutputDir = input.Info.OutputDir
 		}
 
-		t.OutputSpec.Info.DumpContext = input.Info.DumpContext
-		t.OutputSpec.Info.Primitives = input.Info.Primitives
+		if t.OutputSpec.Info.Namespace == "" && input.Info.Namespace == "" {
+			t.OutputSpec.Info.Namespace = input.Info.Namespace
+		} else {
+			t.Errorf("namespace already defined")
+		}
 
-		for _, p := range util.SchemaTypePrimitives {
-			t.primitiveMap[string(p)] = ""
-			t.dependencies[string(p)] = NewNode(string(p))
+		t.OutputSpec.Info.DumpContext = input.Info.DumpContext
+
+		if len(t.OutputSpec.Info.Primitives) <= 0 {
+			t.OutputSpec.Info.Primitives = make(map[string]string)
+			for _, p := range util.SchemaTypePrimitives {
+				t.OutputSpec.Info.Primitives[string(p)] = ""
+				t.dependencies[string(p)] = NewNode(string(p))
+			}
 		}
 
 		for k, v := range input.Info.Primitives {
@@ -35,11 +43,11 @@ func (t *Loader) processInput() error {
 				return t.ErrInvalidPrimitive(k)
 			}
 
-			if p, ok := t.primitiveMap[k]; ok {
+			if p, ok := t.OutputSpec.Info.Primitives[k]; ok {
 				if p != "" {
 					return t.ErrDuplicatePrimitive(k)
 				} else {
-					t.primitiveMap[k] = v
+					t.OutputSpec.Info.Primitives[k] = v
 				}
 			} else {
 				return t.ErrInvalidPrimitive(k)
@@ -66,36 +74,6 @@ func (t *Loader) processInput() error {
 			t.appendInfoTemplate(inputTemplate)
 		}
 	}
-
-	// t.reportStack.Push(`"%v"`, filepath.Base(t.inputPath))
-	// defer t.reportStack.Pop()
-
-	// checkName := func() error {
-	// 	t.reportStack.Push("name")
-	// 	defer t.reportStack.Pop()
-
-	// 	t.Output.Name = t.input.Name
-	// 	return nil
-	// }
-
-	// checkVersion := func() error {
-	// 	t.reportStack.Push("version")
-	// 	defer t.reportStack.Pop()
-
-	// 	return nil
-	// }
-
-	// if err := checkName(); err != nil {
-	// 	return err
-	// }
-
-	// if err := checkVersion(); err != nil {
-	// 	return err
-	// }
-
-	// if err := t.processInput_Info(); err != nil {
-	// 	return err
-	// }
 
 	if err := t.processModel1(); err != nil {
 		return err

@@ -7,7 +7,6 @@ import (
 type Loader struct {
 	inputPaths         []string
 	reportStack        model.StrStack
-	primitiveMap       map[string]string
 	inputModels        map[string]model.InputModel
 	outputModels       map[string]*model.OutputModel
 	dependencies       map[string]*Node
@@ -44,7 +43,6 @@ func (t *Loader) appendInfoTemplate(v model.InputTemplate) {
 func New() *Loader {
 	return &Loader{
 		inputPaths:       make([]string, 0),
-		primitiveMap:     make(map[string]string),
 		inputModels:      make(map[string]model.InputModel),
 		outputModels:     make(map[string]*model.OutputModel),
 		inputOperations:  make(map[string]model.InputOperation),

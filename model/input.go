@@ -63,6 +63,7 @@ type InputInfo struct {
 	DumpContext               bool              `json:"dumpContext" yaml:"dumpContext"`
 	FilenameMarker            string            `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
 	TemplateHeader            string            `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
+	Namespace                 string            `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 	DescriptionSplitCharacter string            `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
 	Primitives                map[string]string `json:"primitives,omitempty" yaml:"primitives,omitempty"`
 }

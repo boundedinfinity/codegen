@@ -17,7 +17,7 @@ func (t *Generator) langType(m *model.OutputModel) string {
 	typ := "<unkown type>"
 
 	switch m.Type {
-	case model.SchemaType_String, model.SchemaType_Int, model.SchemaType_Float, model.SchemaType_Double, model.SchemaType_Boolean:
+	case model.SchemaType_String, model.SchemaType_Int, model.SchemaType_Long, model.SchemaType_Float, model.SchemaType_Double, model.SchemaType_Boolean:
 		typ = t.schema2Primtive(m.Type.String())
 	case model.SchemaType_Ref:
 		if ref, ok := t.spec.ModelMap[m.Ref]; ok {
@@ -29,7 +29,6 @@ func (t *Generator) langType(m *model.OutputModel) string {
 				typ = fmt.Sprintf("%v.%v", r, n)
 			}
 		}
-
 	}
 
 	return typ

@@ -89,6 +89,7 @@ type OutputInfo struct {
 	DumpContext    bool              `json:"dumpContext" yaml:"dumpContext"`
 	FilenameMarker string            `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
 	Primitives     map[string]string `json:"primitives,omitempty" yaml:"primitives,omitempty"`
+	Namespace      string            `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 }
 
 type OutputTemplate struct {
