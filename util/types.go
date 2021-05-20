@@ -6,17 +6,17 @@ import (
 
 var (
 	SchemaTypePrimitives = []model.SchemaTypeEnum{
+		model.SchemaType_Byte,
 		model.SchemaType_String,
+		model.SchemaType_Boolean,
 		model.SchemaType_Long,
 		model.SchemaType_Int,
 		model.SchemaType_Float,
 		model.SchemaType_Double,
-		model.SchemaType_Byte,
-		model.SchemaType_Boolean,
 	}
 )
 
-func IsSchemaPrimitive(v model.SchemaTypeEnum) bool {
+func IsSchemaSimpleType(v model.SchemaTypeEnum) bool {
 	for _, x := range SchemaTypePrimitives {
 		if v == x {
 			return true
@@ -26,12 +26,7 @@ func IsSchemaPrimitive(v model.SchemaTypeEnum) bool {
 	return false
 }
 
-func IsSchemaPrimitiveS(v string) bool {
-	for _, x := range SchemaTypePrimitives {
-		if v == string(x) {
-			return true
-		}
-	}
-
-	return false
+func IsSchemaSimpleTypeS(v string) bool {
+	t, _ := model.SchemaTypeEnumParse(v)
+	return IsSchemaSimpleType(t)
 }

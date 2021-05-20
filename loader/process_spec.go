@@ -7,7 +7,6 @@ import (
 )
 
 func (t *Loader) processInput() error {
-	// t.reportStack.Push(fmt.Sprintf("input[%v]", util.SummerySuffix(t.inputPath, model.SUMMERY_SIZE)))
 	t.reportStack.Push("loader")
 	defer t.reportStack.Pop()
 
@@ -94,6 +93,14 @@ func (t *Loader) processInput() error {
 	}
 
 	if err := t.processModel5(); err != nil {
+		return err
+	}
+
+	if err := t.processModel6(); err != nil {
+		return err
+	}
+
+	if err := t.processModel7(); err != nil {
 		return err
 	}
 

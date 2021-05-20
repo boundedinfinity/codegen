@@ -102,7 +102,7 @@ func (t *Loader) processTemplate2() error {
 
 func (t *Loader) processTemplate3() error {
 	for _, outputModel := range t.outputModels {
-		namespace := outputModel.Name
+		namespace := outputModel.FullName
 
 		for {
 			namespace = path.Dir(namespace)
@@ -158,8 +158,12 @@ func (t *Loader) processTemplate3() error {
 
 func (t *Loader) processTemplate4() error {
 	for _, outputModel := range t.outputModels {
+		// if util.IsSchemaSimpleType(outputModel.Type) {
+		// 	continue
+		// }
+
 		for _, template := range outputModel.Templates {
-			if err := t.processOutputTemplate(path.Base(outputModel.Name), path.Dir(outputModel.Name), template); err != nil {
+			if err := t.processOutputTemplate(path.Base(outputModel.FullName), path.Dir(outputModel.FullName), template); err != nil {
 				return err
 			}
 		}

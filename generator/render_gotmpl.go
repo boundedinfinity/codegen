@@ -20,7 +20,6 @@ func (t *Generator) renderGoTemplate(s string, d interface{}) (string, error) {
 		"is_int":            util.IsSchemaInt,
 		"is_string":         util.IsSchemaString,
 		"primitive":         t.schema2Primtive,
-		"lang_type":         t.langType,
 		"join":              strings.Join,
 	}
 

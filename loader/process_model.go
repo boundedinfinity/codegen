@@ -123,7 +123,7 @@ func (t *Loader) processModel3() error {
 
 func (t *Loader) processModel4() error {
 	for _, node := range t.solvedDependencies {
-		if util.IsSchemaPrimitiveS(node.Name) {
+		if util.IsSchemaSimpleTypeS(node.Name) {
 			continue
 		}
 
@@ -149,45 +149,95 @@ func (t *Loader) processModel4() error {
 }
 
 func (t *Loader) buildJson(outputModel *model.OutputModel) (*orderedmap.OrderedMap, error) {
-	jsonOut := orderedmap.New()
-	n := outputModel.Name
+	jout := orderedmap.New()
+	n := outputModel.FullName
 	n = path.Base(n)
 
 	switch outputModel.Type {
 	case model.SchemaType_String:
-		jsonOut.Set(n, outputModel.Example)
+		jout.Set(n, outputModel.Example)
 	case model.SchemaType_Int:
-		jsonOut.Set(n, outputModel.Example)
+		jout.Set(n, outputModel.Example)
 	case model.SchemaType_Enum:
-		jsonOut.Set(n, outputModel.Example)
+		jout.Set(n, outputModel.Example)
 	case model.SchemaType_Array:
-		jsonOut.Set(n, outputModel.Example)
+		jout.Set(n, outputModel.Example)
 	case model.SchemaType_Complex:
 		for _, property := range outputModel.Properties {
 			if pJsonOut, err := t.buildJson(property); err != nil {
-				return jsonOut, err
+				return jout, err
 			} else {
 				for _, k := range pJsonOut.Keys() {
 					v, _ := pJsonOut.Get(k)
-					jsonOut.Set(k, v)
+					jout.Set(k, v)
 				}
 			}
 		}
 	case model.SchemaType_Ref:
 		if dep, ok := t.outputModels[outputModel.Ref]; ok {
-			jsonOut.Set(n, dep.Example)
+			jout.Set(n, dep.Example)
 		} else {
 			return orderedmap.New(), t.ErrInvalidType(outputModel.Ref)
 		}
 
 	default:
-		return orderedmap.New(), t.ErrInvalidType(outputModel.Name)
+		return orderedmap.New(), t.ErrInvalidType(outputModel.FullName)
 	}
 
-	return jsonOut, nil
+	return jout, nil
 }
 
 func (t *Loader) processModel5() error {
+	for name, omodel := range t.outputModels {
+		if resolved, err := t.processRefs(omodel); err != nil {
+			return err
+		} else {
+			t.outputModels[name] = resolved
+		}
+	}
+
+	return nil
+}
+
+func (t *Loader) processRefs(input *model.OutputModel) (*model.OutputModel, error) {
+	var output *model.OutputModel
+
+	switch input.Type {
+	case model.SchemaType_Array:
+		switch input.Items.Type {
+		case model.SchemaType_Ref:
+			if ref, ok := t.outputModels[input.Items.Ref]; ok {
+				output = ref
+			}
+		}
+	case model.SchemaType_Ref:
+		if ref, ok := t.outputModels[input.Ref]; ok {
+			output = model.NewOutputModelWithOutput(ref)
+			output.Name = input.Name
+		} else {
+			return output, t.ErrInvalidModel(input.Ref)
+		}
+	case model.SchemaType_Complex:
+		properties := make([]*model.OutputModel, 0)
+
+		for _, property := range input.Properties {
+			if resolved, err := t.processRefs(property); err != nil {
+				return output, err
+			} else {
+				properties = append(properties, resolved)
+			}
+		}
+
+		output = input
+		input.Properties = properties
+	default:
+		output = input
+	}
+
+	return output, nil
+}
+
+func (t *Loader) processModel6() error {
 	for name, outputModel := range t.outputModels {
 		if outputModel.Type != model.SchemaType_Complex {
 			continue
@@ -212,6 +262,16 @@ func (t *Loader) processModel5() error {
 				outputModel.Imports = append(outputModel.Imports, property.Ref)
 				property.Imported = true
 			}
+		}
+	}
+
+	return nil
+}
+
+func (t *Loader) processModel7() error {
+	for name, omodel := range t.outputModels {
+		if util.IsSchemaSimpleType(omodel.Type) {
+			delete(t.outputModels, name)
 		}
 	}
 

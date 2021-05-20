@@ -32,6 +32,7 @@ func NewOutputNamespace() *OutputNamespace {
 
 type OutputModel struct {
 	Name        string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	FullName    string                 `json:"fullName,omitempty" yaml:"fullName,omitempty"`
 	Type        SchemaTypeEnum         `json:"type,omitempty" yaml:"type,omitempty"`
 	Description []string               `json:"description,omitempty" yaml:"description,omitempty"`
 	Items       *OutputModel           `json:"items,omitempty" yaml:"items,omitempty"`
@@ -56,24 +57,48 @@ func NewOutputModel() *OutputModel {
 	}
 }
 
-func NewOutputModelWithInput(input *InputModel) *OutputModel {
+func NewOutputModelWithInput(v *InputModel) *OutputModel {
 	m := NewOutputModel()
 
-	if input == nil {
+	if v == nil {
 		return m
 	}
 
-	for _, property := range input.Properties {
+	for _, property := range v.Properties {
 		m.Properties = append(m.Properties, NewOutputModelWithInput(&property))
 	}
 
-	m.Name = input.Name
-	m.Type = input.Type
-	m.Description = splitDescription(input.Description)
-	m.Items = NewOutputModelWithInput(input.Items)
-	m.Symbols = append(m.Symbols, input.Symbols...)
-	m.Example = input.Example
-	m.Ref = input.Ref
+	m.Name = v.Name
+	m.FullName = v.Name
+	m.Type = v.Type
+	m.Description = splitDescription(v.Description)
+	m.Items = NewOutputModelWithInput(v.Items)
+	m.Symbols = append(m.Symbols, v.Symbols...)
+	m.Example = v.Example
+	m.Ref = v.Ref
+
+	return m
+}
+
+func NewOutputModelWithOutput(v *OutputModel) *OutputModel {
+	m := NewOutputModel()
+
+	if v == nil {
+		return m
+	}
+
+	for _, property := range v.Properties {
+		m.Properties = append(m.Properties, NewOutputModelWithOutput(property))
+	}
+
+	m.Name = v.Name
+	m.FullName = v.FullName
+	m.Type = v.Type
+	m.Description = v.Description
+	m.Items = NewOutputModelWithOutput(v.Items)
+	m.Symbols = append(m.Symbols, v.Symbols...)
+	m.Example = v.Example
+	m.Ref = v.Ref
 
 	return m
 }

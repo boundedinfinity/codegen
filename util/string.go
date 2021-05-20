@@ -53,7 +53,7 @@ func NsDir(v string) string {
 }
 
 func SameNamespace(a, b model.OutputModel) bool {
-	aNs := path.Dir(a.Name)
-	bNs := path.Dir(b.Name)
+	aNs := path.Dir(a.FullName)
+	bNs := path.Dir(b.FullName)
 	return aNs == bNs
 }
