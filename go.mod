@@ -12,6 +12,7 @@ require (
 	github.com/onsi/gomega v1.11.0
 	github.com/ozgio/strutil v0.3.0
 	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/zeromake/pkg v0.0.0-20210513105351-4f7b7d998e74
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
 	gopkg.in/yaml.v2 v2.4.0
 )

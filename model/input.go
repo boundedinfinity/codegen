@@ -73,4 +73,5 @@ type InputTemplate struct {
 	Path      string           `json:"path,omitempty" yaml:"path,omitempty"`
 	Type      TemplateTypeEnum `json:"type,omitempty" yaml:"type,omitempty"`
 	Namespace string           `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	Recurse   bool             `json:"recurse,omitempty" yaml:"recurse,omitempty"`
 }

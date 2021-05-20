@@ -153,9 +153,6 @@ func (t *Loader) processTemplate3() error {
 		}
 	}
 
-	// for _, inputTemplates := range t.inputTemplates {
-
-	// }
 	return nil
 }
 

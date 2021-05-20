@@ -22,10 +22,12 @@ func (t *Loader) processInput() error {
 			t.OutputSpec.Info.OutputDir = input.Info.OutputDir
 		}
 
-		if t.OutputSpec.Info.Namespace == "" && input.Info.Namespace == "" {
-			t.OutputSpec.Info.Namespace = input.Info.Namespace
-		} else {
-			t.Errorf("namespace already defined")
+		if input.Info.Namespace != "" {
+			if t.OutputSpec.Info.Namespace == "" {
+				t.OutputSpec.Info.Namespace = input.Info.Namespace
+			} else {
+				t.Errorf("namespace already defined")
+			}
 		}
 
 		t.OutputSpec.Info.DumpContext = input.Info.DumpContext

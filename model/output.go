@@ -35,11 +35,12 @@ type OutputModel struct {
 	Type        SchemaTypeEnum         `json:"type,omitempty" yaml:"type,omitempty"`
 	Description []string               `json:"description,omitempty" yaml:"description,omitempty"`
 	Items       *OutputModel           `json:"items,omitempty" yaml:"items,omitempty"`
-	Properties  []OutputModel          `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Properties  []*OutputModel         `json:"properties,omitempty" yaml:"properties,omitempty"`
 	Symbols     []string               `json:"symbols,omitempty" yaml:"symbols,omitempty"`
 	Ref         string                 `json:"ref,omitempty" yaml:"ref,omitempty"`
 	Example     interface{}            `json:"example,omitempty" yaml:"example,omitempty"`
 	Json        *orderedmap.OrderedMap `json:"json,omitempty" yaml:"json,omitempty"`
+	Imported    bool                   `json:"imported,omitempty" yaml:"imported,omitempty"`
 	Imports     []string               `json:"imports,omitempty" yaml:"imports,omitempty"`
 	Templates   []*OutputTemplate      `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
@@ -47,7 +48,7 @@ type OutputModel struct {
 func NewOutputModel() *OutputModel {
 	return &OutputModel{
 		Description: make([]string, 0),
-		Properties:  make([]OutputModel, 0),
+		Properties:  make([]*OutputModel, 0),
 		Templates:   make([]*OutputTemplate, 0),
 		Symbols:     make([]string, 0),
 		Imports:     make([]string, 0),
@@ -63,7 +64,7 @@ func NewOutputModelWithInput(input *InputModel) *OutputModel {
 	}
 
 	for _, property := range input.Properties {
-		m.Properties = append(m.Properties, *NewOutputModelWithInput(&property))
+		m.Properties = append(m.Properties, NewOutputModelWithInput(&property))
 	}
 
 	m.Name = input.Name

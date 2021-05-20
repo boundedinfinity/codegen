@@ -5,7 +5,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ozgio/strutil"
+	"github.com/zeromake/pkg/textconv"
 )
 
 func IsSchemaInt(v *model.OutputModel) bool {
@@ -37,7 +37,11 @@ func LcFirst(v string) string {
 }
 
 func CamelCase(v string) string {
-	return LcFirst(strutil.ToCamelCase(v))
+	return LcFirst(textconv.CamelCase(v))
+}
+
+func PascalCase(v string) string {
+	return LcFirst(textconv.PascalCase(v))
 }
 
 func NsBase(v string) string {
@@ -49,5 +53,7 @@ func NsDir(v string) string {
 }
 
 func SameNamespace(a, b model.OutputModel) bool {
-	return path.Dir(a.Name) == path.Dir(b.Name)
+	aNs := path.Dir(a.Name)
+	bNs := path.Dir(b.Name)
+	return aNs == bNs
 }

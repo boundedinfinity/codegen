@@ -14,19 +14,19 @@ func (t *Loader) processOperation1() error {
 		outputOperation.Name = inputOperation.Name
 
 		switch inputOperation.Input.Type {
-		// case model.SchemaType_Ref:
-		// 	if _, ok := t.outputModels[inputOperation.Input.Ref.Ref]; !ok {
-		// 		return t.ErrInvalidModel(inputOperation.Input.Name)
-		// 	}
+		case model.SchemaType_Ref:
+			if _, ok := t.outputModels[inputOperation.Input.Ref]; !ok {
+				return t.ErrInvalidModel(inputOperation.Input.Ref)
+			}
 		default:
 			return t.ErrInvalidModel(inputOperation.Input.Name)
 		}
 
 		switch inputOperation.Output.Type {
-		// case model.SchemaType_Ref:
-		// 	if _, ok := t.outputModels[inputOperation.Output.Ref.Ref]; !ok {
-		// 		return t.ErrInvalidModel(inputOperation.Output.Name)
-		// 	}
+		case model.SchemaType_Ref:
+			if _, ok := t.outputModels[inputOperation.Output.Ref]; !ok {
+				return t.ErrInvalidModel(inputOperation.Input.Ref)
+			}
 		default:
 			return t.ErrInvalidModel(inputOperation.Output.Name)
 		}

@@ -20,7 +20,8 @@
             "program": "${workspaceFolder}", 
             "args": [
                 "${env:HOME}/codegen-project/model.yaml",
-                "${env:HOME}/codegen-project/ping.yaml"
+                "${env:HOME}/codegen-project/application.yaml",
+                "${env:HOME}/codegen-project/lib.yaml",
             ],
         }
     ]

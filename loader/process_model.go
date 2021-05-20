@@ -3,7 +3,6 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"fmt"
 	"path"
 
 	"github.com/iancoleman/orderedmap"
@@ -24,74 +23,79 @@ func (t *Loader) processModel1() error {
 }
 
 func (t *Loader) processModel2() error {
-	for n, m := range t.inputModels {
-		mNode, ok := t.dependencies[n]
+	for _, m := range t.inputModels {
+		if err := t.processModelDep(nil, &m); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (t *Loader) processModelDep(p, m *model.InputModel) error {
+	addDep := func(depender, dependee string) error {
+		dependerNode, ok := t.dependencies[depender]
 
 		if !ok {
-			return t.ErrInvalidType(n)
+			return t.ErrCustomTypeNotFound(depender)
 		}
 
-		handleDep := func(n, v string) error {
-			dNode, ok := t.dependencies[v]
+		dependeeNode, ok := t.dependencies[dependee]
 
-			if !ok {
-				return t.ErrInvalidType(n)
-			}
-
-			mNode.Add(dNode)
-			return nil
+		if !ok {
+			return t.ErrCustomTypeNotFound(dependee)
 		}
 
-		switch m.Type {
-		case model.SchemaType_String:
-			if err := handleDep(m.Type.String(), m.Type.String()); err != nil {
-				return err
-			}
-		case model.SchemaType_Int:
-			if err := handleDep(m.Type.String(), m.Type.String()); err != nil {
-				return err
-			}
-		case model.SchemaType_Array:
-			switch m.Items.Type {
-			case model.SchemaType_String:
-				if err := handleDep(m.Items.Type.String(), m.Items.Type.String()); err != nil {
-					return err
-				}
-			}
-		case model.SchemaType_Enum:
-			// no dependencies
-		case model.SchemaType_Ref:
-			if err := handleDep(m.Ref, m.Type.String()); err != nil {
-				return err
-			}
-		case model.SchemaType_Complex:
-			for _, property := range m.Properties {
-				if util.IsSchemaPrimitive(property.Type) {
-					dNode, ok := t.dependencies[property.Type.String()]
+		dependerNode.Add(dependeeNode)
+		return nil
+	}
 
-					if !ok {
-						return t.ErrInvalidType(property.Type.String())
-					}
-
-					mNode.Add(dNode)
-				} else {
-					switch property.Type {
-					case model.SchemaType_Ref:
-						dNode, ok := t.dependencies[property.Ref]
-
-						if !ok {
-							return t.ErrInvalidType(property.Type.String())
-						}
-
-						mNode.Add(dNode)
-					default:
-						return t.ErrInvalidType(fmt.Sprintf("%v/%v", m.Name, property.Name))
-					}
-				}
-			}
-		default:
-			return t.ErrInvalidType(m.Type.String())
+	fn := func(a, b *model.InputModel) string {
+		if a != nil && a.Name != "" {
+			return a.Name
 		}
+
+		if b != nil && b.Name != "" {
+			return b.Name
+		}
+
+		return "turd"
+	}
+
+	switch m.Type {
+	case model.SchemaType_String, model.SchemaType_Boolean,
+		model.SchemaType_Int, model.SchemaType_Long,
+		model.SchemaType_Float, model.SchemaType_Double:
+		dependee := fn(p, m)
+		if err := addDep(dependee, m.Type.String()); err != nil {
+			return err
+		}
+	case model.SchemaType_Array:
+		if p != nil {
+			if err := t.processModelDep(p, m.Items); err != nil {
+				return err
+			}
+		} else {
+			if err := t.processModelDep(m, m.Items); err != nil {
+				return err
+			}
+		}
+	case model.SchemaType_Enum:
+		if err := addDep(m.Name, model.SchemaType_String.String()); err != nil {
+			return err
+		}
+	case model.SchemaType_Ref:
+		if err := addDep(p.Name, m.Ref); err != nil {
+			return err
+		}
+	case model.SchemaType_Complex:
+		for _, property := range m.Properties {
+			if err := t.processModelDep(m, &property); err != nil {
+				return err
+			}
+		}
+	default:
+		return t.ErrInvalidType(m.Type.String())
 	}
 
 	return nil
@@ -160,7 +164,7 @@ func (t *Loader) buildJson(outputModel *model.OutputModel) (*orderedmap.OrderedM
 		jsonOut.Set(n, outputModel.Example)
 	case model.SchemaType_Complex:
 		for _, property := range outputModel.Properties {
-			if pJsonOut, err := t.buildJson(&property); err != nil {
+			if pJsonOut, err := t.buildJson(property); err != nil {
 				return jsonOut, err
 			} else {
 				for _, k := range pJsonOut.Keys() {
@@ -184,8 +188,8 @@ func (t *Loader) buildJson(outputModel *model.OutputModel) (*orderedmap.OrderedM
 }
 
 func (t *Loader) processModel5() error {
-	for name, inputModel := range t.inputModels {
-		if inputModel.Type != model.SchemaType_Complex {
+	for name, outputModel := range t.outputModels {
+		if outputModel.Type != model.SchemaType_Complex {
 			continue
 		}
 
@@ -197,7 +201,7 @@ func (t *Loader) processModel5() error {
 
 		modelNamespace := path.Dir(name)
 
-		for _, property := range inputModel.Properties {
+		for _, property := range outputModel.Properties {
 			if property.Type != model.SchemaType_Ref {
 				continue
 			}
@@ -206,6 +210,7 @@ func (t *Loader) processModel5() error {
 
 			if modelNamespace != propertyNamespace {
 				outputModel.Imports = append(outputModel.Imports, property.Ref)
+				property.Imported = true
 			}
 		}
 	}
