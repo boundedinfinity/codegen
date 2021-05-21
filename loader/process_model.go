@@ -154,13 +154,10 @@ func (t *Loader) buildJson(outputModel *model.OutputModel) (*orderedmap.OrderedM
 	n = path.Base(n)
 
 	switch outputModel.Type {
-	case model.SchemaType_String:
-		jout.Set(n, outputModel.Example)
-	case model.SchemaType_Int:
-		jout.Set(n, outputModel.Example)
-	case model.SchemaType_Enum:
-		jout.Set(n, outputModel.Example)
-	case model.SchemaType_Array:
+	case model.SchemaType_String, model.SchemaType_Byte, model.SchemaType_Boolean,
+		model.SchemaType_Int, model.SchemaType_Long,
+		model.SchemaType_Float, model.SchemaType_Double,
+		model.SchemaType_Enum, model.SchemaType_Array:
 		jout.Set(n, outputModel.Example)
 	case model.SchemaType_Complex:
 		for _, property := range outputModel.Properties {
@@ -207,8 +204,18 @@ func (t *Loader) processRefs(input *model.OutputModel) (*model.OutputModel, erro
 		switch input.Items.Type {
 		case model.SchemaType_Ref:
 			if ref, ok := t.outputModels[input.Items.Ref]; ok {
-				output = ref
+				output = model.NewOutputModelWithOutput(input)
+				output.Items = model.NewOutputModelWithOutput(ref)
+			} else {
+				return output, t.ErrInvalidType(input.Items.Type.String())
 			}
+		case model.SchemaType_String, model.SchemaType_Byte, model.SchemaType_Boolean,
+			model.SchemaType_Int, model.SchemaType_Long,
+			model.SchemaType_Float, model.SchemaType_Double,
+			model.SchemaType_Enum:
+			output = model.NewOutputModelWithOutput(input)
+		default:
+			return output, t.ErrInvalidType(input.Items.Type.String())
 		}
 	case model.SchemaType_Ref:
 		if ref, ok := t.outputModels[input.Ref]; ok {
