@@ -214,6 +214,14 @@ func (t *Loader) processRefs(input *model.OutputModel) (*model.OutputModel, erro
 		if ref, ok := t.outputModels[input.Ref]; ok {
 			output = model.NewOutputModelWithOutput(ref)
 			output.Name = input.Name
+
+			description := append([]string{}, input.Description...)
+			if len(description) > 0 {
+				description = append(description, "")
+			}
+
+			description = append(description, ref.Description...)
+			output.Description = description
 		} else {
 			return output, t.ErrInvalidModel(input.Ref)
 		}
@@ -252,14 +260,16 @@ func (t *Loader) processModel6() error {
 		modelNamespace := path.Dir(name)
 
 		for _, property := range outputModel.Properties {
-			if property.Type != model.SchemaType_Ref {
+			switch property.Type {
+			case model.SchemaType_Complex:
+			default:
 				continue
 			}
 
-			propertyNamespace := path.Dir(property.Ref)
+			propertyNamespace := path.Dir(property.FullName)
 
 			if modelNamespace != propertyNamespace {
-				outputModel.Imports = append(outputModel.Imports, property.Ref)
+				outputModel.Imports = append(outputModel.Imports, property.FullName)
 				property.Imported = true
 			}
 		}

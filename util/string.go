@@ -2,6 +2,7 @@ package util
 
 import (
 	"boundedinfinity/codegen/model"
+	"encoding/json"
 	"path"
 	"strings"
 
@@ -56,4 +57,9 @@ func SameNamespace(a, b model.OutputModel) bool {
 	aNs := path.Dir(a.FullName)
 	bNs := path.Dir(b.FullName)
 	return aNs == bNs
+}
+
+func ToJson(v interface{}) string {
+	j, _ := json.MarshalIndent(v, "", "    ")
+	return string(j)
 }

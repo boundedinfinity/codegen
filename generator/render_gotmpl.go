@@ -21,6 +21,7 @@ func (t *Generator) renderGoTemplate(s string, d interface{}) (string, error) {
 		"is_string":         util.IsSchemaString,
 		"primitive":         t.schema2Primtive,
 		"join":              strings.Join,
+		"to_json":           util.ToJson,
 	}
 
 	tmpl, err := template.New("template").Funcs(fnm).Parse(s)

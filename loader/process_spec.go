@@ -29,7 +29,7 @@ func (t *Loader) processInput() error {
 			}
 		}
 
-		t.OutputSpec.Info.DumpContext = input.Info.DumpContext
+		t.OutputSpec.Info.DumpContext = t.OutputSpec.Info.DumpContext || input.Info.DumpContext
 
 		if len(t.OutputSpec.Info.Primitives) <= 0 {
 			t.OutputSpec.Info.Primitives = make(map[string]string)
