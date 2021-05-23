@@ -86,12 +86,20 @@ func (t *Loader) processTemplate1() error {
 
 func (t *Loader) processTemplate2() error {
 	shouldAddTemplate := func(it model.InputTemplate, name string) bool {
-		if it.Namespace == "." {
+		ns := it.Namespace
+
+		if ns == name {
 			return true
 		}
 
-		if it.Recurse && strings.HasPrefix(name, it.Namespace) {
-			return true
+		if it.Recurse {
+			if strings.HasPrefix(name, ns) {
+				return true
+			}
+
+			if ns == "." {
+				return true
+			}
 		}
 
 		return false
