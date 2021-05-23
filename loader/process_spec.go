@@ -3,7 +3,6 @@ package loader
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
-	"fmt"
 )
 
 func (t *Loader) processInput() error {
@@ -108,6 +107,18 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
+	if err := t.processNamespace1(); err != nil {
+		return err
+	}
+
+	if err := t.processNamespace2(); err != nil {
+		return err
+	}
+
+	if err := t.processNamespace3(); err != nil {
+		return err
+	}
+
 	if err := t.processTemplate1(); err != nil {
 		return err
 	}
@@ -116,16 +127,31 @@ func (t *Loader) processInput() error {
 		return err
 	}
 
-	if err := t.processTemplate3(); err != nil {
-		return err
-	}
-
-	if err := t.processTemplate4(); err != nil {
-		return err
-	}
-
-	fmt.Println(util.Jdump(t.OutputSpec))
+	// fmt.Println(util.Jdump(t.OutputSpec))
 
 	t.OutputSpec.ModelMap = t.outputModels
 	return nil
+}
+
+func (t *Loader) appendInfoTemplate(v model.InputTemplate) {
+	list, ok := t.inputTemplates[v.Namespace]
+
+	if !ok {
+		list = make([]model.InputTemplate, 0)
+	}
+
+	var found bool
+
+	for _, x := range list {
+		if x.Path == v.Path {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		list = append(list, v)
+	}
+
+	t.inputTemplates[v.Namespace] = list
 }

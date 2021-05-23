@@ -8,29 +8,35 @@ func (t *Loader) processOperation1() error {
 			return t.ErrInvalidOperation(name)
 		}
 
-		outputOperation := model.NewOutputOperation()
+		outputOperation := model.NewOutputOperationWithInput(inputOperation)
 		t.outputOperations[name] = outputOperation
-		outputOperation.Description = t.splitDescription(inputOperation.Description)
-		outputOperation.Name = inputOperation.Name
 
-		switch inputOperation.Input.Type {
-		case model.SchemaType_Ref:
-			if _, ok := t.outputModels[inputOperation.Input.Ref]; !ok {
-				return t.ErrInvalidModel(inputOperation.Input.Ref)
+		assign := func(i model.InputModel, o **model.OutputModel) error {
+			switch i.Type {
+			case model.SchemaType_Ref:
+				if ref, ok := t.outputModels[i.Ref]; ok {
+					nm := model.NewOutputModelWithOutput(ref)
+					nm.Name = i.Name
+					*o = nm
+				} else {
+					return t.ErrInvalidModel(i.Ref)
+				}
+			default:
+				return t.ErrInvalidModel(i.Name)
 			}
-		default:
-			return t.ErrInvalidModel(inputOperation.Input.Name)
+
+			return nil
 		}
 
-		switch inputOperation.Output.Type {
-		case model.SchemaType_Ref:
-			if _, ok := t.outputModels[inputOperation.Output.Ref]; !ok {
-				return t.ErrInvalidModel(inputOperation.Input.Ref)
-			}
-		default:
-			return t.ErrInvalidModel(inputOperation.Output.Name)
+		if err := assign(inputOperation.Input, &outputOperation.Input); err != nil {
+			return err
 		}
 
+		if err := assign(inputOperation.Output, &outputOperation.Output); err != nil {
+			return err
+		}
+
+		t.OutputSpec.Operations = append(t.OutputSpec.Operations, outputOperation)
 	}
 
 	return nil

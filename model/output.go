@@ -21,11 +21,14 @@ func NewOutputSpec() *OutputSpec {
 
 type OutputNamespace struct {
 	Name      string            `json:"name,omitempty" yaml:"name,omitempty"`
+	Children  []string          `json:"children,omitempty" yaml:"children,omitempty"`
 	Templates []*OutputTemplate `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
-func NewOutputNamespace() *OutputNamespace {
+func NewOutputNamespace(name string) *OutputNamespace {
 	return &OutputNamespace{
+		Name:      name,
+		Children:  make([]string, 0),
 		Templates: make([]*OutputTemplate, 0),
 	}
 }
@@ -139,20 +142,37 @@ func NewOutputTemplateWithInput() *OutputTemplate {
 	}
 }
 
+func NewOutputTemplateWithOutput(input InputTemplate) *OutputTemplate {
+	return &OutputTemplate{
+		Type:   input.Type,
+		Header: splitDescription(input.Header),
+		Input:  input.Path,
+	}
+}
+
 type OutputOperation struct {
 	Name        string            `json:"name,omitempty" yaml:"name,omitempty"`
-	Namespace   string            `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	SpecPath    string            `json:"specPath,omitempty" yaml:"specPath,omitempty"`
 	Description []string          `json:"description,omitempty" yaml:"description,omitempty"`
 	Imports     []string          `json:"imports,omitempty" yaml:"imports,omitempty"`
-	Input       OutputModel       `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      OutputModel       `json:"output,omitempty" yaml:"output,omitempty"`
+	Input       *OutputModel      `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      *OutputModel      `json:"output,omitempty" yaml:"output,omitempty"`
 	Templates   []*OutputTemplate `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 func NewOutputOperation() *OutputOperation {
 	return &OutputOperation{
 		Description: make([]string, 0),
+		Imports:     make([]string, 0),
+		Templates:   make([]*OutputTemplate, 0),
+	}
+}
+
+func NewOutputOperationWithInput(input InputOperation) *OutputOperation {
+	return &OutputOperation{
+		Name:        input.Name,
+		Description: splitDescription(input.Description),
+		Input:       NewOutputModelWithInput(&input.Input),
+		Output:      NewOutputModelWithInput(&input.Output),
 		Imports:     make([]string, 0),
 		Templates:   make([]*OutputTemplate, 0),
 	}

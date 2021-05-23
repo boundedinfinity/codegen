@@ -28,22 +28,6 @@ type InputModel struct {
 	Example     interface{}    `json:"example,omitempty" yaml:"example,omitempty"`
 }
 
-type StringExample struct {
-	Example string `json:"example,omitempty" yaml:"example,omitempty"`
-}
-
-type StringArrayExample struct {
-	Example []string `json:"example,omitempty" yaml:"example,omitempty"`
-}
-
-type EnumExample struct {
-	Example string `json:"example,omitempty" yaml:"example,omitempty"`
-}
-
-type EnumArrayExample struct {
-	Example []string `json:"example,omitempty" yaml:"example,omitempty"`
-}
-
 type InputValidation struct {
 	Minimum  int  `json:"minimum,omitempty" yaml:"minimum,omitempty"`
 	Maximum  int  `json:"maximum,omitempty" yaml:"maximum,omitempty"`

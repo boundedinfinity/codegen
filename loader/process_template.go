@@ -18,6 +18,7 @@ func (t *Loader) processTemplate1() error {
 				Header:    inputTemplate.Header,
 				Type:      inputTemplate.Type,
 				Namespace: inputTemplate.Namespace,
+				Recurse:   inputTemplate.Recurse,
 			}
 
 			if filepath.IsAbs(inputTemplate.Path) {
@@ -84,95 +85,71 @@ func (t *Loader) processTemplate1() error {
 }
 
 func (t *Loader) processTemplate2() error {
-	for _, inputTemplates := range t.inputTemplates {
-		for _, inputTemplate := range inputTemplates {
-			for {
-				t.appendInfoTemplate(inputTemplate)
-				inputTemplate.Namespace = path.Dir(inputTemplate.Namespace)
-
-				if inputTemplate.Namespace == "." {
-					break
-				}
-			}
+	shouldAddTemplate := func(it model.InputTemplate, name string) bool {
+		if it.Namespace == "." {
+			return true
 		}
+
+		if it.Recurse && strings.HasPrefix(name, it.Namespace) {
+			return true
+		}
+
+		return false
 	}
 
-	return nil
-}
+	for _, templates := range t.inputTemplates {
+		for _, template := range templates {
+			switch template.Type {
+			case model.TemplateType_Model:
+				for _, omodel := range t.outputModels {
+					if shouldAddTemplate(template, omodel.FullName) {
+						oTemplate := model.NewOutputTemplateWithOutput(template)
+						name := path.Base(omodel.FullName)
+						namespace := path.Dir(omodel.FullName)
 
-func (t *Loader) processTemplate3() error {
-	for _, outputModel := range t.outputModels {
-		namespace := outputModel.FullName
+						if err := t.processOutputTemplate(name, namespace, oTemplate); err != nil {
+							return err
+						}
 
-		for {
-			namespace = path.Dir(namespace)
-
-			if inputTemplates, ok := t.inputTemplates[namespace]; ok {
-				for _, inputTemplate := range inputTemplates {
-					if inputTemplate.Type != model.TemplateType_Model {
-						continue
+						omodel.Templates = append(omodel.Templates, oTemplate)
 					}
-
-					outputTemplate := model.NewOutputTemplate()
-					outputTemplate.Type = inputTemplate.Type
-					outputTemplate.Input = inputTemplate.Path
-					outputTemplate.Header = t.splitDescription(inputTemplate.Header)
-					outputModel.Templates = append(outputModel.Templates, outputTemplate)
 				}
-			}
+			case model.TemplateType_Operation:
+				for _, operation := range t.outputOperations {
+					if shouldAddTemplate(template, operation.Name) {
+						oTemplate := model.NewOutputTemplateWithOutput(template)
+						name := path.Base(operation.Name)
+						namespace := path.Dir(operation.Name)
 
-			if namespace == "." {
-				break
-			}
-		}
-	}
+						if err := t.processOutputTemplate(name, namespace, oTemplate); err != nil {
+							return err
+						}
 
-	for _, outputOperation := range t.outputOperations {
-		namespace := outputOperation.Name
-
-		for {
-			namespace = path.Dir(namespace)
-
-			if inputTemplates, ok := t.inputTemplates[namespace]; ok {
-				for _, inputTemplate := range inputTemplates {
-					if inputTemplate.Type != model.TemplateType_Operation {
-						continue
+						operation.Templates = append(operation.Templates, oTemplate)
 					}
-
-					outputTemplate := model.NewOutputTemplate()
-					outputTemplate.Type = inputTemplate.Type
-					outputTemplate.Input = inputTemplate.Path
-					outputTemplate.Header = t.splitDescription(inputTemplate.Header)
-					outputOperation.Templates = append(outputOperation.Templates, outputTemplate)
 				}
-			}
+			case model.TemplateType_Namespace:
+				for name, namespace := range t.outputNamespace {
+					if shouldAddTemplate(template, namespace.Name) {
+						oTemplate := model.NewOutputTemplateWithOutput(template)
+						var name2 string
 
-			if namespace == "." {
-				break
-			}
-		}
-	}
+						if name == "." {
+							name2 = "root"
+						} else {
+							name2 = path.Base(name)
+						}
 
-	return nil
-}
+						name2 = fmt.Sprintf("%v_ns", name2)
+						namespace2 := namespace.Name
 
-func (t *Loader) processTemplate4() error {
-	for _, outputModel := range t.outputModels {
-		// if util.IsSchemaSimpleType(outputModel.Type) {
-		// 	continue
-		// }
+						if err := t.processOutputTemplate(name2, namespace2, oTemplate); err != nil {
+							return err
+						}
 
-		for _, template := range outputModel.Templates {
-			if err := t.processOutputTemplate(path.Base(outputModel.FullName), path.Dir(outputModel.FullName), template); err != nil {
-				return err
-			}
-		}
-	}
-
-	for _, outputOperation := range t.outputOperations {
-		for _, template := range outputOperation.Templates {
-			if err := t.processOutputTemplate(path.Base(outputOperation.Name), path.Dir(outputOperation.Name), template); err != nil {
-				return err
+						namespace.Templates = append(namespace.Templates, oTemplate)
+					}
+				}
 			}
 		}
 	}
