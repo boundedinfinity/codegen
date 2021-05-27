@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/zeromake/pkg/textconv"
+	"github.com/boundedinfinity/caser"
 )
 
 func IsSchemaInt(v *model.OutputModel) bool {
@@ -38,11 +38,11 @@ func LcFirst(v string) string {
 }
 
 func CamelCase(v string) string {
-	return LcFirst(textconv.CamelCase(v))
+	return caser.PhraseToCamel(v)
 }
 
 func PascalCase(v string) string {
-	return LcFirst(textconv.PascalCase(v))
+	return caser.PhraseToCamel(v)
 }
 
 func PathBase(v string) string {
