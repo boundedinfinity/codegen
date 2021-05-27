@@ -10,7 +10,7 @@ func init() {
 	raymond.RegisterHelper("uc", util.Uc)
 	raymond.RegisterHelper("ucFirst", util.UcFirst)
 	raymond.RegisterHelper("ifeq", ifeq)
-	raymond.RegisterHelper("basePath", util.NsBase)
+	raymond.RegisterHelper("basePath", util.PathBase)
 	// raymond.RegisterHelper("operationId", operationId)
 
 	// raymond.RegisterHelper("type_go", t)

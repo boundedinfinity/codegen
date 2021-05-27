@@ -9,8 +9,9 @@ import (
 
 func (t *Generator) renderGoTemplate(s string, d interface{}) (string, error) {
 	fnm := template.FuncMap{
-		"ns_base":           util.NsBase,
-		"ns_dir":            util.NsDir,
+		"path_base":         util.PathBase,
+		"path_dir":          util.PathDir,
+		"path_base_dir":     util.PathDirBase,
 		"uc_first":          util.UcFirst,
 		"uc":                util.Uc,
 		"lc_first":          util.LcFirst,

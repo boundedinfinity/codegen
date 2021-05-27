@@ -45,12 +45,24 @@ func PascalCase(v string) string {
 	return LcFirst(textconv.PascalCase(v))
 }
 
-func NsBase(v string) string {
+func PathBase(v string) string {
 	return path.Base(v)
 }
 
-func NsDir(v string) string {
+func PathDir(v string) string {
 	return path.Dir(v)
+}
+
+func PathDirBase(v string) string {
+	o := v
+
+	if strings.Contains(v, "/") {
+		o = path.Base(path.Dir(v))
+	} else {
+		o = v
+	}
+
+	return o
 }
 
 func SameNamespace(a, b model.OutputModel) bool {

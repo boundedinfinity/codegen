@@ -168,30 +168,33 @@ func (t *Loader) processTemplate2() error {
 func (t *Loader) processOutputTemplate(name, namespace string, template *model.OutputTemplate) error {
 	var templateTypeExt string
 	var templateExt string
-	var fullPath string
+	var filename string
 
-	templateTypeExt = template.Input
+	filename = template.Input
+	filename = filepath.Base(filename)
+
+	templateTypeExt = filename
 	templateTypeExt = filepath.Ext(templateTypeExt)
-	templateTypeExt = strings.TrimPrefix(templateTypeExt, ".")
 
-	templateExt = template.Input
-	templateExt = strings.TrimSuffix(templateExt, filepath.Ext(template.Input))
+	filename = strings.TrimSuffix(filename, templateTypeExt)
+
+	templateExt = filename
 	templateExt = filepath.Ext(templateExt)
-	templateExt = strings.TrimPrefix(templateExt, ".")
 
-	fullPath = name
+	filename = strings.TrimSuffix(filename, templateExt)
+	filename = fmt.Sprintf("%v.%v", name, filename)
 
 	if t.OutputSpec.Info.FilenameMarker != model.DEFAULT_FILENAME_DISABLE {
 		if t.OutputSpec.Info.FilenameMarker != "" {
-			fullPath = fmt.Sprintf("%v.%v", fullPath, t.OutputSpec.Info.FilenameMarker)
+			filename = fmt.Sprintf("%v.%v", filename, t.OutputSpec.Info.FilenameMarker)
 		} else {
-			fullPath = fmt.Sprintf("%v.%v", fullPath, model.DEFAULT_FILENAME_MARKER)
+			filename = fmt.Sprintf("%v.%v", filename, model.DEFAULT_FILENAME_MARKER)
 		}
 	}
 
-	fullPath = fmt.Sprintf("%v.%v", fullPath, templateExt)
-	fullPath = path.Join(t.OutputSpec.Info.OutputDir, namespace, fullPath)
+	filename = fmt.Sprintf("%v%v", filename, templateExt)
+	filename = path.Join(t.OutputSpec.Info.OutputDir, namespace, filename)
 
-	template.Output = fullPath
+	template.Output = filename
 	return nil
 }
