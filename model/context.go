@@ -13,5 +13,5 @@ type WalkFunc func(ctx *WalkContext) error
 
 type WalkContext struct {
 	// Model     InputModel
-	Operation InputOperation
+	// Operation InputOperation
 }

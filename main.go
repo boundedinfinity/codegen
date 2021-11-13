@@ -1,27 +1,26 @@
 package main
 
 import (
-	"boundedinfinity/codegen/generator"
-	"boundedinfinity/codegen/loader"
+	"boundedinfinity/codegen/system"
 	"fmt"
 	"os"
 )
+
+//go:generate enumer -standalone=true -package=uritype -name=UriType -items=file,http,https
 
 func main() {
 	// schemaPath := "../codegen-templates/spec.bi.yaml"
 	schemaPaths := os.Args[1:]
 
-	l := loader.New()
+	l := system.New()
 
-	if err := l.FromPaths(schemaPaths); err != nil {
-		os.Exit(handleError(err))
+	if err := l.Load(schemaPaths...); err != nil {
+		handleError(err)
 	}
 
-	g := generator.New(*l.OutputSpec)
-
-	if err := g.Generate(); err != nil {
-		os.Exit(handleError(err))
-	}
+	// if err := g.Generate(); err != nil {
+	// 	os.Exit(handleError(err))
+	// }
 }
 
 func handleError(err error) int {

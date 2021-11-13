@@ -1,21 +1,19 @@
 package util
 
 import (
-	"boundedinfinity/codegen/model"
-	"encoding/json"
 	"path"
 	"strings"
 
 	"github.com/boundedinfinity/caser"
 )
 
-func IsSchemaInt(v *model.OutputModel) bool {
-	return v.Type == model.SchemaType_Int
-}
+// func IsSchemaInt(v *model.OutputModel) bool {
+// 	return v.Type == model.SchemaType_Int
+// }
 
-func IsSchemaString(v *model.OutputModel) bool {
-	return v.Type == model.SchemaType_String
-}
+// func IsSchemaString(v *model.OutputModel) bool {
+// 	return v.Type == model.SchemaType_String
+// }
 
 func Uc(v string) string {
 	return strings.ToUpper(v)
@@ -65,13 +63,13 @@ func PathDirBase(v string) string {
 	return o
 }
 
-func SameNamespace(a, b model.OutputModel) bool {
-	aNs := path.Dir(a.FullName)
-	bNs := path.Dir(b.FullName)
-	return aNs == bNs
-}
+// func SameNamespace(a, b model.OutputModel) bool {
+// 	aNs := path.Dir(a.FullName)
+// 	bNs := path.Dir(b.FullName)
+// 	return aNs == bNs
+// }
 
-func ToJson(v interface{}) string {
-	j, _ := json.MarshalIndent(v, "", "    ")
-	return string(j)
-}
+// func ToJson(v interface{}) string {
+// 	j, _ := json.MarshalIndent(v, "", "    ")
+// 	return string(j)
+// }
