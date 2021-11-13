@@ -1,0 +1,10 @@
+info:
+    version: 0.0.1
+operations:
+    -   name: AddLabel
+        input: 
+            name: request
+            $ref: https://www.boundedinfinity.com/json-schema/label-input
+        output: 
+            name: response
+            $ref: https://www.boundedinfinity.com/json-schema/label-output
