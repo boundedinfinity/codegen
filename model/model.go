@@ -12,12 +12,12 @@ import (
 // https://medium.com/@nate510/dynamic-json-umarshalling-in-go-88095561d6a0
 
 type Schema struct {
-	Id         string                  `json:"$id" yaml:"$id"`
-	Info       Info                    `json:"info,omitempty" yaml:"info,omitempty"`
-	Mappings   Mappings                `json:"mappings,omitempty" yaml:"mappings,omitempty"`
-	Operations []Operation             `json:"operations,omitempty" yaml:"operations,omitempty"`
-	Models     []jsonschema.JsonSchmea `json:"models,omitempty" yaml:"models,omitempty"`
-	Defs       []jsonschema.JsonSchmea `json:"$defs,omitempty" yaml:"$defs,omitempty"`
+	Id         string                   `json:"$id" yaml:"$id"`
+	Info       Info                     `json:"info,omitempty" yaml:"info,omitempty"`
+	Mappings   Mappings                 `json:"mappings,omitempty" yaml:"mappings,omitempty"`
+	Operations []Operation              `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Models     []*jsonschema.JsonSchmea `json:"models,omitempty" yaml:"models,omitempty"`
+	Defs       []*jsonschema.JsonSchmea `json:"$defs,omitempty" yaml:"$defs,omitempty"`
 }
 
 type Info struct {

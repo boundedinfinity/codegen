@@ -25,47 +25,63 @@ func (t *System) Unmarshal() error {
 		}
 
 		if util.IsCodeGenFile(info.LocalPath) {
-			var schemas []model.Schema
-
-			switch info.MimeType {
-			case mimetype.ApplicationYaml, mimetype.ApplicationXYaml:
-				if err := t.unmarshalYaml(&schemas, bs); err != nil {
-					return err
-				}
-			case mimetype.ApplicationJson, mimetype.ApplicationXJson:
-				if err := t.unmarshalJson(&schemas, bs); err != nil {
-					return err
-				}
-			default:
-				mimetype.Error(model.SUPPORTED_MIMETYPES, string(info.MimeType))
-			}
-
-			for _, schema := range schemas {
-				if schema.Id == "" {
-					return model.ErrCodeGenIdEmpty
-				}
-
-				if _, ok := t.codeGen[schema.Id]; ok {
-					return model.ErrCodeGenIdDuplicateV(schema.Id)
-				}
-
-				t.codeGen[schema.Id] = &schema
+			if err := t.unmarshalCodeGen(info, bs); err != nil {
+				return err
 			}
 		}
 
 		if util.IsJsonSchemaFile(info.LocalPath) {
-			var schemas []jsonschema.JsonSchmea
-
-			if err := t.jsonSchema.Unmarshal(&schemas, info.MimeType, bs); err != nil {
+			if err := t.unmarshalJsonSchema(info, bs); err != nil {
 				return err
 			}
-
-			for _, schema := range schemas {
-				if err := t.jsonSchema.AddtoMap(&schema); err != nil {
-					return err
-				}
-			}
 		}
+	}
+
+	return nil
+}
+
+func (t *System) unmarshalJsonSchema(info *model.SourceInfo, bs []byte) error {
+	var schemas []jsonschema.JsonSchmea
+
+	if err := t.jsonSchema.Unmarshal(&schemas, info.MimeType, bs); err != nil {
+		return err
+	}
+
+	for _, schema := range schemas {
+		if err := t.jsonSchema.AddtoMap(&schema); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (t *System) unmarshalCodeGen(info *model.SourceInfo, bs []byte) error {
+	var schemas []model.Schema
+
+	switch info.MimeType {
+	case mimetype.ApplicationYaml, mimetype.ApplicationXYaml:
+		if err := t.unmarshalYaml(&schemas, bs); err != nil {
+			return err
+		}
+	case mimetype.ApplicationJson, mimetype.ApplicationXJson:
+		if err := t.unmarshalJson(&schemas, bs); err != nil {
+			return err
+		}
+	default:
+		mimetype.Error(model.SUPPORTED_MIMETYPES, string(info.MimeType))
+	}
+
+	for _, schema := range schemas {
+		if schema.Id == "" {
+			return model.ErrCodeGenIdEmpty
+		}
+
+		if _, ok := t.codeGen[schema.Id]; ok {
+			return model.ErrCodeGenIdDuplicateV(schema.Id)
+		}
+
+		t.codeGen[schema.Id] = &schema
 	}
 
 	return nil
