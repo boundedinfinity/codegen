@@ -26,6 +26,10 @@ func main() {
 		handleError(err)
 	}
 
+	if err := l.Process(); err != nil {
+		handleError(err)
+	}
+
 	// if err := g.Generate(); err != nil {
 	// 	os.Exit(handleError(err))
 	// }

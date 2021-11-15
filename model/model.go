@@ -32,10 +32,10 @@ type Mappings struct {
 }
 
 type Operation struct {
-	Name        string                `json:"name,omitempty" yaml:"name,omitempty"`
-	Description string                `json:"description,omitempty" yaml:"description,omitempty"`
-	Input       jsonschema.JsonSchmea `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      jsonschema.JsonSchmea `json:"output,omitempty" yaml:"output,omitempty"`
+	Name        string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	Description string                 `json:"description,omitempty" yaml:"description,omitempty"`
+	Input       *jsonschema.JsonSchmea `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      *jsonschema.JsonSchmea `json:"output,omitempty" yaml:"output,omitempty"`
 }
 
 type Template struct {

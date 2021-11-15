@@ -48,7 +48,7 @@ func (t *System) unmarshalJsonSchema(info *model.SourceInfo, bs []byte) error {
 	}
 
 	for _, schema := range schemas {
-		if err := t.jsonSchema.AddtoMap(&schema); err != nil {
+		if err := t.jsonSchema.Add(&schema); err != nil {
 			return err
 		}
 	}
