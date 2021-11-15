@@ -19,7 +19,8 @@
             "mode": "debug",
             "program": "${workspaceFolder}", 
             "args": [
-                "file://${env:HOME}/test-projects/projects/labels.codegen.yaml"
+                "file://${workspaceFolder}/test-projects/schemas",
+                "file://${workspaceFolder}/test-projects/projects",
             ],
         }
     ]

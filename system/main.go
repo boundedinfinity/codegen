@@ -1,17 +1,21 @@
 package system
 
-import "boundedinfinity/codegen/uritype"
+import (
+	"boundedinfinity/codegen/model"
+
+	"github.com/boundedinfinity/jsonschema"
+)
 
 type System struct {
-	uri2uriType   map[string]uritype.UriType
-	local2uriType map[string]uritype.UriType
-	mimeType      map[string]string
+	sourceInfo map[string]*model.SourceInfo
+	codeGen    map[string]*model.Schema
+	jsonSchema *jsonschema.System
 }
 
 func New() *System {
 	return &System{
-		uri2uriType:   make(map[string]uritype.UriType),
-		local2uriType: make(map[string]uritype.UriType),
-		mimeType:      make(map[string]string),
+		sourceInfo: make(map[string]*model.SourceInfo),
+		codeGen:    make(map[string]*model.Schema),
+		jsonSchema: jsonschema.New(),
 	}
 }

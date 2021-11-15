@@ -1,5 +1,14 @@
+$id: https://www.boundedinfinity.com/codegen/labels
 info:
     version: 0.0.1
+mappings:
+    package:
+        "https://www.boundedinfinity.com/codegen": "codegen/model"
+        "https://www.boundedinfinity.com/json-schema": "codegen/model"
+    language:
+        "string": "string"
+        "integer": "int64"
+        "number": "float64"
 operations:
     -   name: AddLabel
         input: 

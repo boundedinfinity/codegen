@@ -1,32 +1,41 @@
 package util
 
 import (
+	"boundedinfinity/codegen/uritype"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/boundedinfinity/optional"
 )
 
+var (
+	fileUriPrefix = fmt.Sprintf("%v://", uritype.File.String())
+)
+
+func Uri2Path(v string) string {
+	return strings.ReplaceAll(v, fileUriPrefix, "")
+}
+
+func Path2Uri(v string) string {
+	return fmt.Sprintf("%v%v", fileUriPrefix, v)
+}
+
 func DirEnsure(v string) error {
-	ok, err := DirExists(v)
+	ok, err := PathExists(v)
 
 	if err != nil {
 		return err
 	}
 
 	if !ok {
-		d := filepath.Dir(v)
-		if err := os.MkdirAll(d, 0755); err != nil {
+		if err := os.MkdirAll(v, 0755); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func DirExists(v string) (bool, error) {
-	d := filepath.Dir(v)
-	return PathExists(d)
 }
 
 func PathExists(v string) (bool, error) {

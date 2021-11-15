@@ -7,14 +7,22 @@ import (
 )
 
 //go:generate enumer -standalone=true -package=uritype -name=UriType -items=file,http,https
+//go:generate enumer -standalone=true -package=fileext -name=FileExt -items=yaml,yml,json
+//go:generate enumer -standalone=true -package=template_type -name=TemplateType -items=model,operation,namespace
+
+// go:generate enumeration -package=model -name=LanguageExt -suffix=Enum -items=unknown,go,mod,ts,js,html,css
+// go:generate enumeration -package=model -name=TemplateExt -suffix=Enum -items=unknown,gotmpl,handlebars
 
 func main() {
-	// schemaPath := "../codegen-templates/spec.bi.yaml"
 	schemaPaths := os.Args[1:]
 
 	l := system.New()
 
 	if err := l.Load(schemaPaths...); err != nil {
+		handleError(err)
+	}
+
+	if err := l.Unmarshal(); err != nil {
 		handleError(err)
 	}
 

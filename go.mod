@@ -13,6 +13,7 @@ require (
 	github.com/iancoleman/orderedmap v0.2.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.16.0
+	github.com/sethgrid/pester v1.1.0 // indirect
 	github.com/spf13/cobra v1.2.1
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
 	gopkg.in/yaml.v2 v2.4.0

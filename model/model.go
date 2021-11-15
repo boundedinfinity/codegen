@@ -1,21 +1,34 @@
 package model
 
-import "github.com/boundedinfinity/jsonschema"
+import (
+	"boundedinfinity/codegen/uritype"
+
+	"github.com/boundedinfinity/jsonschema"
+	"github.com/boundedinfinity/jsonschema/mimetype"
+	"github.com/boundedinfinity/optional"
+)
 
 // Reference
 // https://medium.com/@nate510/dynamic-json-umarshalling-in-go-88095561d6a0
 
-type File struct {
-	Name       string                  `json:"name,omitempty" yaml:"name,omitempty"`
-	Version    string                  `json:"version,omitempty" yaml:"version,omitempty"`
-	TypeMaps   string                  `json:"typeMaps,omitempty" yaml:"typeMaps,omitempty"`
+type Schema struct {
+	Id         string                  `json:"$id" yaml:"$id"`
+	Info       Info                    `json:"info,omitempty" yaml:"info,omitempty"`
+	Mappings   Mappings                `json:"mappings,omitempty" yaml:"mappings,omitempty"`
 	Operations []Operation             `json:"operations,omitempty" yaml:"operations,omitempty"`
 	Models     []jsonschema.JsonSchmea `json:"models,omitempty" yaml:"models,omitempty"`
 	Defs       []jsonschema.JsonSchmea `json:"$defs,omitempty" yaml:"$defs,omitempty"`
 }
 
-type TypeMaps struct {
-	LangType map[string]string `json:"lang-type,omitempty" yaml:"lang-type,omitempty"`
+type Info struct {
+	Name        optional.StringOptional `json:"name,omitempty" yaml:"name,omitempty"`
+	Description optional.StringOptional `json:"description,omitempty" yaml:"description,omitempty"`
+	Version     optional.StringOptional `json:"version,omitempty" yaml:"version,omitempty"`
+}
+
+type Mappings struct {
+	Language map[string]string `json:"language,omitempty" yaml:"language,omitempty"`
+	Package  map[string]string `json:"package,omitempty" yaml:"package,omitempty"`
 }
 
 type Operation struct {
@@ -30,6 +43,13 @@ type Template struct {
 	Description string                `json:"description,omitempty" yaml:"description,omitempty"`
 	Input       jsonschema.JsonSchmea `json:"input,omitempty" yaml:"input,omitempty"`
 	Output      jsonschema.JsonSchmea `json:"output,omitempty" yaml:"output,omitempty"`
+}
+
+type SourceInfo struct {
+	SourceUri string
+	UriType   uritype.UriType
+	LocalPath string
+	MimeType  mimetype.MimeType
 }
 
 // type InputInfo struct {
