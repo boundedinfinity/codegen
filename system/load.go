@@ -1,16 +1,11 @@
 package system
 
 import (
-	"boundedinfinity/codegen/fileext"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/uritype"
 	"boundedinfinity/codegen/util"
 	"io/fs"
-	"net/url"
 	"path/filepath"
-	"strings"
-
-	"github.com/boundedinfinity/jsonschema/mimetype"
 )
 
 func (t *System) Load(uris ...string) error {
@@ -115,43 +110,6 @@ func (t *System) load3() error {
 		if err := t.detectMimeType(uri, &info.MimeType); err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (t *System) detectUriType(uri string, typ *uritype.UriType) error {
-	parsed, err := url.Parse(uri)
-
-	if err != nil {
-		return err
-	}
-
-	x, err := uritype.Parse(parsed.Scheme)
-
-	if err != nil {
-		return err
-	}
-
-	*typ = x
-
-	return nil
-}
-
-func (t *System) detectMimeType(uri string, typ *mimetype.MimeType) error {
-	ext := filepath.Ext(uri)
-	test := strings.TrimPrefix(ext, ".")
-	mt, err := fileext.Parse(test)
-
-	if err != nil {
-		return err
-	}
-
-	switch mt {
-	case fileext.Json:
-		*typ = mimetype.ApplicationJson
-	case fileext.Yaml, fileext.Yml:
-		*typ = mimetype.ApplicationXYaml
 	}
 
 	return nil

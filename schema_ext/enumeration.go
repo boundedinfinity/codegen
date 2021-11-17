@@ -6,7 +6,7 @@
 //*                                                                                  *
 //************************************************************************************
 
-package fileext
+package schema_ext
 
 import (
 	"encoding/json"
@@ -15,11 +15,11 @@ import (
 	"strings"
 )
 
-type FileExt string
-type FileExts []FileExt
+type SchemaExt string
+type SchemaExts []SchemaExt
 
-func Slice(es ...FileExt) FileExts {
-	var s FileExts
+func Slice(es ...SchemaExt) SchemaExts {
+	var s SchemaExts
 
 	for _, e := range es {
 		s = append(s, e)
@@ -29,13 +29,13 @@ func Slice(es ...FileExt) FileExts {
 }
 
 const (
-	Json FileExt = "json"
-	Yaml FileExt = "yaml"
-	Yml  FileExt = "yml"
+	Json SchemaExt = "json"
+	Yaml SchemaExt = "yaml"
+	Yml  SchemaExt = "yml"
 )
 
 var (
-	All = FileExts{
+	All = SchemaExts{
 		Json,
 		Yaml,
 		Yml,
@@ -46,7 +46,7 @@ func Is(v string) bool {
 	return All.Is(v)
 }
 
-func Parse(v string) (FileExt, error) {
+func Parse(v string) (SchemaExt, error) {
 	return All.Parse(v)
 }
 
@@ -54,20 +54,20 @@ func Strings() []string {
 	return All.Strings()
 }
 
-func (t FileExt) String() string {
+func (t SchemaExt) String() string {
 	return string(t)
 }
 
-var ErrFileExtInvalid = errors.New("invalid enumeration type")
+var ErrSchemaExtInvalid = errors.New("invalid enumeration type")
 
-func Error(vs FileExts, v string) error {
+func Error(vs SchemaExts, v string) error {
 	return fmt.Errorf(
 		"%w '%v', must be one of %v",
-		ErrFileExtInvalid, v, strings.Join(vs.Strings(), ","),
+		ErrSchemaExtInvalid, v, strings.Join(vs.Strings(), ","),
 	)
 }
 
-func (t FileExts) Strings() []string {
+func (t SchemaExts) Strings() []string {
 	var ss []string
 
 	for _, v := range t {
@@ -77,8 +77,8 @@ func (t FileExts) Strings() []string {
 	return ss
 }
 
-func (t FileExts) Parse(v string) (FileExt, error) {
-	var o FileExt
+func (t SchemaExts) Parse(v string) (SchemaExt, error) {
+	var o SchemaExt
 	var f bool
 	n := strings.ToLower(v)
 
@@ -97,7 +97,7 @@ func (t FileExts) Parse(v string) (FileExt, error) {
 	return o, nil
 }
 
-func (t FileExts) Is(v string) bool {
+func (t SchemaExts) Is(v string) bool {
 	var f bool
 
 	for _, e := range t {
@@ -110,7 +110,7 @@ func (t FileExts) Is(v string) bool {
 	return f
 }
 
-func (t FileExts) Contains(v FileExt) bool {
+func (t SchemaExts) Contains(v SchemaExt) bool {
 	for _, e := range t {
 		if e == v {
 			return true
@@ -120,11 +120,11 @@ func (t FileExts) Contains(v FileExt) bool {
 	return false
 }
 
-func (t FileExt) MarshalJSON() ([]byte, error) {
+func (t SchemaExt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(t))
 }
 
-func (t *FileExt) UnmarshalJSON(data []byte) error {
+func (t *SchemaExt) UnmarshalJSON(data []byte) error {
 	var s string
 
 	if err := json.Unmarshal(data, &s); err != nil {

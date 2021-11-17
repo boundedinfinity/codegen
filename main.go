@@ -7,11 +7,10 @@ import (
 )
 
 //go:generate enumer -standalone=true -package=uritype -name=UriType -items=file,http,https
-//go:generate enumer -standalone=true -package=fileext -name=FileExt -items=yaml,yml,json
+//go:generate enumer -standalone=true -package=schema_ext -name=SchemaExt -items=yaml,yml,json
 //go:generate enumer -standalone=true -package=template_type -name=TemplateType -items=model,operation,namespace
-
-// go:generate enumeration -package=model -name=LanguageExt -suffix=Enum -items=unknown,go,mod,ts,js,html,css
-// go:generate enumeration -package=model -name=TemplateExt -suffix=Enum -items=unknown,gotmpl,handlebars
+//go:generate enumer -standalone=true -package=lang_ext -name=LanguageExt -items=go,mod,ts,js,html,css
+//go:generate enumer -standalone=true -package=template_ext -name=TemplateExt -items=gotmpl,handlebars
 
 func main() {
 	schemaPaths := os.Args[1:]

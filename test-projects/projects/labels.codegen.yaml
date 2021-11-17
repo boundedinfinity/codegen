@@ -13,7 +13,11 @@ operations:
     -   name: AddLabel
         input: 
             name: request
-            $ref: https://www.boundedinfinity.com/json-schema/label-input
+            $ref: https://www.boundedinfinity.com/json-schema/label-add-request
         output: 
             name: response
-            $ref: https://www.boundedinfinity.com/json-schema/label-output
+            $ref: https://www.boundedinfinity.com/json-schema/label-add-response
+templates:
+    files:
+        -   name: file://test-projects/templates/go/server/echo/gotmpl/model
+            type: model

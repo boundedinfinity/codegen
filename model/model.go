@@ -1,6 +1,7 @@
 package model
 
 import (
+	"boundedinfinity/codegen/template_type"
 	"boundedinfinity/codegen/uritype"
 
 	"github.com/boundedinfinity/jsonschema"
@@ -18,6 +19,7 @@ type Schema struct {
 	Operations []Operation              `json:"operations,omitempty" yaml:"operations,omitempty"`
 	Models     []*jsonschema.JsonSchmea `json:"models,omitempty" yaml:"models,omitempty"`
 	Defs       []*jsonschema.JsonSchmea `json:"$defs,omitempty" yaml:"$defs,omitempty"`
+	Templates  Templates                `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
 
 type Info struct {
@@ -38,11 +40,16 @@ type Operation struct {
 	Output      *jsonschema.JsonSchmea `json:"output,omitempty" yaml:"output,omitempty"`
 }
 
-type Template struct {
-	Name        string                `json:"name,omitempty" yaml:"name,omitempty"`
-	Description string                `json:"description,omitempty" yaml:"description,omitempty"`
-	Input       jsonschema.JsonSchmea `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      jsonschema.JsonSchmea `json:"output,omitempty" yaml:"output,omitempty"`
+type Templates struct {
+	Name   string         `json:"name,omitempty" yaml:"name,omitempty"`
+	Header string         `json:"header,omitempty" yaml:"header,omitempty"`
+	Files  []TemplateFile `json:"files,omitempty" yaml:"files,omitempty"`
+}
+
+type TemplateFile struct {
+	Name   string                     `json:"name,omitempty" yaml:"name,omitempty"`
+	Header optional.StringOptional    `json:"header,omitempty" yaml:"header,omitempty"`
+	Type   template_type.TemplateType `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
 type SourceInfo struct {
@@ -51,22 +58,3 @@ type SourceInfo struct {
 	LocalPath string
 	MimeType  mimetype.MimeType
 }
-
-// type InputInfo struct {
-// 	InputDir                  string            `json:"inputDir,omitempty" yaml:"inputDir,omitempty"`
-// 	OutputDir                 string            `json:"outputDir,omitempty" yaml:"outputDir,omitempty"`
-// 	DumpContext               bool              `json:"dumpContext" yaml:"dumpContext"`
-// 	FilenameMarker            string            `json:"filenameMarker,omitempty" yaml:"filenameMarker,omitempty"`
-// 	TemplateHeader            string            `json:"templateHeader,omitempty" yaml:"templateHeader,omitempty"`
-// 	Namespace                 string            `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-// 	DescriptionSplitCharacter string            `json:"descriptionSplitCharacter,omitempty" yaml:"descriptionSplitCharacter,omitempty"`
-// 	Primitives                map[string]string `json:"primitives,omitempty" yaml:"primitives,omitempty"`
-// }
-
-// type InputTemplate struct {
-// 	Header    string           `json:"header,omitempty" yaml:"header,omitempty"`
-// 	Path      string           `json:"path,omitempty" yaml:"path,omitempty"`
-// 	Type      TemplateTypeEnum `json:"type,omitempty" yaml:"type,omitempty"`
-// 	Namespace string           `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-// 	Recurse   bool             `json:"recurse,omitempty" yaml:"recurse,omitempty"`
-// }
