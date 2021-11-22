@@ -52,6 +52,8 @@ properties:
     labels:
         type: array
         items:
-            $ref: https://www.boundedinfinity.com/json-schema/label
+            $ref: https://www.boundedinfinity.com/json-schema/label-simple
+    audit:
+        $ref: https://www.boundedinfinity.com/json-schema/notes
 required:
     -   person

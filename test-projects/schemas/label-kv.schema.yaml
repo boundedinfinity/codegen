@@ -1,13 +1,13 @@
-$id: https://www.boundedinfinity.com/json-schema/tag
+$id: https://www.boundedinfinity.com/json-schema/label-kv
 $schema: https://json-schema.org/draft/2020-12/schema
-description: A tag is a simple key value pair
+description: A key/value label
 type: object
 properties:
     key:
-        description: The tag key
+        description: The label key
         type: string
         maxLength: 200
     value:
-        description: The tag value
+        description: The label value
         type: string
         maxLength: 200
