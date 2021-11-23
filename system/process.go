@@ -5,18 +5,39 @@ import (
 	"boundedinfinity/codegen/template_type"
 	"boundedinfinity/codegen/util"
 	"io/fs"
+	"io/ioutil"
 	"path/filepath"
 )
 
-func (t *System) Process() error {
-	for _, schema := range t.codeGen {
-		if err := t.process1(schema); err != nil {
+func (t *System) Process(uris ...string) error {
+	for _, uri := range uris {
+		if err := t.processUri(uri); err != nil {
 			return err
 		}
 	}
 
+	for _, info := range t.sourceInfo {
+		bs, err := ioutil.ReadFile(info.LocalPath)
+
+		if err != nil {
+			return err
+		}
+
+		if util.IsCodeGenFile(info.LocalPath) {
+			if err := t.unmarshalCodeGen(info, bs); err != nil {
+				return err
+			}
+		}
+
+		if util.IsJsonSchemaFile(info.LocalPath) {
+			if err := t.unmarshalJsonSchema(info, bs); err != nil {
+				return err
+			}
+		}
+	}
+
 	for _, schema := range t.codeGen {
-		if err := t.process2(schema); err != nil {
+		if err := t.process1(schema); err != nil {
 			return err
 		}
 	}
@@ -36,15 +57,17 @@ func (t *System) Process() error {
 
 func (t *System) process1(schema *model.Schema) error {
 	for _, v := range schema.Models {
-		if err := t.jsonSchema.Add(v); err != nil {
-			return err
+		if v.Ref.IsDefined() {
+			if err := t.jsonSchema.Assert(v.Ref.Get()); err != nil {
+				return err
+			}
+		} else {
+			if err := t.jsonSchema.Add(v); err != nil {
+				return err
+			}
 		}
 	}
 
-	return nil
-}
-
-func (t *System) process2(schema *model.Schema) error {
 	for _, v := range schema.Operations {
 		if err := t.jsonSchema.Resolve(v.Input); err != nil {
 			return err

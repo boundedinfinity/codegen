@@ -1,6 +1,8 @@
 package model
 
-import "github.com/boundedinfinity/jsonschema/mimetype"
+import (
+	"github.com/boundedinfinity/mimetyper/mime_type"
+)
 
 const (
 	TYPE_UNKNOWN                        = "<UNKNOWN_TYPE>"
@@ -17,5 +19,5 @@ const (
 )
 
 var (
-	SUPPORTED_MIMETYPES = mimetype.Slice(mimetype.ApplicationXYaml, mimetype.ApplicationJson)
+	SUPPORTED_MIMETYPES = mime_type.Slice(mime_type.ApplicationXYaml, mime_type.ApplicationJson)
 )

@@ -8,6 +8,7 @@ require (
 	github.com/boundedinfinity/caser v0.0.0-20210527024155-815fe7d3a37e
 	github.com/boundedinfinity/collection_util v0.0.0-20210527024233-37ff01a876b7 // indirect
 	github.com/boundedinfinity/jsonschema v0.0.0-20211105210951-d87310107986 // indirect
+	github.com/boundedinfinity/mimetyper v0.0.0-20211121204855-2eb5ba3c3d07 // indirect
 	github.com/boundedinfinity/optional v0.0.0-20210407141403-b656be5ecb97
 	github.com/deckarep/golang-set v1.7.1
 	github.com/iancoleman/orderedmap v0.2.0
@@ -20,3 +21,4 @@ require (
 )
 
 replace github.com/boundedinfinity/jsonschema => /home/bbabb/Documents/git/jsonschema
+replace github.com/boundedinfinity/mimetyper => /home/bbabb/Documents/git/mimetyper

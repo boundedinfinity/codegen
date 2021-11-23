@@ -5,7 +5,7 @@ import (
 	"boundedinfinity/codegen/uritype"
 
 	"github.com/boundedinfinity/jsonschema"
-	"github.com/boundedinfinity/jsonschema/mimetype"
+	"github.com/boundedinfinity/mimetyper/mime_type"
 	"github.com/boundedinfinity/optional"
 )
 
@@ -56,5 +56,5 @@ type SourceInfo struct {
 	SourceUri string
 	UriType   uritype.UriType
 	LocalPath string
-	MimeType  mimetype.MimeType
+	MimeType  mime_type.MimeType
 }

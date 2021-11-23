@@ -19,8 +19,8 @@
             "mode": "debug",
             "program": "${workspaceFolder}", 
             "args": [
-                "file://${workspaceFolder}/test-projects/schemas",
-                "file://${workspaceFolder}/test-projects/projects",
+                "file://${workspaceFolder}/codegen-templates/schemas/jsonschema/label-simple.schema.yaml",
+                "file://${workspaceFolder}/codegen-templates/schemas/codegen/labels.codegen.yaml",
             ],
         }
     ]

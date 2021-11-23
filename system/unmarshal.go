@@ -2,43 +2,17 @@ package system
 
 import (
 	"boundedinfinity/codegen/model"
-	"boundedinfinity/codegen/util"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"github.com/boundedinfinity/jsonschema"
-	"github.com/boundedinfinity/jsonschema/mimetype"
+	"github.com/boundedinfinity/mimetyper/mime_type"
 	"gopkg.in/yaml.v2"
 )
-
-func (t *System) Unmarshal() error {
-	for _, info := range t.sourceInfo {
-		bs, err := ioutil.ReadFile(info.LocalPath)
-
-		if err != nil {
-			return err
-		}
-
-		if util.IsCodeGenFile(info.LocalPath) {
-			if err := t.unmarshalCodeGen(info, bs); err != nil {
-				return err
-			}
-		}
-
-		if util.IsJsonSchemaFile(info.LocalPath) {
-			if err := t.unmarshalJsonSchema(info, bs); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
 
 func (t *System) unmarshalJsonSchema(info *model.SourceInfo, bs []byte) error {
 	var schemas []jsonschema.JsonSchmea
@@ -60,16 +34,16 @@ func (t *System) unmarshalCodeGen(info *model.SourceInfo, bs []byte) error {
 	var schemas []model.Schema
 
 	switch info.MimeType {
-	case mimetype.ApplicationYaml, mimetype.ApplicationXYaml:
+	case mime_type.ApplicationXYaml:
 		if err := t.unmarshalYaml(&schemas, bs); err != nil {
 			return err
 		}
-	case mimetype.ApplicationJson, mimetype.ApplicationXJson:
+	case mime_type.ApplicationJson:
 		if err := t.unmarshalJson(&schemas, bs); err != nil {
 			return err
 		}
 	default:
-		mimetype.Error(model.SUPPORTED_MIMETYPES, string(info.MimeType))
+		mime_type.Error(model.SUPPORTED_MIMETYPES, string(info.MimeType))
 	}
 
 	for _, schema := range schemas {
