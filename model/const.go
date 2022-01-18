@@ -1,6 +1,8 @@
 package model
 
 import (
+	"path/filepath"
+
 	"github.com/boundedinfinity/mimetyper/mime_type"
 )
 
@@ -15,9 +17,11 @@ const (
 	DEFAULT_FILENAME_DISABLE            = "none"
 	JSON_DEFAULT_STRING                 = "a string"
 	JSON_DEFAULT_NUMBER                 = 1
-	CACHE_DIR                           = ".codegen"
+	WORK_DIR                            = ".codegen"
 )
 
 var (
+	CACHE_DIR           = filepath.Join(WORK_DIR, "cache")
+	BUILD_DIR           = filepath.Join(WORK_DIR, "build")
 	SUPPORTED_MIMETYPES = mime_type.Slice(mime_type.ApplicationXYaml, mime_type.ApplicationJson)
 )

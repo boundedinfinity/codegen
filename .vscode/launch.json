@@ -19,6 +19,8 @@
             "mode": "debug",
             "program": "${workspaceFolder}", 
             "args": [
+                // "https://raw.githubusercontent.com/boundedinfinity/codegen-templates/master/schemas/jsonschema/label-simple.schema.yaml",
+                // "file://${workspaceFolder}/codegen-templates/schemas/jsonschema",
                 "file://${workspaceFolder}/codegen-templates/schemas/jsonschema/label-simple.schema.yaml",
                 "file://${workspaceFolder}/codegen-templates/schemas/codegen/labels.codegen.yaml",
             ],

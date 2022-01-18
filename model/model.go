@@ -16,8 +16,8 @@ type Schema struct {
 	Id         string                   `json:"$id" yaml:"$id"`
 	Info       Info                     `json:"info,omitempty" yaml:"info,omitempty"`
 	Mappings   Mappings                 `json:"mappings,omitempty" yaml:"mappings,omitempty"`
-	Operations []Operation              `json:"operations,omitempty" yaml:"operations,omitempty"`
-	Models     []*jsonschema.JsonSchmea `json:"models,omitempty" yaml:"models,omitempty"`
+	Operations []*Operation             `json:"operations,omitempty" yaml:"operations,omitempty"`
+	Models     []*Model                 `json:"models,omitempty" yaml:"models,omitempty"`
 	Defs       []*jsonschema.JsonSchmea `json:"$defs,omitempty" yaml:"$defs,omitempty"`
 	Templates  Templates                `json:"templates,omitempty" yaml:"templates,omitempty"`
 }
@@ -34,10 +34,15 @@ type Mappings struct {
 }
 
 type Operation struct {
-	Name        string                 `json:"name,omitempty" yaml:"name,omitempty"`
-	Description string                 `json:"description,omitempty" yaml:"description,omitempty"`
-	Input       *jsonschema.JsonSchmea `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      *jsonschema.JsonSchmea `json:"output,omitempty" yaml:"output,omitempty"`
+	Name        string `json:"name,omitempty" yaml:"name,omitempty"`
+	Description string `json:"description,omitempty" yaml:"description,omitempty"`
+	Input       Model  `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      Model  `json:"output,omitempty" yaml:"output,omitempty"`
+}
+
+type Model struct {
+	Name   string                 `json:"name,omitempty" yaml:"name,omitempty"`
+	Schema *jsonschema.JsonSchmea `json:"schema,omitempty" yaml:"schema,omitempty"`
 }
 
 type Templates struct {
@@ -53,8 +58,15 @@ type TemplateFile struct {
 }
 
 type SourceInfo struct {
+	InputUri  string
 	SourceUri string
 	UriType   uritype.UriType
 	LocalPath string
 	MimeType  mime_type.MimeType
+}
+
+type TemplateContext struct {
+	Package string
+	Path    string
+	Model   Model
 }

@@ -13,13 +13,13 @@ import (
 //-go:generate enumer -standalone=true -package=template_ext -name=TemplateExt -items=gotmpl,handlebars
 
 func main() {
-	schemaPaths := os.Args[1:]
+	// schemaPaths := os.Args[1:]
 
 	s := system.New()
 
-	if err := s.Process(schemaPaths...); err != nil {
-		os.Exit(handleError(err))
-	}
+	// if err := s.Process(schemaPaths...); err != nil {
+	// 	os.Exit(handleError(err))
+	// }
 
 	if err := s.Generate(); err != nil {
 		os.Exit(handleError(err))

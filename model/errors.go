@@ -11,16 +11,16 @@ var (
 	ErrCodeGenIdDuplicate = errors.New("duplicate codegen schema ID")
 	ErrTemplateEmpty      = errors.New("duplicate empty")
 	ErrTemplateDuplicate  = errors.New("duplicate template")
+	ErrUnsupportedScheme  = errors.New("unsupported scheme")
+	ErrMissingName        = errors.New("missing name")
+	ErrInvalidSchemaType  = errors.New("invalid schema type")
 )
 
-func ErrDuplicateSourceUriV(v string) error {
-	return fmt.Errorf("%w : %v", ErrDuplicateSourceUri, v)
-}
+func ErrDuplicateSourceUriV(v string) error { return nE(ErrDuplicateSourceUri, v) }
+func ErrCodeGenIdDuplicateV(v string) error { return nE(ErrCodeGenIdDuplicate, v) }
+func ErrTemplateDuplicateV(v string) error  { return nE(ErrTemplateDuplicate, v) }
+func ErrUnsupportedSchemeV(v string) error  { return nE(ErrUnsupportedScheme, v) }
 
-func ErrCodeGenIdDuplicateV(v string) error {
-	return fmt.Errorf("%w : %v", ErrCodeGenIdDuplicate, v)
-}
-
-func ErrTemplateDuplicateV(v string) error {
-	return fmt.Errorf("%w : %v", ErrTemplateDuplicate, v)
+func nE(err error, v interface{}) error {
+	return fmt.Errorf("%w : %v", err, v)
 }

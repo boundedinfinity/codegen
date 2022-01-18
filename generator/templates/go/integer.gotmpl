@@ -1,0 +1,16 @@
+package {{ .Package }}
+
+type {{ .Name }} int
+
+{{ if .Schema.HasValidation }}
+func (t {{ .Name }}) Validate() error {
+{{ if .Schema.MultipleOf.IsDefined }}
+    if t % {{ .Schema.MultipleOf.Get }} != 0 {
+        return jsonschema.ErrNotMultipleOff(v, t.schema.MaxContains.Get())
+    }
+{{ end }}
+
+
+    return nil
+}
+{{ end }}

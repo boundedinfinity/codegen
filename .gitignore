@@ -3,3 +3,4 @@ __debug_bin
 remove.txt
 .codegen/
 codegen-templates
+codegen-templates/

@@ -1,0 +1,12 @@
+type {{ .Name }} = number;
+
+{{ if .Schema.HasValidation }} 
+{{ .Name }}.prototype.validate(this: string) {
+{{ if .Schema.MultipleOf.IsDefined }}
+    if this % {{ .Schema.MultipleOf.Get }} != 0 {
+        throw new Error("not a multiple of")
+    }
+{{ end }}
+}
+{{ end }}
+

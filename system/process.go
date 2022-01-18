@@ -11,7 +11,12 @@ import (
 
 func (t *System) Process(uris ...string) error {
 	for _, uri := range uris {
-		if err := t.processUri(uri); err != nil {
+		source := model.SourceInfo{
+			InputUri:  uri,
+			SourceUri: uri,
+		}
+
+		if err := t.processUri(&source); err != nil {
 			return err
 		}
 	}
@@ -56,27 +61,27 @@ func (t *System) Process(uris ...string) error {
 }
 
 func (t *System) process1(schema *model.Schema) error {
-	for _, v := range schema.Models {
-		if v.Ref.IsDefined() {
-			if err := t.jsonSchema.Assert(v.Ref.Get()); err != nil {
-				return err
-			}
-		} else {
-			if err := t.jsonSchema.Add(v); err != nil {
-				return err
-			}
-		}
-	}
+	// for _, v := range schema.Models {
+	// 	if v.Ref.IsDefined() {
+	// 		if err := t.jsonSchema.Assert(v.Ref.Get()); err != nil {
+	// 			return err
+	// 		}
+	// 	} else {
+	// 		if err := t.jsonSchema.Add(v); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 
-	for _, v := range schema.Operations {
-		if err := t.jsonSchema.Resolve(v.Input); err != nil {
-			return err
-		}
+	// for _, v := range schema.Operations {
+	// 	if err := t.jsonSchema.Resolve(v.Input); err != nil {
+	// 		return err
+	// 	}
 
-		if err := t.jsonSchema.Resolve(v.Output); err != nil {
-			return err
-		}
-	}
+	// 	if err := t.jsonSchema.Resolve(v.Output); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }
@@ -106,6 +111,12 @@ func (t *System) process3(schema *model.Schema) error {
 		}
 
 		path := util.Uri2Path(v.Name)
+		path, err := filepath.Abs(path)
+
+		if err != nil {
+			return err
+		}
+
 		file, err := util.IsFile(path)
 
 		if err != nil {

@@ -3,17 +3,40 @@ package util
 import (
 	"path"
 	"strings"
+	"unicode"
 
 	"github.com/boundedinfinity/caser"
 )
 
-// func IsSchemaInt(v *model.OutputModel) bool {
-// 	return v.Type == model.SchemaType_Int
-// }
+func ReplaceMap(v string, m map[string]string) string {
+	for o, n := range m {
+		v = strings.ReplaceAll(v, o, n)
+	}
 
-// func IsSchemaString(v *model.OutputModel) bool {
-// 	return v.Type == model.SchemaType_String
-// }
+	return v
+}
+
+func Normalize(v string) string {
+	var o strings.Builder
+
+	for i, r := range v {
+		if i == 0 {
+			if unicode.IsLetter(r) || r == '_' {
+				o.WriteRune(r)
+			} else {
+				o.WriteRune('_')
+			}
+		} else {
+			if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '_' {
+				o.WriteRune(r)
+			} else {
+				o.WriteRune('_')
+			}
+		}
+	}
+
+	return o.String()
+}
 
 func Uc(v string) string {
 	return strings.ToUpper(v)
