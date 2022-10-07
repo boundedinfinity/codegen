@@ -1,21 +1,33 @@
 module boundedinfinity/codegen
 
-go 1.16
+go 1.18
 
 require (
-	github.com/blang/semver/v4 v4.0.0
-	github.com/boundedinfinity/caser v0.0.0-20210527024155-815fe7d3a37e
-	github.com/boundedinfinity/jsonschema v0.0.0-20211105210951-d87310107986
-	github.com/boundedinfinity/mimetyper v0.0.0-20211121204855-2eb5ba3c3d07
-	github.com/boundedinfinity/optional v0.0.0-20210407141403-b656be5ecb97
-	github.com/boundedinfinity/optioner v0.0.0-20211128211839-467e4518af3a // indirect
-	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.16.0
-	github.com/sethgrid/pester v1.1.0
-	github.com/spf13/cobra v1.2.1
+	github.com/boundedinfinity/go-commoner v1.0.16
+	github.com/boundedinfinity/jsonschema v1.0.1
+	github.com/boundedinfinity/mimetyper v1.0.10
+	github.com/spf13/cobra v1.5.0
+	github.com/stretchr/testify v1.8.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-replace github.com/boundedinfinity/jsonschema => /home/bbabb/Documents/git/jsonschema
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
 
-replace github.com/boundedinfinity/mimetyper => /home/bbabb/Documents/git/mimetyper
+require (
+	github.com/boundedinfinity/commons v1.0.9 // indirect
+	github.com/boundedinfinity/go-marshaler v1.0.3 // indirect
+	github.com/boundedinfinity/go-trier v1.0.1 // indirect
+	github.com/boundedinfinity/optioner v1.0.1 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+)
+
+replace github.com/boundedinfinity/jsonschema => ../jsonschema
+
+replace github.com/boundedinfinity/go-commoner => ../go-commoner
+
+replace github.com/boundedinfinity/mimetyper => ../mimetyper

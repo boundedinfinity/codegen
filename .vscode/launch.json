@@ -13,16 +13,13 @@
             ]
         },
         {
-            "name": "codegen labels",
+            "name": "codegen string-1",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}", 
             "args": [
-                // "https://raw.githubusercontent.com/boundedinfinity/codegen-templates/master/schemas/jsonschema/label-simple.schema.yaml",
-                // "file://${workspaceFolder}/codegen-templates/schemas/jsonschema",
-                "file://${workspaceFolder}/codegen-templates/schemas/jsonschema/label-simple.schema.yaml",
-                "file://${workspaceFolder}/codegen-templates/schemas/codegen/labels.codegen.yaml",
+                "file://${workspaceFolder}/../codegen-templates/json-schema/test-data/string-1.schema.yaml",
             ],
         }
     ]

@@ -1,5 +1,15 @@
 package generator
 
+import (
+	"boundedinfinity/codegen/model"
+)
+
+func (t *Generator) PackageBase(s model.Schema) string {
+	// result := pl.New[string]().Append(path.Base).RunSingle(s.Id)
+	// return result
+	return ""
+}
+
 // func (t *Generator) schema2Primtive(s string) string {
 // 	p, _ := t.spec.Info.Primitives[s]
 // 	return p

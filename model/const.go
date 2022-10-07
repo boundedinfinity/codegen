@@ -2,8 +2,6 @@ package model
 
 import (
 	"path/filepath"
-
-	"github.com/boundedinfinity/mimetyper/mime_type"
 )
 
 const (
@@ -21,7 +19,7 @@ const (
 )
 
 var (
-	CACHE_DIR           = filepath.Join(WORK_DIR, "cache")
-	BUILD_DIR           = filepath.Join(WORK_DIR, "build")
-	SUPPORTED_MIMETYPES = mime_type.Slice(mime_type.ApplicationXYaml, mime_type.ApplicationJson)
+	CACHE_DIR = filepath.Join(WORK_DIR, "cache")
+	BUILD_DIR = filepath.Join(WORK_DIR, "build")
+	// SUPPORTED_MIMETYPES = mime_type.Slice(mime_type.ApplicationXYaml, mime_type.ApplicationJson)
 )

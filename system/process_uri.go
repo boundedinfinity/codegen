@@ -2,124 +2,95 @@ package system
 
 import (
 	"boundedinfinity/codegen/model"
-	"boundedinfinity/codegen/uritype"
-	"boundedinfinity/codegen/util"
+	"boundedinfinity/codegen/uri_scheme"
 	"fmt"
-	"io/fs"
-	"io/ioutil"
-	"path/filepath"
 
-	"github.com/sethgrid/pester"
+	"github.com/boundedinfinity/go-marshaler"
 )
 
-func (t *System) processUri(source *model.SourceInfo) error {
-	if _, ok := t.sourceInfo[source.SourceUri]; ok {
-		fmt.Printf("already processed: %v", source.SourceUri)
+func (t *System) processUri(uri string) error {
+	path, scheme, err := uri_scheme.PathErr(uri)
+
+	if err != nil {
+		return err
+	}
+
+	source := model.SourceInfo{
+		InputUri: uri,
+		Path:     path,
+		Scheme:   scheme,
+	}
+
+	if _, ok := t.sourceInfo[path]; ok {
+		fmt.Printf("already processed: %v", path)
 		return nil
 	}
 
-	if err := t.detectUriType(source.SourceUri, &source.UriType); err != nil {
-		return err
-	}
+	m := map[string]jsonschema.Sch
 
-	switch source.UriType {
-	case uritype.File:
-		localPath := util.Uri2Path(source.SourceUri)
-		file, err := util.IsFile(localPath)
+	marshaler.UnmarshalFromPath()
 
-		if err != nil {
-			return err
-		}
-
-		if file {
-			source.LocalPath = localPath
-		} else {
-			if err := filepath.WalkDir(localPath, t.processInputDir(source.InputUri)); err != nil {
-				return err
-			}
-		}
-	case uritype.Http, uritype.Https:
-		cache, err := t.cacheUrl(source.SourceUri)
-
-		if err != nil {
-			return err
-		}
-
-		source.LocalPath = cache
-	default:
-		return uritype.ErrUriTypeInvalid
-	}
-
-	if err := t.detectMimeType(source.SourceUri, &source.MimeType); err != nil {
-		return err
-	}
-
-	t.sourceInfo[source.SourceUri] = source
+	t.sourceInfo[source.SourceUri] = &source
 
 	return nil
 }
 
-func (t System) processInputDir(uri string) fs.WalkDirFunc {
-	return func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
+// func (t System) processInputDir(uri string) fs.WalkDirFunc {
+// 	return func(path string, d fs.DirEntry, err error) error {
+// 		if err != nil {
+// 			return err
+// 		}
 
-		if d.IsDir() {
-			return nil
-		}
+// 		if d.IsDir() {
+// 			return nil
+// 		}
 
-		source := model.SourceInfo{
-			InputUri:  uri,
-			SourceUri: util.Path2Uri(path),
-		}
+// 		if err := t.processUri(util.Path2Uri(path)); err != nil {
+// 			return err
+// 		}
 
-		if err := t.processUri(&source); err != nil {
-			return err
-		}
+// 		return nil
+// 	}
+// }
 
-		return nil
-	}
-}
+// func (t System) cacheUrl(uri string) (string, error) {
+// 	if err := pather.DirEnsure(model.CACHE_DIR); err != nil {
+// 		return "", err
+// 	}
 
-func (t System) cacheUrl(uri string) (string, error) {
-	if err := util.DirEnsure(model.CACHE_DIR); err != nil {
-		return "", err
-	}
+// 	filename := filepath.Base(uri)
+// 	localPath := filepath.Join(model.CACHE_DIR, filename)
+// 	exist, err := pather.PathExistsErr(localPath)
 
-	filename := filepath.Base(uri)
-	localPath := filepath.Join(model.CACHE_DIR, filename)
-	exist, err := util.PathExists(localPath)
+// 	if err != nil {
+// 		return localPath, err
+// 	}
 
-	if err != nil {
-		return localPath, err
-	}
+// 	if exist {
+// 		return localPath, nil
+// 	}
 
-	if exist {
-		return localPath, nil
-	}
+// 	resp, err := pester.Get(uri)
 
-	resp, err := pester.Get(uri)
+// 	if err != nil {
+// 		return localPath, err
+// 	}
 
-	if err != nil {
-		return localPath, err
-	}
+// 	defer resp.Body.Close()
 
-	defer resp.Body.Close()
+// 	body, err := ioutil.ReadAll(resp.Body)
 
-	body, err := ioutil.ReadAll(resp.Body)
+// 	if err != nil {
+// 		return localPath, err
+// 	}
 
-	if err != nil {
-		return localPath, err
-	}
+// 	if err := ioutil.WriteFile(localPath, body, 0755); err != nil {
+// 		return localPath, err
+// 	}
 
-	if err := ioutil.WriteFile(localPath, body, 0755); err != nil {
-		return localPath, err
-	}
+// 	return localPath, nil
+// }
 
-	return localPath, nil
-}
-
-func (t System) cacheFile(source *model.SourceInfo) error {
-	return nil
-}
+// func (t System) cacheFile(source *model.SourceInfo) error {
+// 	return nil
+// }

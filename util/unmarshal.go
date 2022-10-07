@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/boundedinfinity/go-commoner/pather"
 	"gopkg.in/yaml.v2"
 )
 
@@ -50,7 +51,7 @@ func MarshalIndentToFile(p string, v interface{}, prefix, indent string) error {
 		return wrapErr(fmt.Errorf("unmarshal error: unsupported extention %v", ext))
 	}
 
-	if err := DirEnsure(p); err != nil {
+	if err := pather.DirEnsure(p); err != nil {
 		return wrapErr(err)
 	}
 
