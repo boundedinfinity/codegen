@@ -1,10 +1,10 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/model"
+	jmodel "github.com/boundedinfinity/go-jsonschema/model"
 )
 
-func (t *Generator) PackageBase(s model.Schema) string {
+func (t *Generator) PackageBase(s jmodel.JsonSchema) string {
 	// result := pl.New[string]().Append(path.Base).RunSingle(s.Id)
 	// return result
 	return ""

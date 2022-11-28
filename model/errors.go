@@ -1,26 +1,34 @@
 package model
 
 import (
-	"errors"
-	"fmt"
+	"github.com/boundedinfinity/go-commoner/errorer"
 )
 
 var (
-	ErrDuplicateSourceUri = errors.New("duplicate uri")
-	ErrCodeGenIdEmpty     = errors.New("empty codegen schema ID")
-	ErrCodeGenIdDuplicate = errors.New("duplicate codegen schema ID")
-	ErrTemplateEmpty      = errors.New("duplicate empty")
-	ErrTemplateDuplicate  = errors.New("duplicate template")
-	ErrUnsupportedScheme  = errors.New("unsupported scheme")
-	ErrMissingName        = errors.New("missing name")
-	ErrInvalidSchemaType  = errors.New("invalid schema type")
+	ErrDuplicateSourceUri               = errorer.Errorf("duplicate uri")
+	ErrDuplicateSourceUriv              = errorer.Errorfn(ErrDuplicateSourceUri)
+	ErrCodeGenIdEmpty                   = errorer.Errorf("empty codegen schema ID")
+	ErrCodeGenIdDuplicate               = errorer.Errorf("duplicate codegen schema ID")
+	ErrCodeGenIdDuplicatev              = errorer.Errorfn(ErrCodeGenIdDuplicate)
+	ErrTemplateEmpty                    = errorer.Errorf("duplicate empty")
+	ErrTemplateDuplicate                = errorer.Errorf("duplicate template")
+	ErrTemplateDuplicatev               = errorer.Errorfn(ErrTemplateDuplicate)
+	ErrUnsupportedScheme                = errorer.Errorf("unsupported scheme")
+	ErrUnsupportedSchemev               = errorer.Errorfn(ErrUnsupportedScheme)
+	ErrMissingName                      = errorer.Errorf("missing name")
+	ErrInvalidSchemaType                = errorer.Errorf("invalid schema type")
+	ErrPathDuplicate                    = errorer.Errorf("code gen schema path duplicate")
+	ErrPathDuplicatev                   = errorer.Errorfn(ErrPathDuplicate)
+	ErrMimeTypeUnsupported              = errorer.Errorf("MIME type unsupported")
+	ErrMimeTypeUnsupportedv             = errorer.Errorfn(ErrMimeTypeUnsupported)
+	ErrCodeGenRefNotFound               = errorer.Errorf("code gen ref not found")
+	ErrCodeGenRefNotFoundv              = errorer.Errorfn(ErrCodeGenRefNotFound)
+	ErrCodeGenOperationDuplicate        = errorer.Errorf("duplicate codegen schema operation")
+	ErrCodeGenOperationDuplicatev       = errorer.Errorfn(ErrCodeGenOperationDuplicate)
+	ErrCodeGenMappingsPackageDuplicate  = errorer.Errorf("codegen.mappings.package already defined")
+	ErrCodeGenMappingsPackageDuplicatev = errorer.Errorfn(ErrCodeGenMappingsPackageDuplicate)
+	ErrCodeGenMappingsRootDirDuplicate  = errorer.Errorf("duplicate codegen.mappings.rootDir")
+	ErrCodeGenMappingsRootDirDuplicatev = errorer.Errorfn(ErrCodeGenMappingsRootDirDuplicate)
+	ErrCodeGenMappingsRelpaceDuplicate  = errorer.Errorf("duplicate codegen.mappings.replace")
+	ErrCodeGenMappingsRelpaceDuplicatev = errorer.Errorfn(ErrCodeGenMappingsRelpaceDuplicate)
 )
-
-func ErrDuplicateSourceUriV(v string) error { return nE(ErrDuplicateSourceUri, v) }
-func ErrCodeGenIdDuplicateV(v string) error { return nE(ErrCodeGenIdDuplicate, v) }
-func ErrTemplateDuplicateV(v string) error  { return nE(ErrTemplateDuplicate, v) }
-func ErrUnsupportedSchemeV(v string) error  { return nE(ErrUnsupportedScheme, v) }
-
-func nE(err error, v interface{}) error {
-	return fmt.Errorf("%w : %v", err, v)
-}

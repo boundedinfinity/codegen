@@ -6,7 +6,7 @@
 //*                                                                                  *
 //************************************************************************************
 
-package uri_scheme
+package check_sumer
 
 import (
 	"encoding/json"
@@ -17,20 +17,20 @@ import (
 )
 
 var (
-	All = []Scheme{
-		File,
-		Http,
-		Https,
+	All = []CheckSumAlgo{
+		Md5,
+		Sha1,
+		Sha256,
 	}
 )
 
-func (t Scheme) String() string {
+func (t CheckSumAlgo) String() string {
 	return string(t)
 }
 
-func Parse(v string) (Scheme, error) {
-	f, ok := slicer.FindFn(All, func(x Scheme) bool {
-		return Scheme(v) == x
+func Parse(v string) (CheckSumAlgo, error) {
+	f, ok := slicer.FindFn(All, func(x CheckSumAlgo) bool {
+		return CheckSumAlgo(v) == x
 	})
 
 	if !ok {
@@ -41,7 +41,7 @@ func Parse(v string) (Scheme, error) {
 }
 
 func Is(s string) bool {
-	return slicer.ContainsFn(All, func(v Scheme) bool {
+	return slicer.ContainsFn(All, func(v CheckSumAlgo) bool {
 		return string(v) == s
 	})
 }
@@ -55,11 +55,11 @@ func ErrorV(v string) error {
 	)
 }
 
-func (t Scheme) MarshalJSON() ([]byte, error) {
+func (t CheckSumAlgo) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(t))
 }
 
-func (t *Scheme) UnmarshalJSON(data []byte) error {
+func (t *CheckSumAlgo) UnmarshalJSON(data []byte) error {
 	var v string
 
 	if err := json.Unmarshal(data, &v); err != nil {
@@ -77,11 +77,11 @@ func (t *Scheme) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (t Scheme) MarshalYAML() (interface{}, error) {
+func (t CheckSumAlgo) MarshalYAML() (interface{}, error) {
 	return string(t), nil
 }
 
-func (t *Scheme) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (t *CheckSumAlgo) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var v string
 
 	if err := unmarshal(&v); err != nil {

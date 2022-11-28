@@ -2,17 +2,24 @@ package main
 
 import (
 	"boundedinfinity/codegen/system"
-	"fmt"
 	"os"
 )
 
 func main() {
 	schemaPaths := os.Args[1:]
 
-	s := system.New()
+	s, err := system.New()
 
-	if err := s.Process(schemaPaths...); err != nil {
-		os.Exit(handleError(err))
+	if err != nil {
+		handleError(err)
+	}
+
+	if err := s.LoadUri(schemaPaths...); err != nil {
+		handleError(err)
+	}
+
+	if err := s.Check(); err != nil {
+		handleError(err)
 	}
 
 	// if err := s.Generate(); err != nil {
@@ -20,7 +27,6 @@ func main() {
 	// }
 }
 
-func handleError(err error) int {
-	fmt.Printf("%v\n", err.Error())
-	return 1
+func handleError(err error) {
+	panic(err)
 }

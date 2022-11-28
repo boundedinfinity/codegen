@@ -1,29 +1,28 @@
 package util
 
 import (
-	"path"
-
-	"github.com/boundedinfinity/go-commoner/caser"
 	"github.com/boundedinfinity/go-commoner/chain"
 	"github.com/boundedinfinity/go-commoner/stringer"
-	"github.com/boundedinfinity/jsonschema/model"
+	"github.com/boundedinfinity/go-jsonschema/model"
 )
 
-func GoTypeBase(s model.JsonSchemaCommon) string {
-	result := chain.New[string]().
-		Append(path.Base).
-		Append(replaceNonWord).
-		Append(caser.PhraseToPascal[string]).
-		RunSingle(s.Id.Get())
-	return result
+func GoTypeBase(s model.JsonSchema) string {
+	// result := chain.New[string]().
+	// 	Append(path.Base).
+	// 	Append(replaceNonWord).
+	// 	Append(caser.PhraseToPascal[string]).
+	// 	RunSingle(s.Id.Get())
+	// return result
+	return ""
 }
 
-func GoTypeDir(s model.JsonSchemaCommon) string {
-	result := chain.New[string]().
-		Append(removeScheme).
-		Append(path.Dir).
-		RunSingle(s.Id.Get())
-	return result
+func GoTypeDir(s model.JsonSchema) string {
+	// result := chain.New[string]().
+	// 	Append(removeScheme).
+	// 	Append(path.Dir).
+	// 	RunSingle(s.Id.Get())
+	// return result
+	return ""
 }
 
 func replaceNonWord(s string) string {

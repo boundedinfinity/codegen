@@ -2,40 +2,36 @@ package util
 
 import (
 	"strings"
+
+	"github.com/boundedinfinity/go-commoner/slicer"
 )
 
-func IsCodeGenFile(v string) bool {
-	var x bool
-
-	if strings.HasSuffix(v, ".codegen.json") {
-		x = true
+var (
+	codegenExts = []string{
+		".codegen.json",
+		".codegen.yaml",
+		".codegen.yml",
 	}
 
-	if strings.HasSuffix(v, ".codegen.yaml") {
-		x = true
+	jsonSchemaExts = []string{
+		".schema.json",
+		".schema.yaml",
+		".schema.yml",
 	}
+)
 
-	if strings.HasSuffix(v, ".codegen.yml") {
-		x = true
-	}
-
-	return x
+func IsCodeGenSchemaFile(v string) bool {
+	return slicer.ContainsFn(codegenExts, func(x string) bool {
+		return strings.HasSuffix(v, x)
+	})
 }
 
 func IsJsonSchemaFile(v string) bool {
-	var x bool
+	return slicer.ContainsFn(jsonSchemaExts, func(x string) bool {
+		return strings.HasSuffix(v, x)
+	})
+}
 
-	if strings.HasSuffix(v, ".schema.json") {
-		x = true
-	}
-
-	if strings.HasSuffix(v, ".schema.yaml") {
-		x = true
-	}
-
-	if strings.HasSuffix(v, ".schema.yml") {
-		x = true
-	}
-
-	return x
+func IsSchemaFile(v string) bool {
+	return IsCodeGenSchemaFile(v) || IsJsonSchemaFile(v)
 }

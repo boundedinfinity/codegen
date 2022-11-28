@@ -3,11 +3,12 @@ package generator_test
 import (
 	"testing"
 
-	jsmodel "github.com/boundedinfinity/jsonschema/model"
+	jsmodel "github.com/boundedinfinity/go-jsonschema/model"
 )
 
-func createString() jsmodel.JsonSchemaString[string] {
-	m := jsmodel.NewString[string]("https://www.boundedinfinity.com/schema/string-1")
+func createString() jsmodel.JsonSchemaString {
+	// m := jsmodel.NewString("https://www.boundedinfinity.com/schema/string-1")
+	m := jsmodel.JsonSchemaString{}
 	return m
 }
 
