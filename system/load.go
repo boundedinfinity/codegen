@@ -11,26 +11,22 @@ import (
 )
 
 func (t *System) LoadUri(uris ...string) error {
-	if results, err := t.cacher.Cache(uris...); err != nil {
+	if err := t.cacher.Cache("schema", uris...); err != nil {
 		return err
-	} else {
-		for _, result := range results {
-			t.cacheResults[result.DestPath] = result
-		}
 	}
 
-	for _, path := range t.cacheResults.Keys().Get() {
+	for _, cdata := range t.cacher.FindByGroup("schema").Get() {
 		switch {
-		case util.IsJsonSchemaFile(path):
-			if err := t.jsonSchemas.LoadPath(path); err != nil {
+		case util.IsJsonSchemaFile(cdata.DestPath):
+			if err := t.jsonSchemas.LoadPath(cdata.DestPath); err != nil {
 				return err
 			}
-		case util.IsCodeGenSchemaFile(path):
-			if err := t.LoadPath(path); err != nil {
+		case util.IsCodeGenSchemaFile(cdata.DestPath):
+			if err := t.LoadPath(cdata.DestPath); err != nil {
 				return err
 			}
 		default:
-			return model.ErrUnsupportedSchemev(path)
+			return model.ErrUnsupportedSchemev(cdata.DestPath)
 		}
 	}
 

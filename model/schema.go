@@ -54,8 +54,8 @@ type CodeGenSchemaOperation struct {
 }
 
 type CodeGenSchemaTemplates struct {
-	Header CodeGenSchemaHeader         `json:"header,omitempty" yaml:"header,omitempty"`
-	Files  []CodeGenSchemaTemplateFile `json:"files,omitempty" yaml:"files,omitempty"`
+	Header o.Option[CodeGenSchemaHeader] `json:"header,omitempty" yaml:"header,omitempty"`
+	Files  []CodeGenSchemaTemplateFile   `json:"files,omitempty" yaml:"files,omitempty"`
 }
 
 type CodeGenSchemaHeader struct {
@@ -65,6 +65,7 @@ type CodeGenSchemaHeader struct {
 }
 
 type CodeGenSchemaTemplateFile struct {
-	Path   o.Option[string]              `json:"path,omitempty" yaml:"path,omitempty"`
-	Header o.Option[CodeGenSchemaHeader] `json:"header,omitempty" yaml:"header,omitempty"`
+	Header  o.Option[CodeGenSchemaHeader] `json:"header,omitempty" yaml:"header,omitempty"`
+	Path    o.Option[string]              `json:"path,omitempty" yaml:"path,omitempty"`
+	Content o.Option[string]              `json:"content,omitempty" yaml:"content,omitempty"`
 }

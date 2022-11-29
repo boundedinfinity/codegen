@@ -4,7 +4,7 @@ import (
 	"boundedinfinity/codegen/model"
 	"path/filepath"
 
-	"github.com/boundedinfinity/go-commoner/optioner"
+	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 func (t *System) Check() error {
@@ -12,16 +12,20 @@ func (t *System) Check() error {
 		return err
 	}
 
-	for _, schema := range t.pathMap {
-		if err := t.mergeSchema(schema); err != nil {
+	for schemaPath, schema := range t.pathMap {
+		if err := t.mergeSchema(schemaPath, schema); err != nil {
 			return err
 		}
+	}
+
+	if err := t.tm.Register(t.combined.Templates); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (t *System) mergeSchema(schema model.CodeGenSchema) error {
+func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) error {
 	for language, mappings := range schema.Mappings {
 		if err := t.mergeMapping(language, *mappings); err != nil {
 			return err
@@ -36,14 +40,38 @@ func (t *System) mergeSchema(schema model.CodeGenSchema) error {
 		t.combined.Operations[name] = operation
 	}
 
-	// for x := range schema.Templates {
-
-	// }
+	if err := t.mergeTemplate(schemaPath, schema.Templates); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (t *System) mergeTemplate(tmpl model.CodeGenSchemaTemplateFile) error {
+func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaTemplates) error {
+	dir := filepath.Dir(schemaPath)
+
+	if templates.Header.Defined() {
+		t.combined.Templates.Header = templates.Header
+	}
+
+	for _, file := range templates.Files {
+		if err := t.cacher.CacheWithBase("templates", o.Some(dir), file.Path.Get()); err != nil {
+			return err
+		}
+	}
+
+	// for _, file := range templates.Files {
+	// 	filter := func(f model.CodeGenSchemaTemplateFile) bool {
+	// 		return f.Path.Get() == file.Path.Get()
+	// 	}
+
+	// 	if slicer.ContainsFn(t.combined.Templates.Files, filter) {
+	// 		return model.ErrCodeGenTemplateFilePathDuplicatev(file.Path.Get())
+	// 	}
+
+	// 	t.combined.Templates.Files = append(t.combined.Templates.Files, file)
+	// }
+
 	return nil
 }
 
@@ -51,7 +79,7 @@ func (t *System) mergeMapping(language string, b model.CodeGenSchemaMappings) er
 	a := t.combined.Mappings.Get(language)
 
 	if a.Empty() {
-		a = optioner.Some(model.NewMappings())
+		a = o.Some(model.NewMappings())
 		t.combined.Mappings[language] = a.Get()
 	}
 
@@ -74,7 +102,7 @@ func (t *System) mergeMapping(language string, b model.CodeGenSchemaMappings) er
 			return err
 
 		}
-		a.Get().RootDir = optioner.Some(abs)
+		a.Get().RootDir = o.Some(abs)
 	}
 
 	for from, to := range b.Replace {

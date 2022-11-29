@@ -8,38 +8,31 @@ import (
 	"github.com/boundedinfinity/go-urischemer"
 )
 
-func (t Cacher) cacheFilePath(path string) ([]CachedData, error) {
-	var results []CachedData
-
+func (t Cacher) cacheFilePath(group string, path string) error {
 	ok, err := pather.IsDir(path)
 
 	if err != nil {
-		return results, err
+		return err
 	}
 
 	if ok {
-		if rs, err := t.cacheFileDir(path); err != nil {
-			return results, err
-		} else {
-			results = append(results, rs...)
+		if err := t.cacheFileDir(group, path); err != nil {
+			return err
 		}
 	} else {
-		if r, err := t.cacheFileFile(path); err != nil {
-			return results, err
-		} else {
-			results = append(results, r)
+		if err := t.cacheFileFile(group, path); err != nil {
+			return err
 		}
 	}
 
-	return results, nil
+	return nil
 }
 
-func (t Cacher) cacheFileDir(root string) ([]CachedData, error) {
-	var results []CachedData
+func (t Cacher) cacheFileDir(group string, root string) error {
 	paths, err := pather.GetPaths(root)
 
 	if err != nil {
-		return results, err
+		return err
 	}
 
 	paths = slicer.Filter(paths, func(p string) bool {
@@ -47,23 +40,21 @@ func (t Cacher) cacheFileDir(root string) ([]CachedData, error) {
 	})
 
 	for _, path := range paths {
-		if rs, err := t.cacheFilePath(path); err != nil {
-			return results, err
-		} else {
-			results = append(results, rs...)
+		if err := t.cacheFilePath(group, path); err != nil {
+			return err
 		}
 	}
 
-	return results, nil
+	return nil
 }
 
-func (t Cacher) cacheFileFile(path string) (CachedData, error) {
+func (t Cacher) cacheFileFile(group string, path string) error {
 	var data CachedData
 
 	data.SourceUrl = urischemer.Combine(urischemer.File, path)
 
 	if clean, err := urischemer.Clean(data.SourceUrl); err != nil {
-		return data, err
+		return err
 	} else {
 		data.SourceUrl = clean
 	}
@@ -71,7 +62,7 @@ func (t Cacher) cacheFileFile(path string) (CachedData, error) {
 	data.DestPath = filepath.Clean(path)
 
 	if r, err := t.checkSumer.Read(data.DestPath); err != nil {
-		return data, err
+		return err
 	} else {
 		data.DestCheckSumPath = r.Path
 		data.DestCheckSum = r.CheckSum
@@ -80,10 +71,28 @@ func (t Cacher) cacheFileFile(path string) (CachedData, error) {
 	}
 
 	if r, err := t.checkSumer.CalculateFile(data.DestPath); err != nil {
-		return data, err
+		return err
 	} else {
 		data.CalculateCheckSum = r.CheckSum
 	}
 
-	return data, nil
+	if !t.groupMap.Has(group) {
+		t.groupMap[group] = make([]*CachedData, 0)
+	}
+
+	t.groupMap[group] = append(t.groupMap[group], &data)
+
+	if !t.sourceMap.Has(data.SourceUrl) {
+		t.sourceMap[data.SourceUrl] = &data
+	} else {
+		// TODO
+	}
+
+	if !t.destMap.Has(data.DestPath) {
+		t.destMap[data.DestPath] = &data
+	} else {
+		// TODO
+	}
+
+	return nil
 }

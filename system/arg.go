@@ -54,7 +54,7 @@ func (t *System) init() error {
 
 	t.cacher = c
 
-	tm, err := template_manager.New()
+	tm, err := template_manager.New(template_manager.Cacher(c))
 
 	if err != nil {
 		return err

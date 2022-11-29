@@ -1,6 +1,9 @@
 package cacher
 
 import (
+	"path/filepath"
+
+	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-urischemer"
 )
 
@@ -14,33 +17,41 @@ type CachedData struct {
 	CalculateCheckSum  string
 }
 
-func (t Cacher) Cache(urls ...string) ([]CachedData, error) {
-	var results []CachedData
+func (t Cacher) Cache(group string, urls ...string) error {
+	return t.CacheWithBase(group, optioner.None[string](), urls...)
+}
 
+func (t Cacher) CacheWithBase(group string, dir optioner.Option[string], urls ...string) error {
 	for _, sourceUrl := range urls {
 		scheme, path, err := urischemer.Break(sourceUrl)
 
 		if err != nil {
-			return results, err
+			return err
+		}
+
+		if scheme == urischemer.File && !filepath.IsAbs(path) && dir.Defined() {
+			rel := path
+			path = filepath.Join(dir.Get(), rel)
+			path, err = filepath.Abs(path)
+
+			if err != nil {
+				return err
+			}
 		}
 
 		switch scheme {
 		case urischemer.File:
-			if rs, err := t.cacheFilePath(path); err != nil {
-				return results, err
-			} else {
-				results = append(results, rs...)
+			if err := t.cacheFilePath(group, path); err != nil {
+				return err
 			}
 		case urischemer.Http, urischemer.Https:
-			if rs, err := t.cacheHttpPath(path); err != nil {
-				return results, err
-			} else {
-				results = append(results, rs...)
+			if err := t.cacheHttpPath(group, path); err != nil {
+				return err
 			}
 		default:
-			return results, urischemer.ErrUriSchemeNotFoundv(scheme)
+			return urischemer.ErrUriSchemeNotFoundv(scheme)
 		}
 	}
 
-	return results, nil
+	return nil
 }

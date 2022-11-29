@@ -1,14 +1,19 @@
 package template_manager
 
-import "github.com/boundedinfinity/go-commoner/optioner/mapper"
+import (
+	"boundedinfinity/codegen/cacher"
+
+	"github.com/boundedinfinity/go-commoner/optioner/mapper"
+)
 
 type TemplateManager struct {
-	pathMap mapper.Mapper[string, string]
+	pathMap mapper.Mapper[string, []byte]
+	cacher  *cacher.Cacher
 }
 
 func New(args ...Arg) (*TemplateManager, error) {
 	t := &TemplateManager{
-		pathMap: make(mapper.Mapper[string, string]),
+		pathMap: make(mapper.Mapper[string, []byte]),
 	}
 
 	for _, arg := range args {

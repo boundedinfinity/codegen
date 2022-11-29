@@ -42,8 +42,12 @@ func (t *CheckSumer) CalculatePath(path string) ([]CheckSumCalculation, error) {
 func (t *CheckSumer) CalculateDir(path string) ([]CheckSumCalculation, error) {
 	var results []CheckSumCalculation
 
-	if err := pather.IsDirErr(path); err != nil {
+	if ok, err := pather.IsDir(path); err != nil {
 		return results, err
+	} else {
+		if !ok {
+			return results, nil
+		}
 	}
 
 	subPaths, err := pather.GetPaths(path)

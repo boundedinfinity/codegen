@@ -12,24 +12,22 @@ import (
 )
 
 type System struct {
-	workDir      optioner.Option[string]
-	outputDir    optioner.Option[string]
-	cacheDir     optioner.Option[string]
-	cacheResults mapper.Mapper[string, cacher.CachedData]
-	jsonSchemas  *jsonschema.System
-	pathMap      mapper.Mapper[string, model.CodeGenSchema]
-	combined     *model.CodeGenSchema
-	cacher       *cacher.Cacher
-	generator    *generator.Generator
-	tm           *template_manager.TemplateManager
+	workDir     optioner.Option[string]
+	outputDir   optioner.Option[string]
+	cacheDir    optioner.Option[string]
+	jsonSchemas *jsonschema.System
+	pathMap     mapper.Mapper[string, model.CodeGenSchema]
+	combined    *model.CodeGenSchema
+	cacher      *cacher.Cacher
+	generator   *generator.Generator
+	tm          *template_manager.TemplateManager
 }
 
 func New(args ...Arg) (*System, error) {
 	t := &System{
-		jsonSchemas:  jsonschema.New(),
-		cacheResults: mapper.Mapper[string, cacher.CachedData]{},
-		pathMap:      mapper.Mapper[string, model.CodeGenSchema]{},
-		combined:     model.NewSchema(),
+		jsonSchemas: jsonschema.New(),
+		pathMap:     mapper.Mapper[string, model.CodeGenSchema]{},
+		combined:    model.NewSchema(),
 	}
 
 	for _, arg := range args {
