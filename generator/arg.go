@@ -3,6 +3,8 @@ package generator
 import (
 	"boundedinfinity/codegen/template_manager"
 	"fmt"
+
+	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Arg func(*Generator)
@@ -25,6 +27,12 @@ func TemplateManager(v *template_manager.TemplateManager) Arg {
 	}
 }
 
+func JsonSchemas(v *jsonschema.System) Arg {
+	return func(t *Generator) {
+		t.jsonSchemas = v
+	}
+}
+
 const (
 	DEFAULT_GENEXT  = "gen"
 	DEFAULT_DESTDIR = "/tmp/codegen"
@@ -40,7 +48,11 @@ func (t *Generator) init() error {
 	}
 
 	if t.tm == nil {
-		return fmt.Errorf("missing template manager")
+		return fmt.Errorf("generator requires template manager")
+	}
+
+	if t.jsonSchemas == nil {
+		return fmt.Errorf("generator requires jsonSchemas")
 	}
 
 	return nil

@@ -2,20 +2,19 @@ package generator
 
 import (
 	"boundedinfinity/codegen/template_manager"
-	"text/template"
+
+	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Generator struct {
-	destDir string
-	genExt  string
-	tm      *template_manager.TemplateManager
-	tmpl    *template.Template
+	destDir     string
+	genExt      string
+	tm          *template_manager.TemplateManager
+	jsonSchemas *jsonschema.System
 }
 
 func New(args ...Arg) (*Generator, error) {
-	g := &Generator{
-		tmpl: template.New(""),
-	}
+	g := &Generator{}
 
 	for _, arg := range args {
 		arg(g)

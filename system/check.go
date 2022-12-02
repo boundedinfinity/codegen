@@ -1,10 +1,14 @@
 package system
 
 import (
+	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/model"
 	"path/filepath"
+	"strings"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
+	"github.com/boundedinfinity/go-commoner/slicer"
+	"github.com/boundedinfinity/go-urischemer"
 )
 
 func (t *System) Check() error {
@@ -16,10 +20,6 @@ func (t *System) Check() error {
 		if err := t.mergeSchema(schemaPath, schema); err != nil {
 			return err
 		}
-	}
-
-	if err := t.tm.Register(t.combined.Templates); err != nil {
-		return err
 	}
 
 	return nil
@@ -48,29 +48,60 @@ func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 }
 
 func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaTemplates) error {
-	dir := filepath.Dir(schemaPath)
-
 	if templates.Header.Defined() {
 		t.combined.Templates.Header = templates.Header
 	}
 
+	dir := filepath.Dir(schemaPath)
+	files := make([]model.CodeGenSchemaTemplateFile, 0)
+
 	for _, file := range templates.Files {
-		if err := t.cacher.CacheWithBase("templates", o.Some(dir), file.Path.Get()); err != nil {
+		if file.Path.Defined() {
+			scheme, path, err := urischemer.Break(file.Path.Get())
+
+			if err != nil {
+				return err
+			}
+
+			if scheme == urischemer.File && !filepath.IsAbs(path) {
+				rel := path
+				path = filepath.Join(dir, rel)
+				path, err = filepath.Abs(path)
+
+				if err != nil {
+					return err
+				}
+
+				path = urischemer.Combine(scheme, path)
+				file.Path = o.Some(path)
+			}
+		}
+
+		files = append(files, file)
+
+		if err := t.cacher.Cache("templates", file.Path.Get()); err != nil {
 			return err
 		}
 	}
 
-	// for _, file := range templates.Files {
-	// 	filter := func(f model.CodeGenSchemaTemplateFile) bool {
-	// 		return f.Path.Get() == file.Path.Get()
-	// 	}
+	cached := t.cacher.FindByGroup("templates")
 
-	// 	if slicer.ContainsFn(t.combined.Templates.Files, filter) {
-	// 		return model.ErrCodeGenTemplateFilePathDuplicatev(file.Path.Get())
-	// 	}
+	if cached.Empty() {
+		return nil
+	}
 
-	// 	t.combined.Templates.Files = append(t.combined.Templates.Files, file)
-	// }
+	for _, file := range files {
+		cds := slicer.Filter(cached.Get(), func(cd *cacher.CachedData) bool {
+			return cd.SourceUrl == file.Path.Get() || strings.HasPrefix(cd.SourceUrl, file.Path.Get())
+		})
+
+		for _, cd := range cds {
+			t.combined.Templates.Files = append(t.combined.Templates.Files, model.CodeGenSchemaTemplateFile{
+				Header: file.Header,
+				Path:   o.Some(cd.DestPath),
+			})
+		}
+	}
 
 	return nil
 }

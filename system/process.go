@@ -1,45 +1,27 @@
 package system
 
-// 	for _, v := range schema.Templates.Files {
-// 		if v.Name == "" {
-// 			return model.ErrTemplateEmpty
-// 		}
+func (t *System) ProcessTemplates() error {
+	if err := t.tm.Register(t.combined.Templates); err != nil {
+		return err
+	}
+	return nil
+}
 
-// 		path := util.Uri2Path(v.Name)
-// 		path, err := filepath.Abs(path)
+func (t *System) Generate() error {
+	for _, operation := range t.combined.Operations {
+		if operation.Input.Defined() {
+			schema := t.jsonSchemas.Get(string(operation.Input.Get()))
 
-// 		if err != nil {
-// 			return err
-// 		}
+			switch {
+			case schema.Defined():
+				if err := t.generator.GenerateJsonSchema(schema.Get()); err != nil {
+					return err
+				}
+			default:
+				// TODO
+			}
+		}
+	}
 
-// 		file, err := pather.IsFileErr(path)
-
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		if file {
-// 			if _, ok := t.template[v.Name]; ok {
-// 				return model.ErrTemplateDuplicateV(v.Name)
-// 			}
-// 		} else {
-// 			if err := filepath.WalkDir(path, fn); err != nil {
-// 				return err
-// 			}
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-// func (t *System) process4() error {
-// 	for _, v := range t.template {
-// 		var typ template_type.TemplateType
-
-// 		if err := t.detectTemplateType(v.Name, &typ); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	return nil
-// }
+	return nil
+}

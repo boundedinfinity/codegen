@@ -54,7 +54,10 @@ func (t *System) init() error {
 
 	t.cacher = c
 
-	tm, err := template_manager.New(template_manager.Cacher(c))
+	tm, err := template_manager.New(
+		template_manager.Cacher(c),
+		template_manager.JsonSchema(t.jsonSchemas),
+	)
 
 	if err != nil {
 		return err
@@ -65,6 +68,7 @@ func (t *System) init() error {
 	g, err := generator.New(
 		generator.DestDir(t.outputDir.Get()),
 		generator.TemplateManager(t.tm),
+		generator.JsonSchemas(t.jsonSchemas),
 	)
 
 	if err != nil {

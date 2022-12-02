@@ -2,16 +2,19 @@ package template_manager
 
 import (
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/template_type"
 	"fmt"
 	"io/ioutil"
+	"text/template"
 
-	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
+	"github.com/boundedinfinity/go-mimetyper/file_extention"
+	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
-func (t *TemplateManager) Register(templates ...model.CodeGenSchemaTemplates) error {
-	for _, template := range templates {
-		if err := t.registerTemplate(template); err != nil {
+func (t *TemplateManager) Register(templates model.CodeGenSchemaTemplates) error {
+	for _, file := range templates.Files {
+		if err := t.registerFileFile(file); err != nil {
 			return err
 		}
 	}
@@ -19,65 +22,8 @@ func (t *TemplateManager) Register(templates ...model.CodeGenSchemaTemplates) er
 	return nil
 }
 
-func (t *TemplateManager) registerTemplate(template model.CodeGenSchemaTemplates) error {
-	for _, file := range template.Files {
-		if err := t.registerFilePath(file); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (t *TemplateManager) registerFilePath(file model.CodeGenSchemaTemplateFile) error {
+func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile) error {
 	if file.Path.Defined() {
-		if ok, err := pather.IsDir(file.Path.Get()); err != nil {
-			return err
-		} else {
-			if ok {
-				if err := t.registerFileDir(file); err != nil {
-					return err
-				}
-			} else {
-				if err := t.registerFileFile(o.None[string](), file); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func (t *TemplateManager) registerFileDir(file model.CodeGenSchemaTemplateFile) error {
-	if file.Path.Defined() {
-		if paths, err := pather.GetPaths(file.Path.Get()); err != nil {
-			return err
-		} else {
-			for _, path := range paths {
-				new := model.CodeGenSchemaTemplateFile{
-					Header: file.Header,
-					Path:   o.Some(path),
-				}
-
-				if err := t.registerFilePath(new); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func (t *TemplateManager) registerFileFile(base o.Option[string], file model.CodeGenSchemaTemplateFile) error {
-	if file.Path.Defined() {
-		err := t.cacher.Cache("templates", file.Path.Get())
-
-		if err != nil {
-			return err
-		}
-
 		cdata := t.cacher.Find(file.Path.Get())
 
 		if cdata.Empty() {
@@ -87,15 +33,47 @@ func (t *TemplateManager) registerFileFile(base o.Option[string], file model.Cod
 		if t.pathMap.Has(cdata.Get().DestPath) {
 			return model.ErrCodeGenTemplateFilePathDuplicatev(file.Path.Get())
 		} else {
-			data, err := ioutil.ReadFile(cdata.Get().DestPath)
+			path := cdata.Get().DestPath
+			ext := pather.Ext(path)
+			mt, err := file_extention.GetMimeType(ext)
 
 			if err != nil {
 				return err
 			}
 
-			t.pathMap[file.Path.Get()] = data
+			bs, err := ioutil.ReadFile(cdata.Get().DestPath)
+
+			if err != nil {
+				return err
+			}
+
+			template, err := template.
+				New("").
+				Funcs(t.funcs).Parse(string(bs))
+
+			if err != nil {
+				return err
+			}
+
+			tt, err := template_type.FromUrl(cdata.Get().DestPath)
+
+			if err != nil {
+				return err
+			}
+
+			t.pathMap[file.Path.Get()] = TemplateContext{
+				TemplateMimeType: mt,
+				TemplateType:     tt,
+				Template:         template,
+				OutputMimeType:   mime_type.ApplicationXGo,
+				Path:             cdata.Get().DestPath,
+			}
 		}
 	}
+
+	// if file.Content.Defined() {
+	// 	t.pathMap[file.Path.Get()] = []byte(file.Content.Get())
+	// }
 
 	return nil
 }

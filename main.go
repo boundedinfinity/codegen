@@ -22,9 +22,13 @@ func main() {
 		handleError(err)
 	}
 
-	// if err := s.Generate(); err != nil {
-	// 	os.Exit(handleError(err))
-	// }
+	if err := s.ProcessTemplates(); err != nil {
+		handleError(err)
+	}
+
+	if err := s.Generate(); err != nil {
+		handleError(err)
+	}
 }
 
 func handleError(err error) {

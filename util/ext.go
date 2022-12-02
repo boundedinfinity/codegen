@@ -1,9 +1,12 @@
 package util
 
 import (
+	"path/filepath"
 	"strings"
 
+	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/slicer"
+	"github.com/boundedinfinity/go-jsonschema/schematype"
 )
 
 var (
@@ -34,4 +37,14 @@ func IsJsonSchemaFile(v string) bool {
 
 func IsSchemaFile(v string) bool {
 	return IsCodeGenSchemaFile(v) || IsJsonSchemaFile(v)
+}
+
+func IsJsonSchemaTemplate(typ optioner.Option[schematype.SchemaType], path string) bool {
+	if typ.Empty() {
+		return false
+	}
+
+	base := filepath.Base(path)
+	ts := typ.String()
+	return strings.HasPrefix(base, ts)
 }
