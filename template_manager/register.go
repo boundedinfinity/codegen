@@ -47,9 +47,7 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 				return err
 			}
 
-			template, err := template.
-				New("").
-				Funcs(t.funcs).Parse(string(bs))
+			template, err := template.New("").Funcs(t.funcs).Parse(string(bs))
 
 			if err != nil {
 				return err
@@ -70,10 +68,6 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 			}
 		}
 	}
-
-	// if file.Content.Defined() {
-	// 	t.pathMap[file.Path.Get()] = []byte(file.Content.Get())
-	// }
 
 	return nil
 }

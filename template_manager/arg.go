@@ -2,12 +2,18 @@ package template_manager
 
 import (
 	"boundedinfinity/codegen/cacher"
-	"fmt"
+	"boundedinfinity/codegen/model"
 
 	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Arg func(*TemplateManager)
+
+func CodeGenSchema(v *model.CodeGenSchema) Arg {
+	return func(t *TemplateManager) {
+		t.codeGenSchema = v
+	}
+}
 
 func JsonSchema(v *jsonschema.System) Arg {
 	return func(t *TemplateManager) {
@@ -43,20 +49,4 @@ func Verbose(v bool) Arg {
 	return func(t *TemplateManager) {
 		t.verbose = v
 	}
-}
-
-func (t *TemplateManager) init() error {
-	if t.cacher == nil {
-		return fmt.Errorf("cacher is nil")
-	}
-
-	if t.pathMap == nil {
-		return fmt.Errorf("pathMap is nil")
-	}
-
-	if t.funcs == nil {
-		return fmt.Errorf("funcs is nil")
-	}
-
-	return nil
 }

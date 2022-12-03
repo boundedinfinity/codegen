@@ -19,7 +19,12 @@ func (t *TemplateManager) RenderModel(schema jmodel.JsonSchema) ([]TemplateOutpu
 		return util.IsJsonSchemaTemplate(t.jsonSchemas.GetType(schema), tmpl.Path)
 	})
 
-	return t.render(found, schema)
+	ctx := RenderContext{
+		Info:   t.codeGenSchema.Info,
+		Schema: schema,
+	}
+
+	return t.render(found, ctx)
 }
 
 func (t *TemplateManager) RenderOperation(schema model.CodeGenSchemaOperation) ([]TemplateOutput, error) {

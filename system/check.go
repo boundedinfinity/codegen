@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
+	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 	"github.com/boundedinfinity/go-commoner/slicer"
 	"github.com/boundedinfinity/go-urischemer"
 )
@@ -26,10 +27,12 @@ func (t *System) Check() error {
 }
 
 func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) error {
-	for language, mappings := range schema.Mappings {
-		if err := t.mergeMapping(language, *mappings); err != nil {
-			return err
-		}
+	if err := t.mergeInfo(schema.Info); err != nil {
+		return err
+	}
+
+	if err := t.mergeMapping(schema.Mappings); err != nil {
+		return err
 	}
 
 	for name, operation := range schema.Operations {
@@ -42,6 +45,26 @@ func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 
 	if err := t.mergeTemplate(schemaPath, schema.Templates); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (t *System) mergeInfo(info model.CodeGenSchemaInfo) error {
+	if info.Description.Defined() {
+		t.combined.Info.Description = info.Description
+	}
+
+	if info.Package.Defined() {
+		t.combined.Info.Package = info.Package
+	} else {
+		// TODO
+	}
+
+	if info.RootDir.Defined() {
+		t.combined.Info.RootDir = info.RootDir
+	} else {
+		// TODO
 	}
 
 	return nil
@@ -106,43 +129,13 @@ func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaT
 	return nil
 }
 
-func (t *System) mergeMapping(language string, b model.CodeGenSchemaMappings) error {
-	a := t.combined.Mappings.Get(language)
-
-	if a.Empty() {
-		a = o.Some(model.NewMappings())
-		t.combined.Mappings[language] = a.Get()
-	}
-
-	switch {
-	case a.Get().Package.Defined() && b.Package.Defined():
-		if a.Get().Package.Get() == b.Package.Get() {
-			return model.ErrCodeGenMappingsPackageDuplicatev(b.Package)
+func (t *System) mergeMapping(mappings mapper.Mapper[string, string]) error {
+	for k, v := range mappings {
+		if t.combined.Mappings.Has(k) {
+			// TODO
 		}
-	case b.Package.Defined():
-		a.Get().Package = b.Package
-	}
 
-	switch {
-	case a.Get().RootDir.Defined() && b.RootDir.Defined():
-		return model.ErrCodeGenMappingsRootDirDuplicatev(b.RootDir)
-	case b.RootDir.Defined():
-		abs, err := filepath.Abs(b.RootDir.Get())
-
-		if err != nil {
-			return err
-
-		}
-		a.Get().RootDir = o.Some(abs)
-	}
-
-	for from, to := range b.Replace {
-		switch {
-		case a.Get().Replace.Has(from):
-			return model.ErrCodeGenMappingsRelpaceDuplicatev(from)
-		default:
-			a.Get().Replace[from] = to
-		}
+		t.combined.Mappings[k] = v
 	}
 
 	return nil
