@@ -1,5 +1,3 @@
-github.com/boundedinfinity/mimetyper v1.0.10 h1:Voq5q8n9MpDg/8Aol/yKX5V/Fv7Vg9OjPaNigZwDs0U=
-github.com/boundedinfinity/mimetyper v1.0.10/go.mod h1:UODJ2UOu48HIzyn+GfBBNorudvd5ixI+mJOYlcPKyQk=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

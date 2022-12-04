@@ -7,9 +7,8 @@ import (
 	"io/ioutil"
 	"text/template"
 
-	"github.com/boundedinfinity/go-commoner/pather"
+	"github.com/boundedinfinity/go-commoner/extentioner"
 	"github.com/boundedinfinity/go-mimetyper/file_extention"
-	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
 func (t *TemplateManager) Register(templates model.CodeGenSchemaTemplates) error {
@@ -34,8 +33,15 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 			return model.ErrCodeGenTemplateFilePathDuplicatev(file.Path.Get())
 		} else {
 			path := cdata.Get().DestPath
-			ext := pather.Ext(path)
-			mt, err := file_extention.GetMimeType(ext)
+			tmplExt := extentioner.Ext(path)
+			outputExt := extentioner.Ext(extentioner.Strip(path))
+			tmt, err := file_extention.GetMimeType(tmplExt)
+
+			if err != nil {
+				return err
+			}
+
+			omt, err := file_extention.GetMimeType(outputExt)
 
 			if err != nil {
 				return err
@@ -47,7 +53,7 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 				return err
 			}
 
-			template, err := template.New("").Funcs(t.funcs).Parse(string(bs))
+			tmpl, err := template.New("").Funcs(t.funcs).Parse(string(bs))
 
 			if err != nil {
 				return err
@@ -59,13 +65,16 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 				return err
 			}
 
-			t.pathMap[file.Path.Get()] = TemplateContext{
-				TemplateMimeType: mt,
+			tc := TemplateContext{
+				TemplateMimeType: tmt,
 				TemplateType:     tt,
-				Template:         template,
-				OutputMimeType:   mime_type.ApplicationXGo,
+				OutputMimeType:   omt,
+				Template:         tmpl,
 				Path:             cdata.Get().DestPath,
 			}
+
+			t.pathMap[file.Path.Get()] = tc
+			t.AppendTemplateContext(tc)
 		}
 	}
 

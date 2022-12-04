@@ -70,7 +70,7 @@ func Test_String_Marshal(t *testing.T) {
 
 	v1 := conical.ConicalInteger{
 		ConicalBase: conical.ConicalBase{
-			Source:      "../../codegen-templates/templates/go/types/integer.model.gotmpl",
+			Source:      "../../codegen-templates/templates/go/types/base/integer.model.go.gotmpl",
 			Import:      "boundedinfinity/example/conical/SomeInteger",
 			Type:        "SomeInteger",
 			Package:     "conical",
@@ -84,7 +84,7 @@ func Test_String_Marshal(t *testing.T) {
 
 	v3 := conical.ConicalString{
 		ConicalBase: conical.ConicalBase{
-			Source:      "../../codegen-templates/templates/go/types/string.model.gotmpl",
+			Source:      "../../codegen-templates/templates/go/types/base/string.model.go.gotmpl",
 			Import:      "boundedinfinity/example/conical/SomeString",
 			Type:        "SomeString",
 			Package:     "conical",
@@ -97,7 +97,7 @@ func Test_String_Marshal(t *testing.T) {
 
 	v2 := conical.ConicalObject{
 		ConicalBase: conical.ConicalBase{
-			Source:      "../../codegen-templates/templates/go/types/object.model.gotmpl",
+			Source:      "../../codegen-templates/templates/go/types/base/object.model.go.gotmpl",
 			Import:      "boundedinfinity/example/conical/SomeObject",
 			Type:        "SomeObject",
 			Package:     "conical",

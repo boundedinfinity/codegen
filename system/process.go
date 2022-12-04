@@ -4,6 +4,7 @@ func (t *System) ProcessTemplates() error {
 	if err := t.tm.Register(t.combined.Templates); err != nil {
 		return err
 	}
+
 	return nil
 }
 

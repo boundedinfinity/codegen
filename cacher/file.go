@@ -39,6 +39,8 @@ func (t Cacher) cacheFileDir(group string, root string) error {
 		return p != root
 	})
 
+	paths = slicer.Dedup(paths)
+
 	for _, path := range paths {
 		if err := t.cacheFilePath(group, path); err != nil {
 			return err
@@ -76,17 +78,17 @@ func (t Cacher) cacheFileFile(group string, path string) error {
 		data.CalculateCheckSum = r.CheckSum
 	}
 
+	if t.sourceMap.Has(data.SourceUrl) {
+		return nil
+	} else {
+		t.sourceMap[data.SourceUrl] = &data
+	}
+
 	if !t.groupMap.Has(group) {
 		t.groupMap[group] = make([]*CachedData, 0)
 	}
 
 	t.groupMap[group] = append(t.groupMap[group], &data)
-
-	if !t.sourceMap.Has(data.SourceUrl) {
-		t.sourceMap[data.SourceUrl] = &data
-	} else {
-		// TODO
-	}
 
 	if !t.destMap.Has(data.DestPath) {
 		t.destMap[data.DestPath] = &data

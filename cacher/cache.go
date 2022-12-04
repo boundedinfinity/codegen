@@ -1,6 +1,7 @@
 package cacher
 
 import (
+	"github.com/boundedinfinity/go-commoner/slicer"
 	"github.com/boundedinfinity/go-urischemer"
 )
 
@@ -15,7 +16,11 @@ type CachedData struct {
 }
 
 func (t Cacher) Cache(group string, urls ...string) error {
-	for _, sourceUrl := range urls {
+	for _, sourceUrl := range slicer.Dedup(urls) {
+		if t.sourceMap.Has(sourceUrl) {
+			continue
+		}
+
 		scheme, path, err := urischemer.Break(sourceUrl)
 
 		if err != nil {

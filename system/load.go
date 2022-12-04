@@ -15,7 +15,9 @@ func (t *System) LoadUri(uris ...string) error {
 		return err
 	}
 
-	for _, cdata := range t.cacher.FindByGroup("schema").Get() {
+	cdatas := t.cacher.FindByGroup("schema").Get()
+
+	for _, cdata := range cdatas {
 		switch {
 		case util.IsJsonSchemaFile(cdata.DestPath):
 			if err := t.jsonSchemas.LoadPath(cdata.DestPath); err != nil {

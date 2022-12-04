@@ -20,9 +20,9 @@ type RenderContext struct {
 
 type TemplateContext struct {
 	TemplateMimeType mime_type.MimeType
+	OutputMimeType   mime_type.MimeType
 	TemplateType     template_type.TemplateType
 	Template         *template.Template
-	OutputMimeType   mime_type.MimeType
 	Path             string
 }
 
@@ -36,6 +36,7 @@ type TemplateOutput struct {
 type TemplateManager struct {
 	codeGenSchema *model.CodeGenSchema
 	pathMap       mapper.Mapper[string, TemplateContext]
+	modelMap      mapper.Mapper[string, []TemplateContext]
 	cacher        *cacher.Cacher
 	funcs         template.FuncMap
 	formatSource  bool
@@ -45,8 +46,9 @@ type TemplateManager struct {
 
 func New(args ...Arg) (*TemplateManager, error) {
 	t := &TemplateManager{
-		pathMap: make(mapper.Mapper[string, TemplateContext]),
-		funcs:   make(template.FuncMap),
+		pathMap:  make(mapper.Mapper[string, TemplateContext]),
+		modelMap: make(mapper.Mapper[string, []TemplateContext]),
+		funcs:    make(template.FuncMap),
 	}
 
 	args = append(args,
