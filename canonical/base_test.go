@@ -1,4 +1,4 @@
-package conical_test
+package canonical_test
 
 import (
 	"testing"

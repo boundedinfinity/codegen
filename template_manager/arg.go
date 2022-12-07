@@ -2,22 +2,21 @@ package template_manager
 
 import (
 	"boundedinfinity/codegen/cacher"
+	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
-
-	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Arg func(*TemplateManager)
 
-func CodeGenSchema(v *model.CodeGenSchema) Arg {
+func CanonicalCombined(v *canonical.CanonicalCombined) Arg {
 	return func(t *TemplateManager) {
-		t.codeGenSchema = v
+		t.canonicals = v
 	}
 }
 
-func JsonSchema(v *jsonschema.System) Arg {
+func CodeGenSchema(v *model.CodeGenSchema) Arg {
 	return func(t *TemplateManager) {
-		t.jsonSchemas = v
+		t.codeGenSchema = v
 	}
 }
 

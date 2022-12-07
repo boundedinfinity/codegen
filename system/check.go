@@ -36,11 +36,11 @@ func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 	}
 
 	for name, operation := range schema.Operations {
-		if t.combined.Operations.Has(name) {
+		if t.mergedCodeGen.Operations.Has(name) {
 			return model.ErrCodeGenOperationDuplicatev(name)
 		}
 
-		t.combined.Operations[name] = operation
+		t.mergedCodeGen.Operations[name] = operation
 	}
 
 	if err := t.mergeTemplate(schemaPath, schema.Templates); err != nil {
@@ -52,17 +52,17 @@ func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 
 func (t *System) mergeInfo(info model.CodeGenSchemaInfo) error {
 	if info.Description.Defined() {
-		t.combined.Info.Description = info.Description
+		t.mergedCodeGen.Info.Description = info.Description
 	}
 
 	if info.Package.Defined() {
-		t.combined.Info.Package = info.Package
+		t.mergedCodeGen.Info.Package = info.Package
 	} else {
 		// TODO
 	}
 
 	if info.RootDir.Defined() {
-		t.combined.Info.RootDir = info.RootDir
+		t.mergedCodeGen.Info.RootDir = info.RootDir
 	} else {
 		// TODO
 	}
@@ -72,7 +72,7 @@ func (t *System) mergeInfo(info model.CodeGenSchemaInfo) error {
 
 func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaTemplates) error {
 	if templates.Header.Defined() {
-		t.combined.Templates.Header = templates.Header
+		t.mergedCodeGen.Templates.Header = templates.Header
 	}
 
 	dir := filepath.Dir(schemaPath)
@@ -119,7 +119,7 @@ func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaT
 		})
 
 		for _, cd := range cds {
-			t.combined.Templates.Files = append(t.combined.Templates.Files, model.CodeGenSchemaTemplateFile{
+			t.mergedCodeGen.Templates.Files = append(t.mergedCodeGen.Templates.Files, model.CodeGenSchemaTemplateFile{
 				Header: file.Header,
 				Path:   o.Some(cd.DestPath),
 			})
@@ -131,11 +131,11 @@ func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaT
 
 func (t *System) mergeMapping(mappings mapper.Mapper[string, string]) error {
 	for k, v := range mappings {
-		if t.combined.Mappings.Has(k) {
+		if t.mergedCodeGen.Mappings.Has(k) {
 			// TODO
 		}
 
-		t.combined.Mappings[k] = v
+		t.mergedCodeGen.Mappings[k] = v
 	}
 
 	return nil

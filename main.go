@@ -22,6 +22,10 @@ func main() {
 		handleError(err)
 	}
 
+	if err := s.Convert(); err != nil {
+		handleError(err)
+	}
+
 	if err := s.ProcessTemplates(); err != nil {
 		handleError(err)
 	}

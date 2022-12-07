@@ -44,8 +44,8 @@ func (t *System) init() error {
 
 	tm, err := template_manager.New(
 		template_manager.Cacher(c),
-		template_manager.JsonSchema(t.jsonSchemas),
-		template_manager.CodeGenSchema(t.combined),
+		template_manager.CanonicalCombined(t.canonicals),
+		template_manager.CodeGenSchema(t.mergedCodeGen),
 	)
 
 	if err != nil {

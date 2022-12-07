@@ -5,7 +5,6 @@ import (
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
-	"github.com/boundedinfinity/go-jsonschema/model"
 )
 
 type CodeGenSchema struct {
@@ -38,9 +37,9 @@ func NewInfo() CodeGenSchemaInfo {
 }
 
 type CodeGenSchemaOperation struct {
-	Description o.Option[string]    `json:"description,omitempty" yaml:"description,omitempty"`
-	Input       o.Option[model.IdT] `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      o.Option[model.IdT] `json:"output,omitempty" yaml:"output,omitempty"`
+	Description o.Option[string] `json:"description,omitempty" yaml:"description,omitempty"`
+	Input       o.Option[string] `json:"input,omitempty" yaml:"input,omitempty"`
+	Output      o.Option[string] `json:"output,omitempty" yaml:"output,omitempty"`
 }
 
 type CodeGenSchemaTemplates struct {

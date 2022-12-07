@@ -15,5 +15,9 @@ func (t *TemplateManager) init() error {
 		return fmt.Errorf("funcs is nil")
 	}
 
+	if t.canonicals == nil {
+		return fmt.Errorf("canonicals is nil")
+	}
+
 	return nil
 }

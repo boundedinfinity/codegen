@@ -8,18 +8,18 @@ import (
 )
 
 func (t *Generator) GenerateJsonSchema(schema model.JsonSchema) error {
-	renders, err := t.tm.RenderModel(schema)
+	// renders, err := t.tm.RenderModel(schema)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	for _, render := range renders {
-		title := t.dumpSchema(schema)
-		fmt.Println()
-		fmt.Println(title)
-		fmt.Println(string(render.Output))
-	}
+	// for _, render := range renders {
+	// 	title := t.dumpSchema(schema)
+	// 	fmt.Println()
+	// 	fmt.Println(title)
+	// 	fmt.Println(string(render.Output))
+	// }
 
 	return nil
 }

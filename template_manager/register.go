@@ -65,11 +65,16 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 				return err
 			}
 
+			_, err = t.combinedTemplates.AddParseTree(cdata.Get().DestPath, tmpl.Tree)
+
+			if err != nil {
+				return err
+			}
+
 			tc := TemplateContext{
 				TemplateMimeType: tmt,
 				TemplateType:     tt,
 				OutputMimeType:   omt,
-				Template:         tmpl,
 				Path:             cdata.Get().DestPath,
 			}
 

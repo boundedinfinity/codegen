@@ -1,30 +1,24 @@
 package template_manager
 
 import (
+	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_type"
-	"boundedinfinity/codegen/util"
 	"bytes"
 	"go/format"
 
-	"github.com/boundedinfinity/go-commoner/slicer"
-	jmodel "github.com/boundedinfinity/go-jsonschema/model"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
-func (t *TemplateManager) RenderModel(schema jmodel.JsonSchema) ([]TemplateOutput, error) {
+func (t *TemplateManager) RenderModel(schema canonical.Canonical) ([]TemplateOutput, error) {
 	tmpls := t.Find(template_type.Model)
-
-	found := slicer.Filter(tmpls, func(tmpl TemplateContext) bool {
-		return util.IsJsonSchemaTemplate(t.jsonSchemas.GetType(schema), tmpl.Path)
-	})
 
 	ctx := RenderContext{
 		Info:   t.codeGenSchema.Info,
 		Schema: schema,
 	}
 
-	return t.render(found, ctx)
+	return t.render(tmpls, ctx)
 }
 
 func (t *TemplateManager) RenderOperation(schema model.CodeGenSchemaOperation) ([]TemplateOutput, error) {
@@ -41,7 +35,7 @@ func (t *TemplateManager) render(tmpls []TemplateContext, data any) ([]TemplateO
 	for _, tmpl := range tmpls {
 		var writer bytes.Buffer
 
-		if err := tmpl.Template.Execute(&writer, data); err != nil {
+		if err := t.combinedTemplates.ExecuteTemplate(&writer, tmpl.Path, data); err != nil {
 			return output, err
 		}
 

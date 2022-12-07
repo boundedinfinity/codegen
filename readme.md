@@ -20,6 +20,7 @@ Specification:
     - https://www.uml.org/
     - https://raml.org/
     - https://avro.apache.org/
+    - https://avro.apache.org/docs/1.11.1/specification/
     - https://typeschema.org/
     - https://github.com/Masterminds/sprig
     - https://developers.google.com/protocol-buffers

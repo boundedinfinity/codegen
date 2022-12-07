@@ -1,7 +1,7 @@
 package system
 
 func (t *System) ProcessTemplates() error {
-	if err := t.tm.Register(t.combined.Templates); err != nil {
+	if err := t.tm.Register(t.mergedCodeGen.Templates); err != nil {
 		return err
 	}
 
@@ -9,7 +9,7 @@ func (t *System) ProcessTemplates() error {
 }
 
 func (t *System) Generate() error {
-	for _, operation := range t.combined.Operations {
+	for _, operation := range t.mergedCodeGen.Operations {
 		if operation.Input.Defined() {
 			schema := t.jsonSchemas.Get(string(operation.Input.Get()))
 

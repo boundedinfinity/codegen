@@ -6,7 +6,7 @@
 //*                                                                                  *
 //************************************************************************************
 
-package conical_type
+package uuid_version
 
 import (
 	"encoding/json"
@@ -17,21 +17,22 @@ import (
 )
 
 var (
-	All = []ConicalType{
-		Integer,
-		Float,
-		String,
-		Date,
+	All = []UuidVersion{
+		V1,
+		V2,
+		V3,
+		V4,
+		V5,
 	}
 )
 
-func (t ConicalType) String() string {
+func (t UuidVersion) String() string {
 	return string(t)
 }
 
-func Parse(v string) (ConicalType, error) {
-	f, ok := slicer.FindFn(All, func(x ConicalType) bool {
-		return ConicalType(v) == x
+func Parse(v string) (UuidVersion, error) {
+	f, ok := slicer.FindFn(All, func(x UuidVersion) bool {
+		return UuidVersion(v) == x
 	})
 
 	if !ok {
@@ -42,7 +43,7 @@ func Parse(v string) (ConicalType, error) {
 }
 
 func Is(s string) bool {
-	return slicer.ContainsFn(All, func(v ConicalType) bool {
+	return slicer.ContainsFn(All, func(v UuidVersion) bool {
 		return string(v) == s
 	})
 }
@@ -56,11 +57,11 @@ func ErrorV(v string) error {
 	)
 }
 
-func (t ConicalType) MarshalJSON() ([]byte, error) {
+func (t UuidVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(t))
 }
 
-func (t *ConicalType) UnmarshalJSON(data []byte) error {
+func (t *UuidVersion) UnmarshalJSON(data []byte) error {
 	var v string
 
 	if err := json.Unmarshal(data, &v); err != nil {
@@ -78,11 +79,11 @@ func (t *ConicalType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (t ConicalType) MarshalYAML() (interface{}, error) {
+func (t UuidVersion) MarshalYAML() (interface{}, error) {
 	return string(t), nil
 }
 
-func (t *ConicalType) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (t *UuidVersion) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var v string
 
 	if err := unmarshal(&v); err != nil {
