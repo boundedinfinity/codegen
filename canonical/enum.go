@@ -21,4 +21,8 @@ func (t CanonicalEnum) HasValidation() bool {
 	return t.CaseSensitive.Defined()
 }
 
+func (t CanonicalEnum) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Enum
+}
+
 var _ Canonical = &CanonicalEnum{}

@@ -24,6 +24,10 @@ func (t CanonicalObject) HasValidation() bool {
 	return false
 }
 
+func (t CanonicalObject) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Object
+}
+
 var _ Canonical = &CanonicalObject{}
 
 type canonicalObject struct {

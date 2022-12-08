@@ -19,17 +19,25 @@ import (
 var (
 	All = []CanonicalType{
 		Array,
+		Coordinate,
+		CreditCardNumber,
 		Date,
 		Datetime,
 		Duration,
+		Email,
 		Enum,
 		Float,
 		Integer,
+		Ipv4,
+		Ipv6,
+		Mac,
 		Object,
+		Phone,
+		SemanticVersion,
 		String,
+		Time,
 		Uuid,
 		Url,
-		Email,
 	}
 )
 

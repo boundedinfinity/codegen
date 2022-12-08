@@ -71,7 +71,8 @@ func (t *System) init() error {
 	g, err := generator.New(
 		generator.DestDir(t.outputDir.Get()),
 		generator.TemplateManager(t.tm),
-		generator.JsonSchemas(t.jsonSchemas),
+		generator.Canonicals(t.canonicals),
+		generator.CodeGenSchema(t.mergedCodeGen),
 	)
 
 	if err != nil {

@@ -19,4 +19,8 @@ func (t CanonicalRef) HasValidation() bool {
 	return true
 }
 
+func (t CanonicalRef) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Ref
+}
+
 var _ Canonical = &CanonicalRef{}

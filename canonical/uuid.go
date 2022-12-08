@@ -7,6 +7,8 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
+// https://ihateregex.io/expr/uuid
+
 type CanonicalUuid struct {
 	CanonicalBase
 	CaseSensitive o.Option[bool]                     `json:"caseSensitive,omitempty" yaml:"caseSensitive,omitempty"`
@@ -19,6 +21,10 @@ func (t CanonicalUuid) CType() canonical_type.CanonicalType {
 
 func (t CanonicalUuid) HasValidation() bool {
 	return t.CaseSensitive.Defined()
+}
+
+func (t CanonicalUuid) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Uuid
 }
 
 var _ Canonical = &CanonicalUuid{}

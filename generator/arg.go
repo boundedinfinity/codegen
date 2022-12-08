@@ -1,10 +1,10 @@
 package generator
 
 import (
+	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
 	"fmt"
-
-	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Arg func(*Generator)
@@ -21,15 +21,21 @@ func GenExt(v string) Arg {
 	}
 }
 
+func Canonicals(v *canonical.CanonicalCombined) Arg {
+	return func(t *Generator) {
+		t.canonicals = v
+	}
+}
+
 func TemplateManager(v *template_manager.TemplateManager) Arg {
 	return func(t *Generator) {
 		t.tm = v
 	}
 }
 
-func JsonSchemas(v *jsonschema.System) Arg {
+func CodeGenSchema(v *model.CodeGenSchema) Arg {
 	return func(t *Generator) {
-		t.jsonSchemas = v
+		t.codeGenSchema = v
 	}
 }
 
@@ -48,11 +54,15 @@ func (t *Generator) init() error {
 	}
 
 	if t.tm == nil {
-		return fmt.Errorf("generator requires template manager")
+		return fmt.Errorf("template manager is nil")
 	}
 
-	if t.jsonSchemas == nil {
-		return fmt.Errorf("generator requires jsonSchemas")
+	if t.canonicals == nil {
+		return fmt.Errorf("canonicals is nil")
+	}
+
+	if t.codeGenSchema == nil {
+		return fmt.Errorf("codeGenSchema is nil")
 	}
 
 	return nil

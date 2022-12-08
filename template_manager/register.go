@@ -3,12 +3,10 @@ package template_manager
 import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_type"
+	"boundedinfinity/codegen/util"
 	"fmt"
 	"io/ioutil"
 	"text/template"
-
-	"github.com/boundedinfinity/go-commoner/extentioner"
-	"github.com/boundedinfinity/go-mimetyper/file_extention"
 )
 
 func (t *TemplateManager) Register(templates model.CodeGenSchemaTemplates) error {
@@ -22,66 +20,57 @@ func (t *TemplateManager) Register(templates model.CodeGenSchemaTemplates) error
 }
 
 func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile) error {
-	if file.Path.Defined() {
-		cdata := t.cacher.Find(file.Path.Get())
+	if file.Path.Empty() {
+		return nil
+	}
 
-		if cdata.Empty() {
-			return fmt.Errorf("cache not found for %v", file.Path.Get())
-		}
+	cached := t.cacher.Find(file.Path.Get())
 
-		if t.pathMap.Has(cdata.Get().DestPath) {
-			return model.ErrCodeGenTemplateFilePathDuplicatev(file.Path.Get())
+	if cached.Empty() {
+		return fmt.Errorf("cache not found for %v", file.Path.Get())
+	}
+
+	if t.pathMap.Has(cached.Get().DestPath) {
+		return model.ErrCodeGenTemplateFilePathDuplicatev(file.Path.Get())
+	}
+
+	tc := TemplateContext{
+		Path:      cached.Get().DestPath,
+		ModelType: util.GetCanonicalType(cached.Get().DestPath),
+	}
+
+	if try := util.GetTemplateType(tc.Path); try.Failure() {
+		return try.Error
+	} else {
+		tc.TemplateMimeType = try.Result
+	}
+
+	if try := util.GetOutputType(tc.Path); try.Failure() {
+		return try.Error
+	} else {
+		tc.OutputMimeType = try.Result
+	}
+
+	if tt, err := template_type.FromUrl(tc.Path); err != nil {
+		return err
+	} else {
+		tc.TemplateType = tt
+	}
+
+	if bs, err := ioutil.ReadFile(tc.Path); err != nil {
+		return err
+	} else {
+		if tmpl, err := template.New("").Funcs(t.funcs).Parse(string(bs)); err != nil {
+			return err
 		} else {
-			path := cdata.Get().DestPath
-			tmplExt := extentioner.Ext(path)
-			outputExt := extentioner.Ext(extentioner.Strip(path))
-			tmt, err := file_extention.GetMimeType(tmplExt)
-
-			if err != nil {
+			if _, err = t.combinedTemplates.AddParseTree(tc.Path, tmpl.Tree); err != nil {
 				return err
 			}
-
-			omt, err := file_extention.GetMimeType(outputExt)
-
-			if err != nil {
-				return err
-			}
-
-			bs, err := ioutil.ReadFile(cdata.Get().DestPath)
-
-			if err != nil {
-				return err
-			}
-
-			tmpl, err := template.New("").Funcs(t.funcs).Parse(string(bs))
-
-			if err != nil {
-				return err
-			}
-
-			tt, err := template_type.FromUrl(cdata.Get().DestPath)
-
-			if err != nil {
-				return err
-			}
-
-			_, err = t.combinedTemplates.AddParseTree(cdata.Get().DestPath, tmpl.Tree)
-
-			if err != nil {
-				return err
-			}
-
-			tc := TemplateContext{
-				TemplateMimeType: tmt,
-				TemplateType:     tt,
-				OutputMimeType:   omt,
-				Path:             cdata.Get().DestPath,
-			}
-
-			t.pathMap[file.Path.Get()] = tc
-			t.AppendTemplateContext(tc)
 		}
 	}
+
+	t.pathMap[file.Path.Get()] = tc
+	t.AppendTemplateContext(tc)
 
 	return nil
 }

@@ -28,7 +28,7 @@ type CodeGenSchemaInfo struct {
 	Description o.Option[string] `json:"description,omitempty" yaml:"description,omitempty"`
 	Version     o.Option[string] `json:"version,omitempty" yaml:"version,omitempty"`
 	Header      o.Option[string] `json:"header,omitempty" yaml:"header,omitempty"`
-	Package     o.Option[string] `json:"package,omitempty" yaml:"package,omitempty"`
+	Namespace   o.Option[string] `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 	RootDir     o.Option[string] `json:"rootDir,omitempty" yaml:"rootDir,omitempty"`
 }
 

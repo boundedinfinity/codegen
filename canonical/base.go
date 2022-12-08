@@ -1,12 +1,16 @@
 package canonical
 
 import (
+	"boundedinfinity/codegen/canonical/canonical_type"
+
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 type Canonical interface {
 	// CType() conical_type.ConicalType
 	HasValidation() bool
+	SchemaId() o.Option[string]
+	SchemaType() canonical_type.CanonicalType
 }
 
 type CanonicalBase struct {
@@ -32,4 +36,8 @@ func (t *CanonicalBase) Merge(o CanonicalBase) bool {
 	t.Source = o.Source
 
 	return false
+}
+
+func (t CanonicalBase) SchemaId() o.Option[string] {
+	return t.Id
 }

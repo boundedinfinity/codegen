@@ -20,4 +20,8 @@ func (t CanonicalDuration) HasValidation() bool {
 	return t.Minimum.Defined() || t.Maximum.Defined()
 }
 
+func (t CanonicalDuration) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Duration
+}
+
 var _ Canonical = &CanonicalDuration{}

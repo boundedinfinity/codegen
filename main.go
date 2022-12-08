@@ -8,7 +8,9 @@ import (
 func main() {
 	uris := os.Args[1:]
 
-	s, err := system.New()
+	s, err := system.New(
+		system.OutputDir("/tmp/codegen"),
+	)
 
 	if err != nil {
 		handleError(err)

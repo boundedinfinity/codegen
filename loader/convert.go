@@ -2,73 +2,52 @@ package loader
 
 import (
 	"boundedinfinity/codegen/canonical"
-	"path/filepath"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-jsonschema/model"
 	"github.com/boundedinfinity/go-jsonschema/stringformat"
-	"github.com/boundedinfinity/go-urischemer"
 )
 
-func (t *Loader) createId(v model.JsonSchema) (o.Option[string], error) {
-	id := t.jsonSchemas.Id(v)
-
-	if id.Empty() {
-		return id, nil
+func (t *Loader) convertJsonSchemaBase(js model.JsonSchemaBase, name o.Option[string]) canonical.CanonicalBase {
+	return canonical.CanonicalBase{
+		Id:          js.Id,
+		Name:        o.FirstOf(name, js.Title),
+		Description: js.Description,
+		Public:      o.Some(true),
 	}
-
-	_, path, err := urischemer.Break(id.Get())
-
-	if err != nil {
-		return id, err
-	}
-
-	pkg := t.mergedCodeGen.Info.Package.Get()
-	pkg = filepath.Join(pkg, path)
-
-	return o.Some(pkg), nil
 }
 
-func (t *Loader) convert(v model.JsonSchema, name o.Option[string]) (canonical.Canonical, error) {
+func (t *Loader) convertJsonSchema(v model.JsonSchema, name o.Option[string]) (canonical.Canonical, error) {
 	var can canonical.Canonical
 	var err error
-
-	id, err := t.createId(v)
-
-	if err != nil {
-		return can, err
-	}
 
 	switch js := v.(type) {
 	case *model.JsonSchemaString:
 		switch js.Format.Get() {
 		case stringformat.Duration:
 			can = canonical.CanonicalDuration{
-				CanonicalBase: canonical.CanonicalBase{
-					Id:          id,
-					Name:        o.FirstOf(name, js.Title),
-					Description: js.Description,
-					Public:      o.Some(true),
-				},
+				CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
 			}
 		case stringformat.Date:
 			can = canonical.CanonicalDate{
-				CanonicalBase: canonical.CanonicalBase{
-					Id:          id,
-					Name:        o.FirstOf(name, js.Title),
-					Description: js.Description,
-					Public:      o.Some(true),
-				},
+				CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			}
+		case stringformat.DateTime:
+			can = canonical.CanonicalDateTime{
+				CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			}
+		case stringformat.Time:
+			can = canonical.CanonicalTime{
+				CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			}
+		case stringformat.Email:
+			can = canonical.CanonicalEmail{
+				CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
 			}
 		default:
 			if js.Enum.Defined() {
 				enum := canonical.CanonicalEnum{
-					CanonicalBase: canonical.CanonicalBase{
-						Id:          id,
-						Name:        o.FirstOf(name, js.Title),
-						Description: js.Description,
-						Public:      o.Some(true),
-					},
+					CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
 				}
 
 				if js.EnumDescription.Defined() {
@@ -81,28 +60,18 @@ func (t *Loader) convert(v model.JsonSchema, name o.Option[string]) (canonical.C
 				can = enum
 			} else {
 				can = canonical.CanonicalString{
-					CanonicalBase: canonical.CanonicalBase{
-						Id:          id,
-						Name:        o.FirstOf(name, js.Title),
-						Description: js.Description,
-						Public:      o.Some(true),
-					},
-					Regex: js.Pattern,
+					CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+					Regex:         js.Pattern,
 				}
 			}
 		}
 
 	case *model.JsonSchemaArray:
-		items, err := t.convert(js.Items.Get(), o.None[string]())
+		items, err := t.convertJsonSchema(js.Items.Get(), o.None[string]())
 
 		arr := canonical.CanonicalArray{
-			CanonicalBase: canonical.CanonicalBase{
-				Id:          id,
-				Name:        o.FirstOf(name, js.Title),
-				Description: js.Description,
-				Public:      o.Some(true),
-			},
-			Items: items,
+			CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			Items:         items,
 		}
 
 		if err != nil {
@@ -112,16 +81,11 @@ func (t *Loader) convert(v model.JsonSchema, name o.Option[string]) (canonical.C
 		can = arr
 	case *model.JsonSchemaObject:
 		obj := canonical.CanonicalObject{
-			CanonicalBase: canonical.CanonicalBase{
-				Id:          id,
-				Name:        o.FirstOf(name, js.Title),
-				Description: js.Description,
-				Public:      o.Some(true),
-			},
+			CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
 		}
 
 		for name, jsProp := range js.Properties {
-			if canonicalProp, err := t.convert(jsProp, o.Some(name)); err != nil {
+			if canonicalProp, err := t.convertJsonSchema(jsProp, o.Some(name)); err != nil {
 				return can, err
 			} else {
 				obj.Properties = append(obj.Properties, canonicalProp)
@@ -131,13 +95,8 @@ func (t *Loader) convert(v model.JsonSchema, name o.Option[string]) (canonical.C
 		can = obj
 	case *model.JsonSchemaRef:
 		can = canonical.CanonicalRef{
-			CanonicalBase: canonical.CanonicalBase{
-				Id:          id,
-				Name:        o.FirstOf(name, js.Title),
-				Description: js.Description,
-				Public:      o.Some(true),
-			},
-			Ref: js.Ref,
+			CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			Ref:           js.Ref,
 		}
 	}
 

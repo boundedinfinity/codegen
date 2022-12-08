@@ -21,4 +21,8 @@ func (t CanonicalFloat) HasValidation() bool {
 	return t.Minimum.Defined() || t.Maximum.Defined() || t.MultipleOf.Defined()
 }
 
+func (t CanonicalFloat) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Float
+}
+
 var _ Canonical = &CanonicalFloat{}

@@ -1,16 +1,17 @@
 package generator
 
 import (
+	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
-
-	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Generator struct {
-	destDir     string
-	genExt      string
-	tm          *template_manager.TemplateManager
-	jsonSchemas *jsonschema.System
+	destDir       string
+	genExt        string
+	tm            *template_manager.TemplateManager
+	canonicals    *canonical.CanonicalCombined
+	codeGenSchema *model.CodeGenSchema
 }
 
 func New(args ...Arg) (*Generator, error) {

@@ -3,38 +3,41 @@ package template_manager
 import (
 	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/canonical/canonical_type"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_type"
+	"fmt"
 	"text/template"
 
 	"github.com/boundedinfinity/go-commoner/caser"
+	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
-
-type RenderContext struct {
-	Info   model.CodeGenSchemaInfo
-	Schema canonical.Canonical
-}
 
 type TemplateContext struct {
 	TemplateMimeType mime_type.MimeType
 	OutputMimeType   mime_type.MimeType
 	TemplateType     template_type.TemplateType
+	ModelType        optioner.Option[canonical_type.CanonicalType]
 	Path             string
 }
 
 type TemplateOutput struct {
-	MimeType     mime_type.MimeType
-	TemplateType template_type.TemplateType
-	Output       []byte
-	Path         string
+	TemplateContext
+	Output []byte
+}
+
+type ModelOutput struct {
+	TemplateOutput
+	Schema canonical.Canonical
 }
 
 type TemplateManager struct {
 	codeGenSchema     *model.CodeGenSchema
 	pathMap           mapper.Mapper[string, TemplateContext]
-	modelMap          mapper.Mapper[string, []TemplateContext]
+	modelMap          mapper.Mapper[template_type.TemplateType, []TemplateContext]
+	schemaMap         mapper.Mapper[canonical_type.CanonicalType, []TemplateContext]
 	cacher            *cacher.Cacher
 	funcs             template.FuncMap
 	formatSource      bool
@@ -45,17 +48,17 @@ type TemplateManager struct {
 
 func New(args ...Arg) (*TemplateManager, error) {
 	t := &TemplateManager{
-		pathMap:           make(mapper.Mapper[string, TemplateContext]),
-		modelMap:          make(mapper.Mapper[string, []TemplateContext]),
-		funcs:             make(template.FuncMap),
-		combinedTemplates: template.New(""),
+		pathMap:   make(mapper.Mapper[string, TemplateContext]),
+		modelMap:  make(mapper.Mapper[template_type.TemplateType, []TemplateContext]),
+		schemaMap: make(mapper.Mapper[canonical_type.CanonicalType, []TemplateContext]),
+		funcs:     make(template.FuncMap),
 	}
 
 	args = append(args,
 		TemplateFunc("DUMP", dumpJson),
 		TemplateFunc("PASCAL", caser.KebabToPascal[string]),
 		TemplateFunc("CAMEL", caser.KebabToCamel[string]),
-		TemplateFunc("IMPORT_PATH", t.importPath),
+		TemplateFunc("PACKAGE", t.getPackage),
 		TemplateFunc("IMPORT_TYPE", t.importType),
 		TemplateFunc("OBJ_NAME", t.objName),
 		TemplateFunc("OBJ_PKG", t.objPackage),
@@ -72,4 +75,26 @@ func New(args ...Arg) (*TemplateManager, error) {
 	}
 
 	return t, nil
+}
+
+func (t *TemplateManager) init() error {
+	if t.cacher == nil {
+		return fmt.Errorf("cacher is nil")
+	}
+
+	if t.pathMap == nil {
+		return fmt.Errorf("pathMap is nil")
+	}
+
+	if t.funcs == nil {
+		return fmt.Errorf("funcs is nil")
+	}
+
+	if t.canonicals == nil {
+		return fmt.Errorf("canonicals is nil")
+	}
+
+	t.combinedTemplates = template.New("").Funcs(t.funcs)
+
+	return nil
 }

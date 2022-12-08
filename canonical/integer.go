@@ -21,4 +21,8 @@ func (t CanonicalInteger) HasValidation() bool {
 	return t.Minimum.Defined() || t.Maximum.Defined() || t.MultipleOf.Defined()
 }
 
-var _ Canonical = &CanonicalObject{}
+func (t CanonicalInteger) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Integer
+}
+
+var _ Canonical = &CanonicalInteger{}

@@ -1,11 +1,17 @@
 package template_manager
 
 func (t *TemplateManager) AppendTemplateContext(tc TemplateContext) {
-	typ := string(tc.TemplateType)
-
-	if !t.modelMap.Has(typ) {
-		t.modelMap[typ] = make([]TemplateContext, 0)
+	if !t.modelMap.Has(tc.TemplateType) {
+		t.modelMap[tc.TemplateType] = make([]TemplateContext, 0)
 	}
 
-	t.modelMap[typ] = append(t.modelMap[typ], tc)
+	t.modelMap[tc.TemplateType] = append(t.modelMap[tc.TemplateType], tc)
+
+	if tc.ModelType.Defined() {
+		if !t.schemaMap.Has(tc.ModelType.Get()) {
+			t.schemaMap[tc.ModelType.Get()] = make([]TemplateContext, 0)
+		}
+
+		t.schemaMap[tc.ModelType.Get()] = append(t.schemaMap[tc.ModelType.Get()], tc)
+	}
 }

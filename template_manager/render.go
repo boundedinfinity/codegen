@@ -10,57 +10,77 @@ import (
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
-func (t *TemplateManager) RenderModel(schema canonical.Canonical) ([]TemplateOutput, error) {
-	tmpls := t.Find(template_type.Model)
+func (t *TemplateManager) RenderModel(schema canonical.Canonical) ([]ModelOutput, error) {
+	tmpls := t.FindSchemaTemplate(schema.SchemaType())
+	outputs := make([]ModelOutput, 0)
 
-	ctx := RenderContext{
-		Info:   t.codeGenSchema.Info,
-		Schema: schema,
+	for _, tmpl := range tmpls {
+		if output, err := t.render(tmpl, schema); err != nil {
+			return outputs, err
+		} else {
+			outputs = append(outputs, ModelOutput{
+				TemplateOutput: output,
+				Schema:         schema,
+			})
+		}
 	}
 
-	return t.render(tmpls, ctx)
+	return outputs, nil
 }
 
 func (t *TemplateManager) RenderOperation(schema model.CodeGenSchemaOperation) ([]TemplateOutput, error) {
-	return t.render(t.Find(template_type.Operation), schema)
+	outputs := make([]TemplateOutput, 0)
+
+	for _, tmpl := range t.FindTemplateType(template_type.Operation) {
+		if output, err := t.render(tmpl, schema); err != nil {
+			return outputs, err
+		} else {
+			outputs = append(outputs, output)
+		}
+	}
+
+	return outputs, nil
 }
 
 func (t *TemplateManager) RenderNamespace(schema model.CodeGenSchemaOperation) ([]TemplateOutput, error) {
-	return t.render(t.Find(template_type.Namespace), schema)
-}
+	outputs := make([]TemplateOutput, 0)
 
-func (t *TemplateManager) render(tmpls []TemplateContext, data any) ([]TemplateOutput, error) {
-	output := make([]TemplateOutput, 0)
-
-	for _, tmpl := range tmpls {
-		var writer bytes.Buffer
-
-		if err := t.combinedTemplates.ExecuteTemplate(&writer, tmpl.Path, data); err != nil {
-			return output, err
+	for _, tmpl := range t.FindTemplateType(template_type.Namespace) {
+		if output, err := t.render(tmpl, schema); err != nil {
+			return outputs, err
+		} else {
+			outputs = append(outputs, output)
 		}
-
-		rendered := writer.Bytes()
-
-		if t.formatSource {
-			switch tmpl.OutputMimeType {
-			case mime_type.ApplicationXGo:
-				formatted, err := format.Source([]byte(rendered))
-
-				if err != nil {
-					return output, err
-				}
-
-				rendered = formatted
-			}
-		}
-
-		output = append(output, TemplateOutput{
-			MimeType:     tmpl.TemplateMimeType,
-			TemplateType: tmpl.TemplateType,
-			Output:       writer.Bytes(),
-			Path:         tmpl.Path,
-		})
 	}
 
+	return outputs, nil
+}
+
+func (t *TemplateManager) render(tmpl TemplateContext, data any) (TemplateOutput, error) {
+	output := TemplateOutput{
+		TemplateContext: tmpl,
+	}
+	var writer bytes.Buffer
+
+	if err := t.combinedTemplates.ExecuteTemplate(&writer, tmpl.Path, data); err != nil {
+		return output, err
+	}
+
+	rendered := writer.Bytes()
+
+	if t.formatSource {
+		switch tmpl.OutputMimeType {
+		case mime_type.ApplicationXGo:
+			formatted, err := format.Source([]byte(rendered))
+
+			if err != nil {
+				return output, err
+			}
+
+			rendered = formatted
+		}
+	}
+
+	output.Output = writer.Bytes()
 	return output, nil
 }

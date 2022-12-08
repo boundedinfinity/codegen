@@ -22,6 +22,10 @@ func (t CanonicalArray) HasValidation() bool {
 	return t.Min.Defined() || t.Max.Defined() || t.Items.HasValidation()
 }
 
+func (t CanonicalArray) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.Array
+}
+
 var _ Canonical = &CanonicalArray{}
 
 type canonicalArray struct {

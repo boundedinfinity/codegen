@@ -21,4 +21,8 @@ func (t CanonicalString) HasValidation() bool {
 	return t.Min.Defined() || t.Max.Defined()
 }
 
+func (t CanonicalString) SchemaType() canonical_type.CanonicalType {
+	return canonical_type.String
+}
+
 var _ Canonical = &CanonicalString{}
