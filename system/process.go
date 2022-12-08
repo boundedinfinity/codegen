@@ -1,5 +1,17 @@
 package system
 
+func (t *System) Load(uris ...string) error {
+	if err := t.loader.LoadUri(uris...); err != nil {
+		return err
+	}
+
+	if err := t.loader.Check(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (t *System) ProcessTemplates() error {
 	if err := t.tm.Register(t.mergedCodeGen.Templates); err != nil {
 		return err

@@ -16,12 +16,24 @@ var (
 		".codegen.yml",
 	}
 
+	codegenTypeExts = []string{
+		".codegen-type.json",
+		".codegen-type.yaml",
+		".codegen-type.yml",
+	}
+
 	jsonSchemaExts = []string{
-		".schema.json",
-		".schema.yaml",
-		".schema.yml",
+		".json-schema.json",
+		".json-schema.yaml",
+		".json-schema.yml",
 	}
 )
+
+func IsCodeGenSchemaTypeFile(v string) bool {
+	return slicer.ContainsFn(codegenTypeExts, func(x string) bool {
+		return strings.HasSuffix(v, x)
+	})
+}
 
 func IsCodeGenSchemaFile(v string) bool {
 	return slicer.ContainsFn(codegenExts, func(x string) bool {
@@ -36,7 +48,7 @@ func IsJsonSchemaFile(v string) bool {
 }
 
 func IsSchemaFile(v string) bool {
-	return IsCodeGenSchemaFile(v) || IsJsonSchemaFile(v)
+	return IsCodeGenSchemaFile(v) || IsJsonSchemaFile(v) || IsCodeGenSchemaTypeFile(v)
 }
 
 func IsJsonSchemaTemplate(typ optioner.Option[schematype.SchemaType], path string) bool {

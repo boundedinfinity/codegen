@@ -8,8 +8,9 @@ import (
 
 type CanonicalString struct {
 	CanonicalBase
-	Min o.Option[int] `json:"min,omitempty" yaml:"min,omitempty"`
-	Max o.Option[int] `json:"max,omitempty" yaml:"max,omitempty"`
+	Min   o.Option[int]    `json:"min,omitempty" yaml:"min,omitempty"`
+	Max   o.Option[int]    `json:"max,omitempty" yaml:"max,omitempty"`
+	Regex o.Option[string] `json:"regex,omitempty" yaml:"regex,omitempty"`
 }
 
 func (t CanonicalString) CType() canonical_type.CanonicalType {

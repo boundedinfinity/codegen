@@ -22,14 +22,14 @@ func UnmarshalCanonicalSchemaYaml(data []byte) (Canonical, error) {
 }
 
 func UnmarshalCanonicalSchemaJson(data []byte) (Canonical, error) {
-	var d canonicalDiscriminator
-
-	if err := json.Unmarshal(data, &d); err != nil {
-		return nil, err
-	}
-
 	var c Canonical
 	var err error
+
+	d, err := unmarshalConcrete[canonicalDiscriminator](data)
+
+	if err != nil {
+		return nil, err
+	}
 
 	if d.Ref == "" {
 		typ, err := canonical_type.Parse(d.Type)

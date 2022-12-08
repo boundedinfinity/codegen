@@ -4,6 +4,7 @@ import (
 	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/generator"
+	"boundedinfinity/codegen/loader"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
 
@@ -23,6 +24,7 @@ type System struct {
 	cacher        *cacher.Cacher
 	generator     *generator.Generator
 	tm            *template_manager.TemplateManager
+	loader        *loader.Loader
 }
 
 func New(args ...Arg) (*System, error) {

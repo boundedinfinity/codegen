@@ -3,6 +3,7 @@ package system
 import (
 	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/generator"
+	"boundedinfinity/codegen/loader"
 	"boundedinfinity/codegen/template_manager"
 	"os"
 	"path/filepath"
@@ -41,6 +42,19 @@ func (t *System) init() error {
 	}
 
 	t.cacher = c
+
+	ld, err := loader.New(
+		loader.Cacher(c),
+		loader.Jsonschemas(t.jsonSchemas),
+		loader.Canonicals(t.canonicals),
+		loader.MergedCodeGen(t.mergedCodeGen),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	t.loader = ld
 
 	tm, err := template_manager.New(
 		template_manager.Cacher(c),

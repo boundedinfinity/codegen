@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/boundedinfinity/go-commoner/optioner"
+	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 var (
@@ -12,6 +12,6 @@ type Arg func(*System)
 
 func OutputDir(v string) Arg {
 	return func(t *System) {
-		t.outputDir = optioner.Some(v)
+		t.outputDir = o.Some(v)
 	}
 }

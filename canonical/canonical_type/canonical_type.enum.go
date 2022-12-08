@@ -28,6 +28,8 @@ var (
 		Object,
 		String,
 		Uuid,
+		Url,
+		Email,
 	}
 )
 

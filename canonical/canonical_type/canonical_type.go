@@ -15,4 +15,6 @@ const (
 	Object   CanonicalType = "object"
 	String   CanonicalType = "string"
 	Uuid     CanonicalType = "uuid"
+	Url      CanonicalType = "url"
+	Email    CanonicalType = "email"
 )

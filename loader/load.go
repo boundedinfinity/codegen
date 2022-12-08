@@ -1,6 +1,7 @@
-package system
+package loader
 
 import (
+	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"encoding/json"
@@ -10,7 +11,7 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func (t *System) LoadUri(uris ...string) error {
+func (t *Loader) LoadUri(uris ...string) error {
 	if err := t.cacher.Cache("schema", uris...); err != nil {
 		return err
 	}
@@ -23,8 +24,8 @@ func (t *System) LoadUri(uris ...string) error {
 			if err := t.jsonSchemas.LoadPath(cdata.DestPath); err != nil {
 				return err
 			}
-		case util.IsCodeGenSchemaFile(cdata.DestPath):
-			if err := t.LoadPath(cdata.DestPath); err != nil {
+		case util.IsCodeGenSchemaFile(cdata.DestPath), util.IsCodeGenSchemaTypeFile(cdata.DestPath):
+			if err := t.LoadCodeGenPath(cdata.DestPath); err != nil {
 				return err
 			}
 		default:
@@ -35,7 +36,12 @@ func (t *System) LoadUri(uris ...string) error {
 	return nil
 }
 
-func (t *System) LoadPath(root string) error {
+func (t *Loader) LoadCodeGenTypePath(root string) error {
+
+	return nil
+}
+
+func (t *Loader) LoadCodeGenPath(root string) error {
 	m, err := marshaler.ReadFromPath(root)
 
 	if err != nil {
@@ -43,7 +49,7 @@ func (t *System) LoadPath(root string) error {
 	}
 
 	for path, content := range m {
-		if t.pathMap.Has(path) {
+		if t.cgsPathMap.Has(path) {
 			return model.ErrPathDuplicatev(path)
 		}
 
@@ -55,7 +61,7 @@ func (t *System) LoadPath(root string) error {
 	return nil
 }
 
-func (t *System) LoadSchema(data []byte, mt mime_type.MimeType, path string) error {
+func (t *Loader) LoadSchema(data []byte, mt mime_type.MimeType, path string) error {
 	var bs []byte
 	var err error
 
@@ -72,13 +78,22 @@ func (t *System) LoadSchema(data []byte, mt mime_type.MimeType, path string) err
 		return model.ErrMimeTypeUnsupportedv(mt)
 	}
 
-	var schema model.CodeGenSchema
+	switch {
+	case util.IsCodeGenSchemaFile(path):
+		var schema model.CodeGenSchema
 
-	if err := json.Unmarshal(bs, &schema); err != nil {
-		return err
+		if err := json.Unmarshal(bs, &schema); err != nil {
+			return err
+		}
+
+		t.cgsPathMap[path] = schema
+	case util.IsCodeGenSchemaTypeFile(path):
+		if schema, err := canonical.UnmarshalCanonicalSchemaJson(bs); err != nil {
+			return err
+		} else {
+			t.canonicalPathMap[path] = schema
+		}
 	}
-
-	t.pathMap[path] = schema
 
 	return nil
 }

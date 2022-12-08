@@ -1,4 +1,4 @@
-package system
+package loader
 
 import (
 	"boundedinfinity/codegen/cacher"
@@ -12,12 +12,26 @@ import (
 	"github.com/boundedinfinity/go-urischemer"
 )
 
-func (t *System) Check() error {
+func (t *Loader) Check() error {
 	if err := t.jsonSchemas.Check(); err != nil {
 		return err
 	}
 
-	for schemaPath, schema := range t.pathMap {
+	for _, v := range t.jsonSchemas.All() {
+		if can, err := t.convert(v, o.None[string]()); err != nil {
+			return err
+		} else {
+			t.canonicals.Register(can)
+		}
+	}
+
+	for _, schema := range t.canonicalPathMap {
+		if err := t.canonicals.Register(schema); err != nil {
+			return err
+		}
+	}
+
+	for schemaPath, schema := range t.cgsPathMap {
 		if err := t.mergeSchema(schemaPath, schema); err != nil {
 			return err
 		}
@@ -26,7 +40,7 @@ func (t *System) Check() error {
 	return nil
 }
 
-func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) error {
+func (t *Loader) mergeSchema(schemaPath string, schema model.CodeGenSchema) error {
 	if err := t.mergeInfo(schema.Info); err != nil {
 		return err
 	}
@@ -50,7 +64,7 @@ func (t *System) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 	return nil
 }
 
-func (t *System) mergeInfo(info model.CodeGenSchemaInfo) error {
+func (t *Loader) mergeInfo(info model.CodeGenSchemaInfo) error {
 	if info.Description.Defined() {
 		t.mergedCodeGen.Info.Description = info.Description
 	}
@@ -70,7 +84,7 @@ func (t *System) mergeInfo(info model.CodeGenSchemaInfo) error {
 	return nil
 }
 
-func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaTemplates) error {
+func (t *Loader) mergeTemplate(schemaPath string, templates model.CodeGenSchemaTemplates) error {
 	if templates.Header.Defined() {
 		t.mergedCodeGen.Templates.Header = templates.Header
 	}
@@ -129,7 +143,7 @@ func (t *System) mergeTemplate(schemaPath string, templates model.CodeGenSchemaT
 	return nil
 }
 
-func (t *System) mergeMapping(mappings mapper.Mapper[string, string]) error {
+func (t *Loader) mergeMapping(mappings mapper.Mapper[string, string]) error {
 	for k, v := range mappings {
 		if t.mergedCodeGen.Mappings.Has(k) {
 			// TODO

@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	schemaPaths := os.Args[1:]
+	uris := os.Args[1:]
 
 	s, err := system.New()
 
@@ -14,15 +14,7 @@ func main() {
 		handleError(err)
 	}
 
-	if err := s.LoadUri(schemaPaths...); err != nil {
-		handleError(err)
-	}
-
-	if err := s.Check(); err != nil {
-		handleError(err)
-	}
-
-	if err := s.Convert(); err != nil {
+	if err := s.Load(uris...); err != nil {
 		handleError(err)
 	}
 

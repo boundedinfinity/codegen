@@ -25,23 +25,33 @@ func (t CanonicalCombined) FindById(id string) o.Option[Canonical] {
 	return t.typeMap.Get(id)
 }
 
-func (t *CanonicalCombined) Register(c Canonical) error {
-	var typ string
+func (t CanonicalCombined) Id(c Canonical) o.Option[string] {
+	var id o.Option[string]
 
 	switch v := c.(type) {
 	case CanonicalString:
-		typ = v.Id.Get()
+		id = v.Id
 	case CanonicalInteger:
-		typ = v.Id.Get()
+		id = v.Id
 	case CanonicalObject:
-		typ = v.Id.Get()
+		id = v.Id
 	}
 
-	if t.typeMap.Has(typ) {
-		fmt.Printf("already have %v", typ)
+	return id
+}
+
+func (t *CanonicalCombined) Register(c Canonical) error {
+	id := t.Id(c)
+
+	if id.Empty() {
+		return nil
 	}
 
-	t.typeMap[typ] = c
+	if t.typeMap.Has(id.Get()) {
+		fmt.Printf("already contains %v", id.Get())
+	}
+
+	t.typeMap[id.Get()] = c
 
 	return nil
 }
