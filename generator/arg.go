@@ -5,6 +5,11 @@ import (
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
 	"fmt"
+	"io/fs"
+)
+
+const (
+	DEFAULT_FILE_MODE = fs.FileMode(0644)
 )
 
 type Arg func(*Generator)
@@ -39,6 +44,12 @@ func CodeGenSchema(v *model.CodeGenSchema) Arg {
 	}
 }
 
+func FileMode(v fs.FileMode) Arg {
+	return func(t *Generator) {
+		t.fileMode = v
+	}
+}
+
 const (
 	DEFAULT_GENEXT  = "gen"
 	DEFAULT_DESTDIR = "/tmp/codegen"
@@ -63,6 +74,10 @@ func (t *Generator) init() error {
 
 	if t.codeGenSchema == nil {
 		return fmt.Errorf("codeGenSchema is nil")
+	}
+
+	if t.fileMode == 0 {
+		t.fileMode = DEFAULT_FILE_MODE
 	}
 
 	return nil

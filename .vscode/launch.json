@@ -20,7 +20,7 @@
             "program": "${workspaceFolder}", 
             "args": [
                 "file://${workspaceFolder}/../codegen-schemas/codegen-schema",
-                "file://${workspaceFolder}/../codegen-schemas/json-schema/label/label-simple",
+                "file://${workspaceFolder}/../codegen-schemas/json-schema/label",
             ],
         }
     ]

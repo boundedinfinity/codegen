@@ -4,6 +4,7 @@ import (
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
+	"io/fs"
 )
 
 type Generator struct {
@@ -12,6 +13,7 @@ type Generator struct {
 	tm            *template_manager.TemplateManager
 	canonicals    *canonical.CanonicalCombined
 	codeGenSchema *model.CodeGenSchema
+	fileMode      fs.FileMode
 }
 
 func New(args ...Arg) (*Generator, error) {

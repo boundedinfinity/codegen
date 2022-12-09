@@ -3,11 +3,11 @@ package template_manager
 import (
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/template_manager/dumper"
+	"boundedinfinity/codegen/util"
+	"fmt"
 	"path"
-	"path/filepath"
 
 	"github.com/boundedinfinity/go-commoner/caser"
-	"github.com/boundedinfinity/go-urischemer"
 )
 
 func dumpJson(obj any) string {
@@ -15,32 +15,23 @@ func dumpJson(obj any) string {
 }
 
 func (t *TemplateManager) namespace(schema canonical.Canonical) string {
-	id := schema.SchemaId()
-
-	if id.Empty() {
-		return "NO-ID"
-	}
-
-	ns := id.Get()
-	_, ns, _ = urischemer.Break(ns)
-	ns = path.Join(t.codeGenSchema.Info.Namespace.Get(), ns)
-	ns = path.Join(path.Dir(ns), caser.KebabToPascal(path.Base(ns)))
-
-	return ns
+	return util.SchemaNamepace(t.codeGenSchema.Info, schema)
 }
 
 func (t *TemplateManager) getPackage(schema canonical.Canonical) string {
-	pkg := t.namespace(schema)
-	pkg = path.Dir(pkg)
-	pkg = path.Base(pkg)
-	return pkg
+	return util.SchemaPackage(t.codeGenSchema.Info, schema)
 }
 
-func (t *TemplateManager) importType(schema canonical.Canonical) string {
-	v := t.namespace(schema)
-	v2 := filepath.Base(filepath.Dir(v))
-	v = v2 + "." + v
-	return v
+func (t *TemplateManager) baseType(schema canonical.Canonical) string {
+	return util.SchemaBaseType(t.codeGenSchema.Info, schema)
+}
+
+func (t *TemplateManager) camel(s fmt.Stringer) string {
+	return caser.KebabToCamel(s.String())
+}
+
+func (t *TemplateManager) pascal(s fmt.Stringer) string {
+	return caser.KebabToPascal(s.String())
 }
 
 func (t *TemplateManager) objPath(schema canonical.Canonical) string {

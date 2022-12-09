@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/boundedinfinity/go-commoner/caser"
 	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
@@ -56,10 +55,10 @@ func New(args ...Arg) (*TemplateManager, error) {
 
 	args = append(args,
 		TemplateFunc("DUMP", dumpJson),
-		TemplateFunc("PASCAL", caser.KebabToPascal[string]),
-		TemplateFunc("CAMEL", caser.KebabToCamel[string]),
+		TemplateFunc("PASCAL", t.pascal),
+		TemplateFunc("CAMEL", t.camel),
 		TemplateFunc("PACKAGE", t.getPackage),
-		TemplateFunc("IMPORT_TYPE", t.importType),
+		TemplateFunc("BASE_TYPE", t.baseType),
 		TemplateFunc("OBJ_NAME", t.objName),
 		TemplateFunc("OBJ_PKG", t.objPackage),
 		TemplateFunc("OBJ_PKG_BASE", t.objPackageBase),

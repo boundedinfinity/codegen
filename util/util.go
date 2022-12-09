@@ -1,10 +1,14 @@
 package util
 
 import (
+	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/canonical/canonical_type"
+	"boundedinfinity/codegen/model"
+	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/boundedinfinity/go-commoner/caser"
 	"github.com/boundedinfinity/go-commoner/extentioner"
 	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
@@ -13,6 +17,7 @@ import (
 	"github.com/boundedinfinity/go-jsonschema/schematype"
 	"github.com/boundedinfinity/go-mimetyper/file_extention"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
+	"github.com/boundedinfinity/go-urischemer"
 )
 
 var (
@@ -93,4 +98,33 @@ func GetOutputType(path string) trier.Try[mime_type.MimeType] {
 	ext = extentioner.Ext(ext)
 	tm, err := file_extention.GetMimeType(ext)
 	return trier.Complete(tm, err)
+}
+
+func SchemaNamepace(info model.CodeGenSchemaInfo, schema canonical.Canonical) string {
+	id := schema.SchemaId()
+
+	if id.Empty() {
+		return "NO-ID"
+	}
+
+	ns := id.Get()
+	_, ns, _ = urischemer.Break(ns)
+	ns = path.Join(info.Namespace.Get(), ns)
+	ns = path.Join(path.Dir(ns), caser.KebabToPascal(path.Base(ns)))
+
+	return ns
+}
+
+func SchemaPackage(info model.CodeGenSchemaInfo, schema canonical.Canonical) string {
+	pkg := SchemaNamepace(info, schema)
+	pkg = path.Dir(pkg)
+	pkg = path.Base(pkg)
+	pkg = caser.KebabToSnake(pkg)
+	return pkg
+}
+
+func SchemaBaseType(info model.CodeGenSchemaInfo, schema canonical.Canonical) string {
+	typ := SchemaNamepace(info, schema)
+	typ = path.Base(typ)
+	return typ
 }
