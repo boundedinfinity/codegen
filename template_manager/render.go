@@ -60,6 +60,7 @@ func (t *TemplateManager) render(tmpl TemplateContext, data any) (TemplateOutput
 	output := TemplateOutput{
 		TemplateContext: tmpl,
 	}
+
 	var writer bytes.Buffer
 
 	if err := t.combinedTemplates.ExecuteTemplate(&writer, tmpl.Path, data); err != nil {
@@ -81,6 +82,6 @@ func (t *TemplateManager) render(tmpl TemplateContext, data any) (TemplateOutput
 		}
 	}
 
-	output.Output = writer.Bytes()
+	output.Output = rendered
 	return output, nil
 }

@@ -8,10 +8,40 @@ import (
 	"path"
 
 	"github.com/boundedinfinity/go-commoner/caser"
+	"github.com/boundedinfinity/go-commoner/optioner"
 )
+
+func (t *TemplateManager) initTemplatesFuncs() error {
+	args := make([]Arg, 0)
+
+	args = append(args,
+		TemplateFunc("DUMP", dumpJson),
+		TemplateFunc("PASCAL", t.pascal),
+		TemplateFunc("CAMEL", t.camel),
+		TemplateFunc("SNAKE", t.camel),
+		TemplateFunc("BASE", t.pathBase),
+		TemplateFunc("DIR", t.pathDir),
+		TemplateFunc("PACKAGE", t.getPackage),
+		TemplateFunc("BASE_TYPE", t.baseType),
+	)
+
+	for _, arg := range args {
+		arg(t)
+	}
+
+	return nil
+}
 
 func dumpJson(obj any) string {
 	return dumper.New().Dump(obj)
+}
+
+func (t *TemplateManager) pathBase(s string) string {
+	return path.Base(s)
+}
+
+func (t *TemplateManager) pathDir(s string) string {
+	return path.Dir(s)
 }
 
 func (t *TemplateManager) namespace(schema canonical.Canonical) string {
@@ -26,52 +56,31 @@ func (t *TemplateManager) baseType(schema canonical.Canonical) string {
 	return util.SchemaBaseType(t.codeGenSchema.Info, schema)
 }
 
-func (t *TemplateManager) camel(s fmt.Stringer) string {
-	return caser.KebabToCamel(s.String())
+func (t *TemplateManager) camel(s any) string {
+	return caser.KebabToCamel(a2s(s))
 }
 
-func (t *TemplateManager) pascal(s fmt.Stringer) string {
-	return caser.KebabToPascal(s.String())
+func (t *TemplateManager) pascal(s any) string {
+	return caser.KebabToPascal(a2s(s))
 }
 
-func (t *TemplateManager) objPath(schema canonical.Canonical) string {
-	var out string
-
-	// id := t.jsonSchemas.Id(rc.Schema)
-
-	// if id.Defined() {
-	// 	out = string(id.Get())
-	// 	_, p, _ := urischemer.Break(out)
-	// 	out = p
-	// } else {
-	// 	// TODO
-	// }
-
-	// if t.codeGenSchema.Info.Package.Defined() {
-	// 	out = path.Join(t.codeGenSchema.Info.Package.Get(), out)
-	// } else {
-	// 	// TODO
-	// }
-
-	return out
+func (t *TemplateManager) snake(s any) string {
+	return caser.KebabToSnake(a2s(s))
 }
 
-func (t *TemplateManager) objName(schema canonical.Canonical) string {
-	out := t.objPath(schema)
-	out = path.Base(out)
-	out = caser.KebabToPascal(out)
-	return out
-}
+func a2s(a any) string {
+	var s string
 
-func (t *TemplateManager) objPackage(schema canonical.Canonical) string {
-	out := t.objPath(schema)
-	out = path.Dir(out)
-	return out
-}
+	switch v := a.(type) {
+	case string:
+		s = v
+	case fmt.Stringer:
+		s = v.String()
+	case optioner.Option[string]:
+		s = v.OrElse("===========>EMPTY OPTION<===========")
+	default:
+		s = fmt.Sprintf("===========>CANT_CONVERT %v<===========", a)
+	}
 
-func (t *TemplateManager) objPackageBase(schema canonical.Canonical) string {
-	out := t.objPath(schema)
-	out = path.Dir(out)
-	out = path.Base(out)
-	return out
+	return s
 }

@@ -2,6 +2,7 @@ package generator
 
 import (
 	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/loader"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
 	"fmt"
@@ -50,6 +51,12 @@ func FileMode(v fs.FileMode) Arg {
 	}
 }
 
+func Loader(v *loader.Loader) Arg {
+	return func(t *Generator) {
+		t.loader = v
+	}
+}
+
 const (
 	DEFAULT_GENEXT  = "gen"
 	DEFAULT_DESTDIR = "/tmp/codegen"
@@ -74,6 +81,10 @@ func (t *Generator) init() error {
 
 	if t.codeGenSchema == nil {
 		return fmt.Errorf("codeGenSchema is nil")
+	}
+
+	if t.loader == nil {
+		return fmt.Errorf("loader is nil")
 	}
 
 	if t.fileMode == 0 {

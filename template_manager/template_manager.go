@@ -6,7 +6,6 @@ import (
 	"boundedinfinity/codegen/canonical/canonical_type"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_type"
-	"fmt"
 	"text/template"
 
 	"github.com/boundedinfinity/go-commoner/optioner"
@@ -53,18 +52,6 @@ func New(args ...Arg) (*TemplateManager, error) {
 		funcs:     make(template.FuncMap),
 	}
 
-	args = append(args,
-		TemplateFunc("DUMP", dumpJson),
-		TemplateFunc("PASCAL", t.pascal),
-		TemplateFunc("CAMEL", t.camel),
-		TemplateFunc("PACKAGE", t.getPackage),
-		TemplateFunc("BASE_TYPE", t.baseType),
-		TemplateFunc("OBJ_NAME", t.objName),
-		TemplateFunc("OBJ_PKG", t.objPackage),
-		TemplateFunc("OBJ_PKG_BASE", t.objPackageBase),
-		TemplateFunc("PACKAGE_DIR", t.objPackage),
-	)
-
 	for _, arg := range args {
 		arg(t)
 	}
@@ -74,26 +61,4 @@ func New(args ...Arg) (*TemplateManager, error) {
 	}
 
 	return t, nil
-}
-
-func (t *TemplateManager) init() error {
-	if t.cacher == nil {
-		return fmt.Errorf("cacher is nil")
-	}
-
-	if t.pathMap == nil {
-		return fmt.Errorf("pathMap is nil")
-	}
-
-	if t.funcs == nil {
-		return fmt.Errorf("funcs is nil")
-	}
-
-	if t.canonicals == nil {
-		return fmt.Errorf("canonicals is nil")
-	}
-
-	t.combinedTemplates = template.New("").Funcs(t.funcs)
-
-	return nil
 }

@@ -17,14 +17,16 @@ func (t *Loader) Merge() error {
 		if schema, err := t.convertJsonSchema(jsSchema, o.None[string]()); err != nil {
 			return err
 		} else {
-			if err := t.canonicals.Register(schema); err != nil {
+			source := t.jsonSchemas.GetSource(jsSchema.GetId().Get())
+
+			if err := t.canonicals.Register(schema, source); err != nil {
 				return err
 			}
 		}
 	}
 
-	for _, schema := range t.canonicalPathMap {
-		if err := t.canonicals.Register(schema); err != nil {
+	for source, schema := range t.canonicalPathMap {
+		if err := t.canonicals.Register(schema, o.Some(source)); err != nil {
 			return err
 		}
 	}

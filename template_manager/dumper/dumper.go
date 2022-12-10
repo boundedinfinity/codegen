@@ -2,6 +2,8 @@ package dumper
 
 import (
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -15,17 +17,17 @@ type errJson struct {
 }
 
 func (t *dumper) Dump(v any) string {
+	name := reflect.TypeOf(v).Name()
 	var out string
 
-	if bs, err := json.MarshalIndent(v, "", t.indent); err != nil {
+	if bs, err := json.MarshalIndent(v, "// ", t.indent); err != nil {
 		errBs, _ := json.MarshalIndent(errJson{Err: err.Error()}, "", t.indent)
 		out = string(errBs)
 	} else {
 		out = string(bs)
 	}
 
-	out = strings.ReplaceAll(out, "\n", "\n"+t.comment+" ")
-	out = t.comment + " " + out
+	out = fmt.Sprintf("// %v\n// ", name) + out
 
 	return out
 }

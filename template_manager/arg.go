@@ -4,7 +4,31 @@ import (
 	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
+	"fmt"
+	"text/template"
 )
+
+func (t *TemplateManager) init() error {
+	if t.cacher == nil {
+		return fmt.Errorf("cacher is nil")
+	}
+
+	if t.pathMap == nil {
+		return fmt.Errorf("pathMap is nil")
+	}
+
+	if t.canonicals == nil {
+		return fmt.Errorf("canonicals is nil")
+	}
+
+	if err := t.initTemplatesFuncs(); err != nil {
+		return nil
+	}
+
+	t.combinedTemplates = template.New("").Funcs(t.funcs)
+
+	return nil
+}
 
 type Arg func(*TemplateManager)
 

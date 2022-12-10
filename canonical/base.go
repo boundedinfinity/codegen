@@ -11,6 +11,7 @@ type Canonical interface {
 	HasValidation() bool
 	SchemaId() o.Option[string]
 	SchemaType() canonical_type.CanonicalType
+	Base() CanonicalBase
 }
 
 type CanonicalBase struct {
@@ -25,6 +26,10 @@ type CanonicalBase struct {
 
 func (t CanonicalBase) HasValidation() bool {
 	return false
+}
+
+func (t CanonicalBase) Base() CanonicalBase {
+	return t
 }
 
 func (t *CanonicalBase) Merge(o CanonicalBase) bool {

@@ -110,7 +110,7 @@ func SchemaNamepace(info model.CodeGenSchemaInfo, schema canonical.Canonical) st
 	ns := id.Get()
 	_, ns, _ = urischemer.Break(ns)
 	ns = path.Join(info.Namespace.Get(), ns)
-	ns = path.Join(path.Dir(ns), caser.KebabToPascal(path.Base(ns)))
+	ns = path.Join(path.Dir(ns), path.Base(ns))
 
 	return ns
 }

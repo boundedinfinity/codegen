@@ -16,20 +16,20 @@ func (t *Loader) LoadUri(uris ...string) error {
 		return err
 	}
 
-	cdatas := t.cacher.FindByGroup("schema").Get()
+	cds := t.cacher.FindByGroup("schema").Get()
 
-	for _, cdata := range cdatas {
+	for _, cd := range cds {
 		switch {
-		case util.IsJsonSchemaFile(cdata.DestPath):
-			if err := t.jsonSchemas.LoadPath(cdata.DestPath); err != nil {
+		case util.IsJsonSchemaFile(cd.DestPath):
+			if err := t.jsonSchemas.LoadPath(cd.DestPath); err != nil {
 				return err
 			}
-		case util.IsCodeGenSchemaFile(cdata.DestPath), util.IsCodeGenSchemaTypeFile(cdata.DestPath):
-			if err := t.LoadCodeGenPath(cdata.DestPath); err != nil {
+		case util.IsCodeGenSchemaFile(cd.DestPath), util.IsCodeGenSchemaTypeFile(cd.DestPath):
+			if err := t.LoadCodeGenPath(cd.DestPath); err != nil {
 				return err
 			}
 		default:
-			return model.ErrUnsupportedSchemev(cdata.DestPath)
+			return model.ErrUnsupportedSchemev(cd.DestPath)
 		}
 	}
 
@@ -87,11 +87,19 @@ func (t *Loader) LoadSchema(data []byte, mt mime_type.MimeType, path string) err
 		}
 
 		t.cgsPathMap[path] = schema
+
+		if schema.Info.Id.Defined() {
+			t.cgsId2path[schema.Info.Id.Get()] = path
+		}
 	case util.IsCodeGenSchemaTypeFile(path):
 		if schema, err := canonical.UnmarshalCanonicalSchemaJson(bs); err != nil {
 			return err
 		} else {
 			t.canonicalPathMap[path] = schema
+
+			if schema.SchemaId().Defined() {
+				t.canonicalId2path[schema.SchemaId().Get()] = path
+			}
 		}
 	}
 

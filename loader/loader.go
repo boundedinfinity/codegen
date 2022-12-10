@@ -4,7 +4,6 @@ import (
 	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
-	"errors"
 
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 	"github.com/boundedinfinity/go-jsonschema"
@@ -14,7 +13,9 @@ type Loader struct {
 	jsonSchemas      *jsonschema.System
 	cacher           *cacher.Cacher
 	cgsPathMap       mapper.Mapper[string, model.CodeGenSchema]
+	cgsId2path       mapper.Mapper[string, string]
 	canonicalPathMap mapper.Mapper[string, canonical.Canonical]
+	canonicalId2path mapper.Mapper[string, string]
 	canonicals       *canonical.CanonicalCombined
 	mergedCodeGen    *model.CodeGenSchema
 }
@@ -22,7 +23,9 @@ type Loader struct {
 func New(args ...Arg) (*Loader, error) {
 	t := &Loader{
 		cgsPathMap:       mapper.Mapper[string, model.CodeGenSchema]{},
+		cgsId2path:       mapper.Mapper[string, string]{},
 		canonicalPathMap: mapper.Mapper[string, canonical.Canonical]{},
+		canonicalId2path: mapper.Mapper[string, string]{},
 	}
 
 	for _, arg := range args {
@@ -34,24 +37,4 @@ func New(args ...Arg) (*Loader, error) {
 	}
 
 	return t, nil
-}
-
-func (t *Loader) init() error {
-	if t.jsonSchemas == nil {
-		return errors.New("jsonSchemas is nil")
-	}
-
-	if t.cacher == nil {
-		return errors.New("cacher is nil")
-	}
-
-	if t.canonicals == nil {
-		return errors.New("canonicals is nil")
-	}
-
-	if t.mergedCodeGen == nil {
-		return errors.New("mergedCodeGen is nil")
-	}
-
-	return nil
 }

@@ -16,6 +16,6 @@ func (t *Cacher) FindByDest(path string) o.Option[*CachedData] {
 	return t.destMap.Get(path)
 }
 
-func (t *Cacher) Find(path string) o.Option[*CachedData] {
-	return o.FirstOf(t.FindBySource(path), t.FindByDest(path))
+func (t *Cacher) Find(id string) o.Option[*CachedData] {
+	return o.FirstOf(t.FindBySource(id), t.FindByDest(id))
 }
