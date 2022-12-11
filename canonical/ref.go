@@ -12,7 +12,7 @@ type CanonicalRef struct {
 }
 
 func (t CanonicalRef) CType() canonical_type.CanonicalType {
-	return canonical_type.String
+	return canonical_type.Ref
 }
 
 func (t CanonicalRef) HasValidation() bool {

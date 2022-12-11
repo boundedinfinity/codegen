@@ -2,14 +2,12 @@ package template_manager_test
 
 import (
 	"boundedinfinity/codegen/cacher"
-	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
 	"log"
 	"testing"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
-	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -80,19 +78,19 @@ func loadTemplates() {
 func Test_String_Marshal(t *testing.T) {
 	loadTemplates()
 
-	v1 := canonical.CanonicalInteger{
-		CanonicalBase: canonical.CanonicalBase{
-			Source: "../../codegen-templates/templates/go/types/base/integer.model.go.gotmpl",
-			// Import:      "boundedinfinity/example/conical/SomeInteger",
-			Id: o.Some("boundedinfinity/example/conical/SomeInteger"),
-			// Package:     "conical",
-			Name:        o.Some("Si"),
-			Description: o.Some("A custom integer type"),
-		},
-		Maximum:    o.Some(10),
-		Minimum:    o.Some(1),
-		MultipleOf: o.Some(2),
-	}
+	// v1 := canonical.CanonicalInteger{
+	// 	CanonicalBase: canonical.CanonicalBase{
+	// 		Source: "../../codegen-templates/templates/go/types/base/integer.model.go.gotmpl",
+	// 		// Import:      "boundedinfinity/example/conical/SomeInteger",
+	// 		Id: o.Some("boundedinfinity/example/conical/SomeInteger"),
+	// 		// Package:     "conical",
+	// 		Name:        o.Some("Si"),
+	// 		Description: o.Some("A custom integer type"),
+	// 	},
+	// 	Maximum:    o.Some(10),
+	// 	Minimum:    o.Some(1),
+	// 	MultipleOf: o.Some(2),
+	// }
 
 	// v3 := conical.ConicalString{
 	// 	ConicalBase: conical.ConicalBase{
@@ -120,12 +118,12 @@ func Test_String_Marshal(t *testing.T) {
 	// 	},
 	// }
 
-	_, err := tm.RenderModel(v1)
-	assert.Nil(t, err)
-	// assert.Nil(t, renderTemplate(v3))
-	// assert.Nil(t, renderTemplate(v2))
+	// _, err := tm.RenderModel(v1)
+	// assert.Nil(t, err)
+	// // assert.Nil(t, renderTemplate(v3))
+	// // assert.Nil(t, renderTemplate(v2))
 
-	expected := ""
-	actual := ""
-	assert.Equal(t, expected, string(actual))
+	// expected := ""
+	// actual := ""
+	// assert.Equal(t, expected, string(actual))
 }

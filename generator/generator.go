@@ -10,7 +10,6 @@ import (
 )
 
 type Generator struct {
-	destDir       string
 	genExt        string
 	tm            *template_manager.TemplateManager
 	canonicals    *canonical.CanonicalCombined

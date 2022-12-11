@@ -5,6 +5,7 @@ import (
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/canonical/canonical_type"
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/template_type"
 	"text/template"
 
@@ -28,7 +29,7 @@ type TemplateOutput struct {
 
 type ModelOutput struct {
 	TemplateOutput
-	Schema canonical.Canonical
+	Schema render_context.RenderContext
 }
 
 type TemplateManager struct {

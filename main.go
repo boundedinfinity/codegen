@@ -9,7 +9,7 @@ func main() {
 	uris := os.Args[1:]
 
 	s, err := system.New(
-		system.OutputDir("/tmp/codegen"),
+	// system.OutputDir("/tmp/codegen"),
 	)
 
 	if err != nil {

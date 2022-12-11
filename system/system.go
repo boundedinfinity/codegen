@@ -13,7 +13,6 @@ import (
 
 type System struct {
 	workDir       optioner.Option[string]
-	outputDir     optioner.Option[string]
 	cacheDir      optioner.Option[string]
 	mergedCodeGen *model.CodeGenSchema
 	canonicals    *canonical.CanonicalCombined

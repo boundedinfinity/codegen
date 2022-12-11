@@ -29,10 +29,8 @@ func (t *System) Generate() error {
 		return err
 	}
 
-	for _, schema := range t.canonicals.All() {
-		if err := t.generator.GenerateModel(schema); err != nil {
-			return err
-		}
+	if err := t.generator.Generate(); err != nil {
+		return err
 	}
 
 	// for _, operation := range t.mergedCodeGen.Operations {

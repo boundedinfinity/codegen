@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/boundedinfinity/go-commoner/optioner"
-	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 func (t *System) init() error {
@@ -24,11 +23,6 @@ func (t *System) init() error {
 		}
 
 		t.workDir = optioner.Some(workDir)
-	}
-
-	if t.outputDir.Empty() {
-		outputDir := filepath.Join(t.workDir.Get(), "output")
-		t.outputDir = optioner.Some(outputDir)
 	}
 
 	if t.cacheDir.Empty() {
@@ -69,7 +63,6 @@ func (t *System) init() error {
 	t.tm = tm
 
 	g, err := generator.New(
-		generator.DestDir(t.outputDir.Get()),
 		generator.TemplateManager(t.tm),
 		generator.Canonicals(t.canonicals),
 		generator.CodeGenSchema(t.mergedCodeGen),
@@ -90,9 +83,3 @@ var (
 )
 
 type Arg func(*System)
-
-func OutputDir(v string) Arg {
-	return func(t *System) {
-		t.outputDir = o.Some(v)
-	}
-}

@@ -21,8 +21,6 @@ func (t *TemplateManager) initTemplatesFuncs() error {
 		TemplateFunc("SNAKE", t.camel),
 		TemplateFunc("BASE", t.pathBase),
 		TemplateFunc("DIR", t.pathDir),
-		TemplateFunc("PACKAGE", t.getPackage),
-		TemplateFunc("BASE_TYPE", t.baseType),
 	)
 
 	for _, arg := range args {

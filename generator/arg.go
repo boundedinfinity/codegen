@@ -15,12 +15,6 @@ const (
 
 type Arg func(*Generator)
 
-func DestDir(v string) Arg {
-	return func(t *Generator) {
-		t.destDir = v
-	}
-}
-
 func GenExt(v string) Arg {
 	return func(t *Generator) {
 		t.genExt = v
@@ -63,10 +57,6 @@ const (
 )
 
 func (t *Generator) init() error {
-	if t.destDir == "" {
-		t.destDir = DEFAULT_DESTDIR
-	}
-
 	if t.genExt == "" {
 		t.genExt = DEFAULT_GENEXT
 	}

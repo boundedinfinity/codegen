@@ -144,8 +144,8 @@ func (t *Loader) mergeInfo(info model.CodeGenSchemaInfo) error {
 		// TODO
 	}
 
-	if info.RootDir.Defined() {
-		t.mergedCodeGen.Info.RootDir = info.RootDir
+	if info.DestDir.Defined() {
+		t.mergedCodeGen.Info.DestDir = info.DestDir
 	} else {
 		// TODO
 	}

@@ -29,7 +29,7 @@ type CodeGenSchemaInfo struct {
 	Version     o.Option[string] `json:"version,omitempty" yaml:"version,omitempty"`
 	Header      o.Option[string] `json:"header,omitempty" yaml:"header,omitempty"`
 	Namespace   o.Option[string] `json:"namespace,omitempty" yaml:"namespace,omitempty"`
-	RootDir     o.Option[string] `json:"rootDir,omitempty" yaml:"rootDir,omitempty"`
+	DestDir     o.Option[string] `json:"destDir,omitempty" yaml:"destDir,omitempty"`
 }
 
 func NewInfo() CodeGenSchemaInfo {

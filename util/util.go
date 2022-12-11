@@ -4,6 +4,7 @@ import (
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/canonical/canonical_type"
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/render_context"
 	"path"
 	"path/filepath"
 	"strings"
@@ -127,4 +128,24 @@ func SchemaBaseType(info model.CodeGenSchemaInfo, schema canonical.Canonical) st
 	typ := SchemaNamepace(info, schema)
 	typ = path.Base(typ)
 	return typ
+}
+
+func DestPath(info model.CodeGenSchemaInfo, schema render_context.RenderContext, tmplPath string) string {
+	file := tmplPath
+	ns := schema.Base().SchemaNs
+	file = filepath.Base(file)
+	file = extentioner.Strip(file)
+	file = filepath.Base(ns) + "." + file
+	path := ns
+	path = strings.ReplaceAll(ns, info.Namespace.Get(), "")
+	path = filepath.Dir(path)
+	path = filepath.Join(info.DestDir.Get(), path, file)
+	return path
+}
+
+func CurrentNs(info model.CodeGenSchemaInfo, outputPath string) string {
+	out := outputPath
+	out = path.Dir(out)
+	out = strings.ReplaceAll(out, info.DestDir.Get(), info.Namespace.Get())
+	return out
 }

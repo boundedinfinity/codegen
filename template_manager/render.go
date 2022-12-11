@@ -1,20 +1,26 @@
 package template_manager
 
 import (
-	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/canonical/canonical_type"
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/template_type"
+	"boundedinfinity/codegen/util"
 	"bytes"
 	"go/format"
 
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
-func (t *TemplateManager) RenderModel(schema canonical.Canonical) ([]ModelOutput, error) {
-	tmpls := t.FindSchemaTemplate(schema.SchemaType())
+func (t *TemplateManager) RenderModel(schema render_context.RenderContext) ([]ModelOutput, error) {
+	tmpls := t.FindSchemaTemplate(canonical_type.CanonicalType(schema.Base().SchemaType))
 	outputs := make([]ModelOutput, 0)
 
 	for _, tmpl := range tmpls {
+		outputPath := util.DestPath(t.codeGenSchema.Info, schema, tmpl.Path)
+		schema.Base().OutputPath = outputPath
+		schema.Base().CurrNs = util.CurrentNs(t.codeGenSchema.Info, outputPath)
+
 		if output, err := t.render(tmpl, schema); err != nil {
 			return outputs, err
 		} else {
