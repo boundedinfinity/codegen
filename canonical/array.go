@@ -19,7 +19,8 @@ func (t CanonicalArray) CType() canonical_type.CanonicalType {
 }
 
 func (t CanonicalArray) HasValidation() bool {
-	return t.Min.Defined() || t.Max.Defined() || t.Items.HasValidation()
+	return t.Min.Defined() || t.Max.Defined() ||
+		t.Items.HasValidation() || t.Items.HasValidation()
 }
 
 func (t CanonicalArray) SchemaType() canonical_type.CanonicalType {

@@ -150,5 +150,17 @@ func (t *Loader) mergeInfo(info model.CodeGenSchemaInfo) error {
 		// TODO
 	}
 
+	if info.FormatSource.Defined() {
+		t.mergedCodeGen.Info.FormatSource = info.FormatSource
+	} else {
+		// TODO
+	}
+
+	if info.TemplateDump.Defined() {
+		t.mergedCodeGen.Info.TemplateDump = info.TemplateDump
+	} else {
+		// TODO
+	}
+
 	return nil
 }

@@ -9,8 +9,4 @@ type RenderContextString struct {
 	Regex o.Option[string]
 }
 
-func (t RenderContextString) Validation() bool {
-	return t.Max.Defined() || t.Max.Defined() || t.Regex.Defined()
-}
-
 var _ RenderContext = &RenderContextString{}

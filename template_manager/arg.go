@@ -5,7 +5,6 @@ import (
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
 	"fmt"
-	"text/template"
 )
 
 func (t *TemplateManager) init() error {
@@ -24,8 +23,6 @@ func (t *TemplateManager) init() error {
 	if err := t.initTemplatesFuncs(); err != nil {
 		return nil
 	}
-
-	t.combinedTemplates = template.New("").Funcs(t.funcs)
 
 	return nil
 }
@@ -59,12 +56,6 @@ func TemplateFunc(v string, fn any) Arg {
 func SetTemplateFuncs(v map[string]any) Arg {
 	return func(t *TemplateManager) {
 		t.funcs = v
-	}
-}
-
-func FormatSource(v bool) Arg {
-	return func(t *TemplateManager) {
-		t.formatSource = v
 	}
 }
 

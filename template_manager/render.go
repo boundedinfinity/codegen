@@ -18,8 +18,17 @@ func (t *TemplateManager) RenderModel(schema render_context.RenderContext) ([]Mo
 
 	for _, tmpl := range tmpls {
 		outputPath := util.DestPath(t.codeGenSchema.Info, schema, tmpl.Path)
-		schema.Base().OutputPath = outputPath
-		schema.Base().CurrNs = util.CurrentNs(t.codeGenSchema.Info, outputPath)
+
+		err := render_context.WalkBase(schema, func(base *render_context.RenderContextBase) error {
+			base.OutputPath = outputPath
+			base.CurrNs = util.CurrentNs(t.codeGenSchema.Info, outputPath)
+			base.SourceUri = schema.Base().SourceUri
+			return nil
+		})
+
+		if err != nil {
+			return outputs, err
+		}
 
 		if output, err := t.render(tmpl, schema); err != nil {
 			return outputs, err
@@ -69,13 +78,17 @@ func (t *TemplateManager) render(tmpl TemplateContext, data any) (TemplateOutput
 
 	var writer bytes.Buffer
 
-	if err := t.combinedTemplates.ExecuteTemplate(&writer, tmpl.Path, data); err != nil {
+	if err := tmpl.Template.Execute(&writer, data); err != nil {
 		return output, err
 	}
 
+	// if err := t.combinedTemplates.ExecuteTemplate(&writer, tmpl.Path, data); err != nil {
+	// 	return output, err
+	// }
+
 	rendered := writer.Bytes()
 
-	if t.formatSource {
+	if t.codeGenSchema.Info.FormatSource.Defined() && t.codeGenSchema.Info.FormatSource.Get() {
 		switch tmpl.OutputMimeType {
 		case mime_type.ApplicationXGo:
 			formatted, err := format.Source([]byte(rendered))

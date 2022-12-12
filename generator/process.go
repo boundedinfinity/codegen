@@ -8,6 +8,7 @@ import (
 	"path"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
+	"github.com/gertd/go-pluralize"
 )
 
 func (t *Generator) Process() error {
@@ -61,20 +62,25 @@ func (t *Generator) convert(ci canonical.Canonical) (render_context.RenderContex
 }
 
 func (t *Generator) handleRenderContextRef(c canonical.CanonicalRef, b render_context.RenderContextBase) (*render_context.RenderContextRef, error) {
-	rc := render_context.RenderContextRef{
-		RenderContextBase: b,
-		Ref:               c.Ref.Get(),
-	}
-
 	ref := t.canonicals.Find(c.Ref)
 
-	if ref.Defined() {
-		refName := ref.Get().Base().Name
-		refIdName := path.Base(ref.Get().SchemaId().Get())
+	if ref.Empty() {
+		// TODO
+	}
 
-		if rc.Name == "" || rc.Name == "." {
-			rc.Name = o.FirstOf(refName, o.Some(refIdName)).Get()
-		}
+	rb, err := t.convert(ref.Get())
+
+	if err != nil {
+		return nil, err
+	}
+
+	rc := render_context.RenderContextRef{
+		RenderContextBase: b,
+		Ref:               rb,
+	}
+
+	if rc.Name == "" || rc.Name == "." {
+		rc.Name = rb.Base().Name
 	}
 
 	return &rc, nil
@@ -88,6 +94,15 @@ func (t *Generator) handleRenderContextArray(c canonical.CanonicalArray, b rende
 	if i, err := t.convert(c.Items); err != nil {
 		return &rc, err
 	} else {
+		if rc.SchemaNs == "" {
+			rc.SchemaNs = i.Base().SchemaNs
+		}
+
+		if rc.Name == "" || rc.Name == "." {
+			rc.Name = i.Base().Name
+			rc.Name = pluralize.NewClient().Plural(rc.Name)
+		}
+
 		rc.Items = i
 	}
 
@@ -129,15 +144,16 @@ func (t *Generator) convertBase(ci canonical.Canonical) (render_context.RenderCo
 	b := ci.Base()
 
 	return render_context.RenderContextBase{
-		SourceUri:   t.loader.FindSource(b.Id).Get(),
-		Id:          b.Id.Get(),
-		SchemaType:  string(ci.SchemaType()),
-		RootNs:      t.codeGenSchema.Info.Namespace.Get(),
-		SchemaNs:    util.SchemaNamepace(t.codeGenSchema.Info, ci),
-		Name:        o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
-		Description: b.Description.Get(),
-		IsPublic:    true,
-		IsInterface: false,
-		IsRequired:  b.Required.Get(),
+		SourceUri:     t.loader.FindSource(b.Id).Get(),
+		Id:            b.Id.Get(),
+		SchemaType:    string(ci.SchemaType()),
+		RootNs:        t.codeGenSchema.Info.Namespace.Get(),
+		SchemaNs:      util.SchemaNamepace(t.codeGenSchema.Info, ci),
+		Name:          o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
+		Description:   b.Description.Get(),
+		IsPublic:      b.Public.OrElse(true),
+		IsInterface:   false,
+		IsRequired:    b.Required.OrElse(false),
+		HasValidation: ci.HasValidation(),
 	}, nil
 }

@@ -21,6 +21,8 @@ func (t *TemplateManager) initTemplatesFuncs() error {
 		TemplateFunc("SNAKE", t.camel),
 		TemplateFunc("BASE", t.pathBase),
 		TemplateFunc("DIR", t.pathDir),
+		TemplateFunc("DEFINED", t.defined),
+		TemplateFunc("EMPTY", t.empty),
 	)
 
 	for _, arg := range args {
@@ -46,14 +48,6 @@ func (t *TemplateManager) namespace(schema canonical.Canonical) string {
 	return util.SchemaNamepace(t.codeGenSchema.Info, schema)
 }
 
-func (t *TemplateManager) getPackage(schema canonical.Canonical) string {
-	return util.SchemaPackage(t.codeGenSchema.Info, schema)
-}
-
-func (t *TemplateManager) baseType(schema canonical.Canonical) string {
-	return util.SchemaBaseType(t.codeGenSchema.Info, schema)
-}
-
 func (t *TemplateManager) camel(s any) string {
 	return caser.KebabToCamel(a2s(s))
 }
@@ -66,6 +60,14 @@ func (t *TemplateManager) snake(s any) string {
 	return caser.KebabToSnake(a2s(s))
 }
 
+func (t *TemplateManager) defined(s any) bool {
+	return a2s(s) != ""
+}
+
+func (t *TemplateManager) empty(s any) bool {
+	return a2s(s) == ""
+}
+
 func a2s(a any) string {
 	var s string
 
@@ -75,9 +77,9 @@ func a2s(a any) string {
 	case fmt.Stringer:
 		s = v.String()
 	case optioner.Option[string]:
-		s = v.OrElse("===========>EMPTY OPTION<===========")
+		s = v.OrElse("")
 	default:
-		s = fmt.Sprintf("===========>CANT_CONVERT %v<===========", a)
+		s = fmt.Sprintf("%v", a)
 	}
 
 	return s

@@ -19,6 +19,7 @@ type TemplateContext struct {
 	OutputMimeType   mime_type.MimeType
 	TemplateType     template_type.TemplateType
 	ModelType        optioner.Option[canonical_type.CanonicalType]
+	Template         *template.Template
 	Path             string
 }
 
@@ -33,16 +34,15 @@ type ModelOutput struct {
 }
 
 type TemplateManager struct {
-	codeGenSchema     *model.CodeGenSchema
-	pathMap           mapper.Mapper[string, TemplateContext]
-	modelMap          mapper.Mapper[template_type.TemplateType, []TemplateContext]
-	schemaMap         mapper.Mapper[canonical_type.CanonicalType, []TemplateContext]
-	cacher            *cacher.Cacher
-	funcs             template.FuncMap
-	formatSource      bool
-	verbose           bool
-	combinedTemplates *template.Template
-	canonicals        *canonical.CanonicalCombined
+	codeGenSchema *model.CodeGenSchema
+	pathMap       mapper.Mapper[string, TemplateContext]
+	modelMap      mapper.Mapper[template_type.TemplateType, []TemplateContext]
+	schemaMap     mapper.Mapper[canonical_type.CanonicalType, []TemplateContext]
+	cacher        *cacher.Cacher
+	funcs         template.FuncMap
+	verbose       bool
+	// combinedTemplates *template.Template
+	canonicals *canonical.CanonicalCombined
 }
 
 func New(args ...Arg) (*TemplateManager, error) {

@@ -39,6 +39,7 @@ func (t *CanonicalBase) Merge(o CanonicalBase) bool {
 	t.Name = o.Name
 	t.Required = o.Required
 	t.Source = o.Source
+	t.Public = o.Public
 
 	return false
 }

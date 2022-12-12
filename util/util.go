@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/boundedinfinity/go-commoner/caser"
 	"github.com/boundedinfinity/go-commoner/extentioner"
 	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
@@ -105,7 +104,7 @@ func SchemaNamepace(info model.CodeGenSchemaInfo, schema canonical.Canonical) st
 	id := schema.SchemaId()
 
 	if id.Empty() {
-		return "NO-ID"
+		return ""
 	}
 
 	ns := id.Get()
@@ -114,20 +113,6 @@ func SchemaNamepace(info model.CodeGenSchemaInfo, schema canonical.Canonical) st
 	ns = path.Join(path.Dir(ns), path.Base(ns))
 
 	return ns
-}
-
-func SchemaPackage(info model.CodeGenSchemaInfo, schema canonical.Canonical) string {
-	pkg := SchemaNamepace(info, schema)
-	pkg = path.Dir(pkg)
-	pkg = path.Base(pkg)
-	pkg = caser.KebabToSnake(pkg)
-	return pkg
-}
-
-func SchemaBaseType(info model.CodeGenSchemaInfo, schema canonical.Canonical) string {
-	typ := SchemaNamepace(info, schema)
-	typ = path.Base(typ)
-	return typ
 }
 
 func DestPath(info model.CodeGenSchemaInfo, schema render_context.RenderContext, tmplPath string) string {

@@ -18,7 +18,7 @@ func (t CanonicalString) CType() canonical_type.CanonicalType {
 }
 
 func (t CanonicalString) HasValidation() bool {
-	return t.Min.Defined() || t.Max.Defined()
+	return t.Min.Defined() || t.Max.Defined() || t.Regex.Defined()
 }
 
 func (t CanonicalString) SchemaType() canonical_type.CanonicalType {

@@ -5,8 +5,4 @@ type RenderContextObject struct {
 	Properties []RenderContext
 }
 
-func (t RenderContextObject) Validation() bool {
-	return true
-}
-
 var _ RenderContext = &RenderContextObject{}

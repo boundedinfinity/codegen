@@ -60,12 +60,16 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 	if bs, err := ioutil.ReadFile(tc.Path); err != nil {
 		return err
 	} else {
+		if t.codeGenSchema.Info.TemplateDump.Defined() && t.codeGenSchema.Info.TemplateDump.Get() {
+			tmp := string(bs)
+			tmp += "\n\n{{ DUMP . }}"
+			bs = []byte(tmp)
+		}
+
 		if tmpl, err := template.New("").Funcs(t.funcs).Parse(string(bs)); err != nil {
 			return err
 		} else {
-			if _, err = t.combinedTemplates.AddParseTree(tc.Path, tmpl.Tree); err != nil {
-				return err
-			}
+			tc.Template = tmpl
 		}
 	}
 

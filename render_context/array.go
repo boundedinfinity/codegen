@@ -5,8 +5,4 @@ type RenderContextArray struct {
 	Items RenderContext
 }
 
-func (t RenderContextArray) Validation() bool {
-	return true
-}
-
 var _ RenderContext = &RenderContextArray{}
