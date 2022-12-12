@@ -54,6 +54,14 @@ func (t *Generator) convert(ci canonical.Canonical) (render_context.RenderContex
 		rci, err = t.handleRenderContextRef(c, b)
 	case *canonical.CanonicalRef:
 		rci, err = t.handleRenderContextRef(*c, b)
+	case canonical.CanonicalInteger:
+		rci, err = t.handleRenderContextInteger(c, b)
+	case *canonical.CanonicalInteger:
+		rci, err = t.handleRenderContextInteger(*c, b)
+	case canonical.CanonicalFloat:
+		rci, err = t.handleRenderContextFloat(c, b)
+	case *canonical.CanonicalFloat:
+		rci, err = t.handleRenderContextFloat(*c, b)
 	default:
 		return rci, fmt.Errorf("unsupported type: %v", c)
 	}
@@ -137,6 +145,24 @@ func (t *Generator) handleRenderContextString(c canonical.CanonicalString, b ren
 		Min:               c.Min,
 		Max:               c.Max,
 		Regex:             c.Regex,
+	}, nil
+}
+
+func (t *Generator) handleRenderContextInteger(c canonical.CanonicalInteger, b render_context.RenderContextBase) (*render_context.RenderContextInteger, error) {
+	return &render_context.RenderContextInteger{
+		RenderContextBase: b,
+		Min:               c.Min,
+		Max:               c.Max,
+		MultipleOf:        c.MultipleOf,
+	}, nil
+}
+
+func (t *Generator) handleRenderContextFloat(c canonical.CanonicalFloat, b render_context.RenderContextBase) (*render_context.RenderContextFloat, error) {
+	return &render_context.RenderContextFloat{
+		RenderContextBase: b,
+		Min:               c.Min,
+		Max:               c.Max,
+		MultipleOf:        c.MultipleOf,
 	}, nil
 }
 

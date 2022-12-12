@@ -8,9 +8,9 @@ import (
 
 type CanonicalFloat struct {
 	CanonicalBase
-	Minimum    o.Option[int] `json:"minimum,omitempty" yaml:"minimum,omitempty"`
-	Maximum    o.Option[int] `json:"maximum,omitempty" yaml:"maximum,omitempty"`
-	MultipleOf o.Option[int] `json:"multipleOf,omitempty" yaml:"multipleOf,omitempty"`
+	Min        o.Option[float64] `json:"min,omitempty" yaml:"min,omitempty"`
+	Max        o.Option[float64] `json:"max,omitempty" yaml:"max,omitempty"`
+	MultipleOf o.Option[float64] `json:"multipleOf,omitempty" yaml:"multipleOf,omitempty"`
 }
 
 func (t CanonicalFloat) CType() canonical_type.CanonicalType {
@@ -18,7 +18,7 @@ func (t CanonicalFloat) CType() canonical_type.CanonicalType {
 }
 
 func (t CanonicalFloat) HasValidation() bool {
-	return t.Minimum.Defined() || t.Maximum.Defined() || t.MultipleOf.Defined()
+	return t.Min.Defined() || t.Max.Defined() || t.MultipleOf.Defined()
 }
 
 func (t CanonicalFloat) SchemaType() canonical_type.CanonicalType {

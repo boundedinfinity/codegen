@@ -65,7 +65,6 @@ func (t *Loader) convertJsonSchema(v model.JsonSchema, name o.Option[string]) (c
 				}
 			}
 		}
-
 	case *model.JsonSchemaArray:
 		items, err := t.convertJsonSchema(js.Items.Get(), o.None[string]())
 
@@ -97,6 +96,20 @@ func (t *Loader) convertJsonSchema(v model.JsonSchema, name o.Option[string]) (c
 		can = canonical.CanonicalRef{
 			CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
 			Ref:           js.Ref,
+		}
+	case *model.JsonSchemaInteger:
+		can = canonical.CanonicalInteger{
+			CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			Min:           js.Maximum,
+			Max:           js.Maximum,
+			MultipleOf:    js.MultipleOf,
+		}
+	case *model.JsonSchemaNumber:
+		can = canonical.CanonicalFloat{
+			CanonicalBase: t.convertJsonSchemaBase(js.JsonSchemaBase, name),
+			Min:           js.Maximum,
+			Max:           js.Maximum,
+			MultipleOf:    js.MultipleOf,
 		}
 	}
 

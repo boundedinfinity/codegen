@@ -1,14 +1,14 @@
 package template_manager
 
 import (
-	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/template_manager/dumper"
-	"boundedinfinity/codegen/util"
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/boundedinfinity/go-commoner/caser"
 	"github.com/boundedinfinity/go-commoner/optioner"
+	"github.com/gertd/go-pluralize"
 )
 
 func (t *TemplateManager) initTemplatesFuncs() error {
@@ -23,6 +23,8 @@ func (t *TemplateManager) initTemplatesFuncs() error {
 		TemplateFunc("DIR", t.pathDir),
 		TemplateFunc("DEFINED", t.defined),
 		TemplateFunc("EMPTY", t.empty),
+		TemplateFunc("SINGULAR", t.singular),
+		TemplateFunc("PLURAL", t.plural),
 	)
 
 	for _, arg := range args {
@@ -36,16 +38,20 @@ func dumpJson(obj any) string {
 	return dumper.New().Dump(obj)
 }
 
+func (t *TemplateManager) singular(s string) string {
+	return pluralize.NewClient().Singular(s)
+}
+
+func (t *TemplateManager) plural(s string) string {
+	return pluralize.NewClient().Plural(s)
+}
+
 func (t *TemplateManager) pathBase(s string) string {
-	return path.Base(s)
+	return strings.ReplaceAll(path.Base(s), ".", "")
 }
 
 func (t *TemplateManager) pathDir(s string) string {
-	return path.Dir(s)
-}
-
-func (t *TemplateManager) namespace(schema canonical.Canonical) string {
-	return util.SchemaNamepace(t.codeGenSchema.Info, schema)
+	return strings.ReplaceAll(path.Dir(s), ".", "")
 }
 
 func (t *TemplateManager) camel(s any) string {
