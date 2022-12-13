@@ -8,8 +8,8 @@ import (
 
 type CanonicalDuration struct {
 	CanonicalBase
-	Minimum o.Option[CanonicalDuration] `json:"minimum,omitempty" yaml:"minimum,omitempty"`
-	Maximum o.Option[CanonicalDuration] `json:"maximum,omitempty" yaml:"maximum,omitempty"`
+	Min o.Option[CanonicalDuration] `json:"min,omitempty" yaml:"min,omitempty"`
+	Max o.Option[CanonicalDuration] `json:"max,omitempty" yaml:"max,omitempty"`
 }
 
 func (t CanonicalDuration) CType() canonical_type.CanonicalType {
@@ -17,7 +17,7 @@ func (t CanonicalDuration) CType() canonical_type.CanonicalType {
 }
 
 func (t CanonicalDuration) HasValidation() bool {
-	return t.Minimum.Defined() || t.Maximum.Defined()
+	return t.Min.Defined() || t.Max.Defined()
 }
 
 func (t CanonicalDuration) SchemaType() canonical_type.CanonicalType {

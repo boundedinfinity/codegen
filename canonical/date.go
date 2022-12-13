@@ -14,8 +14,8 @@ type CanonicalDate struct {
 	Before o.Option[CanonicalDate]     `json:"before,omitempty" yaml:"before,omitempty"`
 	After  o.Option[CanonicalDate]     `json:"after,omitempty" yaml:"after,omitempty"`
 	Within o.Option[CanonicalDuration] `json:"within,omitempty" yaml:"within,omitempty"`
-	Ahead  o.Option[CanonicalDuration] `json:"minimum,omitempty" yaml:"minimum,omitempty"`
-	Behind o.Option[CanonicalDuration] `json:"maximum,omitempty" yaml:"maximum,omitempty"`
+	Ahead  o.Option[CanonicalDuration] `json:"ahead,omitempty" yaml:"ahead,omitempty"`
+	Behind o.Option[CanonicalDuration] `json:"behind,omitempty" yaml:"behind,omitempty"`
 }
 
 func (t CanonicalDate) CType() canonical_type.CanonicalType {
