@@ -115,6 +115,19 @@ func SchemaNamepace(info model.CodeGenSchemaInfo, schema canonical.Canonical) st
 	return ns
 }
 
+func RelNamepace(info model.CodeGenSchemaInfo, schema canonical.Canonical) string {
+	schemaNs := SchemaNamepace(info, schema)
+
+	if schemaNs == "" {
+		return ""
+	}
+
+	relNs := schemaNs
+	relNs = strings.ReplaceAll(schemaNs, info.Namespace.Get(), "")
+	relNs = strings.Replace(relNs, "/", "", 1)
+	return relNs
+}
+
 func DestPath(info model.CodeGenSchemaInfo, schema render_context.RenderContext, tmplPath string) string {
 	file := tmplPath
 	ns := schema.Base().SchemaNs

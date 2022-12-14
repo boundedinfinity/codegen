@@ -1,9 +1,10 @@
 package template_manager
 
 import (
+	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/template_manager/dumper"
 	"fmt"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/boundedinfinity/go-commoner/caser"
@@ -21,10 +22,13 @@ func (t *TemplateManager) initTemplatesFuncs() error {
 		TemplateFunc("SNAKE", t.camel),
 		TemplateFunc("BASE", t.pathBase),
 		TemplateFunc("DIR", t.pathDir),
+		TemplateFunc("PATH_REL", t.pathRel),
 		TemplateFunc("DEFINED", t.defined),
 		TemplateFunc("EMPTY", t.empty),
 		TemplateFunc("SINGULAR", t.singular),
 		TemplateFunc("PLURAL", t.plural),
+		TemplateFunc("RES_SCHEMA_NS", t.resolveSchemaNs),
+		TemplateFunc("RES_SCHEMA", t.resolveSchema),
 	)
 
 	for _, arg := range args {
@@ -38,6 +42,36 @@ func dumpJson(obj any) string {
 	return dumper.New().Dump(obj)
 }
 
+func (t *TemplateManager) resolveSchemaNs(schema render_context.RenderContext) string {
+	var found string
+
+	render_context.WalkBase(schema, func(base *render_context.RenderContextBase) error {
+		if found != "" {
+			return render_context.ErrExit
+		}
+
+		if base.SchemaNs != "" {
+			found = base.SchemaNs
+			return render_context.ErrExit
+		}
+
+		return nil
+	})
+
+	return found
+}
+
+func (t *TemplateManager) resolveSchema(schema render_context.RenderContext) render_context.RenderContext {
+	switch c := schema.(type) {
+	case *render_context.RenderContextArray:
+		return t.resolveSchema(c.Items)
+	case *render_context.RenderContextRef:
+		return t.resolveSchema(c.Ref)
+	default:
+		return schema
+	}
+}
+
 func (t *TemplateManager) singular(s string) string {
 	return pluralize.NewClient().Singular(s)
 }
@@ -46,12 +80,40 @@ func (t *TemplateManager) plural(s string) string {
 	return pluralize.NewClient().Plural(s)
 }
 
+func (t *TemplateManager) pathRel(a, b string) (string, error) {
+	r, err := filepath.Rel(a, b)
+
+	if err != nil {
+		return r, err
+	}
+
+	if !strings.HasPrefix(r, "..") && !strings.HasPrefix(r, "/") {
+		r = "./" + r
+	}
+
+	return r, err
+}
+
 func (t *TemplateManager) pathBase(s string) string {
-	return strings.ReplaceAll(path.Base(s), ".", "")
+	p := s
+	p = filepath.Base(p)
+
+	// if p == "." {
+	// 	p = ""
+	// }
+
+	return p
 }
 
 func (t *TemplateManager) pathDir(s string) string {
-	return strings.ReplaceAll(path.Dir(s), ".", "")
+	p := s
+	p = filepath.Dir(p)
+
+	// if p == "." {
+	// 	p = ""
+	// }
+
+	return p
 }
 
 func (t *TemplateManager) camel(s any) string {

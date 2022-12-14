@@ -7,7 +7,6 @@ import (
 )
 
 type Canonical interface {
-	// CType() conical_type.ConicalType
 	HasValidation() bool
 	SchemaId() o.Option[string]
 	SchemaType() canonical_type.CanonicalType
@@ -22,6 +21,7 @@ type CanonicalBase struct {
 	Imported    o.Option[bool]   `json:"imported,omitempty" yaml:"imported,omitempty"`
 	Public      o.Option[bool]   `json:"public,omitempty" yaml:"public,omitempty"`
 	Required    o.Option[bool]   `json:"required,omitempty" yaml:"required,omitempty"`
+	Deprecated  o.Option[bool]   `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
 }
 
 func (t CanonicalBase) HasValidation() bool {

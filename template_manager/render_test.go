@@ -81,9 +81,9 @@ func Test_String_Marshal(t *testing.T) {
 	// v1 := canonical.CanonicalInteger{
 	// 	CanonicalBase: canonical.CanonicalBase{
 	// 		Source: "../../codegen-templates/templates/go/types/base/integer.model.go.gotmpl",
-	// 		// Import:      "boundedinfinity/example/conical/SomeInteger",
-	// 		Id: o.Some("boundedinfinity/example/conical/SomeInteger"),
-	// 		// Package:     "conical",
+	// 		// Import:      "boundedinfinity/example/canonical/SomeInteger",
+	// 		Id: o.Some("boundedinfinity/example/canonical/SomeInteger"),
+	// 		// Package:     "canonical",
 	// 		Name:        o.Some("Si"),
 	// 		Description: o.Some("A custom integer type"),
 	// 	},
@@ -92,12 +92,12 @@ func Test_String_Marshal(t *testing.T) {
 	// 	MultipleOf: o.Some(2),
 	// }
 
-	// v3 := conical.ConicalString{
-	// 	ConicalBase: conical.ConicalBase{
+	// v3 := canonical.CanonicalString{
+	// 	CanonicalBase: canonical.CanonicalBase{
 	// 		Source:      "../../codegen-templates/templates/go/types/base/string.model.go.gotmpl",
-	// 		Import:      "boundedinfinity/example/conical/SomeString",
+	// 		Import:      "boundedinfinity/example/canonical/SomeString",
 	// 		Type:        "SomeString",
-	// 		Package:     "conical",
+	// 		Package:     "canonical",
 	// 		Name:        "Ss",
 	// 		Description: optioner.Some("A custom string type"),
 	// 	},
@@ -105,15 +105,15 @@ func Test_String_Marshal(t *testing.T) {
 	// 	Minimum: optioner.Some(1),
 	// }
 
-	// v2 := conical.ConicalObject{
-	// 	ConicalBase: conical.ConicalBase{
+	// v2 := canonical.CanonicalObject{
+	// 	CanonicalBase: canonical.CanonicalBase{
 	// 		Source:      "../../codegen-templates/templates/go/types/base/object.model.go.gotmpl",
-	// 		Import:      "boundedinfinity/example/conical/SomeObject",
+	// 		Import:      "boundedinfinity/example/canonical/SomeObject",
 	// 		Type:        "SomeObject",
-	// 		Package:     "conical",
+	// 		Package:     "canonical",
 	// 		Description: optioner.Some("A custom object type"),
 	// 	},
-	// 	Properties: []conical.Conical{
+	// 	Properties: []canonical.Canonical{
 	// 		v1, v3,
 	// 	},
 	// }

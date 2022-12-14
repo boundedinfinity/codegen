@@ -13,14 +13,29 @@
             ]
         },
         {
-            "name": "debug label-simple",
+            "name": "go-server",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}", 
             "args": [
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema",
+                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/common",
+                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/types",
                 "file://${workspaceFolder}/../codegen-schemas/json-schema/label",
+                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/go-server",
+            ],
+        },
+        {
+            "name": "ts-server",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}", 
+            "args": [
+                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/common",
+                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/types",
+                "file://${workspaceFolder}/../codegen-schemas/json-schema/label",
+                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/ts-server",
             ],
         }
     ]

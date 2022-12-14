@@ -2,6 +2,7 @@ package template_manager
 
 import (
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/template_delimiter"
 	"boundedinfinity/codegen/template_type"
 	"boundedinfinity/codegen/util"
 	"fmt"
@@ -61,12 +62,15 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 		return err
 	} else {
 		if t.codeGenSchema.Info.TemplateDump.Defined() && t.codeGenSchema.Info.TemplateDump.Get() {
+			l, r := template_delimiter.Get(t.codeGenSchema.Info.Delimiter.Get())
 			tmp := string(bs)
-			tmp += "\n\n{{ DUMP . }}"
+			tmp += fmt.Sprintf("\n\n%v DUMP . %v", l, r)
 			bs = []byte(tmp)
 		}
 
-		if tmpl, err := template.New("").Funcs(t.funcs).Parse(string(bs)); err != nil {
+		l, r := template_delimiter.Get(t.codeGenSchema.Info.Delimiter.Get())
+
+		if tmpl, err := template.New("").Funcs(t.funcs).Delims(l, r).Parse(string(bs)); err != nil {
 			return err
 		} else {
 			tc.Template = tmpl

@@ -6,7 +6,7 @@
 //*                                                                                  *
 //************************************************************************************
 
-package canonical_type
+package template_delimiter
 
 import (
 	"encoding/json"
@@ -17,38 +17,20 @@ import (
 )
 
 var (
-	All = []CanonicalType{
-		Ref,
-		Array,
-		Coordinate,
-		CreditCardNumber,
-		Date,
-		Datetime,
-		Duration,
-		Email,
-		Enum,
-		Float,
-		Integer,
-		Ipv4,
-		Ipv6,
-		Mac,
-		Object,
-		Phone,
-		SemanticVersion,
-		String,
-		Time,
-		Uuid,
-		Url,
+	All = []TemplateDelimiter{
+		Curly,
+		Square,
+		Parens,
 	}
 )
 
-func (t CanonicalType) String() string {
+func (t TemplateDelimiter) String() string {
 	return string(t)
 }
 
-func Parse(v string) (CanonicalType, error) {
-	f, ok := slicer.FindFn(All, func(x CanonicalType) bool {
-		return CanonicalType(v) == x
+func Parse(v string) (TemplateDelimiter, error) {
+	f, ok := slicer.FindFn(All, func(x TemplateDelimiter) bool {
+		return TemplateDelimiter(v) == x
 	})
 
 	if !ok {
@@ -59,7 +41,7 @@ func Parse(v string) (CanonicalType, error) {
 }
 
 func Is(s string) bool {
-	return slicer.ContainsFn(All, func(v CanonicalType) bool {
+	return slicer.ContainsFn(All, func(v TemplateDelimiter) bool {
 		return string(v) == s
 	})
 }
@@ -73,11 +55,11 @@ func ErrorV(v string) error {
 	)
 }
 
-func (t CanonicalType) MarshalJSON() ([]byte, error) {
+func (t TemplateDelimiter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(t))
 }
 
-func (t *CanonicalType) UnmarshalJSON(data []byte) error {
+func (t *TemplateDelimiter) UnmarshalJSON(data []byte) error {
 	var v string
 
 	if err := json.Unmarshal(data, &v); err != nil {
@@ -95,11 +77,11 @@ func (t *CanonicalType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (t CanonicalType) MarshalYAML() (interface{}, error) {
+func (t TemplateDelimiter) MarshalYAML() (interface{}, error) {
 	return string(t), nil
 }
 
-func (t *CanonicalType) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (t *TemplateDelimiter) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var v string
 
 	if err := unmarshal(&v); err != nil {

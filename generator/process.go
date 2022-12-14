@@ -172,9 +172,10 @@ func (t *Generator) convertBase(ci canonical.Canonical) (render_context.RenderCo
 	return render_context.RenderContextBase{
 		SourceUri:     t.loader.FindSource(b.Id).Get(),
 		Id:            b.Id.Get(),
-		SchemaType:    string(ci.SchemaType()),
+		SchemaType:    ci.SchemaType(),
 		RootNs:        t.codeGenSchema.Info.Namespace.Get(),
 		SchemaNs:      util.SchemaNamepace(t.codeGenSchema.Info, ci),
+		RelNs:         util.RelNamepace(t.codeGenSchema.Info, ci),
 		Name:          o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
 		Description:   b.Description.Get(),
 		IsPublic:      b.Public.OrElse(true),

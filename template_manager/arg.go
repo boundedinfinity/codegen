@@ -4,7 +4,10 @@ import (
 	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/template_delimiter"
 	"fmt"
+
+	"github.com/boundedinfinity/go-commoner/optioner"
 )
 
 func (t *TemplateManager) init() error {
@@ -22,6 +25,10 @@ func (t *TemplateManager) init() error {
 
 	if err := t.initTemplatesFuncs(); err != nil {
 		return nil
+	}
+
+	if t.codeGenSchema.Info.Delimiter.Empty() {
+		t.codeGenSchema.Info.Delimiter = optioner.Some(template_delimiter.Square)
 	}
 
 	return nil
