@@ -29,6 +29,7 @@ func (t *TemplateManager) initTemplatesFuncs() error {
 		TemplateFunc("PLURAL", t.plural),
 		TemplateFunc("RES_SCHEMA_NS", t.resolveSchemaNs),
 		TemplateFunc("RES_SCHEMA", t.resolveSchema),
+		TemplateFunc("RESOLVE", t.resolveSchema),
 	)
 
 	for _, arg := range args {

@@ -17,12 +17,13 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}", 
+            "program": "${workspaceFolder}",
+            "env": {
+                "SCHEMA_DIR": "${workspaceFolder}/../codegen-schemas",
+                "TEMPLATES_DIR": "${workspaceFolder}/../codegen-templates",
+            },
             "args": [
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/common",
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/types",
-                "file://${workspaceFolder}/../codegen-schemas/json-schema/label",
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/go-server",
+                "file://${workspaceFolder}/../codegen-schemas/applications/go-server",
             ],
         },
         {
@@ -30,12 +31,13 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}", 
+            "program": "${workspaceFolder}",
+            "env": {
+                "SCHEMA_DIR": "${workspaceFolder}/../codegen-schemas",
+                "TEMPLATES_DIR": "${workspaceFolder}/../codegen-templates",
+            },
             "args": [
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/common",
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/types",
-                "file://${workspaceFolder}/../codegen-schemas/json-schema/label",
-                "file://${workspaceFolder}/../codegen-schemas/codegen-schema/ts-server",
+                "file://${workspaceFolder}/../codegen-schemas/applications/ts-server",
             ],
         }
     ]

@@ -25,7 +25,7 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 		return nil
 	}
 
-	cached := t.cacher.Find(file.Path.Get())
+	cached := t.cacher.FindSingle(file.Path.Get())
 
 	if cached.Empty() {
 		return fmt.Errorf("cache not found for %v", file.Path.Get())
@@ -61,14 +61,13 @@ func (t *TemplateManager) registerFileFile(file model.CodeGenSchemaTemplateFile)
 	if bs, err := ioutil.ReadFile(tc.Path); err != nil {
 		return err
 	} else {
+		l, r := template_delimiter.Get(t.codeGenSchema.Info.Delimiter.Get())
+
 		if t.codeGenSchema.Info.TemplateDump.Defined() && t.codeGenSchema.Info.TemplateDump.Get() {
-			l, r := template_delimiter.Get(t.codeGenSchema.Info.Delimiter.Get())
 			tmp := string(bs)
 			tmp += fmt.Sprintf("\n\n%v DUMP . %v", l, r)
 			bs = []byte(tmp)
 		}
-
-		l, r := template_delimiter.Get(t.codeGenSchema.Info.Delimiter.Get())
 
 		if tmpl, err := template.New("").Funcs(t.funcs).Delims(l, r).Parse(string(bs)); err != nil {
 			return err

@@ -1,6 +1,7 @@
 package cacher
 
 import (
+	"boundedinfinity/codegen/model"
 	"path/filepath"
 
 	"github.com/boundedinfinity/go-commoner/pather"
@@ -8,31 +9,23 @@ import (
 	"github.com/boundedinfinity/go-urischemer"
 )
 
-func (t Cacher) cacheFilePath(group string, path string) error {
-	ok, err := pather.IsDir(path)
+func (t Cacher) cacheFilePath(orig, root string) error {
+	paths := make([]string, 0)
+
+	ok, err := pather.IsDir(root)
 
 	if err != nil {
 		return err
 	}
 
 	if ok {
-		if err := t.cacheFileDir(group, path); err != nil {
+		ps, err := pather.GetFiles(root)
+
+		if err != nil {
 			return err
 		}
-	} else {
-		if err := t.cacheFileFile(group, path); err != nil {
-			return err
-		}
-	}
 
-	return nil
-}
-
-func (t Cacher) cacheFileDir(group string, root string) error {
-	paths, err := pather.GetPaths(root)
-
-	if err != nil {
-		return err
+		paths = append(paths, ps...)
 	}
 
 	paths = slicer.Filter(paths, func(p string) bool {
@@ -42,7 +35,7 @@ func (t Cacher) cacheFileDir(group string, root string) error {
 	paths = slicer.Dedup(paths)
 
 	for _, path := range paths {
-		if err := t.cacheFilePath(group, path); err != nil {
+		if err := t.cacheFileFile(orig, path); err != nil {
 			return err
 		}
 	}
@@ -50,7 +43,7 @@ func (t Cacher) cacheFileDir(group string, root string) error {
 	return nil
 }
 
-func (t Cacher) cacheFileFile(group string, path string) error {
+func (t Cacher) cacheFileFile(orig, path string) error {
 	var data CachedData
 
 	data.SourceUrl = urischemer.Combine(urischemer.File, path)
@@ -78,23 +71,11 @@ func (t Cacher) cacheFileFile(group string, path string) error {
 		data.CalculateCheckSum = r.CheckSum
 	}
 
-	if t.sourceMap.Has(data.SourceUrl) {
-		return nil
-	} else {
-		t.sourceMap[data.SourceUrl] = &data
-	}
-
-	if !t.groupMap.Has(group) {
-		t.groupMap[group] = make([]*CachedData, 0)
-	}
-
-	t.groupMap[group] = append(t.groupMap[group], &data)
-
-	if !t.destMap.Has(data.DestPath) {
-		t.destMap[data.DestPath] = &data
-	} else {
-		// TODO
-	}
+	t.source2Data[data.SourceUrl] = &data
+	t.dest2Data[data.DestPath] = &data
+	t.dest2Orig[data.DestPath] = orig
+	model.MapListAdd(t.orig2Dest, orig, data.DestPath)
+	model.MapListAdd(t.orig2Data, orig, &data)
 
 	return nil
 }

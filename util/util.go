@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/boundedinfinity/go-commoner/environmenter"
 	"github.com/boundedinfinity/go-commoner/extentioner"
 	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
@@ -39,6 +40,41 @@ var (
 		".json-schema.yml",
 	}
 )
+
+func ResolveUri(source string, v optioner.Option[string]) (optioner.Option[string], error) {
+	if v.Empty() {
+		return optioner.None[string](), nil
+	}
+
+	s, p, err := urischemer.Break(v.Get())
+
+	if err != nil {
+		return optioner.None[string](), nil
+	}
+
+	p2 := ResolvePath(source, optioner.Some(p))
+	p3 := urischemer.Combine(s, p2.Get())
+
+	return optioner.Some(p3), nil
+}
+
+func ResolvePath(source string, v optioner.Option[string]) optioner.Option[string] {
+	if v.Empty() {
+		return optioner.None[string]()
+	}
+
+	p := v.Get()
+	p = environmenter.Sub(p)
+
+	if !filepath.IsAbs(p) {
+		p = filepath.Join(source, p)
+
+	}
+
+	p = filepath.Clean(p)
+
+	return optioner.Some(p)
+}
 
 func IsCodeGenSchemaTypeFile(v string) bool {
 	return slicer.ContainsFn(codegenTypeExts, func(x string) bool {

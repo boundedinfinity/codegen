@@ -43,7 +43,7 @@ func (t *TemplateManager) RenderModel(schema render_context.RenderContext) ([]Mo
 	return outputs, nil
 }
 
-func (t *TemplateManager) RenderOperation(schema model.CodeGenSchemaOperation) ([]TemplateOutput, error) {
+func (t *TemplateManager) RenderOperation(schema render_context.RenderContextOperation) ([]TemplateOutput, error) {
 	outputs := make([]TemplateOutput, 0)
 
 	for _, tmpl := range t.FindTemplateType(template_type.Operation) {

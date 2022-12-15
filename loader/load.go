@@ -1,22 +1,32 @@
 package loader
 
 import (
+	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/util"
 	"encoding/json"
 
+	"github.com/boundedinfinity/go-commoner/slicer"
 	"github.com/boundedinfinity/go-marshaler"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 	"github.com/ghodss/yaml"
 )
 
 func (t *Loader) LoadUri(uris ...string) error {
-	if err := t.cacher.Cache("schema", uris...); err != nil {
+	if err := t.cacher.Cache(uris...); err != nil {
 		return err
 	}
 
-	cds := t.cacher.FindByGroup("schema").Get()
+	var cds []*cacher.CachedData
+
+	for _, uri := range uris {
+		cached := t.cacher.FindList(uri)
+
+		if cached.Defined() {
+			cds = append(cds, cached.Get()...)
+		}
+	}
 
 	for _, cd := range cds {
 		switch {
@@ -32,11 +42,6 @@ func (t *Loader) LoadUri(uris ...string) error {
 			return model.ErrUnsupportedSchemev(cd.DestPath)
 		}
 	}
-
-	return nil
-}
-
-func (t *Loader) LoadCodeGenTypePath(root string) error {
 
 	return nil
 }
@@ -85,6 +90,30 @@ func (t *Loader) LoadSchema(data []byte, mt mime_type.MimeType, path string) err
 		if err := json.Unmarshal(bs, &schema); err != nil {
 			return err
 		}
+
+		schema.Info.DestDir = util.ResolvePath(path, schema.Info.DestDir)
+
+		schema.Schemas, err = slicer.MapErr(schema.Schemas, func(f model.CodeGenSchemaFile) (model.CodeGenSchemaFile, error) {
+			if p, err := util.ResolveUri(path, f.Path); err != nil {
+				return f, err
+			} else {
+				f.Path = p
+				return f, nil
+			}
+		})
+
+		if err != nil {
+			return err
+		}
+
+		schema.Templates.Files, err = slicer.MapErr(schema.Templates.Files, func(f model.CodeGenSchemaTemplateFile) (model.CodeGenSchemaTemplateFile, error) {
+			if p, err := util.ResolveUri(path, f.Path); err != nil {
+				return f, err
+			} else {
+				f.Path = p
+				return f, nil
+			}
+		})
 
 		t.cgsPathMap[path] = schema
 

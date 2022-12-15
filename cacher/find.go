@@ -4,18 +4,22 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
-func (t *Cacher) FindByGroup(group string) o.Option[[]*CachedData] {
-	return t.groupMap.Get(group)
-}
-
-func (t *Cacher) FindBySource(path string) o.Option[*CachedData] {
-	return t.sourceMap.Get(path)
-}
-
-func (t *Cacher) FindByDest(path string) o.Option[*CachedData] {
-	return t.destMap.Get(path)
-}
-
-func (t *Cacher) Find(id string) o.Option[*CachedData] {
+func (t *Cacher) FindSingle(id string) o.Option[*CachedData] {
 	return o.FirstOf(t.FindBySource(id), t.FindByDest(id))
+}
+
+func (t *Cacher) FindList(id string) o.Option[[]*CachedData] {
+	return o.FirstOf(t.FindByOrig(id))
+}
+
+func (t *Cacher) FindByOrig(id string) o.Option[[]*CachedData] {
+	return t.orig2Data.Get(id)
+}
+
+func (t *Cacher) FindBySource(id string) o.Option[*CachedData] {
+	return t.source2Data.Get(id)
+}
+
+func (t *Cacher) FindByDest(id string) o.Option[*CachedData] {
+	return t.dest2Data.Get(id)
 }

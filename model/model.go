@@ -53,6 +53,7 @@ type CodeGenSchemaFile struct {
 
 type CodeGenSchemaTemplates struct {
 	Header o.Option[CodeGenSchemaHeader] `json:"header,omitempty" yaml:"header,omitempty"`
+	Root   o.Option[string]              `json:"root,omitempty" yaml:"root,omitempty"`
 	Files  []CodeGenSchemaTemplateFile   `json:"files,omitempty" yaml:"files,omitempty"`
 }
 

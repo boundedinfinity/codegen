@@ -1,13 +1,11 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/canonical"
 	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/template_manager"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/boundedinfinity/go-commoner/pather"
 )
@@ -40,6 +38,24 @@ func (t *Generator) GenerateModel(schema render_context.RenderContext) error {
 	return nil
 }
 
+func (t *Generator) GenerateOperation(schema render_context.RenderContextOperation) error {
+	_, err := t.tm.RenderOperation(schema)
+
+	if err != nil {
+		return err
+	}
+
+	// for _, render := range renders {
+	// 	fmt.Println(render.Schema.Base().OutputPath)
+
+	// 	if err := t.writeModel(render); err != nil {
+	// 		return err
+	// 	}
+	// }
+
+	return nil
+}
+
 func (t *Generator) writeModel(output template_manager.ModelOutput) error {
 	path := output.Schema.Base().OutputPath
 
@@ -52,11 +68,4 @@ func (t *Generator) writeModel(output template_manager.ModelOutput) error {
 	}
 
 	return nil
-}
-
-func (t *Generator) dumpSchema(schema canonical.Canonical) string {
-	title := strings.Repeat("=", 5)
-	title = fmt.Sprintf("%v %v %v", title, schema.SchemaId(), title)
-	sep := strings.Repeat("=", len(title))
-	return fmt.Sprintf("%v\n%v", sep, title)
 }

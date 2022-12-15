@@ -13,6 +13,24 @@ import (
 )
 
 func (t *Loader) Merge() error {
+	if err := t.Register(); err != nil {
+		return err
+	}
+
+	for schemaPath, schema := range t.cgsPathMap {
+		if err := t.mergeSchema(schemaPath, schema); err != nil {
+			return err
+		}
+	}
+
+	if err := t.Register(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *Loader) Register() error {
 	for _, jsSchema := range t.jsonSchemas.AllPath() {
 		if schema, err := t.convertJsonSchema(jsSchema, o.None[string]()); err != nil {
 			return err
@@ -31,12 +49,6 @@ func (t *Loader) Merge() error {
 		}
 	}
 
-	for schemaPath, schema := range t.cgsPathMap {
-		if err := t.mergeSchema(schemaPath, schema); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -46,6 +58,10 @@ func (t *Loader) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 	}
 
 	if err := t.mergeMapping(schema.Mappings); err != nil {
+		return err
+	}
+
+	if err := t.mergeSubSchemas(schemaPath, schema.Schemas); err != nil {
 		return err
 	}
 
@@ -65,6 +81,35 @@ func (t *Loader) mergeSchema(schemaPath string, schema model.CodeGenSchema) erro
 		if err := t.mergeTemplates(schemaPath, file); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (t *Loader) mergeSubSchemas(schemaPath string, files []model.CodeGenSchemaFile) error {
+	var uris []string
+
+	for _, file := range files {
+		if file.Path.Defined() {
+			uri := file.Path.Get()
+
+			scheme, path, err := urischemer.Break(uri)
+
+			if err != nil {
+				return err
+			}
+
+			if !filepath.IsAbs(path) {
+				dir := filepath.Dir(schemaPath)
+				uri = filepath.Join(dir, uri)
+				uri = urischemer.Combine(scheme, uri)
+				uris = append(uris, uri)
+			}
+		}
+	}
+
+	if err := t.LoadUri(uris...); err != nil {
+		return err
 	}
 
 	return nil
@@ -95,11 +140,11 @@ func (t *Loader) mergeTemplates(schemaPath string, file model.CodeGenSchemaTempl
 		file.Path = o.Some(path)
 	}
 
-	if err := t.cacher.Cache("templates", file.Path.Get()); err != nil {
+	if err := t.cacher.Cache(file.Path.Get()); err != nil {
 		return err
 	}
 
-	cached := t.cacher.FindByGroup("templates")
+	cached := t.cacher.FindList(file.Path.Get())
 
 	if cached.Empty() {
 		return nil
