@@ -58,7 +58,7 @@ items:
     max: 2
 `,
 			&c.CodeGenTypeArray{
-				CodeGenTypeBase: &c.CodeGenTypeBase{
+				CodeGenTypeBase: c.CodeGenTypeBase{
 					Description: o.Some("array1"),
 				},
 				Min: o.Some(3),
