@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/codegen_project"
+	cp "boundedinfinity/codegen/codegen_project"
 	ct "boundedinfinity/codegen/codegen_type"
 	rc "boundedinfinity/codegen/render_context"
 	"fmt"
@@ -156,12 +156,13 @@ func (t *Generator) convertBase(ci ct.CodeGenType) (rc.RenderContextBase, error)
 	b := ci.Base()
 
 	return rc.RenderContextBase{
-		SourceUri:     t.loader.FindSource(b.Id).Get(),
-		Id:            b.Id.Get(),
+		Root:          b.Root,
+		Source:        b.Source,
 		SchemaType:    ci.SchemaType(),
 		RootNs:        t.projectManager.Merged.Info.Namespace.Get(),
-		SchemaNs:      codegen_project.SchemaNamepace(t.projectManager.Merged.Info, ci),
-		RelNs:         codegen_project.RelNamepace(t.projectManager.Merged.Info, ci),
+		SchemaNs:      cp.SchemaNamepace(t.projectManager.Merged.Info, ci),
+		RelNs:         cp.RelNamepace(t.projectManager.Merged.Info, ci),
+		Id:            b.Id.Get(),
 		Name:          o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
 		Description:   b.Description.Get(),
 		IsPublic:      b.Public.OrElse(true),

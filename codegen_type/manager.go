@@ -36,14 +36,13 @@ func (t *CodeGenTypeManager) Register(root, path string, schema CodeGenType) err
 		return nil
 	}
 
-	b := schema.Base()
-	b.Source = path
-	b.Root = root
+	schema.Base().Source = path
+	schema.Base().Root = root
 
-	if b.Id.Defined() {
-		t.id2Type[b.Id.Get()] = schema
-		t.id2path[b.Id.Get()] = path
-		t.path2id[path] = b.Id.Get()
+	if schema.Base().Id.Defined() {
+		t.id2Type[schema.Base().Id.Get()] = schema
+		t.id2path[schema.Base().Id.Get()] = path
+		t.path2id[path] = schema.Base().Id.Get()
 	}
 
 	t.path2Type[path] = schema

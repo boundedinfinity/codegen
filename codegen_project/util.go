@@ -8,20 +8,18 @@ import (
 	"strings"
 
 	"github.com/boundedinfinity/go-commoner/extentioner"
-	"github.com/boundedinfinity/go-urischemer"
 )
 
 func SchemaNamepace(info CodeGenProjectInfo, schema codegen_type.CodeGenType) string {
-	id := schema.Base().Id
-
-	if id.Empty() {
+	if schema.Base().Id.Empty() {
 		return ""
 	}
 
-	ns := id.Get()
-	_, ns, _ = urischemer.Break(ns)
+	ns := schema.Base().Source
+	ns = strings.Replace(ns, schema.Base().Root, "", 1)
 	ns = path.Join(info.Namespace.Get(), ns)
-	ns = path.Join(path.Dir(ns), path.Base(ns))
+	ns = extentioner.Strip(ns)
+	ns = extentioner.Strip(ns)
 
 	return ns
 }

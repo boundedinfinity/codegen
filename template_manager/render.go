@@ -21,7 +21,8 @@ func (t *TemplateManager) RenderModel(schema render_context.RenderContext) ([]Mo
 		err := render_context.WalkBase(schema, func(base *render_context.RenderContextBase) error {
 			base.OutputPath = outputPath
 			base.CurrNs = codegen_project.CurrentNs(t.projectManager.Merged.Info, outputPath)
-			base.SourceUri = schema.Base().SourceUri
+			base.Source = schema.Base().Source
+			base.Root = schema.Base().Root
 			return nil
 		})
 

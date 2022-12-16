@@ -8,7 +8,8 @@ type RenderContext interface {
 
 type RenderContextBase struct {
 	OutputPath    string
-	SourceUri     string
+	Root          string
+	Source        string
 	Id            string
 	RootNs        string
 	CurrNs        string

@@ -50,10 +50,6 @@ func ExpandPath(root, path string) string {
 }
 
 func ExpandPatho(root, path o.Option[string]) o.Option[string] {
-	if root.Empty() || path.Empty() {
-		return o.None[string]()
-	}
-
 	new := ExpandPath(root.Get(), path.Get())
 
 	return o.Some(new)

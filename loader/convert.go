@@ -9,13 +9,14 @@ import (
 )
 
 func (t *Loader) ConvertJsonSchema() error {
-	for _, jsSchema := range t.jsonSchemas.AllPath() {
-		if schema, err := t.convertJsonSchema(jsSchema, o.None[string]()); err != nil {
+	for _, js := range t.jsonSchemas.AllPath() {
+		if schema, err := t.convertJsonSchema(js, o.None[string]()); err != nil {
 			return err
 		} else {
-			source := t.jsonSchemas.GetSource(jsSchema.Base().Id.Get())
+			source := t.jsonSchemas.GetSource(js.Base().Id.Get())
+			root := t.jsonSchemas.GetRoot(js.Base().Id.Get())
 
-			if err := t.typeManager.Register(source.Get(), source.Get(), schema); err != nil {
+			if err := t.typeManager.Register(root.Get(), source.Get(), schema); err != nil {
 				return err
 			}
 		}
