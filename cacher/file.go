@@ -1,7 +1,7 @@
 package cacher
 
 import (
-	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/util"
 	"path/filepath"
 
 	"github.com/boundedinfinity/go-commoner/pather"
@@ -9,17 +9,17 @@ import (
 	"github.com/boundedinfinity/go-urischemer"
 )
 
-func (t Cacher) cacheFilePath(orig, root string) error {
+func (t Cacher) cacheFilePath(rootUri, path string) error {
 	paths := make([]string, 0)
 
-	ok, err := pather.IsDir(root)
+	ok, err := pather.IsDir(path)
 
 	if err != nil {
 		return err
 	}
 
 	if ok {
-		ps, err := pather.GetFiles(root)
+		ps, err := pather.GetFiles(path)
 
 		if err != nil {
 			return err
@@ -29,13 +29,13 @@ func (t Cacher) cacheFilePath(orig, root string) error {
 	}
 
 	paths = slicer.Filter(paths, func(p string) bool {
-		return p != root
+		return p != path
 	})
 
 	paths = slicer.Dedup(paths)
 
 	for _, path := range paths {
-		if err := t.cacheFileFile(orig, path); err != nil {
+		if err := t.cacheFileFile(rootUri, path); err != nil {
 			return err
 		}
 	}
@@ -43,15 +43,17 @@ func (t Cacher) cacheFilePath(orig, root string) error {
 	return nil
 }
 
-func (t Cacher) cacheFileFile(orig, path string) error {
-	var data CachedData
+func (t Cacher) cacheFileFile(rootUri, path string) error {
+	data := CachedData{
+		RootUri: rootUri,
+	}
 
-	data.SourceUrl = urischemer.Combine(urischemer.File, path)
+	data.SourceUri = urischemer.Combine(urischemer.File, path)
 
-	if clean, err := urischemer.Clean(data.SourceUrl); err != nil {
+	if clean, err := urischemer.Clean(data.SourceUri); err != nil {
 		return err
 	} else {
-		data.SourceUrl = clean
+		data.SourceUri = clean
 	}
 
 	data.DestPath = filepath.Clean(path)
@@ -68,14 +70,14 @@ func (t Cacher) cacheFileFile(orig, path string) error {
 	if r, err := t.checkSumer.CalculateFile(data.DestPath); err != nil {
 		return err
 	} else {
-		data.CalculateCheckSum = r.CheckSum
+		data.CalculatedCheckSum = r.CheckSum
 	}
 
-	t.source2Data[data.SourceUrl] = &data
+	t.source2Data[data.SourceUri] = &data
 	t.dest2Data[data.DestPath] = &data
-	t.dest2Orig[data.DestPath] = orig
-	model.MapListAdd(t.orig2Dest, orig, data.DestPath)
-	model.MapListAdd(t.orig2Data, orig, &data)
+	t.dest2Orig[data.DestPath] = data.DestPath
+	util.MapListAdd(t.orig2Dest, data.RootUri, data.DestPath)
+	util.MapListAdd(t.orig2Data, data.RootUri, &data)
 
 	return nil
 }

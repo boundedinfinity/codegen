@@ -23,7 +23,7 @@
                 "TEMPLATES_DIR": "${workspaceFolder}/../codegen-templates",
             },
             "args": [
-                "file://${workspaceFolder}/../codegen-schemas/applications/go-server",
+                "${workspaceFolder}/../codegen-schemas/applications/go-server",
             ],
         },
         {
@@ -37,7 +37,7 @@
                 "TEMPLATES_DIR": "${workspaceFolder}/../codegen-templates",
             },
             "args": [
-                "file://${workspaceFolder}/../codegen-schemas/applications/ts-server",
+                "${workspaceFolder}/../codegen-schemas/applications/ts-server",
             ],
         }
     ]

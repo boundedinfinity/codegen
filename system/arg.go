@@ -1,7 +1,6 @@
 package system
 
 import (
-	"boundedinfinity/codegen/cacher"
 	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
 	"boundedinfinity/codegen/template_manager"
@@ -30,18 +29,18 @@ func (t *System) init() error {
 		t.cacheDir = optioner.Some(cacheDir)
 	}
 
-	c, err := cacher.New(cacher.CacheDir(t.cacheDir.Get()))
+	// c, err := cacher.New(cacher.CacheDir(t.cacheDir.Get()))
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	t.cacher = c
+	// t.cacher = c
 
 	ld, err := loader.New(
-		loader.Cacher(c),
-		loader.Canonicals(t.canonicals),
-		loader.MergedCodeGen(t.mergedCodeGen),
+		// loader.Cacher(c),
+		loader.Canonicals(t.typeManager),
+		loader.ProjectManager(t.projectManager),
 	)
 
 	if err != nil {
@@ -51,9 +50,9 @@ func (t *System) init() error {
 	t.loader = ld
 
 	tm, err := template_manager.New(
-		template_manager.Cacher(c),
-		template_manager.CanonicalCombined(t.canonicals),
-		template_manager.CodeGenSchema(t.mergedCodeGen),
+		// template_manager.Cacher(c),
+		template_manager.TypeManaager(t.typeManager),
+		template_manager.ProjectManager(t.projectManager),
 	)
 
 	if err != nil {
@@ -64,8 +63,8 @@ func (t *System) init() error {
 
 	g, err := generator.New(
 		generator.TemplateManager(t.tm),
-		generator.Canonicals(t.canonicals),
-		generator.CodeGenSchema(t.mergedCodeGen),
+		generator.TypeManager(t.typeManager),
+		generator.ProjectManager(t.projectManager),
 		generator.Loader(t.loader),
 	)
 

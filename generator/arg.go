@@ -1,9 +1,9 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/loader"
-	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
 	"fmt"
 	"io/fs"
@@ -21,9 +21,9 @@ func GenExt(v string) Arg {
 	}
 }
 
-func Canonicals(v *canonical.CanonicalCombined) Arg {
+func TypeManager(v *codegen_type.CodeGenTypeManager) Arg {
 	return func(t *Generator) {
-		t.canonicals = v
+		t.typeManager = v
 	}
 }
 
@@ -33,9 +33,9 @@ func TemplateManager(v *template_manager.TemplateManager) Arg {
 	}
 }
 
-func CodeGenSchema(v *model.CodeGenSchema) Arg {
+func ProjectManager(v *codegen_project.CodeGenProjectManager) Arg {
 	return func(t *Generator) {
-		t.codeGenSchema = v
+		t.projectManager = v
 	}
 }
 
@@ -65,11 +65,11 @@ func (t *Generator) init() error {
 		return fmt.Errorf("template manager is nil")
 	}
 
-	if t.canonicals == nil {
-		return fmt.Errorf("canonicals is nil")
+	if t.typeManager == nil {
+		return fmt.Errorf("codeGenTypeManager is nil")
 	}
 
-	if t.codeGenSchema == nil {
+	if t.projectManager == nil {
 		return fmt.Errorf("codeGenSchema is nil")
 	}
 

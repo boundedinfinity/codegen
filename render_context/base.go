@@ -1,6 +1,6 @@
 package render_context
 
-import "boundedinfinity/codegen/canonical/canonical_type"
+import "boundedinfinity/codegen/codegen_type/codegen_type_id"
 
 type RenderContext interface {
 	Base() *RenderContextBase
@@ -14,7 +14,7 @@ type RenderContextBase struct {
 	CurrNs        string
 	SchemaNs      string
 	RelNs         string
-	SchemaType    canonical_type.CanonicalType
+	SchemaType    codegen_type_id.CodgenTypeId
 	Name          string
 	Description   string
 	IsPublic      bool

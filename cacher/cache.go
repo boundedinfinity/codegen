@@ -1,30 +1,28 @@
 package cacher
 
 import (
-	"github.com/boundedinfinity/go-commoner/environmenter"
 	"github.com/boundedinfinity/go-commoner/slicer"
 	"github.com/boundedinfinity/go-urischemer"
 )
 
 type CachedData struct {
-	SourceUrl          string
+	RootUri            string
+	SourceUri          string
 	SourceCheckSum     string
 	SourceCheckSumPath string
 	DestPath           string
 	DestCheckSum       string
 	DestCheckSumPath   string
-	CalculateCheckSum  string
+	CalculatedCheckSum string
 }
 
 func (t Cacher) Cache(urls ...string) error {
-	rUrls := slicer.Map(urls, environmenter.Sub)
-
-	for _, sourceUrl := range slicer.Dedup(rUrls) {
-		if t.source2Data.Has(sourceUrl) {
+	for _, rootUri := range slicer.Dedup(urls) {
+		if t.source2Data.Has(rootUri) {
 			continue
 		}
 
-		scheme, path, err := urischemer.Break(sourceUrl)
+		scheme, path, err := urischemer.Break(rootUri)
 
 		if err != nil {
 			return err
@@ -32,11 +30,11 @@ func (t Cacher) Cache(urls ...string) error {
 
 		switch scheme {
 		case urischemer.File:
-			if err := t.cacheFilePath(sourceUrl, path); err != nil {
+			if err := t.cacheFilePath(rootUri, path); err != nil {
 				return err
 			}
 		case urischemer.Http, urischemer.Https:
-			if err := t.cacheHttpPath(sourceUrl, path); err != nil {
+			if err := t.cacheHttpPath(rootUri, path); err != nil {
 				return err
 			}
 		default:

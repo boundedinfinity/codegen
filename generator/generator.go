@@ -1,22 +1,22 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/canonical"
+	"boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/loader"
-	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/template_manager"
 	"io/fs"
 )
 
 type Generator struct {
-	genExt        string
-	tm            *template_manager.TemplateManager
-	canonicals    *canonical.CanonicalCombined
-	codeGenSchema *model.CodeGenSchema
-	rcs           []render_context.RenderContext
-	fileMode      fs.FileMode
-	loader        *loader.Loader
+	genExt         string
+	tm             *template_manager.TemplateManager
+	typeManager    *codegen_type.CodeGenTypeManager
+	projectManager *codegen_project.CodeGenProjectManager
+	rcs            []render_context.RenderContext
+	fileMode       fs.FileMode
+	loader         *loader.Loader
 }
 
 func New(args ...Arg) (*Generator, error) {

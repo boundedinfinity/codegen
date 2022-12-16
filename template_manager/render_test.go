@@ -1,13 +1,8 @@
 package template_manager_test
 
 import (
-	"boundedinfinity/codegen/cacher"
-	"boundedinfinity/codegen/model"
 	"boundedinfinity/codegen/template_manager"
-	"log"
 	"testing"
-
-	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 var (
@@ -15,31 +10,31 @@ var (
 )
 
 func loadTemplates() {
-	p1 := "file://../../codegen-templates/templates/go/types/base/date.model.go.gotmpl"
+	// p1 := "../../codegen-templates/templates/go/types/base/date.model.go.gotmpl"
 
-	var err error
+	// var err error
 
-	c, err := cacher.New()
+	// c, err := cacher.New()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	if err := c.Cache("test", p1); err != nil {
-		log.Fatal(err)
-	}
+	// if err := c.Cache("test", p1); err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	tm, err = template_manager.New(template_manager.Cacher(c))
+	// tm, err = template_manager.New()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	tm.Register(model.CodeGenSchemaTemplates{
-		Files: []model.CodeGenSchemaTemplateFile{
-			{Path: o.Some(p1)},
-		},
-	})
+	// tm.Register(codegen_project.CodeGenProjectTemplates{
+	// 	Files: []codegen_project.CodeGenProjectTemplateFile{
+	// 		{Path: o.Some(p1)},
+	// 	},
+	// })
 }
 
 // func renderTemplate(data canonical.Canonical) error {

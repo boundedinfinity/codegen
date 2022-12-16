@@ -1,72 +1,41 @@
 package loader
 
 import (
-	"boundedinfinity/codegen/cacher"
-	"boundedinfinity/codegen/canonical"
-	"boundedinfinity/codegen/model"
+	cp "boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/util"
 	"encoding/json"
+	"path/filepath"
 
+	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/slicer"
+	"github.com/boundedinfinity/go-jsonschema/model"
 	"github.com/boundedinfinity/go-marshaler"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 	"github.com/ghodss/yaml"
 )
 
-func (t *Loader) LoadUri(uris ...string) error {
-	if err := t.cacher.Cache(uris...); err != nil {
-		return err
-	}
+func (t *Loader) LoadTypePaths(paths ...string) error {
+	paths = slicer.Map(paths, filepath.Clean)
 
-	var cds []*cacher.CachedData
+	for _, path := range paths {
+		m, err := marshaler.ReadFromPath(path)
 
-	for _, uri := range uris {
-		cached := t.cacher.FindList(uri)
-
-		if cached.Defined() {
-			cds = append(cds, cached.Get()...)
-		}
-	}
-
-	for _, cd := range cds {
-		switch {
-		case util.IsJsonSchemaFile(cd.DestPath):
-			if err := t.jsonSchemas.LoadPath(cd.DestPath); err != nil {
-				return err
-			}
-		case util.IsCodeGenSchemaFile(cd.DestPath), util.IsCodeGenSchemaTypeFile(cd.DestPath):
-			if err := t.LoadCodeGenPath(cd.DestPath); err != nil {
-				return err
-			}
-		default:
-			return model.ErrUnsupportedSchemev(cd.DestPath)
-		}
-	}
-
-	return nil
-}
-
-func (t *Loader) LoadCodeGenPath(root string) error {
-	m, err := marshaler.ReadFromPath(root)
-
-	if err != nil {
-		return err
-	}
-
-	for path, content := range m {
-		if t.cgsPathMap.Has(path) {
-			return model.ErrPathDuplicatev(path)
-		}
-
-		if err := t.LoadSchema(content.Data, content.MimeType, path); err != nil {
+		if err != nil {
 			return err
 		}
+
+		for source, content := range m {
+			if err := t.LoadTypePath(path, source, content.Data, content.MimeType); err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
 }
 
-func (t *Loader) LoadSchema(data []byte, mt mime_type.MimeType, path string) error {
+func (t *Loader) LoadTypePath(root, source string, data []byte, mt mime_type.MimeType) error {
 	var bs []byte
 	var err error
 
@@ -80,55 +49,41 @@ func (t *Loader) LoadSchema(data []byte, mt mime_type.MimeType, path string) err
 	case mime_type.ApplicationJson:
 		bs = data
 	default:
-		return model.ErrMimeTypeUnsupportedv(mt)
+		return cp.ErrMimeTypeUnsupportedv(mt)
 	}
 
 	switch {
-	case util.IsCodeGenSchemaFile(path):
-		var schema model.CodeGenSchema
+	case util.IsJsonSchemaFile(source):
+		if schema, err := model.UnmarshalSchema(bs); err != nil {
+			return err
+		} else {
+			t.jsonSchemas.Register(root, source, schema)
+		}
+	case util.IsCodeGenSchemaFile(source):
+		var schema cp.CodeGenProjectProject
 
 		if err := json.Unmarshal(bs, &schema); err != nil {
 			return err
 		}
 
-		schema.Info.DestDir = util.ResolvePath(path, schema.Info.DestDir)
+		schema.Info.DestDir = util.ExpandPatho(o.Some(source), schema.Info.DestDir)
 
-		schema.Schemas, err = slicer.MapErr(schema.Schemas, func(f model.CodeGenSchemaFile) (model.CodeGenSchemaFile, error) {
-			if p, err := util.ResolveUri(path, f.Path); err != nil {
-				return f, err
-			} else {
-				f.Path = p
-				return f, nil
-			}
+		schema.Schemas = slicer.Map(schema.Schemas, func(f cp.CodeGenProjectTypeFile) cp.CodeGenProjectTypeFile {
+			f.Path = util.ExpandPatho(o.Some(root), f.Path)
+			return f
 		})
 
-		if err != nil {
-			return err
-		}
-
-		schema.Templates.Files, err = slicer.MapErr(schema.Templates.Files, func(f model.CodeGenSchemaTemplateFile) (model.CodeGenSchemaTemplateFile, error) {
-			if p, err := util.ResolveUri(path, f.Path); err != nil {
-				return f, err
-			} else {
-				f.Path = p
-				return f, nil
-			}
+		schema.Templates.Files = slicer.Map(schema.Templates.Files, func(f cp.CodeGenProjectTemplateFile) cp.CodeGenProjectTemplateFile {
+			f.Path = util.ExpandPatho(o.Some(root), f.Path)
+			return f
 		})
 
-		t.cgsPathMap[path] = schema
-
-		if schema.Info.Id.Defined() {
-			t.cgsId2path[schema.Info.Id.Get()] = path
-		}
-	case util.IsCodeGenSchemaTypeFile(path):
-		if schema, err := canonical.UnmarshalCanonicalSchemaJson(bs); err != nil {
+		t.projectManager.Register(root, source, &schema)
+	case util.IsCodeGenSchemaTypeFile(source):
+		if schema, err := codegen_type.UnmarshalJson(bs); err != nil {
 			return err
 		} else {
-			t.canonicalPathMap[path] = schema
-
-			if schema.SchemaId().Defined() {
-				t.canonicalId2path[schema.SchemaId().Get()] = path
-			}
+			t.typeManager.Register(root, source, schema)
 		}
 	}
 

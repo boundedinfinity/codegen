@@ -1,9 +1,8 @@
 package template_manager
 
 import (
-	"boundedinfinity/codegen/cacher"
-	"boundedinfinity/codegen/canonical"
-	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/template_delimiter"
 	"fmt"
 
@@ -11,24 +10,28 @@ import (
 )
 
 func (t *TemplateManager) init() error {
-	if t.cacher == nil {
-		return fmt.Errorf("cacher is nil")
-	}
+	// if t.cacher == nil {
+	// 	return fmt.Errorf("cacher is nil")
+	// }
 
 	if t.pathMap == nil {
 		return fmt.Errorf("pathMap is nil")
 	}
 
-	if t.canonicals == nil {
-		return fmt.Errorf("canonicals is nil")
+	if t.typeManager == nil {
+		return fmt.Errorf("typeManager is nil")
+	}
+
+	if t.projectManager == nil {
+		return fmt.Errorf("projectManager is nil")
 	}
 
 	if err := t.initTemplatesFuncs(); err != nil {
 		return nil
 	}
 
-	if t.codeGenSchema.Info.Delimiter.Empty() {
-		t.codeGenSchema.Info.Delimiter = optioner.Some(template_delimiter.Square)
+	if t.projectManager.Merged.Info.Delimiter.Empty() {
+		t.projectManager.Merged.Info.Delimiter = optioner.Some(template_delimiter.Square)
 	}
 
 	return nil
@@ -36,23 +39,23 @@ func (t *TemplateManager) init() error {
 
 type Arg func(*TemplateManager)
 
-func CanonicalCombined(v *canonical.CanonicalCombined) Arg {
+func TypeManaager(v *codegen_type.CodeGenTypeManager) Arg {
 	return func(t *TemplateManager) {
-		t.canonicals = v
+		t.typeManager = v
 	}
 }
 
-func CodeGenSchema(v *model.CodeGenSchema) Arg {
+func ProjectManager(v *codegen_project.CodeGenProjectManager) Arg {
 	return func(t *TemplateManager) {
-		t.codeGenSchema = v
+		t.projectManager = v
 	}
 }
 
-func Cacher(v *cacher.Cacher) Arg {
-	return func(t *TemplateManager) {
-		t.cacher = v
-	}
-}
+// func Cacher(v *cacher.Cacher) Arg {
+// 	return func(t *TemplateManager) {
+// 		t.cacher = v
+// 	}
+// }
 
 func TemplateFunc(v string, fn any) Arg {
 	return func(t *TemplateManager) {

@@ -1,9 +1,9 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/canonical"
-	"boundedinfinity/codegen/render_context"
-	"boundedinfinity/codegen/util"
+	"boundedinfinity/codegen/codegen_project"
+	ct "boundedinfinity/codegen/codegen_type"
+	rc "boundedinfinity/codegen/render_context"
 	"fmt"
 	"path"
 
@@ -12,7 +12,7 @@ import (
 )
 
 func (t *Generator) Process() error {
-	for _, c := range t.canonicals.All() {
+	for _, c := range t.typeManager.All() {
 		if rc, err := t.convert(c); err != nil {
 			return err
 		} else {
@@ -23,8 +23,8 @@ func (t *Generator) Process() error {
 	return nil
 }
 
-func (t *Generator) convert(ci canonical.Canonical) (render_context.RenderContext, error) {
-	var rci render_context.RenderContext
+func (t *Generator) convert(ci ct.CodeGenType) (rc.RenderContext, error) {
+	var rci rc.RenderContext
 	var err error
 
 	b, err := t.convertBase(ci)
@@ -34,33 +34,19 @@ func (t *Generator) convert(ci canonical.Canonical) (render_context.RenderContex
 	}
 
 	switch c := ci.(type) {
-	case canonical.CanonicalArray:
-		rci, err = t.handleRenderContextArray(c, b)
-	case *canonical.CanonicalArray:
+	case *ct.CodeGenTypeArray:
 		rci, err = t.handleRenderContextArray(*c, b)
-	case canonical.CanonicalObject:
-		rci, err = t.handleRenderContextObject(c, b)
-	case *canonical.CanonicalObject:
+	case *ct.CodeGenTypeObject:
 		rci, err = t.handleRenderContextObject(*c, b)
-	case canonical.CanonicalUrl:
-		rci, err = t.handleRenderContextUrl(c, b)
-	case *canonical.CanonicalUrl:
+	case *ct.CodeGenTypeUrl:
 		rci, err = t.handleRenderContextUrl(*c, b)
-	case canonical.CanonicalString:
-		rci, err = t.handleRenderContextString(c, b)
-	case *canonical.CanonicalString:
+	case *ct.CodeGenTypeString:
 		rci, err = t.handleRenderContextString(*c, b)
-	case canonical.CanonicalRef:
-		rci, err = t.handleRenderContextRef(c, b)
-	case *canonical.CanonicalRef:
+	case *ct.CodeGenTypeRef:
 		rci, err = t.handleRenderContextRef(*c, b)
-	case canonical.CanonicalInteger:
-		rci, err = t.handleRenderContextInteger(c, b)
-	case *canonical.CanonicalInteger:
+	case *ct.CodeGenTypeInteger:
 		rci, err = t.handleRenderContextInteger(*c, b)
-	case canonical.CanonicalFloat:
-		rci, err = t.handleRenderContextFloat(c, b)
-	case *canonical.CanonicalFloat:
+	case *ct.CodeGenTypeFloat:
 		rci, err = t.handleRenderContextFloat(*c, b)
 	default:
 		return rci, fmt.Errorf("unsupported type: %v", c)
@@ -69,8 +55,8 @@ func (t *Generator) convert(ci canonical.Canonical) (render_context.RenderContex
 	return rci, nil
 }
 
-func (t *Generator) handleRenderContextRef(c canonical.CanonicalRef, b render_context.RenderContextBase) (*render_context.RenderContextRef, error) {
-	ref := t.canonicals.Find(c.Ref)
+func (t *Generator) handleRenderContextRef(c ct.CodeGenTypeRef, b rc.RenderContextBase) (*rc.RenderContextRef, error) {
+	ref := t.typeManager.Find(c.Ref)
 
 	if ref.Empty() {
 		// TODO
@@ -82,7 +68,7 @@ func (t *Generator) handleRenderContextRef(c canonical.CanonicalRef, b render_co
 		return nil, err
 	}
 
-	rc := render_context.RenderContextRef{
+	rc := rc.RenderContextRef{
 		RenderContextBase: b,
 		Ref:               rb,
 	}
@@ -94,8 +80,8 @@ func (t *Generator) handleRenderContextRef(c canonical.CanonicalRef, b render_co
 	return &rc, nil
 }
 
-func (t *Generator) handleRenderContextArray(c canonical.CanonicalArray, b render_context.RenderContextBase) (*render_context.RenderContextArray, error) {
-	rc := render_context.RenderContextArray{
+func (t *Generator) handleRenderContextArray(c ct.CodeGenTypeArray, b rc.RenderContextBase) (*rc.RenderContextArray, error) {
+	rc := rc.RenderContextArray{
 		RenderContextBase: b,
 	}
 
@@ -117,8 +103,8 @@ func (t *Generator) handleRenderContextArray(c canonical.CanonicalArray, b rende
 	return &rc, nil
 }
 
-func (t *Generator) handleRenderContextObject(c canonical.CanonicalObject, b render_context.RenderContextBase) (*render_context.RenderContextObject, error) {
-	rc := render_context.RenderContextObject{
+func (t *Generator) handleRenderContextObject(c ct.CodeGenTypeObject, b rc.RenderContextBase) (*rc.RenderContextObject, error) {
+	rc := rc.RenderContextObject{
 		RenderContextBase: b,
 	}
 
@@ -133,14 +119,14 @@ func (t *Generator) handleRenderContextObject(c canonical.CanonicalObject, b ren
 	return &rc, nil
 }
 
-func (t *Generator) handleRenderContextUrl(c canonical.CanonicalUrl, b render_context.RenderContextBase) (*render_context.RenderContextUrl, error) {
-	return &render_context.RenderContextUrl{
+func (t *Generator) handleRenderContextUrl(c ct.CodeGenTypeUrl, b rc.RenderContextBase) (*rc.RenderContextUrl, error) {
+	return &rc.RenderContextUrl{
 		RenderContextBase: b,
 	}, nil
 }
 
-func (t *Generator) handleRenderContextString(c canonical.CanonicalString, b render_context.RenderContextBase) (*render_context.RenderContextString, error) {
-	return &render_context.RenderContextString{
+func (t *Generator) handleRenderContextString(c ct.CodeGenTypeString, b rc.RenderContextBase) (*rc.RenderContextString, error) {
+	return &rc.RenderContextString{
 		RenderContextBase: b,
 		Min:               c.Min,
 		Max:               c.Max,
@@ -148,8 +134,8 @@ func (t *Generator) handleRenderContextString(c canonical.CanonicalString, b ren
 	}, nil
 }
 
-func (t *Generator) handleRenderContextInteger(c canonical.CanonicalInteger, b render_context.RenderContextBase) (*render_context.RenderContextInteger, error) {
-	return &render_context.RenderContextInteger{
+func (t *Generator) handleRenderContextInteger(c ct.CodeGenTypeInteger, b rc.RenderContextBase) (*rc.RenderContextInteger, error) {
+	return &rc.RenderContextInteger{
 		RenderContextBase: b,
 		Min:               c.Min,
 		Max:               c.Max,
@@ -157,8 +143,8 @@ func (t *Generator) handleRenderContextInteger(c canonical.CanonicalInteger, b r
 	}, nil
 }
 
-func (t *Generator) handleRenderContextFloat(c canonical.CanonicalFloat, b render_context.RenderContextBase) (*render_context.RenderContextFloat, error) {
-	return &render_context.RenderContextFloat{
+func (t *Generator) handleRenderContextFloat(c ct.CodeGenTypeFloat, b rc.RenderContextBase) (*rc.RenderContextFloat, error) {
+	return &rc.RenderContextFloat{
 		RenderContextBase: b,
 		Min:               c.Min,
 		Max:               c.Max,
@@ -166,16 +152,16 @@ func (t *Generator) handleRenderContextFloat(c canonical.CanonicalFloat, b rende
 	}, nil
 }
 
-func (t *Generator) convertBase(ci canonical.Canonical) (render_context.RenderContextBase, error) {
+func (t *Generator) convertBase(ci ct.CodeGenType) (rc.RenderContextBase, error) {
 	b := ci.Base()
 
-	return render_context.RenderContextBase{
+	return rc.RenderContextBase{
 		SourceUri:     t.loader.FindSource(b.Id).Get(),
 		Id:            b.Id.Get(),
 		SchemaType:    ci.SchemaType(),
-		RootNs:        t.codeGenSchema.Info.Namespace.Get(),
-		SchemaNs:      util.SchemaNamepace(t.codeGenSchema.Info, ci),
-		RelNs:         util.RelNamepace(t.codeGenSchema.Info, ci),
+		RootNs:        t.projectManager.Merged.Info.Namespace.Get(),
+		SchemaNs:      codegen_project.SchemaNamepace(t.projectManager.Merged.Info, ci),
+		RelNs:         codegen_project.RelNamepace(t.projectManager.Merged.Info, ci),
 		Name:          o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
 		Description:   b.Description.Get(),
 		IsPublic:      b.Public.OrElse(true),

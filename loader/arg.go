@@ -1,9 +1,8 @@
 package loader
 
 import (
-	"boundedinfinity/codegen/cacher"
-	"boundedinfinity/codegen/canonical"
-	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/codegen_type"
 	"errors"
 
 	"github.com/boundedinfinity/go-jsonschema"
@@ -12,16 +11,16 @@ import (
 func (t *Loader) init() error {
 	t.jsonSchemas = jsonschema.New()
 
-	if t.cacher == nil {
-		return errors.New("cacher is nil")
+	// if t.cacher == nil {
+	// 	return errors.New("cacher is nil")
+	// }
+
+	if t.typeManager == nil {
+		return errors.New("typeManager is nil")
 	}
 
-	if t.canonicals == nil {
-		return errors.New("canonicals is nil")
-	}
-
-	if t.mergedCodeGen == nil {
-		return errors.New("mergedCodeGen is nil")
+	if t.projectManager == nil {
+		return errors.New("projectManager is nil")
 	}
 
 	return nil
@@ -29,20 +28,20 @@ func (t *Loader) init() error {
 
 type Arg func(*Loader)
 
-func Cacher(v *cacher.Cacher) Arg {
+// func Cacher(v *cacher.Cacher) Arg {
+// 	return func(t *Loader) {
+// 		t.cacher = v
+// 	}
+// }
+
+func Canonicals(v *codegen_type.CodeGenTypeManager) Arg {
 	return func(t *Loader) {
-		t.cacher = v
+		t.typeManager = v
 	}
 }
 
-func Canonicals(v *canonical.CanonicalCombined) Arg {
+func ProjectManager(v *codegen_project.CodeGenProjectManager) Arg {
 	return func(t *Loader) {
-		t.canonicals = v
-	}
-}
-
-func MergedCodeGen(v *model.CodeGenSchema) Arg {
-	return func(t *Loader) {
-		t.mergedCodeGen = v
+		t.projectManager = v
 	}
 }

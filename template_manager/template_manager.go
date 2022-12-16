@@ -1,10 +1,9 @@
 package template_manager
 
 import (
-	"boundedinfinity/codegen/cacher"
-	"boundedinfinity/codegen/canonical"
-	"boundedinfinity/codegen/canonical/canonical_type"
-	"boundedinfinity/codegen/model"
+	"boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/codegen_type"
+	"boundedinfinity/codegen/codegen_type/codegen_type_id"
 	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/template_type"
 	"text/template"
@@ -18,9 +17,10 @@ type TemplateContext struct {
 	TemplateMimeType mime_type.MimeType
 	OutputMimeType   mime_type.MimeType
 	TemplateType     template_type.TemplateType
-	ModelType        optioner.Option[canonical_type.CanonicalType]
+	ModelType        optioner.Option[codegen_type_id.CodgenTypeId]
 	Template         *template.Template
-	Path             string
+	Source           string
+	Root             string
 }
 
 type TemplateOutput struct {
@@ -34,22 +34,21 @@ type ModelOutput struct {
 }
 
 type TemplateManager struct {
-	codeGenSchema *model.CodeGenSchema
-	pathMap       mapper.Mapper[string, TemplateContext]
-	modelMap      mapper.Mapper[template_type.TemplateType, []TemplateContext]
-	schemaMap     mapper.Mapper[canonical_type.CanonicalType, []TemplateContext]
-	cacher        *cacher.Cacher
-	funcs         template.FuncMap
-	verbose       bool
-	// combinedTemplates *template.Template
-	canonicals *canonical.CanonicalCombined
+	projectManager *codegen_project.CodeGenProjectManager
+	typeManager    *codegen_type.CodeGenTypeManager
+	pathMap        mapper.Mapper[string, TemplateContext]
+	modelMap       mapper.Mapper[template_type.TemplateType, []TemplateContext]
+	schemaMap      mapper.Mapper[codegen_type_id.CodgenTypeId, []TemplateContext]
+	// cacher         *cacher.Cacher
+	funcs   template.FuncMap
+	verbose bool
 }
 
 func New(args ...Arg) (*TemplateManager, error) {
 	t := &TemplateManager{
 		pathMap:   make(mapper.Mapper[string, TemplateContext]),
 		modelMap:  make(mapper.Mapper[template_type.TemplateType, []TemplateContext]),
-		schemaMap: make(mapper.Mapper[canonical_type.CanonicalType, []TemplateContext]),
+		schemaMap: make(mapper.Mapper[codegen_type_id.CodgenTypeId, []TemplateContext]),
 		funcs:     make(template.FuncMap),
 	}
 

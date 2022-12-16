@@ -21,6 +21,7 @@ var (
 		Curly,
 		Square,
 		Parens,
+		Angle,
 	}
 )
 

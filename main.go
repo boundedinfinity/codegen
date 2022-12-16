@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	uris := os.Args[1:]
+	paths := os.Args[1:]
 
 	s, err := system.New()
 
@@ -16,20 +16,11 @@ func main() {
 		return
 	}
 
-	if err := s.Load(uris...); err != nil {
+	if err := s.Process(paths...); err != nil {
 		handleError(err)
 		return
 	}
 
-	if err := s.ProcessTemplates(); err != nil {
-		handleError(err)
-		return
-	}
-
-	if err := s.Generate(); err != nil {
-		handleError(err)
-		return
-	}
 }
 
 func handleError(err error) {

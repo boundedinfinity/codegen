@@ -7,5 +7,5 @@ func (t *Loader) FindSource(id optioner.Option[string]) optioner.Option[string] 
 		optioner.None[string]()
 	}
 
-	return t.canonicals.FindSource(id)
+	return t.typeManager.FindSource(id)
 }
