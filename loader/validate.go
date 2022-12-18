@@ -6,8 +6,8 @@ import (
 )
 
 func (t *Loader) Validate() error {
-	for _, schema := range t.typeManager.All() {
-		if err := t.validateReference(schema); err != nil {
+	for _, lc := range t.typeManager.All() {
+		if err := t.validateReference(lc.Schema); err != nil {
 			return err
 		}
 	}

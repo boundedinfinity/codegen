@@ -13,8 +13,6 @@ type CodeGenType interface {
 }
 
 type CodeGenTypeBase struct {
-	Source      string           `json:"source,omitempty" yaml:"source,omitempty"`
-	Root        string           `json:"root,omitempty" yaml:"root,omitempty"`
 	Id          o.Option[string] `json:"id,omitempty" yaml:"id,omitempty"`
 	Name        o.Option[string] `json:"name,omitempty" yaml:"name,omitempty"`
 	Description o.Option[string] `json:"description,omitempty" yaml:"description,omitempty"`
@@ -38,8 +36,6 @@ func (t *CodeGenTypeBase) Merge(o CodeGenTypeBase) bool {
 	t.Imported = o.Imported
 	t.Name = o.Name
 	t.Required = o.Required
-	t.Source = o.Source
-	t.Root = o.Root
 	t.Public = o.Public
 
 	return false

@@ -13,7 +13,15 @@ import (
 
 func (t *Generator) Process() error {
 	for _, c := range t.typeManager.All() {
-		if rc, err := t.convert(c); err != nil {
+		if rc, err := t.convertType(c.Schema); err != nil {
+			return err
+		} else {
+			t.rcs = append(t.rcs, rc)
+		}
+	}
+
+	for _, o := range t.projectManager.Merged.Operations {
+		if rc, err := t.convertOperation(o); err != nil {
 			return err
 		} else {
 			t.rcs = append(t.rcs, rc)
@@ -23,7 +31,36 @@ func (t *Generator) Process() error {
 	return nil
 }
 
-func (t *Generator) convert(ci ct.CodeGenType) (rc.RenderContext, error) {
+func (t *Generator) convertOperation(o *cp.CodeGenProjectOperation) (rc.RenderContext, error) {
+	var rci rc.RenderContext
+	var err error
+
+	// base := rc.RenderContextBase{
+	// 	Root:          b.Root,
+	// 	Source:        b.Source,
+	// 	SchemaType:    ci.SchemaType(),
+	// 	RootNs:        t.projectManager.Merged.Info.Namespace.Get(),
+	// 	SchemaNs:      cp.SchemaNamepace(t.projectManager.Merged.Info, ci),
+	// 	RelNs:         cp.RelNamepace(t.projectManager.Merged.Info, ci),
+	// 	Id:            b.Id.Get(),
+	// 	Name:          o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
+	// 	Description:   b.Description.Get(),
+	// 	IsPublic:      b.Public.OrElse(true),
+	// 	IsInterface:   false,
+	// 	IsRequired:    b.Required.OrElse(false),
+	// 	HasValidation: ci.HasValidation(),
+	// }
+
+	// ro := rc.RenderContextOperation{
+	// 	RenderContextBase: base,
+	// }
+
+	// rci = &ro
+
+	return rci, err
+}
+
+func (t *Generator) convertType(ci ct.CodeGenType) (rc.RenderContext, error) {
 	var rci rc.RenderContext
 	var err error
 
@@ -62,7 +99,7 @@ func (t *Generator) handleRenderContextRef(c ct.CodeGenTypeRef, b rc.RenderConte
 		// TODO
 	}
 
-	rb, err := t.convert(ref.Get())
+	rb, err := t.convertType(ref.Get().Schema)
 
 	if err != nil {
 		return nil, err
@@ -85,7 +122,7 @@ func (t *Generator) handleRenderContextArray(c ct.CodeGenTypeArray, b rc.RenderC
 		RenderContextBase: b,
 	}
 
-	if i, err := t.convert(c.Items); err != nil {
+	if i, err := t.convertType(c.Items); err != nil {
 		return &rc, err
 	} else {
 		if rc.SchemaNs == "" {
@@ -109,7 +146,7 @@ func (t *Generator) handleRenderContextObject(c ct.CodeGenTypeObject, b rc.Rende
 	}
 
 	for _, cp := range c.Properties {
-		if rcp, err := t.convert(cp); err != nil {
+		if rcp, err := t.convertType(cp); err != nil {
 			return &rc, err
 		} else {
 			rc.Properties = append(rc.Properties, rcp)
@@ -156,8 +193,8 @@ func (t *Generator) convertBase(ci ct.CodeGenType) (rc.RenderContextBase, error)
 	b := ci.Base()
 
 	return rc.RenderContextBase{
-		Root:          b.Root,
-		Source:        b.Source,
+		// Root:          b.Root,
+		// Source:        b.Source,
 		SchemaType:    ci.SchemaType(),
 		RootNs:        t.projectManager.Merged.Info.Namespace.Get(),
 		SchemaNs:      cp.SchemaNamepace(t.projectManager.Merged.Info, ci),

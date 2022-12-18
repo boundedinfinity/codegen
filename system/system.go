@@ -1,30 +1,30 @@
 package system
 
 import (
-	"boundedinfinity/codegen/codegen_project"
-	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
-	"boundedinfinity/codegen/template_manager"
+	"boundedinfinity/codegen/loader_context"
 
 	"github.com/boundedinfinity/go-commoner/optioner"
 )
 
 type System struct {
-	workDir        optioner.Option[string]
-	cacheDir       optioner.Option[string]
-	projectManager *codegen_project.CodeGenProjectManager
-	typeManager    *codegen_type.CodeGenTypeManager
+	workDir         optioner.Option[string]
+	cacheDir        optioner.Option[string]
+	projectManager  *loader_context.CodeGenProjectManager
+	typeManager     *loader_context.CodeGenTypeManager
+	templateManager *loader_context.CodeGenTemplateManager
+	generator       *generator.Generator
+	loader          *loader.Loader
+	// tm              *template_manager.TemplateManager
 	// cacher         *cacher.Cacher
-	generator *generator.Generator
-	tm        *template_manager.TemplateManager
-	loader    *loader.Loader
 }
 
 func New(args ...Arg) (*System, error) {
 	t := &System{
-		typeManager:    codegen_type.Manager(),
-		projectManager: codegen_project.Manager(),
+		typeManager:     loader_context.TypeManager(),
+		projectManager:  loader_context.ProjectManager(),
+		templateManager: loader_context.TemplateManager(),
 	}
 
 	for _, arg := range args {

@@ -1,13 +1,26 @@
 package loader
 
 func (t *Loader) Process() error {
+	var schemaPaths []string
 
-	for _, project := range t.projectManager.All {
-		for _, file := range project.Schemas {
+	for _, lc := range t.projectManager.All {
+		for _, file := range lc.Project.Schemas {
 			if file.Path.Defined() {
-				if err := t.LoadTypePaths(file.Path.Get()); err != nil {
-					return err
-				}
+				schemaPaths = append(schemaPaths, file.Path.Get())
+			}
+		}
+	}
+
+	if err := t.LoadTypePaths(schemaPaths...); err != nil {
+		return err
+	}
+
+	var templatePaths []string
+
+	for _, lc := range t.projectManager.All {
+		for _, file := range lc.Project.Templates.Files {
+			if file.Path.Defined() {
+				templatePaths = append(templatePaths, file.Path.Get())
 			}
 		}
 	}

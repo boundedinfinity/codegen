@@ -1,8 +1,7 @@
 package loader
 
 import (
-	"boundedinfinity/codegen/codegen_project"
-	"boundedinfinity/codegen/codegen_type"
+	"boundedinfinity/codegen/loader_context"
 	"errors"
 
 	"github.com/boundedinfinity/go-jsonschema"
@@ -23,25 +22,35 @@ func (t *Loader) init() error {
 		return errors.New("projectManager is nil")
 	}
 
+	if t.templateManager == nil {
+		return errors.New("templateManager is nil")
+	}
+
 	return nil
 }
 
 type Arg func(*Loader)
+
+func TemplateManager(v *loader_context.CodeGenTemplateManager) Arg {
+	return func(t *Loader) {
+		t.templateManager = v
+	}
+}
+
+func Canonicals(v *loader_context.CodeGenTypeManager) Arg {
+	return func(t *Loader) {
+		t.typeManager = v
+	}
+}
+
+func ProjectManager(v *loader_context.CodeGenProjectManager) Arg {
+	return func(t *Loader) {
+		t.projectManager = v
+	}
+}
 
 // func Cacher(v *cacher.Cacher) Arg {
 // 	return func(t *Loader) {
 // 		t.cacher = v
 // 	}
 // }
-
-func Canonicals(v *codegen_type.CodeGenTypeManager) Arg {
-	return func(t *Loader) {
-		t.typeManager = v
-	}
-}
-
-func ProjectManager(v *codegen_project.CodeGenProjectManager) Arg {
-	return func(t *Loader) {
-		t.projectManager = v
-	}
-}

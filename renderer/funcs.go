@@ -1,8 +1,8 @@
-package template_manager
+package renderer
 
 import (
 	"boundedinfinity/codegen/render_context"
-	"boundedinfinity/codegen/template_manager/dumper"
+	"boundedinfinity/codegen/renderer/dumper"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -12,7 +12,7 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
-func (t *TemplateManager) initTemplatesFuncs() error {
+func (t *Renderer) initTemplatesFuncs() error {
 	args := make([]Arg, 0)
 
 	args = append(args,
@@ -43,7 +43,7 @@ func dumpJson(obj any) string {
 	return dumper.New().Dump(obj)
 }
 
-func (t *TemplateManager) resolveSchemaNs(schema render_context.RenderContext) string {
+func (t *Renderer) resolveSchemaNs(schema render_context.RenderContext) string {
 	var found string
 
 	render_context.WalkBase(schema, func(base *render_context.RenderContextBase) error {
@@ -62,7 +62,7 @@ func (t *TemplateManager) resolveSchemaNs(schema render_context.RenderContext) s
 	return found
 }
 
-func (t *TemplateManager) resolveSchema(schema render_context.RenderContext) render_context.RenderContext {
+func (t *Renderer) resolveSchema(schema render_context.RenderContext) render_context.RenderContext {
 	switch c := schema.(type) {
 	case *render_context.RenderContextArray:
 		return t.resolveSchema(c.Items)
@@ -73,15 +73,15 @@ func (t *TemplateManager) resolveSchema(schema render_context.RenderContext) ren
 	}
 }
 
-func (t *TemplateManager) singular(s string) string {
+func (t *Renderer) singular(s string) string {
 	return pluralize.NewClient().Singular(s)
 }
 
-func (t *TemplateManager) plural(s string) string {
+func (t *Renderer) plural(s string) string {
 	return pluralize.NewClient().Plural(s)
 }
 
-func (t *TemplateManager) pathRel(a, b string) (string, error) {
+func (t *Renderer) pathRel(a, b string) (string, error) {
 	r, err := filepath.Rel(a, b)
 
 	if err != nil {
@@ -95,7 +95,7 @@ func (t *TemplateManager) pathRel(a, b string) (string, error) {
 	return r, err
 }
 
-func (t *TemplateManager) pathBase(s string) string {
+func (t *Renderer) pathBase(s string) string {
 	p := s
 	p = filepath.Base(p)
 
@@ -106,7 +106,7 @@ func (t *TemplateManager) pathBase(s string) string {
 	return p
 }
 
-func (t *TemplateManager) pathDir(s string) string {
+func (t *Renderer) pathDir(s string) string {
 	p := s
 	p = filepath.Dir(p)
 
@@ -117,23 +117,23 @@ func (t *TemplateManager) pathDir(s string) string {
 	return p
 }
 
-func (t *TemplateManager) camel(s any) string {
+func (t *Renderer) camel(s any) string {
 	return caser.KebabToCamel(a2s(s))
 }
 
-func (t *TemplateManager) pascal(s any) string {
+func (t *Renderer) pascal(s any) string {
 	return caser.KebabToPascal(a2s(s))
 }
 
-func (t *TemplateManager) snake(s any) string {
+func (t *Renderer) snake(s any) string {
 	return caser.KebabToSnake(a2s(s))
 }
 
-func (t *TemplateManager) defined(s any) bool {
+func (t *Renderer) defined(s any) bool {
 	return a2s(s) != ""
 }
 
-func (t *TemplateManager) empty(s any) bool {
+func (t *Renderer) empty(s any) bool {
 	return a2s(s) == ""
 }
 

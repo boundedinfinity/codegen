@@ -1,10 +1,7 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/codegen_project"
-	"boundedinfinity/codegen/codegen_type"
-	"boundedinfinity/codegen/loader"
-	"boundedinfinity/codegen/template_manager"
+	"boundedinfinity/codegen/loader_context"
 	"fmt"
 	"io/fs"
 )
@@ -21,19 +18,19 @@ func GenExt(v string) Arg {
 	}
 }
 
-func TypeManager(v *codegen_type.CodeGenTypeManager) Arg {
+func TypeManager(v *loader_context.CodeGenTypeManager) Arg {
 	return func(t *Generator) {
 		t.typeManager = v
 	}
 }
 
-func TemplateManager(v *template_manager.TemplateManager) Arg {
+func TemplateManager(v *loader_context.CodeGenTemplateManager) Arg {
 	return func(t *Generator) {
-		t.tm = v
+		t.templateManager = v
 	}
 }
 
-func ProjectManager(v *codegen_project.CodeGenProjectManager) Arg {
+func ProjectManager(v *loader_context.CodeGenProjectManager) Arg {
 	return func(t *Generator) {
 		t.projectManager = v
 	}
@@ -45,11 +42,11 @@ func FileMode(v fs.FileMode) Arg {
 	}
 }
 
-func Loader(v *loader.Loader) Arg {
-	return func(t *Generator) {
-		t.loader = v
-	}
-}
+// func Loader(v *loader.Loader) Arg {
+// 	return func(t *Generator) {
+// 		t.loader = v
+// 	}
+// }
 
 const (
 	DEFAULT_GENEXT  = "gen"
@@ -61,20 +58,16 @@ func (t *Generator) init() error {
 		t.genExt = DEFAULT_GENEXT
 	}
 
-	if t.tm == nil {
-		return fmt.Errorf("template manager is nil")
+	if t.templateManager == nil {
+		return fmt.Errorf("templateManager is nil")
 	}
 
 	if t.typeManager == nil {
-		return fmt.Errorf("codeGenTypeManager is nil")
+		return fmt.Errorf("typeManager is nil")
 	}
 
 	if t.projectManager == nil {
-		return fmt.Errorf("codeGenSchema is nil")
-	}
-
-	if t.loader == nil {
-		return fmt.Errorf("loader is nil")
+		return fmt.Errorf("projectManager is nil")
 	}
 
 	if t.fileMode == 0 {

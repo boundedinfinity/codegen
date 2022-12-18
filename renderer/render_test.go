@@ -1,12 +1,12 @@
-package template_manager_test
+package renderer_test
 
 import (
-	"boundedinfinity/codegen/template_manager"
+	"boundedinfinity/codegen/renderer"
 	"testing"
 )
 
 var (
-	tm *template_manager.TemplateManager
+	tm *renderer.Renderer
 )
 
 func loadTemplates() {

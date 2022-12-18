@@ -2,6 +2,7 @@ package util
 
 import (
 	"boundedinfinity/codegen/codegen_type/codegen_type_id"
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -36,12 +37,13 @@ var (
 	}
 )
 
-func ExpandPath(root, path string) string {
-	new := path
+func EnsureAbs(root, path any) string {
+	eRoot := environmenter.Sub(fmt.Sprint(root))
+	new := fmt.Sprint(path)
 	new = environmenter.Sub(new)
 
 	if !filepath.IsAbs(new) {
-		new = filepath.Join(root, new)
+		new = filepath.Join(eRoot, new)
 	}
 
 	new = filepath.Clean(new)
@@ -50,7 +52,7 @@ func ExpandPath(root, path string) string {
 }
 
 func ExpandPatho(root, path o.Option[string]) o.Option[string] {
-	new := ExpandPath(root.Get(), path.Get())
+	new := EnsureAbs(root.Get(), path.Get())
 
 	return o.Some(new)
 }

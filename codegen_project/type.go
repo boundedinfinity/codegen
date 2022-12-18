@@ -6,4 +6,5 @@ import (
 
 type CodeGenProjectTypeFile struct {
 	Path o.Option[string] `json:"path,omitempty" yaml:"path,omitempty"`
+	Root o.Option[string] `json:"root,omitempty" yaml:"root,omitempty"`
 }

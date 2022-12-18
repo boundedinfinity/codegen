@@ -1,17 +1,17 @@
 package loader
 
 import (
-	"boundedinfinity/codegen/codegen_project"
-	"boundedinfinity/codegen/codegen_type"
+	"boundedinfinity/codegen/loader_context"
 
 	"github.com/boundedinfinity/go-jsonschema"
 )
 
 type Loader struct {
-	jsonSchemas *jsonschema.System
+	jsonSchemas     *jsonschema.System
+	typeManager     *loader_context.CodeGenTypeManager
+	projectManager  *loader_context.CodeGenProjectManager
+	templateManager *loader_context.CodeGenTemplateManager
 	// cacher         *cacher.Cacher
-	typeManager    *codegen_type.CodeGenTypeManager
-	projectManager *codegen_project.CodeGenProjectManager
 }
 
 func New(args ...Arg) (*Loader, error) {

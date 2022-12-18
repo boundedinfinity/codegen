@@ -1,12 +1,17 @@
 package loader
 
 import (
-	cp "boundedinfinity/codegen/codegen_project"
+	"boundedinfinity/codegen/loader_context"
+	"fmt"
 )
 
-func (t *Loader) MergeProject() error {
-	for _, project := range t.projectManager.All {
-		if err := t.mergeProject(*project); err != nil {
+func alreadyMerged(name string) {
+	fmt.Printf("already merged %v\n", name)
+}
+
+func (t *Loader) MergeProjects() error {
+	for _, lc := range t.projectManager.All {
+		if err := t.MergeProject(lc); err != nil {
 			return err
 		}
 	}
@@ -14,65 +19,51 @@ func (t *Loader) MergeProject() error {
 	return nil
 }
 
-func (t *Loader) mergeProject(project cp.CodeGenProjectProject) error {
-	if err := t.mergeInfo(project.Info); err != nil {
-		return err
+func (t *Loader) MergeProject(lc *loader_context.ProjectLoaderContext) error {
+	merged := t.projectManager.Merged
+
+	if lc.Project.Info.Description.Defined() {
+		merged.Info.Description = lc.Project.Info.Description
 	}
 
-	for k, v := range project.Mappings {
+	if lc.Project.Info.Namespace.Defined() {
+		merged.Info.Namespace = lc.Project.Info.Namespace
+	}
+
+	if lc.Project.Info.DestDir.Defined() && lc.Project.Info.DestDir.Get() != "" {
+		merged.Info.DestDir = lc.Project.Info.DestDir
+	}
+
+	if lc.Project.Info.FormatSource.Defined() {
+		merged.Info.FormatSource = lc.Project.Info.FormatSource
+	}
+
+	if lc.Project.Info.TemplateDump.Defined() {
+		merged.Info.TemplateDump = lc.Project.Info.TemplateDump
+	}
+
+	for k, v := range lc.Project.Mappings {
 		t.projectManager.Merged.Mappings[k] = v
 	}
 
-	for _, file := range project.Schemas {
+	for _, file := range lc.Project.Schemas {
 		t.projectManager.Merged.Schemas = append(t.projectManager.Merged.Schemas, file)
 	}
 
-	for name, operation := range project.Operations {
-		if t.projectManager.Merged.Operations.Has(name) {
-			return cp.ErrCodeGenOperationDuplicatev(name)
-		}
+	for _, operation := range lc.Project.Operations {
+		// if t.projectManager.Merged.Operations.Has(name) {
+		// 	return cp.ErrCodeGenOperationDuplicatev(name)
+		// }
 
-		t.projectManager.Merged.Operations[name] = operation
+		t.projectManager.Merged.Operations = append(t.projectManager.Merged.Operations, operation)
 	}
 
-	if project.Templates.Header.Defined() {
-		t.projectManager.Merged.Templates.Header = project.Templates.Header
+	if lc.Project.Templates.Header.Defined() {
+		t.projectManager.Merged.Templates.Header = lc.Project.Templates.Header
 	}
 
-	for _, file := range project.Templates.Files {
+	for _, file := range lc.Project.Templates.Files {
 		t.projectManager.Merged.Templates.Files = append(t.projectManager.Merged.Templates.Files, file)
-	}
-
-	return nil
-}
-
-func (t *Loader) mergeInfo(info cp.CodeGenProjectInfo) error {
-	if info.Description.Defined() {
-		t.projectManager.Merged.Info.Description = info.Description
-	}
-
-	if info.Namespace.Defined() {
-		t.projectManager.Merged.Info.Namespace = info.Namespace
-	} else {
-		// TODO
-	}
-
-	if info.DestDir.Defined() {
-		t.projectManager.Merged.Info.DestDir = info.DestDir
-	} else {
-		// TODO
-	}
-
-	if info.FormatSource.Defined() {
-		t.projectManager.Merged.Info.FormatSource = info.FormatSource
-	} else {
-		// TODO
-	}
-
-	if info.TemplateDump.Defined() {
-		t.projectManager.Merged.Info.TemplateDump = info.TemplateDump
-	} else {
-		// TODO
 	}
 
 	return nil

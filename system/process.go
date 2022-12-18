@@ -9,15 +9,7 @@ func (t *System) Process(paths ...string) error {
 		return err
 	}
 
-	if err := t.loader.ConvertJsonSchema(); err != nil {
-		return err
-	}
-
-	if err := t.tm.Process(); err != nil {
-		return err
-	}
-
-	if err := t.loader.MergeProject(); err != nil {
+	if err := t.loader.MergeProjects(); err != nil {
 		return err
 	}
 
