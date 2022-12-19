@@ -5,11 +5,15 @@ func (t *System) Process(paths ...string) error {
 		return err
 	}
 
-	if err := t.loader.Process(); err != nil {
+	if err := t.loader.ProcessTypes(); err != nil {
 		return err
 	}
 
 	if err := t.loader.MergeProjects(); err != nil {
+		return err
+	}
+
+	if err := t.loader.ProcessTempaltes(); err != nil {
 		return err
 	}
 

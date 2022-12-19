@@ -2,7 +2,10 @@ package loader
 
 import (
 	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/template_delimiter"
 	"fmt"
+
+	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 func alreadyMerged(name string) {
@@ -14,6 +17,10 @@ func (t *Loader) MergeProjects() error {
 		if err := t.MergeProject(lc); err != nil {
 			return err
 		}
+	}
+
+	if t.projectManager.Merged.Info.Delimiter.Empty() {
+		t.projectManager.Merged.Info.Delimiter = o.Some(template_delimiter.Square)
 	}
 
 	return nil
@@ -40,6 +47,10 @@ func (t *Loader) MergeProject(lc *loader_context.ProjectLoaderContext) error {
 
 	if lc.Project.Info.TemplateDump.Defined() {
 		merged.Info.TemplateDump = lc.Project.Info.TemplateDump
+	}
+
+	if lc.Project.Info.Delimiter.Defined() {
+		merged.Info.Delimiter = lc.Project.Info.Delimiter
 	}
 
 	for k, v := range lc.Project.Mappings {

@@ -2,7 +2,7 @@ package loader
 
 import (
 	ct "boundedinfinity/codegen/codegen_type"
-	"boundedinfinity/codegen/loader_context"
+	lc "boundedinfinity/codegen/loader_context"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-jsonschema"
@@ -10,20 +10,11 @@ import (
 	"github.com/boundedinfinity/go-jsonschema/stringformat"
 )
 
-func (t *Loader) ConvertJsonSchema(lci loader_context.LoaderFileInfo, js model.JsonSchema) error {
-
+func (t *Loader) ConvertJsonSchema(lc *lc.TypeLoaderContext, js model.JsonSchema) error {
 	if schema, err := t.convertJsonSchema(js, o.None[string]()); err != nil {
 		return err
 	} else {
-
-		lc := loader_context.TypeLoaderContext{
-			FileInfo: lci,
-			Schema:   schema,
-		}
-
-		if err := t.typeManager.Register(lc); err != nil {
-			return err
-		}
+		lc.Schema = schema
 	}
 
 	return nil
@@ -41,6 +32,7 @@ func (t *Loader) convertJsonSchema(v model.JsonSchema, name o.Option[string]) (c
 				Description: js.Description,
 				Public:      o.Some(true),
 			}
+
 			return nil
 		}).
 		String(func(js *model.JsonSchemaString) error {

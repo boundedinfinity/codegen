@@ -3,6 +3,7 @@ package system
 import (
 	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
+	"boundedinfinity/codegen/renderer"
 	"os"
 	"path/filepath"
 
@@ -36,11 +37,24 @@ func (t *System) init() error {
 
 	// t.cacher = c
 
+	rd, err := renderer.New(
+		renderer.TypeManager(t.typeManager),
+		renderer.ProjectManager(t.projectManager),
+		renderer.TemplateManager(t.templateManager),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	t.renderer = rd
+
 	ld, err := loader.New(
 		// loader.Cacher(c),
-		loader.Canonicals(t.typeManager),
+		loader.TypeManager(t.typeManager),
 		loader.ProjectManager(t.projectManager),
 		loader.TemplateManager(t.templateManager),
+		loader.Renderer(t.renderer),
 	)
 
 	if err != nil {

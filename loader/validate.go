@@ -3,6 +3,8 @@ package loader
 import (
 	cp "boundedinfinity/codegen/codegen_type"
 	"fmt"
+
+	"github.com/boundedinfinity/go-commoner/optioner"
 )
 
 func (t *Loader) Validate() error {
@@ -13,17 +15,25 @@ func (t *Loader) Validate() error {
 	}
 
 	for _, operation := range t.projectManager.Merged.Operations {
-		if operation.Input.Defined() {
-			if !t.typeManager.Has(operation.Input.Get()) {
-				return fmt.Errorf("reference not found %v", operation.Input.Get())
-			}
+		if err := t.validateReferenceId(operation.Input); err != nil {
+			return err
 		}
 
-		if operation.Output.Defined() {
-			if !t.typeManager.Has(operation.Output.Get()) {
-				return fmt.Errorf("reference not found %v", operation.Output.Get())
-			}
+		if err := t.validateReferenceId(operation.Output); err != nil {
+			return err
 		}
+	}
+
+	return nil
+}
+
+func (t *Loader) validateReferenceId(id optioner.Option[string]) error {
+	if id.Empty() {
+		// TODO
+	}
+
+	if !t.typeManager.Has(id.Get()) {
+		return fmt.Errorf("reference not found %v", id.Get())
 	}
 
 	return nil

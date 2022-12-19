@@ -3,35 +3,39 @@ package loader_context
 import (
 	"boundedinfinity/codegen/codegen_type/codegen_type_id"
 	"boundedinfinity/codegen/template_type"
+	"boundedinfinity/codegen/util"
 
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 )
 
 type CodeGenTemplateManager struct {
-	path2project         mapper.Mapper[string, TemplateLoaderContext]
-	root2project         mapper.Mapper[string, []TemplateLoaderContext]
-	templateType2Context mapper.Mapper[template_type.TemplateType, []TemplateLoaderContext]
-	typeId2Context       mapper.Mapper[codegen_type_id.CodgenTypeId, []TemplateLoaderContext]
+	All             []*TemplateLoaderContext
+	source2template mapper.Mapper[string, *TemplateLoaderContext]
+	root2template   mapper.Mapper[string, []*TemplateLoaderContext]
+	source2root     mapper.Mapper[string, string]
+	root2source     mapper.Mapper[string, []string]
+	tt2template     mapper.Mapper[template_type.TemplateType, []*TemplateLoaderContext]
+	tId2template    mapper.Mapper[codegen_type_id.CodgenTypeId, []*TemplateLoaderContext]
 }
 
 func TemplateManager() *CodeGenTemplateManager {
 	return &CodeGenTemplateManager{
-		path2project:         make(mapper.Mapper[string, TemplateLoaderContext]),
-		root2project:         make(mapper.Mapper[string, []TemplateLoaderContext]),
-		templateType2Context: make(mapper.Mapper[template_type.TemplateType, []TemplateLoaderContext]),
-		typeId2Context:       make(mapper.Mapper[codegen_type_id.CodgenTypeId, []TemplateLoaderContext]),
+		All:             make([]*TemplateLoaderContext, 0),
+		source2template: make(mapper.Mapper[string, *TemplateLoaderContext]),
+		source2root:     make(mapper.Mapper[string, string]),
+		root2template:   make(mapper.Mapper[string, []*TemplateLoaderContext]),
+		root2source:     make(mapper.Mapper[string, []string]),
+		tt2template:     make(mapper.Mapper[template_type.TemplateType, []*TemplateLoaderContext]),
+		tId2template:    make(mapper.Mapper[codegen_type_id.CodgenTypeId, []*TemplateLoaderContext]),
 	}
 }
 
-func (t *CodeGenTemplateManager) Register(lc *ProjectLoaderContext) {
-	// t.All = append(t.All, lc)
-	// t.source2proj[lc.Source] = lc
-	// t.source2Root[lc.Root] = lc.Source
-
-	// util.MapListAdd(t.root2Proj, lc.Root, lc)
-	// util.MapListAdd(t.root2source, lc.Root, lc.Source)
-
-	// if lc.CodeGenProjectProject.Info.Id.Defined() {
-	// 	t.id2proj[lc.CodeGenProjectProject.Info.Id.Get()] = lc
-	// }
+func (t *CodeGenTemplateManager) Register(lc *TemplateLoaderContext) {
+	t.All = append(t.All, lc)
+	t.source2template[lc.FileInfo.Source] = lc
+	t.source2root[lc.FileInfo.Source] = lc.FileInfo.Root
+	util.MapListAdd(t.root2template, lc.FileInfo.Root, lc)
+	util.MapListAdd(t.root2source, lc.FileInfo.Root, lc.FileInfo.Source)
+	util.MapListAdd(t.tt2template, lc.TemplateType, lc)
+	util.MapListAdd(t.tId2template, lc.TypeId, lc)
 }

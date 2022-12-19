@@ -2,6 +2,7 @@ package loader
 
 import (
 	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/renderer"
 
 	"github.com/boundedinfinity/go-jsonschema"
 )
@@ -11,6 +12,7 @@ type Loader struct {
 	typeManager     *loader_context.CodeGenTypeManager
 	projectManager  *loader_context.CodeGenProjectManager
 	templateManager *loader_context.CodeGenTemplateManager
+	renderer        *renderer.Renderer
 	// cacher         *cacher.Cacher
 }
 

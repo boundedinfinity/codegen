@@ -4,6 +4,7 @@ import (
 	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/loader"
 	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/renderer"
 
 	"github.com/boundedinfinity/go-commoner/optioner"
 )
@@ -16,7 +17,7 @@ type System struct {
 	templateManager *loader_context.CodeGenTemplateManager
 	generator       *generator.Generator
 	loader          *loader.Loader
-	// tm              *template_manager.TemplateManager
+	renderer        *renderer.Renderer
 	// cacher         *cacher.Cacher
 }
 

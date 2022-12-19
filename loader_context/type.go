@@ -32,7 +32,6 @@ func TypeManager() *CodeGenTypeManager {
 }
 
 func (t *CodeGenTypeManager) Register(lc TypeLoaderContext) error {
-
 	if lc.Schema.Base().Id.Defined() {
 		t.id2Type[lc.Schema.Base().Id.Get()] = lc
 		t.id2path[lc.Schema.Base().Id.Get()] = lc.FileInfo.Source

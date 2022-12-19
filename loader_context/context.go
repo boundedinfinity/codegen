@@ -3,6 +3,7 @@ package loader_context
 import (
 	"boundedinfinity/codegen/codegen_project"
 	"boundedinfinity/codegen/codegen_type"
+	"boundedinfinity/codegen/codegen_type/codegen_type_id"
 	"boundedinfinity/codegen/template_type"
 	"text/template"
 
@@ -55,11 +56,11 @@ func (t *JsonSchemaLoaderContext) GetFileInfo() *LoaderFileInfo {
 var _ LoaderContext = &JsonSchemaLoaderContext{}
 
 type TemplateLoaderContext struct {
-	FileInfo         LoaderFileInfo
-	TemplateMimeType mime_type.MimeType
-	OutputMimeType   mime_type.MimeType
-	TemplateType     template_type.TemplateType
-	Template         *template.Template
+	FileInfo       LoaderFileInfo
+	OutputMimeType mime_type.MimeType
+	TemplateType   template_type.TemplateType
+	TypeId         codegen_type_id.CodgenTypeId
+	Template       *template.Template
 }
 
 func (t *TemplateLoaderContext) GetFileInfo() *LoaderFileInfo {

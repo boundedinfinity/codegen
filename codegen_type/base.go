@@ -10,6 +10,7 @@ type CodeGenType interface {
 	HasValidation() bool
 	SchemaType() codegen_type_id.CodgenTypeId
 	Base() *CodeGenTypeBase
+	SetBase(CodeGenTypeBase)
 }
 
 type CodeGenTypeBase struct {
@@ -28,6 +29,10 @@ func (t CodeGenTypeBase) HasValidation() bool {
 
 func (t *CodeGenTypeBase) Base() *CodeGenTypeBase {
 	return t
+}
+
+func (t *CodeGenTypeBase) SetBase(base CodeGenTypeBase) {
+	t = &base
 }
 
 func (t *CodeGenTypeBase) Merge(o CodeGenTypeBase) bool {

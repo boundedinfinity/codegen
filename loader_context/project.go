@@ -30,7 +30,7 @@ func ProjectManager() *CodeGenProjectManager {
 	}
 }
 
-func (t *CodeGenProjectManager) Register(lc *ProjectLoaderContext) {
+func (t *CodeGenProjectManager) Register(lc *ProjectLoaderContext) error {
 	t.All = append(t.All, lc)
 	t.source2proj[lc.FileInfo.Source] = lc
 	t.source2Root[lc.FileInfo.Root] = lc.FileInfo.Source
@@ -41,6 +41,8 @@ func (t *CodeGenProjectManager) Register(lc *ProjectLoaderContext) {
 	if lc.Project.Info.Id.Defined() {
 		t.id2proj[lc.Project.Info.Id.Get()] = lc
 	}
+
+	return nil
 }
 
 func (t *CodeGenProjectManager) FindProject(id o.Option[string]) o.Option[*ProjectLoaderContext] {

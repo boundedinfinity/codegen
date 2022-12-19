@@ -1,6 +1,6 @@
 package loader
 
-func (t *Loader) Process() error {
+func (t *Loader) ProcessTypes() error {
 	var schemaPaths []string
 
 	for _, lc := range t.projectManager.All {
@@ -15,6 +15,10 @@ func (t *Loader) Process() error {
 		return err
 	}
 
+	return nil
+}
+
+func (t *Loader) ProcessTempaltes() error {
 	var templatePaths []string
 
 	for _, lc := range t.projectManager.All {
@@ -23,6 +27,10 @@ func (t *Loader) Process() error {
 				templatePaths = append(templatePaths, file.Path.Get())
 			}
 		}
+	}
+
+	if err := t.LoadTemplatePaths(templatePaths...); err != nil {
+		return err
 	}
 
 	return nil

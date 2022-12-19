@@ -86,21 +86,6 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 	}
 
 	switch {
-	case util.IsJsonSchemaFile(lci.Source):
-		schema, err := model.UnmarshalSchema(bs)
-
-		if err != nil {
-			return err
-		}
-
-		if err = t.jsonSchemas.Register(lci.Root, lci.Source, schema); err != nil {
-			return err
-		}
-
-		if err = t.ConvertJsonSchema(lci, schema); err != nil {
-			return err
-		}
-
 	case util.IsCodeGenSchemaFile(lci.Source):
 		var schema cp.CodeGenProjectProject
 
@@ -117,7 +102,9 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 			Project:  schema,
 		}
 
-		t.projectManager.Register(&lc)
+		if err := t.projectManager.Register(&lc); err != nil {
+			return err
+		}
 	case util.IsCodeGenSchemaTypeFile(lci.Source):
 		if schema, err := codegen_type.UnmarshalJson(bs); err != nil {
 			return err
@@ -127,7 +114,31 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 				Schema:   schema,
 			}
 
-			t.typeManager.Register(lc)
+			if err := t.typeManager.Register(lc); err != nil {
+				return err
+			}
+		}
+	case util.IsJsonSchemaFile(lci.Source):
+		js, err := model.UnmarshalSchema(bs)
+
+		if err != nil {
+			return err
+		}
+
+		if err = t.jsonSchemas.Register(lci.Root, lci.Source, js); err != nil {
+			return err
+		}
+
+		lc := lc.TypeLoaderContext{
+			FileInfo: lci,
+		}
+
+		if err = t.ConvertJsonSchema(&lc, js); err != nil {
+			return err
+		}
+
+		if err := t.typeManager.Register(lc); err != nil {
+			return err
 		}
 	default:
 		fmt.Printf("didn't process %v", lci.Source)

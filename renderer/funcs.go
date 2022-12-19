@@ -12,33 +12,6 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
-func (t *Renderer) initTemplatesFuncs() error {
-	args := make([]Arg, 0)
-
-	args = append(args,
-		TemplateFunc("DUMP", dumpJson),
-		TemplateFunc("PASCAL", t.pascal),
-		TemplateFunc("CAMEL", t.camel),
-		TemplateFunc("SNAKE", t.camel),
-		TemplateFunc("BASE", t.pathBase),
-		TemplateFunc("DIR", t.pathDir),
-		TemplateFunc("PATH_REL", t.pathRel),
-		TemplateFunc("DEFINED", t.defined),
-		TemplateFunc("EMPTY", t.empty),
-		TemplateFunc("SINGULAR", t.singular),
-		TemplateFunc("PLURAL", t.plural),
-		TemplateFunc("RES_SCHEMA_NS", t.resolveSchemaNs),
-		TemplateFunc("RES_SCHEMA", t.resolveSchema),
-		TemplateFunc("RESOLVE", t.resolveSchema),
-	)
-
-	for _, arg := range args {
-		arg(t)
-	}
-
-	return nil
-}
-
 func dumpJson(obj any) string {
 	return dumper.New().Dump(obj)
 }
