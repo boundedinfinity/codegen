@@ -9,4 +9,8 @@ type RenderContextInteger struct {
 	MultipleOf o.Option[int64]
 }
 
+func (t RenderContextInteger) HasValidation() bool {
+	return t.Min.Defined() || t.Max.Defined() || t.MultipleOf.Defined()
+}
+
 var _ RenderContext = &RenderContextInteger{}

@@ -14,11 +14,6 @@ type CodeGenTypeArray struct {
 	Max   o.Option[int] `json:"max,omitempty" yaml:"max,omitempty"`
 }
 
-func (t CodeGenTypeArray) HasValidation() bool {
-	return t.Min.Defined() || t.Max.Defined() ||
-		t.Items.HasValidation() || t.Items.HasValidation()
-}
-
 func (t CodeGenTypeArray) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Array
 }
@@ -43,10 +38,12 @@ func (t *CodeGenTypeArray) UnmarshalJSON(data []byte) error {
 	t.Max = d.Max
 	t.Min = d.Min
 
-	if i, err := UnmarshalJson(d.Items); err != nil {
+	var items CodeGenType
+
+	if err := UnmarshalJson(d.Items, &items); err != nil {
 		return err
 	} else {
-		t.Items = i
+		t.Items = items
 	}
 
 	return nil

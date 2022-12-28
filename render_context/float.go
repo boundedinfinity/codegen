@@ -9,4 +9,8 @@ type RenderContextFloat struct {
 	MultipleOf o.Option[float64]
 }
 
+func (t RenderContextFloat) HasValidation() bool {
+	return t.Min.Defined() || t.Max.Defined() || t.MultipleOf.Defined()
+}
+
 var _ RenderContext = &RenderContextFloat{}

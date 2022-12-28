@@ -2,6 +2,7 @@ package generator
 
 import (
 	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/renderer"
 	"fmt"
 	"io/fs"
 )
@@ -42,11 +43,11 @@ func FileMode(v fs.FileMode) Arg {
 	}
 }
 
-// func Loader(v *loader.Loader) Arg {
-// 	return func(t *Generator) {
-// 		t.loader = v
-// 	}
-// }
+func Renderer(v *renderer.Renderer) Arg {
+	return func(t *Generator) {
+		t.renderer = v
+	}
+}
 
 const (
 	DEFAULT_GENEXT  = "gen"

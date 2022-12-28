@@ -12,6 +12,7 @@ type TemplateOutput struct {
 }
 
 type ModelOutput struct {
+	OutputPath string
 	TemplateOutput
 	Schema render_context.RenderContext
 }

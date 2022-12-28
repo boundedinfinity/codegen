@@ -3,6 +3,7 @@ package generator
 import (
 	"boundedinfinity/codegen/loader_context"
 	"boundedinfinity/codegen/render_context"
+	"boundedinfinity/codegen/renderer"
 	"io/fs"
 )
 
@@ -12,8 +13,8 @@ type Generator struct {
 	projectManager  *loader_context.CodeGenProjectManager
 	templateManager *loader_context.CodeGenTemplateManager
 	rcs             []render_context.RenderContext
+	renderer        *renderer.Renderer
 	fileMode        fs.FileMode
-	// loader          *loader.Loader
 }
 
 func New(args ...Arg) (*Generator, error) {

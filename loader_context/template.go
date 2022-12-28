@@ -5,6 +5,7 @@ import (
 	"boundedinfinity/codegen/template_type"
 	"boundedinfinity/codegen/util"
 
+	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 )
 
@@ -38,4 +39,8 @@ func (t *CodeGenTemplateManager) Register(lc *TemplateLoaderContext) {
 	util.MapListAdd(t.root2source, lc.FileInfo.Root, lc.FileInfo.Source)
 	util.MapListAdd(t.tt2template, lc.TemplateType, lc)
 	util.MapListAdd(t.tId2template, lc.TypeId, lc)
+}
+
+func (t *CodeGenTemplateManager) Find(id codegen_type_id.CodgenTypeId) optioner.Option[[]*TemplateLoaderContext] {
+	return t.tId2template.Get(id)
 }

@@ -18,7 +18,7 @@ func (t *Loader) ProcessTypes() error {
 	return nil
 }
 
-func (t *Loader) ProcessTempaltes() error {
+func (t *Loader) ProcessTemplates() error {
 	var templatePaths []string
 
 	for _, lc := range t.projectManager.All {

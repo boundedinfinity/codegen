@@ -1,6 +1,7 @@
 package loader_context
 
 import (
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/util"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
@@ -57,7 +58,20 @@ func (t CodeGenTypeManager) Has(id string) bool {
 }
 
 func (t CodeGenTypeManager) Find(id o.Option[string]) o.Option[TypeLoaderContext] {
-	return o.FirstOf(t.id2Type.Get(id.Get()), t.path2Type.Get(id.Get()))
+	a := t.id2Type.Get(id.Get())
+	b := t.path2Type.Get(id.Get())
+	return o.FirstOf(a, b)
+}
+
+func (t CodeGenTypeManager) Resolve(schema codegen_type.CodeGenType) o.Option[TypeLoaderContext] {
+	switch c := schema.(type) {
+	case *codegen_type.CodeGenTypeRef:
+		return t.Find(c.Ref)
+	case *codegen_type.CodeGenTypeArray:
+		return t.Resolve(c.Items)
+	default:
+		return t.Find(schema.Base().Id)
+	}
 }
 
 func (t CodeGenTypeManager) FindSource(id o.Option[string]) o.Option[string] {

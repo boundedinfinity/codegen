@@ -6,4 +6,8 @@ type RenderContextOperation struct {
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 }
 
+func (t RenderContextOperation) HasValidation() bool {
+	return false
+}
+
 var _ RenderContext = &RenderContextOperation{}

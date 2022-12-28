@@ -37,6 +37,19 @@ var (
 	}
 )
 
+func RemoveSchema(s string) string {
+	vs := append([]string{}, jsonSchemaExts...)
+	vs = append(vs, codegenExts...)
+	vs = append(vs, codegenTypeExts...)
+
+	for _, v := range vs {
+		v = extentioner.Strip(v)
+		s = strings.ReplaceAll(s, v, "")
+	}
+
+	return s
+}
+
 func EnsureAbs(root, path any) string {
 	eRoot := environmenter.Sub(fmt.Sprint(root))
 	new := fmt.Sprint(path)

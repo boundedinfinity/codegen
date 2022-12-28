@@ -67,6 +67,7 @@ func (t *System) init() error {
 		generator.TemplateManager(t.templateManager),
 		generator.TypeManager(t.typeManager),
 		generator.ProjectManager(t.projectManager),
+		generator.Renderer(t.renderer),
 	)
 
 	if err != nil {

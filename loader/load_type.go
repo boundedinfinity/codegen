@@ -106,7 +106,9 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 			return err
 		}
 	case util.IsCodeGenSchemaTypeFile(lci.Source):
-		if schema, err := codegen_type.UnmarshalJson(bs); err != nil {
+		var schema codegen_type.CodeGenType
+
+		if err := codegen_type.UnmarshalJson(bs, &schema); err != nil {
 			return err
 		} else {
 			lc := lc.TypeLoaderContext{

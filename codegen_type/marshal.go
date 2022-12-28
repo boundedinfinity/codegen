@@ -13,32 +13,33 @@ type codeGenDiscriminator struct {
 	Ref  string `json:"ref,omitempty"`
 }
 
-func UnmarshalYaml(data []byte) (CodeGenType, error) {
+func UnmarshalYaml(data []byte, v *CodeGenType) error {
 	if bs, err := yaml.YAMLToJSON(data); err != nil {
-		return nil, err
+		return err
 	} else {
-		return UnmarshalJson(bs)
+		return UnmarshalJson(bs, v)
 	}
 }
 
-func UnmarshalJson(data []byte) (CodeGenType, error) {
+func UnmarshalJson(data []byte, v *CodeGenType) error {
 	var c CodeGenType
 	var err error
+	var id codegen_type_id.CodgenTypeId
 
 	d, err := unmarshalConcrete[codeGenDiscriminator](data)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if d.Ref == "" {
-		typ, err := codegen_type_id.Parse(d.Type)
+		id, err = codegen_type_id.Parse(d.Type)
 
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		switch typ {
+		switch id {
 		case codegen_type_id.Array:
 			c, err = unmarshalConcrete[CodeGenTypeArray](data)
 		case codegen_type_id.Coordinate:
@@ -80,13 +81,14 @@ func UnmarshalJson(data []byte) (CodeGenType, error) {
 		case codegen_type_id.Uuid:
 			c, err = unmarshalConcrete[CodeGenTypeUuid](data)
 		default:
-			err = fmt.Errorf("%v not implemented", typ)
+			err = fmt.Errorf("%v not implemented", id)
 		}
 	} else {
 		c, err = unmarshalConcrete[CodeGenTypeRef](data)
 	}
 
-	return c, err
+	*v = c
+	return err
 }
 
 func unmarshalConcrete[T any](data []byte) (*T, error) {

@@ -7,10 +7,8 @@ import (
 )
 
 type CodeGenType interface {
-	HasValidation() bool
 	SchemaType() codegen_type_id.CodgenTypeId
 	Base() *CodeGenTypeBase
-	SetBase(CodeGenTypeBase)
 }
 
 type CodeGenTypeBase struct {
@@ -21,10 +19,6 @@ type CodeGenTypeBase struct {
 	Public      o.Option[bool]   `json:"public,omitempty" yaml:"public,omitempty"`
 	Required    o.Option[bool]   `json:"required,omitempty" yaml:"required,omitempty"`
 	Deprecated  o.Option[bool]   `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
-}
-
-func (t CodeGenTypeBase) HasValidation() bool {
-	return false
 }
 
 func (t *CodeGenTypeBase) Base() *CodeGenTypeBase {

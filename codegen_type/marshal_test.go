@@ -106,7 +106,8 @@ func Test_CodeGen_Unmarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			clean := strings.Trim(tt.input, " \t")
-			actual, err := c.UnmarshalYaml([]byte(clean))
+			var actual c.CodeGenType
+			err := c.UnmarshalYaml([]byte(clean), &actual)
 			assert.Nil(t, err)
 			assertSchema(t, tt.expected, actual)
 		})

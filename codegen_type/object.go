@@ -10,16 +10,6 @@ type CodeGenTypeObject struct {
 	Properties []CodeGenType `json:"properties,omitempty" yaml:"properties,omitempty"`
 }
 
-func (t CodeGenTypeObject) HasValidation() bool {
-	for _, property := range t.Properties {
-		if property.HasValidation() {
-			return true
-		}
-	}
-
-	return false
-}
-
 func (t CodeGenTypeObject) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Object
 }
@@ -41,7 +31,8 @@ func (t *CodeGenTypeObject) UnmarshalJSON(data []byte) error {
 	t.CodeGenTypeBase.Merge(d.CodeGenTypeBase)
 
 	for _, property := range d.Properties {
-		if p, err := UnmarshalJson(property); err != nil {
+		var p CodeGenType
+		if err := UnmarshalJson(property, &p); err != nil {
 			return err
 		} else {
 			t.Properties = append(t.Properties, p)

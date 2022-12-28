@@ -3,36 +3,184 @@ package generator
 import (
 	cp "boundedinfinity/codegen/codegen_project"
 	ct "boundedinfinity/codegen/codegen_type"
+	"boundedinfinity/codegen/codegen_type/codegen_type_id"
+	lc "boundedinfinity/codegen/loader_context"
+
 	rc "boundedinfinity/codegen/render_context"
 	"fmt"
 	"path"
+	"strings"
 
+	"github.com/boundedinfinity/go-commoner/extentioner"
 	o "github.com/boundedinfinity/go-commoner/optioner"
-	"github.com/gertd/go-pluralize"
 )
 
 func (t *Generator) Process() error {
-	for _, c := range t.typeManager.All() {
-		if rc, err := t.convertType(c.Schema); err != nil {
+	for _, lc := range t.typeManager.All() {
+		var rc rc.RenderContext
+
+		if err := t.processType(o.None[string](), lc, lc.Schema, &rc); err != nil {
 			return err
 		} else {
 			t.rcs = append(t.rcs, rc)
 		}
 	}
 
-	for _, o := range t.projectManager.Merged.Operations {
-		if rc, err := t.convertOperation(o); err != nil {
+	// for _, o := range t.projectManager.Merged. {
+	// 	if rc, err := t.convertOperation(o); err != nil {
+	// 		return err
+	// 	} else {
+	// 		t.rcs = append(t.rcs, rc)
+	// 	}
+	// }
+
+	return nil
+}
+
+func (t *Generator) processType(currNs o.Option[string], lctx lc.TypeLoaderContext, schema ct.CodeGenType, rctx *rc.RenderContext) error {
+	var err error
+	var base rc.RenderContextBase
+	found := t.typeManager.Resolve(schema)
+
+	if found.Defined() {
+		if err := t.convertBase(found.Get(), &base); err != nil {
 			return err
-		} else {
-			t.rcs = append(t.rcs, rc)
 		}
+	} else {
+		if err := t.convertBase(lc.TypeLoaderContext{Schema: schema}, &base); err != nil {
+			return err
+		}
+	}
+
+	if currNs.Empty() {
+		new := path.Dir(base.SchemaNs)
+		currNs = o.Some(currNs.OrElse(new))
+	}
+
+	base.CurrNs = currNs.Get()
+
+	switch s := schema.(type) {
+	case *ct.CodeGenTypeArray:
+		var items rc.RenderContext
+		base.SchemaType = codegen_type_id.Array
+
+		if err = t.processType(currNs, lctx, s.Items, &items); err != nil {
+			return err
+		}
+
+		*rctx = &rc.RenderContextArray{
+			RenderContextBase: base,
+			Items:             items,
+		}
+	case *ct.CodeGenTypeObject:
+		obj := rc.RenderContextObject{
+			RenderContextBase: base,
+		}
+
+		for _, cgtProperty := range s.Properties {
+			var property rc.RenderContext
+
+			if err = t.processType(currNs, lctx, cgtProperty, &property); err != nil {
+				return err
+			} else {
+				obj.Properties = append(obj.Properties, property)
+			}
+		}
+
+		*rctx = &obj
+	case *ct.CodeGenTypeUrl:
+		*rctx = &rc.RenderContextUrl{RenderContextBase: base}
+	case *ct.CodeGenTypeString:
+		*rctx = &rc.RenderContextString{
+			RenderContextBase: base,
+			Min:               s.Min,
+			Max:               s.Max,
+			Regex:             s.Regex,
+		}
+	case *ct.CodeGenTypeRef:
+		found := t.typeManager.Find(s.Ref)
+		var ref rc.RenderContext
+
+		if found.Defined() {
+			if err = t.processType(currNs, lctx, found.Get().Schema, &ref); err != nil {
+				return err
+			}
+		}
+
+		*rctx = &rc.RenderContextRef{
+			RenderContextBase: base,
+			Ref:               ref,
+		}
+
+	case *ct.CodeGenTypeInteger:
+		*rctx = &rc.RenderContextInteger{
+			RenderContextBase: base,
+			Min:               s.Min,
+			Max:               s.Max,
+			MultipleOf:        s.MultipleOf,
+		}
+	case *ct.CodeGenTypeFloat:
+		*rctx = &rc.RenderContextFloat{
+			RenderContextBase: base,
+			Min:               s.Min,
+			Max:               s.Max,
+			MultipleOf:        s.MultipleOf,
+		}
+	default:
+		return fmt.Errorf("unsupported type: %v", s)
+	}
+
+	return err
+}
+
+func (t *Generator) convertBase(lctx lc.TypeLoaderContext, base *rc.RenderContextBase) error {
+	fi := lctx.FileInfo
+	sb := lctx.Schema.Base()
+	rootNs := t.projectManager.Merged.Info.Namespace.Get()
+	var schemaNs string
+	var relNs string
+	var name o.Option[string]
+
+	if lctx.Schema.Base().Base().Id.Defined() {
+		schemaNs = lctx.FileInfo.Source
+		schemaNs = strings.Replace(schemaNs, lctx.FileInfo.Root, "", 1)
+		schemaNs = path.Join(rootNs, schemaNs)
+		schemaNs = extentioner.Strip(schemaNs)
+		schemaNs = extentioner.Strip(schemaNs)
+	}
+
+	if schemaNs != "" {
+		relNs = schemaNs
+		relNs = strings.ReplaceAll(schemaNs, rootNs, "")
+		relNs = strings.Replace(relNs, "/", "", 1)
+	}
+
+	name = lctx.Schema.Base().Name
+	id := path.Base(lctx.Schema.Base().Id.Get())
+	name = o.FirstOf(name, o.Some(id))
+
+	*base = rc.RenderContextBase{
+		Root:        fi.Root,
+		Source:      fi.Source,
+		SchemaType:  lctx.Schema.SchemaType(),
+		CurrNs:      schemaNs,
+		RootNs:      rootNs,
+		SchemaNs:    schemaNs,
+		RelNs:       relNs,
+		MimeType:    lctx.FileInfo.MimeType,
+		Id:          sb.Id.Get(),
+		Name:        name.Get(),
+		Description: sb.Description.Get(),
+		IsPublic:    sb.Public.OrElse(true),
+		IsInterface: false,
+		IsRequired:  sb.Required.OrElse(false),
 	}
 
 	return nil
 }
 
-func (t *Generator) convertOperation(o *cp.CodeGenProjectOperation) (rc.RenderContext, error) {
-	var rci rc.RenderContext
+func (t *Generator) convertOperation(o *cp.CodeGenProjectOperation) error {
+	// var rci rc.RenderContext
 	var err error
 
 	// base := rc.RenderContextBase{
@@ -57,154 +205,5 @@ func (t *Generator) convertOperation(o *cp.CodeGenProjectOperation) (rc.RenderCo
 
 	// rci = &ro
 
-	return rci, err
-}
-
-func (t *Generator) convertType(ci ct.CodeGenType) (rc.RenderContext, error) {
-	var rci rc.RenderContext
-	var err error
-
-	b, err := t.convertBase(ci)
-
-	if err != nil {
-		return rci, err
-	}
-
-	switch c := ci.(type) {
-	case *ct.CodeGenTypeArray:
-		rci, err = t.handleRenderContextArray(*c, b)
-	case *ct.CodeGenTypeObject:
-		rci, err = t.handleRenderContextObject(*c, b)
-	case *ct.CodeGenTypeUrl:
-		rci, err = t.handleRenderContextUrl(*c, b)
-	case *ct.CodeGenTypeString:
-		rci, err = t.handleRenderContextString(*c, b)
-	case *ct.CodeGenTypeRef:
-		rci, err = t.handleRenderContextRef(*c, b)
-	case *ct.CodeGenTypeInteger:
-		rci, err = t.handleRenderContextInteger(*c, b)
-	case *ct.CodeGenTypeFloat:
-		rci, err = t.handleRenderContextFloat(*c, b)
-	default:
-		return rci, fmt.Errorf("unsupported type: %v", c)
-	}
-
-	return rci, nil
-}
-
-func (t *Generator) handleRenderContextRef(c ct.CodeGenTypeRef, b rc.RenderContextBase) (*rc.RenderContextRef, error) {
-	ref := t.typeManager.Find(c.Ref)
-
-	if ref.Empty() {
-		// TODO
-	}
-
-	rb, err := t.convertType(ref.Get().Schema)
-
-	if err != nil {
-		return nil, err
-	}
-
-	rc := rc.RenderContextRef{
-		RenderContextBase: b,
-		Ref:               rb,
-	}
-
-	if rc.Name == "" || rc.Name == "." {
-		rc.Name = rb.Base().Name
-	}
-
-	return &rc, nil
-}
-
-func (t *Generator) handleRenderContextArray(c ct.CodeGenTypeArray, b rc.RenderContextBase) (*rc.RenderContextArray, error) {
-	rc := rc.RenderContextArray{
-		RenderContextBase: b,
-	}
-
-	if i, err := t.convertType(c.Items); err != nil {
-		return &rc, err
-	} else {
-		if rc.SchemaNs == "" {
-			rc.SchemaNs = i.Base().SchemaNs
-		}
-
-		if rc.Name == "" || rc.Name == "." {
-			rc.Name = i.Base().Name
-			rc.Name = pluralize.NewClient().Plural(rc.Name)
-		}
-
-		rc.Items = i
-	}
-
-	return &rc, nil
-}
-
-func (t *Generator) handleRenderContextObject(c ct.CodeGenTypeObject, b rc.RenderContextBase) (*rc.RenderContextObject, error) {
-	rc := rc.RenderContextObject{
-		RenderContextBase: b,
-	}
-
-	for _, cp := range c.Properties {
-		if rcp, err := t.convertType(cp); err != nil {
-			return &rc, err
-		} else {
-			rc.Properties = append(rc.Properties, rcp)
-		}
-	}
-
-	return &rc, nil
-}
-
-func (t *Generator) handleRenderContextUrl(c ct.CodeGenTypeUrl, b rc.RenderContextBase) (*rc.RenderContextUrl, error) {
-	return &rc.RenderContextUrl{
-		RenderContextBase: b,
-	}, nil
-}
-
-func (t *Generator) handleRenderContextString(c ct.CodeGenTypeString, b rc.RenderContextBase) (*rc.RenderContextString, error) {
-	return &rc.RenderContextString{
-		RenderContextBase: b,
-		Min:               c.Min,
-		Max:               c.Max,
-		Regex:             c.Regex,
-	}, nil
-}
-
-func (t *Generator) handleRenderContextInteger(c ct.CodeGenTypeInteger, b rc.RenderContextBase) (*rc.RenderContextInteger, error) {
-	return &rc.RenderContextInteger{
-		RenderContextBase: b,
-		Min:               c.Min,
-		Max:               c.Max,
-		MultipleOf:        c.MultipleOf,
-	}, nil
-}
-
-func (t *Generator) handleRenderContextFloat(c ct.CodeGenTypeFloat, b rc.RenderContextBase) (*rc.RenderContextFloat, error) {
-	return &rc.RenderContextFloat{
-		RenderContextBase: b,
-		Min:               c.Min,
-		Max:               c.Max,
-		MultipleOf:        c.MultipleOf,
-	}, nil
-}
-
-func (t *Generator) convertBase(ci ct.CodeGenType) (rc.RenderContextBase, error) {
-	b := ci.Base()
-
-	return rc.RenderContextBase{
-		// Root:          b.Root,
-		// Source:        b.Source,
-		SchemaType:    ci.SchemaType(),
-		RootNs:        t.projectManager.Merged.Info.Namespace.Get(),
-		SchemaNs:      cp.SchemaNamepace(t.projectManager.Merged.Info, ci),
-		RelNs:         cp.RelNamepace(t.projectManager.Merged.Info, ci),
-		Id:            b.Id.Get(),
-		Name:          o.FirstOf(b.Name, o.Some(path.Base(b.Id.Get()))).Get(),
-		Description:   b.Description.Get(),
-		IsPublic:      b.Public.OrElse(true),
-		IsInterface:   false,
-		IsRequired:    b.Required.OrElse(false),
-		HasValidation: ci.HasValidation(),
-	}, nil
+	return err
 }

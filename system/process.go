@@ -13,7 +13,7 @@ func (t *System) Process(paths ...string) error {
 		return err
 	}
 
-	if err := t.loader.ProcessTempaltes(); err != nil {
+	if err := t.loader.ProcessTemplates(); err != nil {
 		return err
 	}
 
