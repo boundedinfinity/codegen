@@ -66,9 +66,8 @@ func (t *Loader) convertJsonSchema(v model.JsonSchema, name o.Option[string]) (c
 						for e, d := range js.EnumDescription.Get() {
 							enum.Values[e] = d
 						}
-					} else {
-
 					}
+
 					schema = &enum
 				} else {
 					schema = &ct.CodeGenTypeString{

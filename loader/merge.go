@@ -3,14 +3,9 @@ package loader
 import (
 	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/template_delimiter"
-	"fmt"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
-
-func alreadyMerged(name string) {
-	fmt.Printf("already merged %v\n", name)
-}
 
 func (t *Loader) MergeProjects() error {
 	for _, lc := range t.projectManager.Projects {
@@ -57,25 +52,24 @@ func (t *Loader) MergeProject(lc *codegen_type.ProjectContext) error {
 		t.projectManager.Merged.Mappings[k] = v
 	}
 
-	for _, file := range lc.Project.Schemas {
-		t.projectManager.Merged.Schemas = append(t.projectManager.Merged.Schemas, file)
-	}
+	t.projectManager.Merged.Schemas = append(
+		t.projectManager.Merged.Schemas,
+		lc.Project.Schemas...,
+	)
 
-	for _, operation := range lc.Project.Operations {
-		// if t.projectManager.Merged.Operations.Has(name) {
-		// 	return cp.ErrCodeGenOperationDuplicatev(name)
-		// }
-
-		t.projectManager.Merged.Operations = append(t.projectManager.Merged.Operations, operation)
-	}
+	t.projectManager.Merged.Operations = append(
+		t.projectManager.Merged.Operations,
+		lc.Project.Operations...,
+	)
 
 	if lc.Project.Templates.Header.Defined() {
 		t.projectManager.Merged.Templates.Header = lc.Project.Templates.Header
 	}
 
-	for _, file := range lc.Project.Templates.Files {
-		t.projectManager.Merged.Templates.Files = append(t.projectManager.Merged.Templates.Files, file)
-	}
+	t.projectManager.Merged.Templates.Files = append(
+		t.projectManager.Merged.Templates.Files,
+		lc.Project.Templates.Files...,
+	)
 
 	return nil
 }
