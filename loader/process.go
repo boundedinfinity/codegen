@@ -3,7 +3,7 @@ package loader
 func (t *Loader) ProcessTypes() error {
 	var schemaPaths []string
 
-	for _, lc := range t.projectManager.All {
+	for _, lc := range t.projectManager.Projects {
 		for _, file := range lc.Project.Schemas {
 			if file.Path.Defined() {
 				schemaPaths = append(schemaPaths, file.Path.Get())
@@ -21,7 +21,7 @@ func (t *Loader) ProcessTypes() error {
 func (t *Loader) ProcessTemplates() error {
 	var templatePaths []string
 
-	for _, lc := range t.projectManager.All {
+	for _, lc := range t.projectManager.Projects {
 		for _, file := range lc.Project.Templates.Files {
 			if file.Path.Defined() {
 				templatePaths = append(templatePaths, file.Path.Get())

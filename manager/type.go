@@ -1,7 +1,7 @@
-package loader_context
+package manager
 
 import (
-	"boundedinfinity/codegen/codegen_type"
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/util"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
@@ -9,22 +9,22 @@ import (
 )
 
 type CodeGenTypeManager struct {
-	order     []TypeLoaderContext
-	id2Type   mapper.Mapper[string, TypeLoaderContext]
-	path2Type mapper.Mapper[string, TypeLoaderContext]
+	order     []ct.TypeLoaderContext
+	id2Type   mapper.Mapper[string, ct.TypeLoaderContext]
+	path2Type mapper.Mapper[string, ct.TypeLoaderContext]
 	id2path   mapper.Mapper[string, string]
 	path2id   mapper.Mapper[string, string]
 	root2path mapper.Mapper[string, []string]
 	path2root mapper.Mapper[string, string]
-	root2Type mapper.Mapper[string, []TypeLoaderContext]
+	root2Type mapper.Mapper[string, []ct.TypeLoaderContext]
 }
 
 func TypeManager() *CodeGenTypeManager {
 	return &CodeGenTypeManager{
-		order:     make([]TypeLoaderContext, 0),
-		id2Type:   make(mapper.Mapper[string, TypeLoaderContext], 0),
-		path2Type: make(mapper.Mapper[string, TypeLoaderContext], 0),
-		root2Type: make(mapper.Mapper[string, []TypeLoaderContext], 0),
+		order:     make([]ct.TypeLoaderContext, 0),
+		id2Type:   make(mapper.Mapper[string, ct.TypeLoaderContext], 0),
+		path2Type: make(mapper.Mapper[string, ct.TypeLoaderContext], 0),
+		root2Type: make(mapper.Mapper[string, []ct.TypeLoaderContext], 0),
 		id2path:   make(mapper.Mapper[string, string], 0),
 		path2id:   make(mapper.Mapper[string, string], 0),
 		root2path: make(mapper.Mapper[string, []string], 0),
@@ -32,7 +32,7 @@ func TypeManager() *CodeGenTypeManager {
 	}
 }
 
-func (t *CodeGenTypeManager) Register(lc TypeLoaderContext) error {
+func (t *CodeGenTypeManager) Register(lc ct.TypeLoaderContext) error {
 	if lc.Schema.Base().Id.Defined() {
 		t.id2Type[lc.Schema.Base().Id.Get()] = lc
 		t.id2path[lc.Schema.Base().Id.Get()] = lc.FileInfo.Source
@@ -49,7 +49,7 @@ func (t *CodeGenTypeManager) Register(lc TypeLoaderContext) error {
 	return nil
 }
 
-func (t CodeGenTypeManager) All() []TypeLoaderContext {
+func (t CodeGenTypeManager) All() []ct.TypeLoaderContext {
 	return t.order
 }
 
@@ -57,17 +57,17 @@ func (t CodeGenTypeManager) Has(id string) bool {
 	return t.id2Type.Has(id)
 }
 
-func (t CodeGenTypeManager) Find(id o.Option[string]) o.Option[TypeLoaderContext] {
+func (t CodeGenTypeManager) Find(id o.Option[string]) o.Option[ct.TypeLoaderContext] {
 	a := t.id2Type.Get(id.Get())
 	b := t.path2Type.Get(id.Get())
 	return o.FirstOf(a, b)
 }
 
-func (t CodeGenTypeManager) Resolve(schema codegen_type.CodeGenType) o.Option[TypeLoaderContext] {
+func (t CodeGenTypeManager) Resolve(schema ct.CodeGenType) o.Option[ct.TypeLoaderContext] {
 	switch c := schema.(type) {
-	case *codegen_type.CodeGenTypeRef:
+	case *ct.CodeGenTypeRef:
 		return t.Find(c.Ref)
-	case *codegen_type.CodeGenTypeArray:
+	case *ct.CodeGenTypeArray:
 		return t.Resolve(c.Items)
 	default:
 		return t.Find(schema.Base().Id)

@@ -1,4 +1,4 @@
-package codegen_project
+package codegen_type
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"

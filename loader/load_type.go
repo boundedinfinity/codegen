@@ -1,9 +1,7 @@
 package loader
 
 import (
-	cp "boundedinfinity/codegen/codegen_project"
-	"boundedinfinity/codegen/codegen_type"
-	lc "boundedinfinity/codegen/loader_context"
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/util"
 	"encoding/json"
 	"fmt"
@@ -37,7 +35,7 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 		}
 
 		if ok {
-			lci := lc.LoaderFileInfo{
+			lci := ct.LoaderFileInfo{
 				Root:     pather.Dir(path),
 				Source:   path,
 				IsFile:   true,
@@ -52,7 +50,7 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 		}
 
 		for source, content := range m {
-			lci := lc.LoaderFileInfo{
+			lci := ct.LoaderFileInfo{
 				Root:     path,
 				Source:   source,
 				IsFile:   true,
@@ -68,7 +66,7 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 	return nil
 }
 
-func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
+func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 	var bs []byte
 	var err error
 
@@ -82,12 +80,12 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 	case mime_type.ApplicationJson:
 		bs = data
 	default:
-		return cp.ErrMimeTypeUnsupportedv(lci.MimeType)
+		return ct.ErrMimeTypeUnsupportedv(lci.MimeType)
 	}
 
 	switch {
 	case util.IsCodeGenSchemaFile(lci.Source):
-		var schema cp.CodeGenProjectProject
+		var schema ct.CodeGenProjectProject
 
 		if err := json.Unmarshal(bs, &schema); err != nil {
 			return err
@@ -97,21 +95,36 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 			schema.Info.DestDir = o.OfZ(util.EnsureAbs(pather.Dir(lci.Source), schema.Info.DestDir))
 		}
 
-		lc := lc.ProjectLoaderContext{
+		ctx := ct.ProjectLoaderContext{
 			FileInfo: lci,
 			Project:  schema,
 		}
 
-		if err := t.projectManager.Register(&lc); err != nil {
+		if err := t.projectManager.RegisterProject(&ctx); err != nil {
 			return err
 		}
-	case util.IsCodeGenSchemaTypeFile(lci.Source):
-		var schema codegen_type.CodeGenType
 
-		if err := codegen_type.UnmarshalJson(bs, &schema); err != nil {
+		for _, operation := range ctx.Project.Operations {
+			opCtx := ct.OperationLoaderContext{
+				ProjectLoaderContext: &ctx,
+				Name:                 operation.Name,
+				Description:          operation.Description,
+				Input:                operation.Input,
+				Output:               operation.Output,
+			}
+
+			if err := t.projectManager.RegisterOperation(&opCtx); err != nil {
+				return err
+			}
+		}
+
+	case util.IsCodeGenSchemaTypeFile(lci.Source):
+		var schema ct.CodeGenType
+
+		if err := ct.UnmarshalJson(bs, &schema); err != nil {
 			return err
 		} else {
-			lc := lc.TypeLoaderContext{
+			lc := ct.TypeLoaderContext{
 				FileInfo: lci,
 				Schema:   schema,
 			}
@@ -131,7 +144,7 @@ func (t *Loader) LoadTypePath(lci lc.LoaderFileInfo, data []byte) error {
 			return err
 		}
 
-		lc := lc.TypeLoaderContext{
+		lc := ct.TypeLoaderContext{
 			FileInfo: lci,
 		}
 

@@ -1,13 +1,14 @@
 package renderer
 
 import (
-	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/codegen_type"
+	"boundedinfinity/codegen/manager"
 	"boundedinfinity/codegen/render_context"
 	"text/template"
 )
 
 type TemplateOutput struct {
-	loader_context.TemplateLoaderContext
+	codegen_type.TemplateLoaderContext
 	Output []byte
 }
 
@@ -18,9 +19,9 @@ type ModelOutput struct {
 }
 
 type Renderer struct {
-	projectManager  *loader_context.CodeGenProjectManager
-	typeManager     *loader_context.CodeGenTypeManager
-	templateManager *loader_context.CodeGenTemplateManager
+	projectManager  *manager.CodeGenProjectManager
+	typeManager     *manager.CodeGenTypeManager
+	templateManager *manager.CodeGenTemplateManager
 	funcs           template.FuncMap
 	verbose         bool
 }

@@ -1,7 +1,7 @@
 package loader
 
 import (
-	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/template_delimiter"
 	"fmt"
 
@@ -13,7 +13,7 @@ func alreadyMerged(name string) {
 }
 
 func (t *Loader) MergeProjects() error {
-	for _, lc := range t.projectManager.All {
+	for _, lc := range t.projectManager.Projects {
 		if err := t.MergeProject(lc); err != nil {
 			return err
 		}
@@ -26,7 +26,7 @@ func (t *Loader) MergeProjects() error {
 	return nil
 }
 
-func (t *Loader) MergeProject(lc *loader_context.ProjectLoaderContext) error {
+func (t *Loader) MergeProject(lc *codegen_type.ProjectLoaderContext) error {
 	merged := t.projectManager.Merged
 
 	if lc.Project.Info.Description.Defined() {

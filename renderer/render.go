@@ -1,8 +1,7 @@
 package renderer
 
 import (
-	"boundedinfinity/codegen/codegen_project"
-	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/render_context"
 	"bytes"
 	"go/format"
@@ -46,7 +45,7 @@ func (t *Renderer) RenderOperation(schema render_context.RenderContextOperation)
 	return outputs, nil
 }
 
-func (t *Renderer) RenderNamespace(schema codegen_project.CodeGenProjectOperation) ([]TemplateOutput, error) {
+func (t *Renderer) RenderNamespace(schema codegen_type.CodeGenProjectOperation) ([]TemplateOutput, error) {
 	outputs := make([]TemplateOutput, 0)
 
 	// for _, tmpl := range t.FindTemplateType(template_type.Namespace) {
@@ -60,7 +59,7 @@ func (t *Renderer) RenderNamespace(schema codegen_project.CodeGenProjectOperatio
 	return outputs, nil
 }
 
-func (t *Renderer) render(tmpl loader_context.TemplateLoaderContext, data any) (TemplateOutput, error) {
+func (t *Renderer) render(tmpl codegen_type.TemplateLoaderContext, data any) (TemplateOutput, error) {
 	output := TemplateOutput{
 		TemplateLoaderContext: tmpl,
 	}

@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/render_context"
+	rc "boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/renderer"
 	"boundedinfinity/codegen/util"
 	"os"
@@ -14,8 +14,14 @@ import (
 )
 
 func (t *Generator) Generate() error {
-	for _, rc := range t.rcs {
-		if err := t.GenerateModel(rc); err != nil {
+	for _, typ := range t.types {
+		if err := t.GenerateModel(typ); err != nil {
+			return err
+		}
+	}
+
+	for _, ops := range t.operations {
+		if err := t.GenerateOperation(ops); err != nil {
 			return err
 		}
 	}
@@ -23,7 +29,7 @@ func (t *Generator) Generate() error {
 	return nil
 }
 
-func (t *Generator) GenerateModel(schema render_context.RenderContext) error {
+func (t *Generator) GenerateModel(schema rc.RenderContext) error {
 	renders, err := t.renderer.RenderModel(schema)
 
 	if err != nil {
@@ -73,20 +79,7 @@ func (t *Generator) GenerateModel(schema render_context.RenderContext) error {
 	return nil
 }
 
-func (t *Generator) GenerateOperation(schema render_context.RenderContextOperation) error {
-	// _, err := t.tm.RenderOperation(schema)
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// for _, render := range renders {
-	// 	fmt.Println(render.Schema.Base().OutputPath)
-
-	// 	if err := t.writeModel(render); err != nil {
-	// 		return err
-	// 	}
-	// }
+func (t *Generator) GenerateOperation(schema rc.RenderContextOperation) error {
 
 	return nil
 }

@@ -13,7 +13,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/boundedinfinity/go-commoner/slicer" // v1.0.15
+	"github.com/boundedinfinity/go-commoner/slicer"
 )
 
 var (

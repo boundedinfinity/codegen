@@ -1,4 +1,4 @@
-package codegen_project
+package codegen_type
 
 type walker struct {
 	infoFn      func(*CodeGenProjectProject, *CodeGenProjectInfo) error

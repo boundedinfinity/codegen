@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/manager"
 	"boundedinfinity/codegen/renderer"
 	"fmt"
 	"io/fs"
@@ -19,19 +19,19 @@ func GenExt(v string) Arg {
 	}
 }
 
-func TypeManager(v *loader_context.CodeGenTypeManager) Arg {
+func TypeManager(v *manager.CodeGenTypeManager) Arg {
 	return func(t *Generator) {
 		t.typeManager = v
 	}
 }
 
-func TemplateManager(v *loader_context.CodeGenTemplateManager) Arg {
+func TemplateManager(v *manager.CodeGenTemplateManager) Arg {
 	return func(t *Generator) {
 		t.templateManager = v
 	}
 }
 
-func ProjectManager(v *loader_context.CodeGenProjectManager) Arg {
+func ProjectManager(v *manager.CodeGenProjectManager) Arg {
 	return func(t *Generator) {
 		t.projectManager = v
 	}

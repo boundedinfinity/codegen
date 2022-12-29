@@ -1,14 +1,14 @@
 package renderer
 
 import (
-	lc "boundedinfinity/codegen/loader_context"
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/template_delimiter"
 	"fmt"
 	"io/ioutil"
 	"text/template"
 )
 
-func (t *Renderer) Load(lc *lc.TemplateLoaderContext) error {
+func (t *Renderer) Load(lc *ct.TemplateLoaderContext) error {
 	bs, err := ioutil.ReadFile(lc.FileInfo.Source)
 
 	if err != nil {

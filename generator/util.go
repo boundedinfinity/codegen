@@ -1,8 +1,7 @@
 package generator
 
 import (
-	cp "boundedinfinity/codegen/codegen_project"
-	lc "boundedinfinity/codegen/loader_context"
+	ct "boundedinfinity/codegen/codegen_type"
 	rc "boundedinfinity/codegen/render_context"
 	"path"
 	"path/filepath"
@@ -12,7 +11,7 @@ import (
 	"github.com/boundedinfinity/go-commoner/extentioner"
 )
 
-func (t *Generator) SchemaNamepace(rootNs string, lc lc.TypeLoaderContext) string {
+func (t *Generator) SchemaNamepace(rootNs string, lc ct.TypeLoaderContext) string {
 	if lc.Schema.Base().Base().Id.Empty() {
 		return ""
 	}
@@ -28,7 +27,7 @@ func (t *Generator) SchemaNamepace(rootNs string, lc lc.TypeLoaderContext) strin
 	return ns
 }
 
-func (t *Generator) RelNamepace(rootNs string, lc lc.TypeLoaderContext) string {
+func (t *Generator) RelNamepace(rootNs string, lc ct.TypeLoaderContext) string {
 	schemaNs := t.SchemaNamepace(rootNs, lc)
 
 	if schemaNs == "" {
@@ -41,7 +40,7 @@ func (t *Generator) RelNamepace(rootNs string, lc lc.TypeLoaderContext) string {
 	return relNs
 }
 
-func (t *Generator) DestPath(info cp.CodeGenProjectInfo, schema rc.RenderContext, tmplPath string) string {
+func (t *Generator) DestPath(info ct.CodeGenProjectInfo, schema rc.RenderContext, tmplPath string) string {
 	sourceDir, sourceFile := filepath.Split(schema.Base().Source)
 	rootPath := schema.Base().Root
 	destPath := info.DestDir.Get()
@@ -63,7 +62,7 @@ func (t *Generator) DestPath(info cp.CodeGenProjectInfo, schema rc.RenderContext
 	return outPath
 }
 
-func CurrentNs(info cp.CodeGenProjectInfo, outputPath string) string {
+func CurrentNs(info ct.CodeGenProjectInfo, outputPath string) string {
 	out := outputPath
 	out = path.Dir(out)
 	out = strings.ReplaceAll(out, info.DestDir.Get(), info.Namespace.Get())

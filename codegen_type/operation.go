@@ -1,4 +1,4 @@
-package codegen_project
+package codegen_type
 
 import o "github.com/boundedinfinity/go-commoner/optioner"
 

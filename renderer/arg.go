@@ -1,7 +1,7 @@
 package renderer
 
 import (
-	"boundedinfinity/codegen/loader_context"
+	"boundedinfinity/codegen/manager"
 	"errors"
 )
 
@@ -46,19 +46,19 @@ func TemplateFunc(name string, fn any) Arg {
 	}
 }
 
-func TemplateManager(v *loader_context.CodeGenTemplateManager) Arg {
+func TemplateManager(v *manager.CodeGenTemplateManager) Arg {
 	return func(t *Renderer) {
 		t.templateManager = v
 	}
 }
 
-func TypeManager(v *loader_context.CodeGenTypeManager) Arg {
+func TypeManager(v *manager.CodeGenTypeManager) Arg {
 	return func(t *Renderer) {
 		t.typeManager = v
 	}
 }
 
-func ProjectManager(v *loader_context.CodeGenProjectManager) Arg {
+func ProjectManager(v *manager.CodeGenProjectManager) Arg {
 	return func(t *Renderer) {
 		t.projectManager = v
 	}
