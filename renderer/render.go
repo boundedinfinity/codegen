@@ -59,9 +59,9 @@ func (t *Renderer) RenderNamespace(schema codegen_type.CodeGenProjectOperation) 
 	return outputs, nil
 }
 
-func (t *Renderer) render(tmpl codegen_type.TemplateLoaderContext, data any) (TemplateOutput, error) {
+func (t *Renderer) render(tmpl codegen_type.TemplateContext, data any) (TemplateOutput, error) {
 	output := TemplateOutput{
-		TemplateLoaderContext: tmpl,
+		TemplateContext: tmpl,
 	}
 
 	var writer bytes.Buffer

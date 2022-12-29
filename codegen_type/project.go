@@ -6,11 +6,11 @@ import (
 )
 
 type CodeGenProjectProject struct {
-	Info       CodeGenProjectInfo            `json:"info,omitempty" yaml:"info,omitempty"`
-	Mappings   mapper.Mapper[string, string] `json:"mappings,omitempty" yaml:"mappings,omitempty"`
-	Operations []*CodeGenProjectOperation    `json:"operations,omitempty" yaml:"operations,omitempty"`
-	Templates  CodeGenProjectTemplates       `json:"templates,omitempty" yaml:"templates,omitempty"`
-	Schemas    []*CodeGenProjectTypeFile     `json:"schemas,omitempty" yaml:"schemas,omitempty"`
+	Info       CodeGenProjectInfo            `json:"info,omitempty"`
+	Mappings   mapper.Mapper[string, string] `json:"mappings,omitempty"`
+	Operations []*CodeGenProjectOperation    `json:"operations,omitempty"`
+	Templates  CodeGenProjectTemplates       `json:"templates,omitempty"`
+	Schemas    []*CodeGenProjectTypeFile     `json:"schemas,omitempty"`
 }
 
 func NewProject() *CodeGenProjectProject {
@@ -21,27 +21,27 @@ func NewProject() *CodeGenProjectProject {
 	}
 }
 
-type ProjectLoaderContext struct {
+type ProjectContext struct {
 	FileInfo LoaderFileInfo
 	Project  CodeGenProjectProject
 }
 
-func (t *ProjectLoaderContext) GetFileInfo() *LoaderFileInfo {
+func (t *ProjectContext) GetFileInfo() *LoaderFileInfo {
 	return &t.FileInfo
 }
 
-var _ LoaderContext = &ProjectLoaderContext{}
+var _ LoaderContext = &ProjectContext{}
 
-type OperationLoaderContext struct {
-	*ProjectLoaderContext
-	Name        o.Option[string] `json:"name,omitempty" yaml:"name,omitempty"`
-	Description o.Option[string] `json:"description,omitempty" yaml:"description,omitempty"`
-	Input       o.Option[string] `json:"input,omitempty" yaml:"input,omitempty"`
-	Output      o.Option[string] `json:"output,omitempty" yaml:"output,omitempty"`
+type OperationContext struct {
+	*ProjectContext
+	Name        o.Option[string] `json:"name,omitempty"`
+	Description o.Option[string] `json:"description,omitempty"`
+	Input       o.Option[string] `json:"input,omitempty"`
+	Output      o.Option[string] `json:"output,omitempty"`
 }
 
-func (t *OperationLoaderContext) GetFileInfo() *LoaderFileInfo {
+func (t *OperationContext) GetFileInfo() *LoaderFileInfo {
 	return &t.FileInfo
 }
 
-var _ LoaderContext = &OperationLoaderContext{}
+var _ LoaderContext = &OperationContext{}

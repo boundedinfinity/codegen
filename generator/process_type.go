@@ -13,7 +13,7 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
-func (t *Generator) processType(currNs o.Option[string], lctx ct.TypeLoaderContext, schema ct.CodeGenType, rctx *rc.RenderContext) error {
+func (t *Generator) processType(currNs o.Option[string], lctx ct.CodeGenTypeContext, schema ct.CodeGenType, rctx *rc.RenderContext) error {
 	var err error
 	var base rc.RenderContextBase
 	found := t.typeManager.Resolve(schema)
@@ -23,7 +23,7 @@ func (t *Generator) processType(currNs o.Option[string], lctx ct.TypeLoaderConte
 			return err
 		}
 	} else {
-		if err := t.convertBase(ct.TypeLoaderContext{Schema: schema}, &base); err != nil {
+		if err := t.convertBase(ct.CodeGenTypeContext{Schema: schema}, &base); err != nil {
 			return err
 		}
 	}
@@ -109,7 +109,7 @@ func (t *Generator) processType(currNs o.Option[string], lctx ct.TypeLoaderConte
 	return err
 }
 
-func (t *Generator) convertBase(lctx ct.TypeLoaderContext, base *rc.RenderContextBase) error {
+func (t *Generator) convertBase(lctx ct.CodeGenTypeContext, base *rc.RenderContextBase) error {
 	fileInfo := lctx.FileInfo
 	schemaBase := lctx.Schema.Base()
 	rootNs := t.projectManager.Merged.Info.Namespace.Get()

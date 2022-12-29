@@ -26,7 +26,7 @@ func (t *Loader) MergeProjects() error {
 	return nil
 }
 
-func (t *Loader) MergeProject(lc *codegen_type.ProjectLoaderContext) error {
+func (t *Loader) MergeProject(lc *codegen_type.ProjectContext) error {
 	merged := t.projectManager.Merged
 
 	if lc.Project.Info.Description.Defined() {

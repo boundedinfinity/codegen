@@ -10,9 +10,9 @@ import (
 
 type CodeGenTypeIpv6 struct {
 	CodeGenTypeBase
-	Minimum o.Option[string] `json:"minimum,omitempty" yaml:"minimum,omitempty"`
-	Maximum o.Option[string] `json:"maximum,omitempty" yaml:"maximum,omitempty"`
-	Mask    o.Option[string] `json:"mask,omitempty" yaml:"mask,omitempty"`
+	Minimum o.Option[string] `json:"minimum,omitempty"`
+	Maximum o.Option[string] `json:"maximum,omitempty"`
+	Mask    o.Option[string] `json:"mask,omitempty"`
 }
 
 func (t CodeGenTypeIpv6) HasValidation() bool {

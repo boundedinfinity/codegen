@@ -8,7 +8,7 @@ import (
 	"text/template"
 )
 
-func (t *Renderer) Load(lc *ct.TemplateLoaderContext) error {
+func (t *Renderer) Load(lc *ct.TemplateContext) error {
 	bs, err := ioutil.ReadFile(lc.FileInfo.Source)
 
 	if err != nil {

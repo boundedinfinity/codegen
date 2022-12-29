@@ -8,9 +8,9 @@ import (
 
 type CodeGenTypeFloat struct {
 	CodeGenTypeBase
-	Min        o.Option[float64] `json:"min,omitempty" yaml:"min,omitempty"`
-	Max        o.Option[float64] `json:"max,omitempty" yaml:"max,omitempty"`
-	MultipleOf o.Option[float64] `json:"multipleOf,omitempty" yaml:"multipleOf,omitempty"`
+	Min        o.Option[float64] `json:"min,omitempty"`
+	Max        o.Option[float64] `json:"max,omitempty"`
+	MultipleOf o.Option[float64] `json:"multipleOf,omitempty"`
 }
 
 func (t CodeGenTypeFloat) HasValidation() bool {

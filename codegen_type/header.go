@@ -7,7 +7,7 @@ import (
 )
 
 type CodeGenProjectHeader struct {
-	Content  o.Option[string]                         `json:"content,omitempty" yaml:"content,omitempty"`
-	Path     o.Option[string]                         `json:"path,omitempty" yaml:"path,omitempty"`
-	Strategy o.Option[header_strategy.HeaderStrategy] `json:"strategy,omitempty" yaml:"strategy,omitempty"`
+	Content  o.Option[string]                         `json:"content,omitempty"`
+	Path     o.Option[string]                         `json:"path,omitempty"`
+	Strategy o.Option[header_strategy.HeaderStrategy] `json:"strategy,omitempty"`
 }

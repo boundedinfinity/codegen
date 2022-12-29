@@ -95,7 +95,7 @@ func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 			schema.Info.DestDir = o.OfZ(util.EnsureAbs(pather.Dir(lci.Source), schema.Info.DestDir))
 		}
 
-		ctx := ct.ProjectLoaderContext{
+		ctx := ct.ProjectContext{
 			FileInfo: lci,
 			Project:  schema,
 		}
@@ -105,7 +105,7 @@ func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 		}
 
 		for _, operation := range ctx.Project.Operations {
-			opCtx := ct.OperationLoaderContext{
+			opCtx := ct.OperationContext{
 				ProjectLoaderContext: &ctx,
 				Name:                 operation.Name,
 				Description:          operation.Description,
@@ -124,7 +124,7 @@ func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 		if err := ct.UnmarshalJson(bs, &schema); err != nil {
 			return err
 		} else {
-			lc := ct.TypeLoaderContext{
+			lc := ct.CodeGenTypeContext{
 				FileInfo: lci,
 				Schema:   schema,
 			}
@@ -144,7 +144,7 @@ func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 			return err
 		}
 
-		lc := ct.TypeLoaderContext{
+		lc := ct.CodeGenTypeContext{
 			FileInfo: lci,
 		}
 

@@ -8,9 +8,9 @@ import (
 
 type CodeGenTypeString struct {
 	CodeGenTypeBase
-	Min   o.Option[int]    `json:"min,omitempty" yaml:"min,omitempty"`
-	Max   o.Option[int]    `json:"max,omitempty" yaml:"max,omitempty"`
-	Regex o.Option[string] `json:"regex,omitempty" yaml:"regex,omitempty"`
+	Min   o.Option[int]    `json:"min,omitempty"`
+	Max   o.Option[int]    `json:"max,omitempty"`
+	Regex o.Option[string] `json:"regex,omitempty"`
 }
 
 func (t CodeGenTypeString) HasValidation() bool {

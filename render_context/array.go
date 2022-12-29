@@ -5,8 +5,8 @@ import o "github.com/boundedinfinity/go-commoner/optioner"
 type RenderContextArray struct {
 	RenderContextBase
 	Items RenderContext
-	Min   o.Option[int] `json:"min,omitempty" yaml:"min,omitempty"`
-	Max   o.Option[int] `json:"max,omitempty" yaml:"max,omitempty"`
+	Min   o.Option[int] `json:"min,omitempty"`
+	Max   o.Option[int] `json:"max,omitempty"`
 }
 
 func (t RenderContextArray) HasValidation() bool {

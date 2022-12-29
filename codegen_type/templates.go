@@ -10,17 +10,17 @@ import (
 )
 
 type CodeGenProjectTemplates struct {
-	Header o.Option[CodeGenProjectHeader] `json:"header,omitempty" yaml:"header,omitempty"`
-	Files  []*CodeGenProjectTemplateFile  `json:"files,omitempty" yaml:"files,omitempty"`
+	Header o.Option[CodeGenProjectHeader] `json:"header,omitempty"`
+	Files  []*CodeGenProjectTemplateFile  `json:"files,omitempty"`
 }
 
 type CodeGenProjectTemplateFile struct {
-	Header  o.Option[CodeGenProjectHeader] `json:"header,omitempty" yaml:"header,omitempty"`
-	Path    o.Option[string]               `json:"path,omitempty" yaml:"path,omitempty"`
-	Content o.Option[string]               `json:"content,omitempty" yaml:"content,omitempty"`
+	Header  o.Option[CodeGenProjectHeader] `json:"header,omitempty"`
+	Path    o.Option[string]               `json:"path,omitempty"`
+	Content o.Option[string]               `json:"content,omitempty"`
 }
 
-type TemplateLoaderContext struct {
+type TemplateContext struct {
 	FileInfo       LoaderFileInfo
 	OutputMimeType mime_type.MimeType
 	TemplateType   template_type.TemplateType
@@ -28,8 +28,8 @@ type TemplateLoaderContext struct {
 	Template       *template.Template
 }
 
-func (t *TemplateLoaderContext) GetFileInfo() *LoaderFileInfo {
+func (t *TemplateContext) GetFileInfo() *LoaderFileInfo {
 	return &t.FileInfo
 }
 
-var _ LoaderContext = &TemplateLoaderContext{}
+var _ LoaderContext = &TemplateContext{}

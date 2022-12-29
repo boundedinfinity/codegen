@@ -9,7 +9,7 @@ import (
 	"github.com/boundedinfinity/go-jsonschema/stringformat"
 )
 
-func (t *Loader) ConvertJsonSchema(lc *ct.TypeLoaderContext, js model.JsonSchema) error {
+func (t *Loader) ConvertJsonSchema(lc *ct.CodeGenTypeContext, js model.JsonSchema) error {
 	if schema, err := t.convertJsonSchema(js, o.None[string]()); err != nil {
 		return err
 	} else {

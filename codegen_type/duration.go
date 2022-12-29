@@ -8,8 +8,8 @@ import (
 
 type CodeGenTypeDuration struct {
 	CodeGenTypeBase
-	Min o.Option[CodeGenTypeDuration] `json:"min,omitempty" yaml:"min,omitempty"`
-	Max o.Option[CodeGenTypeDuration] `json:"max,omitempty" yaml:"max,omitempty"`
+	Min o.Option[CodeGenTypeDuration] `json:"min,omitempty"`
+	Max o.Option[CodeGenTypeDuration] `json:"max,omitempty"`
 }
 
 func (t CodeGenTypeDuration) HasValidation() bool {

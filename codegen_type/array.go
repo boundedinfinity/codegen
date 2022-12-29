@@ -9,22 +9,26 @@ import (
 
 type CodeGenTypeArray struct {
 	CodeGenTypeBase
-	Items CodeGenType   `json:"items,omitempty" yaml:"items,omitempty"`
-	Min   o.Option[int] `json:"min,omitempty" yaml:"min,omitempty"`
-	Max   o.Option[int] `json:"max,omitempty" yaml:"max,omitempty"`
+	Items CodeGenType   `json:"items,omitempty"`
+	Min   o.Option[int] `json:"min,omitempty"`
+	Max   o.Option[int] `json:"max,omitempty"`
 }
 
 func (t CodeGenTypeArray) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Array
 }
 
+func (t CodeGenTypeArray) HasValidation() bool {
+	return t.Min.Defined() || t.Max.Defined() || t.Items.HasValidation()
+}
+
 var _ CodeGenType = &CodeGenTypeArray{}
 
 type marshalArray struct {
 	CodeGenTypeBase
-	Items json.RawMessage `json:"items,omitempty" yaml:"items,omitempty"`
-	Min   o.Option[int]   `json:"min,omitempty" yaml:"min,omitempty"`
-	Max   o.Option[int]   `json:"max,omitempty" yaml:"max,omitempty"`
+	Items json.RawMessage `json:"items,omitempty"`
+	Min   o.Option[int]   `json:"min,omitempty"`
+	Max   o.Option[int]   `json:"max,omitempty"`
 }
 
 func (t *CodeGenTypeArray) UnmarshalJSON(data []byte) error {
@@ -34,7 +38,7 @@ func (t *CodeGenTypeArray) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	t.CodeGenTypeBase.Merge(d.CodeGenTypeBase)
+	t.CodeGenTypeBase = d.CodeGenTypeBase
 	t.Max = d.Max
 	t.Min = d.Min
 

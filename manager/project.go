@@ -9,32 +9,32 @@ import (
 )
 
 type CodeGenProjectManager struct {
-	Projects    []*ct.ProjectLoaderContext
-	Operations  []*ct.OperationLoaderContext
-	source2proj mapper.Mapper[string, *ct.ProjectLoaderContext]
-	root2Proj   mapper.Mapper[string, []*ct.ProjectLoaderContext]
+	Projects    []*ct.ProjectContext
+	Operations  []*ct.OperationContext
+	source2proj mapper.Mapper[string, *ct.ProjectContext]
+	root2Proj   mapper.Mapper[string, []*ct.ProjectContext]
 	source2Root mapper.Mapper[string, string]
 	root2source mapper.Mapper[string, []string]
-	id2proj     mapper.Mapper[string, *ct.ProjectLoaderContext]
-	op2proj     mapper.Mapper[string, *ct.ProjectLoaderContext]
+	id2proj     mapper.Mapper[string, *ct.ProjectContext]
+	op2proj     mapper.Mapper[string, *ct.ProjectContext]
 	Merged      *ct.CodeGenProjectProject
 }
 
 func ProjectManager() *CodeGenProjectManager {
 	return &CodeGenProjectManager{
-		Projects:    make([]*ct.ProjectLoaderContext, 0),
-		Operations:  make([]*ct.OperationLoaderContext, 0),
-		source2proj: make(mapper.Mapper[string, *ct.ProjectLoaderContext], 0),
-		root2Proj:   make(mapper.Mapper[string, []*ct.ProjectLoaderContext], 0),
+		Projects:    make([]*ct.ProjectContext, 0),
+		Operations:  make([]*ct.OperationContext, 0),
+		source2proj: make(mapper.Mapper[string, *ct.ProjectContext], 0),
+		root2Proj:   make(mapper.Mapper[string, []*ct.ProjectContext], 0),
 		source2Root: make(mapper.Mapper[string, string], 0),
 		root2source: make(mapper.Mapper[string, []string], 0),
-		id2proj:     make(mapper.Mapper[string, *ct.ProjectLoaderContext], 0),
-		op2proj:     make(mapper.Mapper[string, *ct.ProjectLoaderContext], 0),
+		id2proj:     make(mapper.Mapper[string, *ct.ProjectContext], 0),
+		op2proj:     make(mapper.Mapper[string, *ct.ProjectContext], 0),
 		Merged:      ct.NewProject(),
 	}
 }
 
-func (t *CodeGenProjectManager) RegisterProject(lc *ct.ProjectLoaderContext) error {
+func (t *CodeGenProjectManager) RegisterProject(lc *ct.ProjectContext) error {
 	t.Projects = append(t.Projects, lc)
 	t.source2proj[lc.FileInfo.Source] = lc
 	t.source2Root[lc.FileInfo.Root] = lc.FileInfo.Source
@@ -49,12 +49,12 @@ func (t *CodeGenProjectManager) RegisterProject(lc *ct.ProjectLoaderContext) err
 	return nil
 }
 
-func (t *CodeGenProjectManager) RegisterOperation(lc *ct.OperationLoaderContext) error {
+func (t *CodeGenProjectManager) RegisterOperation(lc *ct.OperationContext) error {
 	t.Operations = append(t.Operations, lc)
 	return nil
 }
 
-func (t *CodeGenProjectManager) FindProject(id o.Option[string]) o.Option[*ct.ProjectLoaderContext] {
+func (t *CodeGenProjectManager) FindProject(id o.Option[string]) o.Option[*ct.ProjectContext] {
 	return o.FirstOf(t.source2proj.Get(id.Get()), t.id2proj.Get(id.Get()))
 }
 

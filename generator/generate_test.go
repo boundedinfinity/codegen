@@ -2,15 +2,7 @@ package generator_test
 
 import (
 	"testing"
-
-	jsmodel "github.com/boundedinfinity/go-jsonschema/model"
 )
-
-func createString() jsmodel.JsonSchemaString {
-	// m := jsmodel.NewString("https://www.boundedinfinity.com/schema/string-1")
-	m := jsmodel.JsonSchemaString{}
-	return m
-}
 
 func Test_Generate_String(t *testing.T) {
 	// input := createString()

@@ -11,8 +11,8 @@ import (
 
 type CodeGenTypeUuid struct {
 	CodeGenTypeBase
-	CaseSensitive o.Option[bool]                     `json:"caseSensitive,omitempty" yaml:"caseSensitive,omitempty"`
-	Version       o.Option[uuid_version.UuidVersion] `json:"version,omitempty" yaml:"version,omitempty"`
+	CaseSensitive o.Option[bool]                     `json:"caseSensitive,omitempty"`
+	Version       o.Option[uuid_version.UuidVersion] `json:"version,omitempty"`
 }
 
 func (t CodeGenTypeUuid) HasValidation() bool {

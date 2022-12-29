@@ -60,7 +60,7 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 }
 
 func (t *Loader) LoadTemplatePath(lci ct.LoaderFileInfo) error {
-	lc := ct.TemplateLoaderContext{
+	lc := ct.TemplateContext{
 		FileInfo: lci,
 	}
 

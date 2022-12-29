@@ -11,7 +11,7 @@ import (
 	"github.com/boundedinfinity/go-commoner/extentioner"
 )
 
-func (t *Generator) SchemaNamepace(rootNs string, lc ct.TypeLoaderContext) string {
+func (t *Generator) SchemaNamepace(rootNs string, lc ct.CodeGenTypeContext) string {
 	if lc.Schema.Base().Base().Id.Empty() {
 		return ""
 	}
@@ -27,7 +27,7 @@ func (t *Generator) SchemaNamepace(rootNs string, lc ct.TypeLoaderContext) strin
 	return ns
 }
 
-func (t *Generator) RelNamepace(rootNs string, lc ct.TypeLoaderContext) string {
+func (t *Generator) RelNamepace(rootNs string, lc ct.CodeGenTypeContext) string {
 	schemaNs := t.SchemaNamepace(rootNs, lc)
 
 	if schemaNs == "" {

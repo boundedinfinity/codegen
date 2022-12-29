@@ -8,7 +8,7 @@ import (
 
 type CodeGenTypeRef struct {
 	CodeGenTypeBase
-	Ref o.Option[string] `json:"ref,omitempty" yaml:"ref,omitempty"`
+	Ref o.Option[string] `json:"ref,omitempty"`
 }
 
 func (t CodeGenTypeRef) HasValidation() bool {

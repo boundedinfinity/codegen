@@ -9,35 +9,21 @@ import (
 type CodeGenType interface {
 	SchemaType() codegen_type_id.CodgenTypeId
 	Base() *CodeGenTypeBase
+	HasValidation() bool
 }
 
 type CodeGenTypeBase struct {
-	Id          o.Option[string] `json:"id,omitempty" yaml:"id,omitempty"`
-	Name        o.Option[string] `json:"name,omitempty" yaml:"name,omitempty"`
-	Description o.Option[string] `json:"description,omitempty" yaml:"description,omitempty"`
-	Imported    o.Option[bool]   `json:"imported,omitempty" yaml:"imported,omitempty"`
-	Public      o.Option[bool]   `json:"public,omitempty" yaml:"public,omitempty"`
-	Required    o.Option[bool]   `json:"required,omitempty" yaml:"required,omitempty"`
-	Deprecated  o.Option[bool]   `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
+	Id          o.Option[string] `json:"id,omitempty"`
+	Name        o.Option[string] `json:"name,omitempty"`
+	Description o.Option[string] `json:"description,omitempty"`
+	Imported    o.Option[bool]   `json:"imported,omitempty"`
+	Public      o.Option[bool]   `json:"public,omitempty"`
+	Required    o.Option[bool]   `json:"required,omitempty"`
+	Deprecated  o.Option[bool]   `json:"deprecated,omitempty"`
 }
 
 func (t *CodeGenTypeBase) Base() *CodeGenTypeBase {
 	return t
-}
-
-func (t *CodeGenTypeBase) SetBase(base CodeGenTypeBase) {
-	t = &base
-}
-
-func (t *CodeGenTypeBase) Merge(o CodeGenTypeBase) bool {
-	t.Description = o.Description
-	t.Id = o.Id
-	t.Imported = o.Imported
-	t.Name = o.Name
-	t.Required = o.Required
-	t.Public = o.Public
-
-	return false
 }
 
 func (t CodeGenTypeBase) SchemaId() o.Option[string] {

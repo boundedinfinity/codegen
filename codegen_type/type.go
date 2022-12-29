@@ -6,28 +6,28 @@ import (
 )
 
 type CodeGenProjectTypeFile struct {
-	Path o.Option[string] `json:"path,omitempty" yaml:"path,omitempty"`
-	Root o.Option[string] `json:"root,omitempty" yaml:"root,omitempty"`
+	Path o.Option[string] `json:"path,omitempty"`
+	Root o.Option[string] `json:"root,omitempty"`
 }
 
-var _ LoaderContext = &TypeLoaderContext{}
-
-type TypeLoaderContext struct {
+type CodeGenTypeContext struct {
 	FileInfo LoaderFileInfo
 	Schema   CodeGenType
 }
 
-func (t *TypeLoaderContext) GetFileInfo() *LoaderFileInfo {
+func (t *CodeGenTypeContext) GetFileInfo() *LoaderFileInfo {
 	return &t.FileInfo
 }
 
-type JsonSchemaLoaderContext struct {
+var _ LoaderContext = &CodeGenTypeContext{}
+
+type JsonSchemaContext struct {
 	FileInfo LoaderFileInfo
 	Schema   model.JsonSchema
 }
 
-func (t *JsonSchemaLoaderContext) GetFileInfo() *LoaderFileInfo {
+func (t *JsonSchemaContext) GetFileInfo() *LoaderFileInfo {
 	return &t.FileInfo
 }
 
-var _ LoaderContext = &JsonSchemaLoaderContext{}
+var _ LoaderContext = &JsonSchemaContext{}

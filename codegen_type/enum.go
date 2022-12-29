@@ -9,8 +9,8 @@ import (
 
 type CodeGenTypeEnum struct {
 	CodeGenTypeBase
-	Values        mapper.Mapper[string, string] `json:"values,omitempty" yaml:"values,omitempty"`
-	CaseSensitive o.Option[bool]                `json:"caseSensitive,omitempty" yaml:"caseSensitive,omitempty"`
+	Values        mapper.Mapper[string, string] `json:"values,omitempty"`
+	CaseSensitive o.Option[bool]                `json:"caseSensitive,omitempty"`
 }
 
 func (t CodeGenTypeEnum) HasValidation() bool {

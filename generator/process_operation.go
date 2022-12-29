@@ -10,7 +10,7 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
-func (t *Generator) processOperation(po ct.OperationLoaderContext, rctx *rc.RenderContextOperation) error {
+func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderContextOperation) error {
 	var err error
 	fileInfo := po.FileInfo
 	rootNs := t.projectManager.Merged.Info.Namespace.Get()

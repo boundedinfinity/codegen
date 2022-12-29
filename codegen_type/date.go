@@ -11,11 +11,11 @@ import (
 
 type CodeGenTypeDate struct {
 	CodeGenTypeBase
-	Before o.Option[CodeGenTypeDate]     `json:"before,omitempty" yaml:"before,omitempty"`
-	After  o.Option[CodeGenTypeDate]     `json:"after,omitempty" yaml:"after,omitempty"`
-	Within o.Option[CodeGenTypeDuration] `json:"within,omitempty" yaml:"within,omitempty"`
-	Ahead  o.Option[CodeGenTypeDuration] `json:"ahead,omitempty" yaml:"ahead,omitempty"`
-	Behind o.Option[CodeGenTypeDuration] `json:"behind,omitempty" yaml:"behind,omitempty"`
+	Before o.Option[CodeGenTypeDate]     `json:"before,omitempty"`
+	After  o.Option[CodeGenTypeDate]     `json:"after,omitempty"`
+	Within o.Option[CodeGenTypeDuration] `json:"within,omitempty"`
+	Ahead  o.Option[CodeGenTypeDuration] `json:"ahead,omitempty"`
+	Behind o.Option[CodeGenTypeDuration] `json:"behind,omitempty"`
 }
 
 func (t CodeGenTypeDate) HasValidation() bool {
