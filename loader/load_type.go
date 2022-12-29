@@ -106,11 +106,11 @@ func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 
 		for _, operation := range ctx.Project.Operations {
 			opCtx := ct.OperationContext{
-				ProjectLoaderContext: &ctx,
-				Name:                 operation.Name,
-				Description:          operation.Description,
-				Input:                operation.Input,
-				Output:               operation.Output,
+				ProjectContext: &ctx,
+				Name:           operation.Name,
+				Description:    operation.Description,
+				Input:          operation.Input,
+				Output:         operation.Output,
 			}
 
 			if err := t.projectManager.RegisterOperation(&opCtx); err != nil {
