@@ -2,7 +2,7 @@ package renderer
 
 import (
 	ct "boundedinfinity/codegen/codegen_type"
-	"boundedinfinity/codegen/template_delimiter"
+	"boundedinfinity/codegen/codegen_type/template_delimiter"
 	"fmt"
 	"io/ioutil"
 	"text/template"

@@ -19,4 +19,8 @@ func (t CodeGenTypeMac) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Mac
 }
 
+func (t CodeGenTypeMac) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeMac{}

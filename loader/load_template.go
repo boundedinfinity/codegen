@@ -2,7 +2,7 @@ package loader
 
 import (
 	ct "boundedinfinity/codegen/codegen_type"
-	"boundedinfinity/codegen/template_type"
+	"boundedinfinity/codegen/codegen_type/template_type"
 	"boundedinfinity/codegen/util"
 	"path/filepath"
 
@@ -24,10 +24,9 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 		}
 
 		if ok {
-			lci := ct.LoaderFileInfo{
+			lci := ct.FileInfo{
 				Root:   pather.Dir(path),
 				Source: path,
-				IsFile: true,
 			}
 
 			if err := t.LoadTemplatePath(lci); err != nil {
@@ -44,10 +43,9 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 		}
 
 		for _, source := range sources {
-			lci := ct.LoaderFileInfo{
+			lci := ct.FileInfo{
 				Root:   path,
 				Source: source,
-				IsFile: true,
 			}
 
 			if err := t.LoadTemplatePath(lci); err != nil {
@@ -59,7 +57,7 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 	return nil
 }
 
-func (t *Loader) LoadTemplatePath(lci ct.LoaderFileInfo) error {
+func (t *Loader) LoadTemplatePath(lci ct.FileInfo) error {
 	lc := ct.TemplateContext{
 		FileInfo: lci,
 	}

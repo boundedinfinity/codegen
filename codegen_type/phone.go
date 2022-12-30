@@ -20,4 +20,8 @@ func (t CodeGenTypePhone) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Phone
 }
 
+func (t CodeGenTypePhone) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypePhone{}

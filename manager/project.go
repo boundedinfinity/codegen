@@ -17,7 +17,7 @@ type CodeGenProjectManager struct {
 	root2source mapper.Mapper[string, []string]
 	id2proj     mapper.Mapper[string, *ct.ProjectContext]
 	op2proj     mapper.Mapper[string, *ct.ProjectContext]
-	Merged      *ct.CodeGenProjectProject
+	Merged      *ct.CodeGenProject
 }
 
 func ProjectManager() *CodeGenProjectManager {

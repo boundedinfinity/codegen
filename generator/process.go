@@ -2,11 +2,11 @@ package generator
 
 import (
 	rc "boundedinfinity/codegen/render_context"
-
-	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
 func (t *Generator) Process() error {
+	typs := make([]rc.RenderContext, 0)
+
 	for _, operation := range t.projectManager.Operations {
 		var ctx rc.RenderContextOperation
 
@@ -14,18 +14,17 @@ func (t *Generator) Process() error {
 			return err
 		} else {
 			t.operations = append(t.operations, ctx)
+			typs = append(typs, ctx.Input, ctx.Output)
 		}
 	}
 
-	for _, lc := range t.typeManager.All() {
-		var rc rc.RenderContext
-
-		if err := t.processType(o.None[string](), lc, lc.Schema, &rc); err != nil {
-			return err
-		} else {
-			t.types = append(t.types, rc)
+	err := rc.NewWalker().Base(func(s rc.RenderContext, b *rc.RenderContextBase) error {
+		if b.Id != "" {
+			t.types = append(t.types, s)
 		}
-	}
 
-	return nil
+		return nil
+	}).Walk(typs...)
+
+	return err
 }

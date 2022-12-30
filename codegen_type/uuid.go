@@ -23,4 +23,8 @@ func (t CodeGenTypeUuid) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Uuid
 }
 
+func (t CodeGenTypeUuid) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeUuid{}

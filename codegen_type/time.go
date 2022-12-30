@@ -27,4 +27,8 @@ func (t CodeGenTypeTime) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Time
 }
 
+func (t CodeGenTypeTime) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeTime{}

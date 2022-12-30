@@ -2,7 +2,6 @@ package render_context
 
 import (
 	"errors"
-	"fmt"
 )
 
 var ErrExit = errors.New("")
@@ -15,111 +14,127 @@ func realErr(err error) error {
 	return nil
 }
 
-func WalkBase(schema RenderContext, fn func(base *RenderContextBase) error) error {
-	if schema == nil || schema.Base() == nil {
-		return nil
-	}
+type walker struct {
+	baseFn    func(RenderContext, *RenderContextBase) error
+	objectFn  func(*RenderContextObject) error
+	arrayFn   func(*RenderContextArray) error
+	stringFn  func(*RenderContextString) error
+	urlFn     func(*RenderContextUrl) error
+	integerFn func(*RenderContextInteger) error
+	floatFn   func(*RenderContextFloat) error
+}
 
-	if err := fn(schema.Base()); err != nil {
-		return err
-	}
-
-	switch c := schema.(type) {
-	case *RenderContextObject:
-		for _, prop := range c.Properties {
-			if err := WalkBase(prop, fn); err != nil {
-				return realErr(err)
-			}
-		}
-	case *RenderContextArray:
-		if err := WalkBase(c.Items, fn); err != nil {
+func (t *walker) Walk(schema ...RenderContext) error {
+	for _, s := range schema {
+		if err := t.walk(s); err != nil {
 			return realErr(err)
 		}
-	case *RenderContextRef:
-		if err := WalkBase(c.Ref, fn); err != nil {
-			return realErr(err)
-		}
-	default:
-		fmt.Printf("WalkBase missing: %v", schema.Base().Id)
 	}
 
 	return nil
 }
 
-func WalkConcrete(
-	schema RenderContext,
-	baseFn func(base *RenderContextBase) error,
-	objectFn func(v *RenderContextObject) error,
-	arrayFn func(v *RenderContextArray) error,
-	stringFn func(v *RenderContextString) error,
-	urlFn func(v *RenderContextUrl) error,
-	integerFn func(v *RenderContextInteger) error,
-	floatFn func(v *RenderContextFloat) error,
-) error {
+func (t *walker) walk(schema RenderContext) error {
 	if schema == nil {
-		return nil
+		return ErrExit
 	}
 
-	if schema.Base() != nil {
-		if err := baseFn(schema.Base()); err != nil {
+	if t.baseFn != nil && schema.Base() != nil {
+		if err := t.baseFn(schema, schema.Base()); err != nil {
 			return realErr(err)
 		}
 	}
 
 	switch c := schema.(type) {
 	case *RenderContextObject:
-		if objectFn != nil {
-			if err := objectFn(c); err != nil {
+		if t.objectFn != nil {
+			if err := t.objectFn(c); err != nil {
 				return realErr(err)
 			}
 		}
 
 		for _, prop := range c.Properties {
 			if prop != nil {
-				if err := WalkConcrete(prop, baseFn, objectFn, arrayFn, stringFn, urlFn, integerFn, floatFn); err != nil {
+				if err := t.Walk(prop); err != nil {
 					return realErr(err)
 				}
 			}
 		}
 	case *RenderContextArray:
-		if arrayFn != nil {
-			if err := arrayFn(c); err != nil {
+		if t.arrayFn != nil {
+			if err := t.arrayFn(c); err != nil {
 				return realErr(err)
 			}
 		}
 
-		if err := WalkConcrete(c.Items, baseFn, objectFn, arrayFn, stringFn, urlFn, integerFn, floatFn); err != nil {
+		if err := t.Walk(c.Items); err != nil {
 			return realErr(err)
 		}
 	case *RenderContextString:
-		if stringFn != nil {
-			if err := stringFn(c); err != nil {
+		if t.stringFn != nil {
+			if err := t.stringFn(c); err != nil {
 				return realErr(err)
 			}
 		}
 	case *RenderContextUrl:
-		if urlFn != nil {
-			if err := urlFn(c); err != nil {
+		if t.urlFn != nil {
+			if err := t.urlFn(c); err != nil {
 				return realErr(err)
 			}
 		}
 	case *RenderContextFloat:
-		if floatFn != nil {
-			if err := floatFn(c); err != nil {
+		if t.floatFn != nil {
+			if err := t.floatFn(c); err != nil {
 				return realErr(err)
 			}
 		}
 	case *RenderContextInteger:
-		if integerFn != nil {
-			if err := integerFn(c); err != nil {
+		if t.integerFn != nil {
+			if err := t.integerFn(c); err != nil {
 				return realErr(err)
 			}
 		}
 	default:
-		if err := baseFn(schema.Base()); err != nil {
-			return realErr(err)
-		}
 	}
 
 	return nil
+}
+
+func NewWalker() *walker {
+	return &walker{}
+}
+
+func (t *walker) Base(v func(RenderContext, *RenderContextBase) error) *walker {
+	t.baseFn = v
+	return t
+}
+
+func (t *walker) Object(v func(*RenderContextObject) error) *walker {
+	t.objectFn = v
+	return t
+}
+
+func (t *walker) Array(v func(*RenderContextArray) error) *walker {
+	t.arrayFn = v
+	return t
+}
+
+func (t *walker) String(v func(*RenderContextString) error) *walker {
+	t.stringFn = v
+	return t
+}
+
+func (t *walker) Url(v func(*RenderContextUrl) error) *walker {
+	t.urlFn = v
+	return t
+}
+
+func (t *walker) Integer(v func(*RenderContextInteger) error) *walker {
+	t.integerFn = v
+	return t
+}
+
+func (t *walker) Float(v func(*RenderContextFloat) error) *walker {
+	t.floatFn = v
+	return t
 }

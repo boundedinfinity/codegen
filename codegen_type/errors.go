@@ -33,4 +33,5 @@ var (
 	ErrCodeGenMappingsRelpaceDuplicatev  = errorer.Errorfn(ErrCodeGenMappingsRelpaceDuplicate)
 	ErrCodeGenTemplateFilePathDuplicate  = errorer.Errorf("duplicate codegen.templates.file.path")
 	ErrCodeGenTemplateFilePathDuplicatev = errorer.Errorfn(ErrCodeGenTemplateFilePathDuplicate)
+	ErrMinMax                            = errorer.Errorf("max is less than min")
 )

@@ -53,11 +53,12 @@ func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderCont
 
 	*rctx = rc.RenderContextOperation{
 		RenderContextBase: rc.RenderContextBase{
-			Root:        fileInfo.Root,
-			Source:      fileInfo.Source,
-			RootNs:      rootNs,
-			SchemaNs:    schemaNs,
-			RelNs:       relNs,
+			Namespace: ct.Namespace{
+				RootNs:   rootNs,
+				SchemaNs: schemaNs,
+				RelNs:    relNs,
+			},
+			FileInfo:    fileInfo,
 			Name:        po.Name.Get(),
 			Description: po.Description.Get(),
 			// IsPublic:    b.Public.OrElse(true),

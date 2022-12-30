@@ -5,12 +5,19 @@ import (
 )
 
 type LoaderContext interface {
-	GetFileInfo() *LoaderFileInfo
+	GetFileInfo() *FileInfo
+	GetNamespace() *Namespace
 }
 
-type LoaderFileInfo struct {
+type FileInfo struct {
 	Source   string
 	Root     string
-	IsFile   bool
 	MimeType mime_type.MimeType
+}
+
+type Namespace struct {
+	RootNs   string
+	CurrNs   string
+	SchemaNs string
+	RelNs    string
 }

@@ -23,4 +23,8 @@ func (t CodeGenTypeIpv6) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Ipv6
 }
 
+func (t CodeGenTypeIpv6) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeIpv6{}

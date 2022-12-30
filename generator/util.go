@@ -40,7 +40,7 @@ func (t *Generator) RelNamepace(rootNs string, lc ct.CodeGenTypeContext) string 
 	return relNs
 }
 
-func (t *Generator) DestPath(info ct.CodeGenProjectInfo, schema rc.RenderContext, tmplPath string) string {
+func (t *Generator) DestPath(info ct.CodeGenInfo, schema rc.RenderContext, tmplPath string) string {
 	sourceDir, sourceFile := filepath.Split(schema.Base().Source)
 	rootPath := schema.Base().Root
 	destPath := info.DestDir.Get()
@@ -62,7 +62,7 @@ func (t *Generator) DestPath(info ct.CodeGenProjectInfo, schema rc.RenderContext
 	return outPath
 }
 
-func CurrentNs(info ct.CodeGenProjectInfo, outputPath string) string {
+func CurrentNs(info ct.CodeGenInfo, outputPath string) string {
 	out := outputPath
 	out = path.Dir(out)
 	out = strings.ReplaceAll(out, info.DestDir.Get(), info.Namespace.Get())

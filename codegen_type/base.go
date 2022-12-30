@@ -10,13 +10,13 @@ type CodeGenType interface {
 	SchemaType() codegen_type_id.CodgenTypeId
 	Base() *CodeGenTypeBase
 	HasValidation() bool
+	ValidateSchema() error
 }
 
 type CodeGenTypeBase struct {
 	Id          o.Option[string] `json:"id,omitempty"`
 	Name        o.Option[string] `json:"name,omitempty"`
 	Description o.Option[string] `json:"description,omitempty"`
-	Imported    o.Option[bool]   `json:"imported,omitempty"`
 	Public      o.Option[bool]   `json:"public,omitempty"`
 	Required    o.Option[bool]   `json:"required,omitempty"`
 	Deprecated  o.Option[bool]   `json:"deprecated,omitempty"`

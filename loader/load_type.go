@@ -35,10 +35,9 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 		}
 
 		if ok {
-			lci := ct.LoaderFileInfo{
+			lci := ct.FileInfo{
 				Root:     pather.Dir(path),
 				Source:   path,
-				IsFile:   true,
 				MimeType: m[path].MimeType,
 			}
 
@@ -50,10 +49,9 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 		}
 
 		for source, content := range m {
-			lci := ct.LoaderFileInfo{
+			lci := ct.FileInfo{
 				Root:     path,
 				Source:   source,
-				IsFile:   true,
 				MimeType: content.MimeType,
 			}
 
@@ -66,7 +64,7 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 	return nil
 }
 
-func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
+func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
 	var bs []byte
 	var err error
 
@@ -85,7 +83,7 @@ func (t *Loader) LoadTypePath(lci ct.LoaderFileInfo, data []byte) error {
 
 	switch {
 	case util.IsCodeGenSchemaFile(lci.Source):
-		var schema ct.CodeGenProjectProject
+		var schema ct.CodeGenProject
 
 		if err := json.Unmarshal(bs, &schema); err != nil {
 			return err

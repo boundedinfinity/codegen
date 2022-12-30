@@ -6,6 +6,8 @@ import (
 )
 
 type CodeGenTypeObject struct {
+	FileInfo
+	Namespace
 	CodeGenTypeBase
 	Properties []CodeGenType `json:"properties,omitempty"`
 }
@@ -22,6 +24,16 @@ func (t CodeGenTypeObject) HasValidation() bool {
 	}
 
 	return false
+}
+
+func (t CodeGenTypeObject) ValidateSchema() error {
+	for _, property := range t.Properties {
+		if err := property.ValidateSchema(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 var _ CodeGenType = &CodeGenTypeObject{}

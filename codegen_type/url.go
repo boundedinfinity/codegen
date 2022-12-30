@@ -25,4 +25,8 @@ func (t CodeGenTypeUrl) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Url
 }
 
+func (t CodeGenTypeUrl) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeUrl{}

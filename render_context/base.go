@@ -1,9 +1,8 @@
 package render_context
 
 import (
+	"boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/codegen_type/codegen_type_id"
-
-	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
 type RenderContext interface {
@@ -12,15 +11,10 @@ type RenderContext interface {
 }
 
 type RenderContextBase struct {
-	Root        string
-	Source      string
+	codegen_type.Namespace
+	codegen_type.FileInfo
 	Id          string
-	RootNs      string
-	CurrNs      string
-	SchemaNs    string
-	RelNs       string
 	SchemaType  codegen_type_id.CodgenTypeId
-	MimeType    mime_type.MimeType
 	Name        string
 	Description string
 	IsPublic    bool

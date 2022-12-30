@@ -19,4 +19,8 @@ func (t CodeGenTypeEmail) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Email
 }
 
+func (t CodeGenTypeEmail) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeEmail{}

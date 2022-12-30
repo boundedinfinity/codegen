@@ -19,4 +19,8 @@ func (t CodeGenTypeRef) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Ref
 }
 
+func (t CodeGenTypeRef) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeRef{}

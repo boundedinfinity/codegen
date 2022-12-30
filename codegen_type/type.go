@@ -11,23 +11,33 @@ type CodeGenProjectTypeFile struct {
 }
 
 type CodeGenTypeContext struct {
-	FileInfo LoaderFileInfo
-	Schema   CodeGenType
+	FileInfo  FileInfo
+	Namespace Namespace
+	Schema    CodeGenType
 }
 
-func (t *CodeGenTypeContext) GetFileInfo() *LoaderFileInfo {
+func (t *CodeGenTypeContext) GetFileInfo() *FileInfo {
 	return &t.FileInfo
+}
+
+func (t *CodeGenTypeContext) GetNamespace() *Namespace {
+	return &t.Namespace
 }
 
 var _ LoaderContext = &CodeGenTypeContext{}
 
 type JsonSchemaContext struct {
-	FileInfo LoaderFileInfo
-	Schema   model.JsonSchema
+	FileInfo  FileInfo
+	Namespace Namespace
+	Schema    model.JsonSchema
 }
 
-func (t *JsonSchemaContext) GetFileInfo() *LoaderFileInfo {
+func (t *JsonSchemaContext) GetFileInfo() *FileInfo {
 	return &t.FileInfo
+}
+
+func (t *JsonSchemaContext) GetNamespace() *Namespace {
+	return &t.Namespace
 }
 
 var _ LoaderContext = &JsonSchemaContext{}

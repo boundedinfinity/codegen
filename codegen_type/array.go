@@ -22,6 +22,10 @@ func (t CodeGenTypeArray) HasValidation() bool {
 	return t.Min.Defined() || t.Max.Defined() || t.Items.HasValidation()
 }
 
+func (t CodeGenTypeArray) ValidateSchema() error {
+	return t.Items.ValidateSchema()
+}
+
 var _ CodeGenType = &CodeGenTypeArray{}
 
 type marshalArray struct {

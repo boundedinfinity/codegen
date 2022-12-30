@@ -136,14 +136,14 @@ func (t *Generator) convertBase(lctx ct.CodeGenTypeContext, base *rc.RenderConte
 	name = o.FirstOf(name, o.Some(id))
 
 	*base = rc.RenderContextBase{
-		Root:        fileInfo.Root,
-		Source:      fileInfo.Source,
+		Namespace: ct.Namespace{
+			RootNs:   rootNs,
+			SchemaNs: schemaNs,
+			RelNs:    relNs,
+			CurrNs:   schemaNs,
+		},
+		FileInfo:    fileInfo,
 		SchemaType:  lctx.Schema.SchemaType(),
-		CurrNs:      schemaNs,
-		RootNs:      rootNs,
-		SchemaNs:    schemaNs,
-		RelNs:       relNs,
-		MimeType:    fileInfo.MimeType,
 		Id:          schemaBase.Id.Get(),
 		Name:        name.Get(),
 		Description: schemaBase.Description.Get(),

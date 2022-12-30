@@ -18,4 +18,8 @@ func (t CodeGenTypeCoordinate) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Coordinate
 }
 
+func (t CodeGenTypeCoordinate) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeCoordinate{}

@@ -3,7 +3,7 @@ package manager
 import (
 	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/codegen_type/codegen_type_id"
-	"boundedinfinity/codegen/template_type"
+	"boundedinfinity/codegen/codegen_type/template_type"
 	"boundedinfinity/codegen/util"
 	"fmt"
 

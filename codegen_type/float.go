@@ -8,9 +8,15 @@ import (
 
 type CodeGenTypeFloat struct {
 	CodeGenTypeBase
-	Min        o.Option[float64] `json:"min,omitempty"`
-	Max        o.Option[float64] `json:"max,omitempty"`
-	MultipleOf o.Option[float64] `json:"multipleOf,omitempty"`
+	Min        o.Option[float64]                 `json:"min,omitempty"`
+	Max        o.Option[float64]                 `json:"max,omitempty"`
+	MultipleOf o.Option[float64]                 `json:"multipleOf,omitempty"`
+	Ranges     o.Option[[]CodeGenTypeFloatRange] `json:"ranges,omitempty"`
+}
+
+type CodeGenTypeFloatRange struct {
+	Min o.Option[float64] `json:"min,omitempty"`
+	Max o.Option[float64] `json:"max,omitempty"`
 }
 
 func (t CodeGenTypeFloat) HasValidation() bool {
@@ -19,6 +25,14 @@ func (t CodeGenTypeFloat) HasValidation() bool {
 
 func (t CodeGenTypeFloat) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.Float
+}
+
+func (t CodeGenTypeFloat) ValidateSchema() error {
+	if err := validateMinMax("float", t.Min, t.Max); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 var _ CodeGenType = &CodeGenTypeFloat{}

@@ -18,4 +18,8 @@ func (t CodeGenTypeCreditCardNumber) SchemaType() codegen_type_id.CodgenTypeId {
 	return codegen_type_id.CreditCardNumber
 }
 
+func (t CodeGenTypeCreditCardNumber) ValidateSchema() error {
+	return nil
+}
+
 var _ CodeGenType = &CodeGenTypeCreditCardNumber{}

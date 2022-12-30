@@ -2,7 +2,7 @@ package loader
 
 import (
 	"boundedinfinity/codegen/codegen_type"
-	"boundedinfinity/codegen/template_delimiter"
+	"boundedinfinity/codegen/codegen_type/template_delimiter"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
