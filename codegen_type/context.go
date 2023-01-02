@@ -1,23 +1,32 @@
 package codegen_type
 
 import (
+	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
 type LoaderContext interface {
-	GetFileInfo() *FileInfo
-	GetNamespace() *Namespace
+	GetFileInfo() *SourceMeta
+	GetNamespace() *RenderNamespace
 }
 
-type FileInfo struct {
-	Source   string
-	Root     string
-	MimeType mime_type.MimeType
+type SourceMeta struct {
+	SourcePath     o.Option[string]   `json:"source-path,omitempty"`
+	RootPath       o.Option[string]   `json:"root-path,omitempty"`
+	SourceMimeType mime_type.MimeType `json:"source-mime-type,omitempty"`
 }
 
-type Namespace struct {
+func (t *SourceMeta) Source() *SourceMeta {
+	return t
+}
+
+type RenderNamespace struct {
 	RootNs   string
 	CurrNs   string
 	SchemaNs string
 	RelNs    string
+}
+
+func (t *RenderNamespace) Namespace() *RenderNamespace {
+	return t
 }

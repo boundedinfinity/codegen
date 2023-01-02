@@ -15,7 +15,7 @@ type CodeGenInfo struct {
 	Namespace    o.Option[string]                               `json:"namespace,omitempty"`
 	DestDir      o.Option[string]                               `json:"dest-dir,omitempty"`
 	FormatSource o.Option[bool]                                 `json:"format-source,omitempty"`
-	TemplateDump o.Option[bool]                                 `json:"templateDump,omitempty"`
+	TemplateDump o.Option[bool]                                 `json:"template-dump,omitempty"`
 	Delimiter    o.Option[template_delimiter.TemplateDelimiter] `json:"delimiter,omitempty"`
 }
 

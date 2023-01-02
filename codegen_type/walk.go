@@ -1,14 +1,19 @@
 package codegen_type
 
+import "errors"
+
+var ErrExit = errors.New("walker exit")
+
 type projectWalker struct {
-	infoFn         func(*CodeGenProject, *CodeGenInfo) error
-	operationFn    func(*CodeGenProject, *CodeGenProjectOperation) error
-	templateFn     func(*CodeGenProject, *CodeGenProjectTemplates, *CodeGenProjectTemplateFile) error
-	schemaFn       func(*CodeGenProject, *CodeGenProjectTypeFile) error
-	schemaAll      func(*CodeGenProject, *CodeGenProjectTypeFile, CodeGenTypeContext) error
-	schemaStringFn func(CodeGenTypeContext, *CodeGenTypeString) error
-	schemaArrayFn  func(CodeGenTypeContext, *CodeGenTypeArray) error
-	schemaObjectFn func(CodeGenTypeContext, *CodeGenTypeObject) error
+	infoFn           func(*CodeGenProject, *CodeGenInfo) error
+	operationFn      func(*CodeGenProject, *CodeGenProjectOperation) error
+	templateFn       func(*CodeGenProject, *CodeGenProjectTemplates, *CodeGenProjectTemplateFile) error
+	typeFn           func(*CodeGenProject, CodeGenType) error
+	typeStringFn     func(*CodeGenProject, *CodeGenTypeString) error
+	typeArrayFn      func(*CodeGenProject, *CodeGenTypeArray) error
+	typeArrayItemsFn func(*CodeGenProject, *CodeGenTypeArray, CodeGenType) error
+	typeObjectFn     func(*CodeGenProject, *CodeGenTypeObject) error
+	typeObjectPropFn func(*CodeGenProject, *CodeGenTypeObject, CodeGenType) error
 }
 
 func Walker() *projectWalker {
@@ -18,6 +23,10 @@ func Walker() *projectWalker {
 func (w *projectWalker) Walk(projects ...*CodeGenProject) error {
 	for _, project := range projects {
 		if err := w.walk(project); err != nil {
+			if errors.Is(err, ErrExit) {
+				return nil
+			}
+
 			return err
 		}
 	}
@@ -44,10 +53,38 @@ func (w *projectWalker) walk(project *CodeGenProject) error {
 		}
 	}
 
-	if w.schemaFn != nil {
-		for _, file := range project.Schemas {
-			if err := w.schemaFn(project, file); err != nil {
+	if w.typeFn != nil {
+		for _, typ := range project.Types {
+			if err := w.typeFn(project, typ); err != nil {
 				return err
+			}
+
+			switch c := typ.(type) {
+			case *CodeGenTypeObject:
+				if w.typeObjectFn != nil {
+					if err := w.typeObjectFn(project, c); err != nil {
+						return err
+					}
+				}
+				if w.typeObjectPropFn != nil {
+					for _, property := range c.Properties {
+						if err := w.typeObjectPropFn(project, c, property); err != nil {
+							return err
+						}
+					}
+				}
+			case *CodeGenTypeArray:
+				if w.typeArrayFn != nil {
+					if err := w.typeArrayFn(project, c); err != nil {
+						return err
+					}
+				}
+
+				if w.typeArrayItemsFn != nil {
+					if err := w.typeArrayItemsFn(project, c, c.Items); err != nil {
+						return err
+					}
+				}
 			}
 		}
 	}
@@ -77,28 +114,33 @@ func (w *projectWalker) Operation(fn func(*CodeGenProject, *CodeGenProjectOperat
 	return w
 }
 
-func (w *projectWalker) Schema(fn func(*CodeGenProject, *CodeGenProjectTypeFile) error) *projectWalker {
-	w.schemaFn = fn
+func (w *projectWalker) Schema(fn func(*CodeGenProject, CodeGenType) error) *projectWalker {
+	w.typeFn = fn
 	return w
 }
 
-func (t *projectWalker) SchemaAll(v func(*CodeGenProject, *CodeGenProjectTypeFile, CodeGenTypeContext) error) *projectWalker {
-	t.schemaAll = v
+func (t *projectWalker) SchemaString(v func(*CodeGenProject, *CodeGenTypeString) error) *projectWalker {
+	t.typeStringFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaString(v func(CodeGenTypeContext, *CodeGenTypeString) error) *projectWalker {
-	t.schemaStringFn = v
+func (t *projectWalker) SchemaArray(v func(*CodeGenProject, *CodeGenTypeArray) error) *projectWalker {
+	t.typeArrayFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaArray(v func(CodeGenTypeContext, *CodeGenTypeArray) error) *projectWalker {
-	t.schemaArrayFn = v
+func (t *projectWalker) SchemaArrayItems(v func(*CodeGenProject, *CodeGenTypeArray, CodeGenType) error) *projectWalker {
+	t.typeArrayItemsFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaObject(v func(CodeGenTypeContext, *CodeGenTypeObject) error) *projectWalker {
-	t.schemaObjectFn = v
+func (t *projectWalker) SchemaObject(v func(*CodeGenProject, *CodeGenTypeObject) error) *projectWalker {
+	t.typeObjectFn = v
+	return t
+}
+
+func (t *projectWalker) SchemaObjectProperty(v func(*CodeGenProject, *CodeGenTypeObject, CodeGenType) error) *projectWalker {
+	t.typeObjectPropFn = v
 	return t
 }
 

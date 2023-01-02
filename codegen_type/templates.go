@@ -21,19 +21,19 @@ type CodeGenProjectTemplateFile struct {
 }
 
 type TemplateContext struct {
-	FileInfo       FileInfo
-	Namespace      Namespace
+	FileInfo       SourceMeta
+	Namespace      RenderNamespace
 	OutputMimeType mime_type.MimeType
 	TemplateType   template_type.TemplateType
 	TypeId         codegen_type_id.CodgenTypeId
 	Template       *template.Template
 }
 
-func (t *TemplateContext) GetFileInfo() *FileInfo {
+func (t *TemplateContext) GetFileInfo() *SourceMeta {
 	return &t.FileInfo
 }
 
-func (t *TemplateContext) GetNamespace() *Namespace {
+func (t *TemplateContext) GetNamespace() *RenderNamespace {
 	return &t.Namespace
 }
 

@@ -7,6 +7,8 @@ import (
 // https://ihateregex.io/expr/lat-long
 
 type CodeGenTypeCoordinate struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 }
 

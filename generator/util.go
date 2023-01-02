@@ -18,8 +18,8 @@ func (t *Generator) SchemaNamepace(rootNs string, lc ct.CodeGenTypeContext) stri
 
 	var ns string
 
-	ns = lc.FileInfo.Source
-	ns = strings.Replace(ns, lc.FileInfo.Root, "", 1)
+	ns = lc.FileInfo.SourcePath.Get()
+	ns = strings.Replace(ns, lc.FileInfo.RootPath.Get(), "", 1)
 	ns = path.Join(rootNs, ns)
 	ns = extentioner.Strip(ns)
 	ns = extentioner.Strip(ns)
@@ -41,8 +41,8 @@ func (t *Generator) RelNamepace(rootNs string, lc ct.CodeGenTypeContext) string 
 }
 
 func (t *Generator) DestPath(info ct.CodeGenInfo, schema rc.RenderContext, tmplPath string) string {
-	sourceDir, sourceFile := filepath.Split(schema.Base().Source)
-	rootPath := schema.Base().Root
+	sourceDir, sourceFile := filepath.Split(schema.Base().SourcePath.Get())
+	rootPath := schema.Base().RootPath
 	destPath := info.DestDir.Get()
 
 	tmplFile := tmplPath
@@ -56,7 +56,7 @@ func (t *Generator) DestPath(info ct.CodeGenInfo, schema rc.RenderContext, tmplP
 	outFile = extentioner.Join(outFile, tmplFile)
 
 	outPath := sourceDir
-	outPath = strings.Replace(outPath, rootPath, "", 1)
+	outPath = strings.Replace(outPath, rootPath.Get(), "", 1)
 	outPath = filepath.Join(destPath, outPath, outFile)
 
 	return outPath

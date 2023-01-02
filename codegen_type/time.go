@@ -10,6 +10,8 @@ import (
 // https://ihateregex.io/expr/date
 
 type CodeGenTypeTime struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Before o.Option[CodeGenTypeDate]     `json:"before,omitempty"`
 	After  o.Option[CodeGenTypeDate]     `json:"after,omitempty"`

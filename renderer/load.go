@@ -9,7 +9,7 @@ import (
 )
 
 func (t *Renderer) Load(lc *ct.TemplateContext) error {
-	bs, err := ioutil.ReadFile(lc.FileInfo.Source)
+	bs, err := ioutil.ReadFile(lc.FileInfo.SourcePath.Get())
 
 	if err != nil {
 		return err

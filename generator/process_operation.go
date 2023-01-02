@@ -17,8 +17,8 @@ func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderCont
 	var schemaNs string
 	var relNs string
 
-	schemaNs = fileInfo.Source
-	schemaNs = strings.Replace(schemaNs, fileInfo.Root, "", 1)
+	schemaNs = fileInfo.SourcePath.Get()
+	schemaNs = strings.Replace(schemaNs, fileInfo.RootPath.Get(), "", 1)
 	schemaNs = path.Join(rootNs, schemaNs)
 	schemaNs = extentioner.Strip(schemaNs)
 	schemaNs = extentioner.Strip(schemaNs)
@@ -53,12 +53,12 @@ func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderCont
 
 	*rctx = rc.RenderContextOperation{
 		RenderContextBase: rc.RenderContextBase{
-			Namespace: ct.Namespace{
+			RenderNamespace: ct.RenderNamespace{
 				RootNs:   rootNs,
 				SchemaNs: schemaNs,
 				RelNs:    relNs,
 			},
-			FileInfo:    fileInfo,
+			SourceMeta:  fileInfo,
 			Name:        po.Name.Get(),
 			Description: po.Description.Get(),
 			// IsPublic:    b.Public.OrElse(true),

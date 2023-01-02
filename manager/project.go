@@ -36,11 +36,11 @@ func ProjectManager() *CodeGenProjectManager {
 
 func (t *CodeGenProjectManager) RegisterProject(lc *ct.ProjectContext) error {
 	t.Projects = append(t.Projects, lc)
-	t.source2proj[lc.FileInfo.Source] = lc
-	t.source2Root[lc.FileInfo.Root] = lc.FileInfo.Source
+	t.source2proj[lc.FileInfo.SourcePath.Get()] = lc
+	t.source2Root[lc.FileInfo.RootPath.Get()] = lc.FileInfo.SourcePath.Get()
 
-	util.MapListAdd(t.root2Proj, lc.FileInfo.Root, lc)
-	util.MapListAdd(t.root2source, lc.FileInfo.Root, lc.FileInfo.Source)
+	util.MapListAdd(t.root2Proj, lc.FileInfo.RootPath.Get(), lc)
+	util.MapListAdd(t.root2source, lc.FileInfo.RootPath.Get(), lc.FileInfo.SourcePath.Get())
 
 	if lc.Project.Info.Id.Defined() {
 		t.id2proj[lc.Project.Info.Id.Get()] = lc

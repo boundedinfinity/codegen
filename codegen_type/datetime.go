@@ -7,6 +7,8 @@ import (
 )
 
 type CodeGenTypeDateTime struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Before o.Option[CodeGenTypeDate]     `json:"before,omitempty"`
 	After  o.Option[CodeGenTypeDate]     `json:"after,omitempty"`

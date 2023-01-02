@@ -118,8 +118,8 @@ func (t *Generator) convertBase(lctx ct.CodeGenTypeContext, base *rc.RenderConte
 	var name o.Option[string]
 
 	if schemaBase.Id.Defined() {
-		schemaNs = fileInfo.Source
-		schemaNs = strings.Replace(schemaNs, fileInfo.Root, "", 1)
+		schemaNs = fileInfo.SourcePath.Get()
+		schemaNs = strings.Replace(schemaNs, fileInfo.RootPath.Get(), "", 1)
 		schemaNs = path.Join(rootNs, schemaNs)
 		schemaNs = extentioner.Strip(schemaNs)
 		schemaNs = extentioner.Strip(schemaNs)
@@ -136,13 +136,13 @@ func (t *Generator) convertBase(lctx ct.CodeGenTypeContext, base *rc.RenderConte
 	name = o.FirstOf(name, o.Some(id))
 
 	*base = rc.RenderContextBase{
-		Namespace: ct.Namespace{
+		RenderNamespace: ct.RenderNamespace{
 			RootNs:   rootNs,
 			SchemaNs: schemaNs,
 			RelNs:    relNs,
 			CurrNs:   schemaNs,
 		},
-		FileInfo:    fileInfo,
+		SourceMeta:  fileInfo,
 		SchemaType:  lctx.Schema.SchemaType(),
 		Id:          schemaBase.Id.Get(),
 		Name:        name.Get(),

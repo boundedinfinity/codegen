@@ -35,10 +35,10 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 		}
 
 		if ok {
-			lci := ct.FileInfo{
-				Root:     pather.Dir(path),
-				Source:   path,
-				MimeType: m[path].MimeType,
+			lci := ct.SourceMeta{
+				RootPath:       o.Some(pather.Dir(path)),
+				SourcePath:     o.Some(path),
+				SourceMimeType: m[path].MimeType,
 			}
 
 			if err := t.LoadTypePath(lci, m[path].Data); err != nil {
@@ -49,10 +49,10 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 		}
 
 		for source, content := range m {
-			lci := ct.FileInfo{
-				Root:     path,
-				Source:   source,
-				MimeType: content.MimeType,
+			lci := ct.SourceMeta{
+				RootPath:       o.Some(path),
+				SourcePath:     o.Some(source),
+				SourceMimeType: content.MimeType,
 			}
 
 			if err := t.LoadTypePath(lci, content.Data); err != nil {
@@ -64,11 +64,11 @@ func (t *Loader) LoadTypePaths(paths ...string) error {
 	return nil
 }
 
-func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
+func (t *Loader) LoadTypePath(lci ct.SourceMeta, data []byte) error {
 	var bs []byte
 	var err error
 
-	switch lci.MimeType {
+	switch lci.SourceMimeType {
 	case mime_type.ApplicationXYaml:
 		bs, err = yaml.YAMLToJSON(data)
 
@@ -78,11 +78,11 @@ func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
 	case mime_type.ApplicationJson:
 		bs = data
 	default:
-		return ct.ErrMimeTypeUnsupportedv(lci.MimeType)
+		return ct.ErrMimeTypeUnsupportedv(lci.SourceMimeType)
 	}
 
 	switch {
-	case util.IsCodeGenSchemaFile(lci.Source):
+	case util.IsCodeGenSchemaFile(lci.SourcePath.Get()):
 		var schema ct.CodeGenProject
 
 		if err := json.Unmarshal(bs, &schema); err != nil {
@@ -90,7 +90,7 @@ func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
 		}
 
 		if schema.Info.DestDir.Defined() {
-			schema.Info.DestDir = o.OfZ(util.EnsureAbs(pather.Dir(lci.Source), schema.Info.DestDir))
+			schema.Info.DestDir = o.OfZ(util.EnsureAbs(pather.Dir(lci.SourcePath.Get()), schema.Info.DestDir))
 		}
 
 		ctx := ct.ProjectContext{
@@ -116,7 +116,7 @@ func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
 			}
 		}
 
-	case util.IsCodeGenSchemaTypeFile(lci.Source):
+	case util.IsCodeGenSchemaTypeFile(lci.SourcePath.Get()):
 		var schema ct.CodeGenType
 
 		if err := ct.UnmarshalJson(bs, &schema); err != nil {
@@ -131,14 +131,14 @@ func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
 				return err
 			}
 		}
-	case util.IsJsonSchemaFile(lci.Source):
+	case util.IsJsonSchemaFile(lci.SourcePath.Get()):
 		js, err := model.UnmarshalSchema(bs)
 
 		if err != nil {
 			return err
 		}
 
-		if err = t.jsonSchemas.Register(lci.Root, lci.Source, js); err != nil {
+		if err = t.jsonSchemas.Register(lci.RootPath.Get(), lci.SourcePath.Get(), js); err != nil {
 			return err
 		}
 
@@ -154,7 +154,7 @@ func (t *Loader) LoadTypePath(lci ct.FileInfo, data []byte) error {
 			return err
 		}
 	default:
-		fmt.Printf("didn't process %v", lci.Source)
+		fmt.Printf("didn't process %v", lci.SourcePath)
 	}
 
 	return nil

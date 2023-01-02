@@ -35,14 +35,14 @@ func TypeManager() *CodeGenTypeManager {
 func (t *CodeGenTypeManager) Register(lc ct.CodeGenTypeContext) error {
 	if lc.Schema.Base().Id.Defined() {
 		t.id2Type[lc.Schema.Base().Id.Get()] = lc
-		t.id2path[lc.Schema.Base().Id.Get()] = lc.FileInfo.Source
-		t.path2id[lc.FileInfo.Source] = lc.Schema.Base().Id.Get()
+		t.id2path[lc.Schema.Base().Id.Get()] = lc.FileInfo.SourcePath.Get()
+		t.path2id[lc.FileInfo.SourcePath.Get()] = lc.Schema.Base().Id.Get()
 	}
 
-	t.path2Type[lc.FileInfo.Source] = lc
-	t.path2root[lc.FileInfo.Source] = lc.FileInfo.Root
-	util.MapListAdd(t.root2Type, lc.FileInfo.Root, lc)
-	util.MapListAdd(t.root2path, lc.FileInfo.Root, lc.FileInfo.Source)
+	t.path2Type[lc.FileInfo.SourcePath.Get()] = lc
+	t.path2root[lc.FileInfo.SourcePath.Get()] = lc.FileInfo.RootPath.Get()
+	util.MapListAdd(t.root2Type, lc.FileInfo.RootPath.Get(), lc)
+	util.MapListAdd(t.root2path, lc.FileInfo.RootPath.Get(), lc.FileInfo.SourcePath.Get())
 
 	t.order = append(t.order, lc)
 

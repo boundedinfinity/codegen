@@ -10,6 +10,8 @@ import (
 // https://ihateregex.io/expr/url
 
 type CodeGenTypeUrl struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	SchemesAllowed o.Option[[]string] `json:"schemes-allowed,omitempty"`
 	SchemesDenied  o.Option[[]string] `json:"schemes-denied,omitempty"`

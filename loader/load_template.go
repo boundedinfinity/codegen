@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/boundedinfinity/go-commoner/environmenter"
+	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
 	"github.com/boundedinfinity/go-commoner/slicer"
 	"github.com/boundedinfinity/go-mimetyper/file_extention"
@@ -24,9 +25,9 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 		}
 
 		if ok {
-			lci := ct.FileInfo{
-				Root:   pather.Dir(path),
-				Source: path,
+			lci := ct.SourceMeta{
+				RootPath:   o.Some(pather.Dir(path)),
+				SourcePath: o.Some(path),
 			}
 
 			if err := t.LoadTemplatePath(lci); err != nil {
@@ -43,9 +44,9 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 		}
 
 		for _, source := range sources {
-			lci := ct.FileInfo{
-				Root:   path,
-				Source: source,
+			lci := ct.SourceMeta{
+				RootPath:   o.Some(path),
+				SourcePath: o.Some(source),
 			}
 
 			if err := t.LoadTemplatePath(lci); err != nil {
@@ -57,30 +58,30 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 	return nil
 }
 
-func (t *Loader) LoadTemplatePath(lci ct.FileInfo) error {
+func (t *Loader) LoadTemplatePath(lci ct.SourceMeta) error {
 	lc := ct.TemplateContext{
 		FileInfo: lci,
 	}
 
-	if mt, err := file_extention.FromPath(lc.FileInfo.Source); err != nil {
+	if mt, err := file_extention.FromPath(lc.FileInfo.SourcePath.Get()); err != nil {
 		return err
 	} else {
-		lc.FileInfo.MimeType = mt
+		lc.FileInfo.SourceMimeType = mt
 	}
 
-	if try := util.GetOutputType(lc.FileInfo.Source); try.Failure() {
+	if try := util.GetOutputType(lc.FileInfo.SourcePath.Get()); try.Failure() {
 		return try.Error
 	} else {
 		lc.OutputMimeType = try.Result
 	}
 
-	if tt, err := template_type.FromUrl(lc.FileInfo.Source); err != nil {
+	if tt, err := template_type.FromUrl(lc.FileInfo.SourcePath.Get()); err != nil {
 		return err
 	} else {
 		lc.TemplateType = tt
 	}
 
-	typeId := util.GetSchemaTypeId(lc.FileInfo.Source)
+	typeId := util.GetSchemaTypeId(lc.FileInfo.SourcePath.Get())
 
 	if typeId.Defined() {
 		lc.TypeId = typeId.Get()

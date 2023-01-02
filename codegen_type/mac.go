@@ -8,6 +8,8 @@ import (
 // https://ihateregex.io/expr/email/
 
 type CodeGenTypeMac struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 }
 

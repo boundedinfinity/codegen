@@ -4,9 +4,9 @@ func (t *Loader) ProcessTypes() error {
 	var schemaPaths []string
 
 	for _, lc := range t.projectManager.Projects {
-		for _, file := range lc.Project.Schemas {
-			if file.Path.Defined() {
-				schemaPaths = append(schemaPaths, file.Path.Get())
+		for _, file := range lc.Project.Types {
+			if file.Source().SourcePath.Defined() {
+				schemaPaths = append(schemaPaths, file.Source().SourcePath.Get())
 			}
 		}
 	}

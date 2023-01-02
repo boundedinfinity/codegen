@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	codegenExts = []string{
+	codegenProjectExts = []string{
 		".codegen-project.json",
 		".codegen-project.yaml",
 		".codegen-project.yml",
@@ -39,7 +39,7 @@ var (
 
 func RemoveSchema(s string) string {
 	vs := append([]string{}, jsonSchemaExts...)
-	vs = append(vs, codegenExts...)
+	vs = append(vs, codegenProjectExts...)
 	vs = append(vs, codegenTypeExts...)
 
 	for _, v := range vs {
@@ -77,7 +77,7 @@ func IsCodeGenSchemaTypeFile(v string) bool {
 }
 
 func IsCodeGenSchemaFile(v string) bool {
-	return slicer.ContainsFn(codegenExts, func(x string) bool {
+	return slicer.ContainsFn(codegenProjectExts, func(x string) bool {
 		return strings.HasSuffix(v, x)
 	})
 }

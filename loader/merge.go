@@ -52,9 +52,9 @@ func (t *Loader) MergeProject(lc *codegen_type.ProjectContext) error {
 		t.projectManager.Merged.Mappings[k] = v
 	}
 
-	t.projectManager.Merged.Schemas = append(
-		t.projectManager.Merged.Schemas,
-		lc.Project.Schemas...,
+	t.projectManager.Merged.Types = append(
+		t.projectManager.Merged.Types,
+		lc.Project.Types...,
 	)
 
 	t.projectManager.Merged.Operations = append(

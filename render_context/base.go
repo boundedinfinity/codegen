@@ -11,8 +11,8 @@ type RenderContext interface {
 }
 
 type RenderContextBase struct {
-	codegen_type.Namespace
-	codegen_type.FileInfo
+	codegen_type.RenderNamespace
+	codegen_type.SourceMeta
 	Id          string
 	SchemaType  codegen_type_id.CodgenTypeId
 	Name        string

@@ -1,42 +1,47 @@
 package codegen_type
 
 import (
-	o "github.com/boundedinfinity/go-commoner/optioner"
+	"boundedinfinity/codegen/codegen_type/codegen_type_id"
+
 	"github.com/boundedinfinity/go-jsonschema/model"
 )
 
-type CodeGenProjectTypeFile struct {
-	Path o.Option[string] `json:"path,omitempty"`
-	Root o.Option[string] `json:"root,omitempty"`
+type CodeGenType interface {
+	Source() *SourceMeta
+	Base() *CodeGenTypeBase
+	Namespace() *RenderNamespace
+	SchemaType() codegen_type_id.CodgenTypeId
+	HasValidation() bool
+	ValidateSchema() error
 }
 
 type CodeGenTypeContext struct {
-	FileInfo  FileInfo
-	Namespace Namespace
+	FileInfo  SourceMeta
+	Namespace RenderNamespace
 	Schema    CodeGenType
 }
 
-func (t *CodeGenTypeContext) GetFileInfo() *FileInfo {
+func (t *CodeGenTypeContext) GetFileInfo() *SourceMeta {
 	return &t.FileInfo
 }
 
-func (t *CodeGenTypeContext) GetNamespace() *Namespace {
+func (t *CodeGenTypeContext) GetNamespace() *RenderNamespace {
 	return &t.Namespace
 }
 
 var _ LoaderContext = &CodeGenTypeContext{}
 
 type JsonSchemaContext struct {
-	FileInfo  FileInfo
-	Namespace Namespace
+	FileInfo  SourceMeta
+	Namespace RenderNamespace
 	Schema    model.JsonSchema
 }
 
-func (t *JsonSchemaContext) GetFileInfo() *FileInfo {
+func (t *JsonSchemaContext) GetFileInfo() *SourceMeta {
 	return &t.FileInfo
 }
 
-func (t *JsonSchemaContext) GetNamespace() *Namespace {
+func (t *JsonSchemaContext) GetNamespace() *RenderNamespace {
 	return &t.Namespace
 }
 

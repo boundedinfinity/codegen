@@ -8,6 +8,8 @@ import (
 // https://ihateregex.io/expr/email/
 
 type CodeGenTypeEmail struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 }
 

@@ -35,10 +35,10 @@ func TemplateManager() *CodeGenTemplateManager {
 
 func (t *CodeGenTemplateManager) Register(lc *ct.TemplateContext) {
 	t.All = append(t.All, lc)
-	t.source2template[lc.FileInfo.Source] = lc
-	t.source2root[lc.FileInfo.Source] = lc.FileInfo.Root
-	util.MapListAdd(t.root2template, lc.FileInfo.Root, lc)
-	util.MapListAdd(t.root2source, lc.FileInfo.Root, lc.FileInfo.Source)
+	t.source2template[lc.FileInfo.SourcePath.Get()] = lc
+	t.source2root[lc.FileInfo.SourcePath.Get()] = lc.FileInfo.RootPath.Get()
+	util.MapListAdd(t.root2template, lc.FileInfo.RootPath.Get(), lc)
+	util.MapListAdd(t.root2source, lc.FileInfo.RootPath.Get(), lc.FileInfo.SourcePath.Get())
 	util.MapListAdd(t.tt2template, lc.TemplateType, lc)
 	util.MapListAdd(t.tId2template, lc.TypeId, lc)
 }

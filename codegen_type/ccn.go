@@ -7,6 +7,8 @@ import (
 // https://ihateregex.io/expr/credit-card/
 
 type CodeGenTypeCreditCardNumber struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 }
 

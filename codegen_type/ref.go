@@ -7,6 +7,8 @@ import (
 )
 
 type CodeGenTypeRef struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Ref o.Option[string] `json:"ref,omitempty"`
 }

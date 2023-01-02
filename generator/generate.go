@@ -45,7 +45,7 @@ func (t *Generator) GenerateModel(schema rc.RenderContext) error {
 			return err
 		}
 
-		inputExts, err := file_extention.GetExts(schema.Base().MimeType)
+		inputExts, err := file_extention.GetExts(schema.Base().SourceMimeType)
 
 		if err != nil {
 			return err
@@ -55,10 +55,10 @@ func (t *Generator) GenerateModel(schema rc.RenderContext) error {
 			outputExt = outputExts[0].String()
 		}
 
-		output = schema.Base().Source
+		output = schema.Base().SourcePath.Get()
 		output = strings.Replace(
 			output,
-			schema.Base().Root,
+			schema.Base().RootPath.Get(),
 			t.projectManager.Merged.Info.DestDir.Get(),
 			1,
 		)

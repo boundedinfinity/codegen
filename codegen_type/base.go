@@ -1,17 +1,8 @@
 package codegen_type
 
 import (
-	"boundedinfinity/codegen/codegen_type/codegen_type_id"
-
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
-
-type CodeGenType interface {
-	SchemaType() codegen_type_id.CodgenTypeId
-	Base() *CodeGenTypeBase
-	HasValidation() bool
-	ValidateSchema() error
-}
 
 type CodeGenTypeBase struct {
 	Id          o.Option[string] `json:"id,omitempty"`

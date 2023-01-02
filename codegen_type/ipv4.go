@@ -9,6 +9,8 @@ import (
 // https://ihateregex.io/expr/ip/
 
 type CodeGenTypeIpv4 struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Minimum o.Option[string] `json:"minimum,omitempty"`
 	Maximum o.Option[string] `json:"maximum,omitempty"`

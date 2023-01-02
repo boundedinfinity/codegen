@@ -8,6 +8,8 @@ import (
 )
 
 type CodeGenTypeArray struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Items CodeGenType   `json:"items,omitempty"`
 	Min   o.Option[int] `json:"min,omitempty"`

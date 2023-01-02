@@ -7,6 +7,8 @@ import (
 )
 
 type CodeGenTypeDuration struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Min o.Option[CodeGenTypeDuration] `json:"min,omitempty"`
 	Max o.Option[CodeGenTypeDuration] `json:"max,omitempty"`

@@ -10,6 +10,8 @@ import (
 // https://ihateregex.io/expr/uuid
 
 type CodeGenTypeUuid struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	CaseSensitive o.Option[bool]                     `json:"caseSensitive,omitempty"`
 	Version       o.Option[uuid_version.UuidVersion] `json:"version,omitempty"`

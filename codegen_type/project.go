@@ -10,7 +10,7 @@ type CodeGenProject struct {
 	Mappings   mapper.Mapper[string, string] `json:"mappings,omitempty"`
 	Operations []*CodeGenProjectOperation    `json:"operations,omitempty"`
 	Templates  CodeGenProjectTemplates       `json:"templates,omitempty"`
-	Schemas    []*CodeGenProjectTypeFile     `json:"schemas,omitempty"`
+	Types      []CodeGenType                 `json:"types,omitempty"`
 }
 
 func NewProject() *CodeGenProject {
@@ -22,16 +22,16 @@ func NewProject() *CodeGenProject {
 }
 
 type ProjectContext struct {
-	FileInfo  FileInfo
-	Namespace Namespace
+	FileInfo  SourceMeta
+	Namespace RenderNamespace
 	Project   CodeGenProject
 }
 
-func (t *ProjectContext) GetFileInfo() *FileInfo {
+func (t *ProjectContext) GetFileInfo() *SourceMeta {
 	return &t.FileInfo
 }
 
-func (t *ProjectContext) GetNamespace() *Namespace {
+func (t *ProjectContext) GetNamespace() *RenderNamespace {
 	return &t.Namespace
 }
 
@@ -45,7 +45,7 @@ type OperationContext struct {
 	Output      o.Option[string] `json:"output,omitempty"`
 }
 
-func (t *OperationContext) GetFileInfo() *FileInfo {
+func (t *OperationContext) GetFileInfo() *SourceMeta {
 	return &t.FileInfo
 }
 

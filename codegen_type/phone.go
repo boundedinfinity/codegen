@@ -9,6 +9,8 @@ import (
 // https://ihateregex.io/expr/phone
 
 type CodeGenTypePhone struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 }
 

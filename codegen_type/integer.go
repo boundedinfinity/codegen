@@ -7,6 +7,8 @@ import (
 )
 
 type CodeGenTypeInteger struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Min        o.Option[int64]                     `json:"min,omitempty"`
 	Max        o.Option[int64]                     `json:"max,omitempty"`

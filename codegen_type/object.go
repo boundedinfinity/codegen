@@ -6,8 +6,8 @@ import (
 )
 
 type CodeGenTypeObject struct {
-	FileInfo
-	Namespace
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Properties []CodeGenType `json:"properties,omitempty"`
 }

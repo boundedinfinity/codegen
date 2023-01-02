@@ -8,6 +8,8 @@ import (
 )
 
 type CodeGenTypeEnum struct {
+	SourceMeta
+	RenderNamespace
 	CodeGenTypeBase
 	Values        mapper.Mapper[string, string] `json:"values,omitempty"`
 	CaseSensitive o.Option[bool]                `json:"caseSensitive,omitempty"`
