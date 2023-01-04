@@ -17,7 +17,7 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func (t *Loader) LoadTypePaths(paths ...string) error {
+func (t *Loader) LoadProjectPaths(paths ...string) error {
 	paths = slicer.Map(paths, environmenter.Sub)
 	paths = slicer.Map(paths, filepath.Clean)
 
@@ -93,17 +93,17 @@ func (t *Loader) LoadTypePath(lci ct.SourceMeta, data []byte) error {
 			schema.Info.DestDir = o.OfZ(util.EnsureAbs(pather.Dir(lci.SourcePath.Get()), schema.Info.DestDir))
 		}
 
-		ctx := ct.ProjectContext{
-			FileInfo: lci,
-			Project:  schema,
+		ctx := ct.CodeGenProject{
+			SourceMeta: lci,
+			Project:    schema,
 		}
 
 		if err := t.projectManager.RegisterProject(&ctx); err != nil {
 			return err
 		}
 
-		for _, operation := range ctx.Project.Operations {
-			opCtx := ct.OperationContext{
+		for _, operation := range ctx.Operations {
+			opCtx := ct.CodeGenProjectOperation{
 				ProjectContext: &ctx,
 				Name:           operation.Name,
 				Description:    operation.Description,
@@ -122,9 +122,9 @@ func (t *Loader) LoadTypePath(lci ct.SourceMeta, data []byte) error {
 		if err := ct.UnmarshalJson(bs, &schema); err != nil {
 			return err
 		} else {
-			lc := ct.CodeGenTypeContext{
-				FileInfo: lci,
-				Schema:   schema,
+			lc := ct.CodeGenType{
+				// Sou: lci,
+				// Schema:   schema,
 			}
 
 			if err := t.typeManager.Register(lc); err != nil {
@@ -142,7 +142,7 @@ func (t *Loader) LoadTypePath(lci ct.SourceMeta, data []byte) error {
 			return err
 		}
 
-		lc := ct.CodeGenTypeContext{
+		lc := ct.CodeGenType{
 			FileInfo: lci,
 		}
 

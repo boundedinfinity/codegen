@@ -10,9 +10,9 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
-func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderContextOperation) error {
+func (t *Generator) processOperation(po ct.CodeGenProjectOperation, rctx *rc.RenderContextOperation) error {
 	var err error
-	fileInfo := po.FileInfo
+	fileInfo := po.SourceMeta
 	rootNs := t.projectManager.Merged.Info.Namespace.Get()
 	var schemaNs string
 	var relNs string
@@ -35,7 +35,7 @@ func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderCont
 
 	var inputRc rc.RenderContext
 
-	if err := t.processType(o.None[string](), input.Get(), input.Get().Schema, &inputRc); err != nil {
+	if err := t.processType(o.None[string](), input.Get(), input.Get(), &inputRc); err != nil {
 		return err
 	}
 
@@ -47,7 +47,7 @@ func (t *Generator) processOperation(po ct.OperationContext, rctx *rc.RenderCont
 
 	var outputRc rc.RenderContext
 
-	if err := t.processType(o.None[string](), output.Get(), output.Get().Schema, &outputRc); err != nil {
+	if err := t.processType(o.None[string](), output.Get(), output.Get(), &outputRc); err != nil {
 		return err
 	}
 

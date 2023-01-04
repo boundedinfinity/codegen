@@ -59,29 +59,29 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 }
 
 func (t *Loader) LoadTemplatePath(lci ct.SourceMeta) error {
-	lc := ct.TemplateContext{
-		FileInfo: lci,
+	lc := ct.TemplateMeta{
+		SourceMeta: lci,
 	}
 
-	if mt, err := file_extention.FromPath(lc.FileInfo.SourcePath.Get()); err != nil {
+	if mt, err := file_extention.FromPath(lc.SourcePath.Get()); err != nil {
 		return err
 	} else {
-		lc.FileInfo.SourceMimeType = mt
+		lc.SourceMimeType = mt
 	}
 
-	if try := util.GetOutputType(lc.FileInfo.SourcePath.Get()); try.Failure() {
+	if try := util.GetOutputType(lc.SourcePath.Get()); try.Failure() {
 		return try.Error
 	} else {
 		lc.OutputMimeType = try.Result
 	}
 
-	if tt, err := template_type.FromUrl(lc.FileInfo.SourcePath.Get()); err != nil {
+	if tt, err := template_type.FromUrl(lc.SourcePath.Get()); err != nil {
 		return err
 	} else {
 		lc.TemplateType = tt
 	}
 
-	typeId := util.GetSchemaTypeId(lc.FileInfo.SourcePath.Get())
+	typeId := util.GetSchemaTypeId(lc.SourcePath.Get())
 
 	if typeId.Defined() {
 		lc.TypeId = typeId.Get()

@@ -8,8 +8,8 @@ import (
 	"text/template"
 )
 
-func (t *Renderer) Load(lc *ct.TemplateContext) error {
-	bs, err := ioutil.ReadFile(lc.FileInfo.SourcePath.Get())
+func (t *Renderer) Load(lc *ct.TemplateMeta) error {
+	bs, err := ioutil.ReadFile(lc.SourcePath.Get())
 
 	if err != nil {
 		return err

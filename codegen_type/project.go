@@ -1,11 +1,12 @@
 package codegen_type
 
 import (
-	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/optioner/mapper"
 )
 
 type CodeGenProject struct {
+	SourceMeta
+	RenderNamespace
 	Info       CodeGenInfo                   `json:"info,omitempty"`
 	Mappings   mapper.Mapper[string, string] `json:"mappings,omitempty"`
 	Operations []*CodeGenProjectOperation    `json:"operations,omitempty"`
@@ -21,32 +22,4 @@ func NewProject() *CodeGenProject {
 	}
 }
 
-type ProjectContext struct {
-	FileInfo  SourceMeta
-	Namespace RenderNamespace
-	Project   CodeGenProject
-}
-
-func (t *ProjectContext) GetFileInfo() *SourceMeta {
-	return &t.FileInfo
-}
-
-func (t *ProjectContext) GetNamespace() *RenderNamespace {
-	return &t.Namespace
-}
-
-var _ LoaderContext = &ProjectContext{}
-
-type OperationContext struct {
-	*ProjectContext
-	Name        o.Option[string] `json:"name,omitempty"`
-	Description o.Option[string] `json:"description,omitempty"`
-	Input       o.Option[string] `json:"input,omitempty"`
-	Output      o.Option[string] `json:"output,omitempty"`
-}
-
-func (t *OperationContext) GetFileInfo() *SourceMeta {
-	return &t.FileInfo
-}
-
-var _ LoaderContext = &OperationContext{}
+var _ LoaderContext = &CodeGenProject{}

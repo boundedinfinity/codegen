@@ -1,7 +1,7 @@
 package system
 
 func (t *System) Process(paths ...string) error {
-	if err := t.loader.LoadTypePaths(paths...); err != nil {
+	if err := t.loader.LoadProjectPaths(paths...); err != nil {
 		return err
 	}
 

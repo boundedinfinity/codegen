@@ -11,15 +11,15 @@ import (
 	"github.com/boundedinfinity/go-commoner/extentioner"
 )
 
-func (t *Generator) SchemaNamepace(rootNs string, lc ct.CodeGenTypeContext) string {
-	if lc.Schema.Base().Base().Id.Empty() {
+func (t *Generator) SchemaNamepace(rootNs string, lc ct.CodeGenType) string {
+	if lc.Base().Base().Id.Empty() {
 		return ""
 	}
 
 	var ns string
 
-	ns = lc.FileInfo.SourcePath.Get()
-	ns = strings.Replace(ns, lc.FileInfo.RootPath.Get(), "", 1)
+	ns = lc.Source().SourcePath.Get()
+	ns = strings.Replace(ns, lc.Source().RootPath.Get(), "", 1)
 	ns = path.Join(rootNs, ns)
 	ns = extentioner.Strip(ns)
 	ns = extentioner.Strip(ns)
@@ -27,7 +27,7 @@ func (t *Generator) SchemaNamepace(rootNs string, lc ct.CodeGenTypeContext) stri
 	return ns
 }
 
-func (t *Generator) RelNamepace(rootNs string, lc ct.CodeGenTypeContext) string {
+func (t *Generator) RelNamepace(rootNs string, lc ct.CodeGenType) string {
 	schemaNs := t.SchemaNamepace(rootNs, lc)
 
 	if schemaNs == "" {

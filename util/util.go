@@ -19,6 +19,8 @@ import (
 
 var (
 	codegenProjectExts = []string{
+		".codegen.json",
+		".codegen.yaml",
 		".codegen-project.json",
 		".codegen-project.yaml",
 		".codegen-project.yml",

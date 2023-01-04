@@ -8,7 +8,7 @@ import (
 )
 
 type TemplateOutput struct {
-	codegen_type.TemplateContext
+	codegen_type.TemplateMeta
 	Output []byte
 }
 

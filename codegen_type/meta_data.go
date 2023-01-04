@@ -6,8 +6,8 @@ import (
 )
 
 type LoaderContext interface {
-	GetFileInfo() *SourceMeta
-	GetNamespace() *RenderNamespace
+	Source() *SourceMeta
+	Namespace() *RenderNamespace
 }
 
 type SourceMeta struct {

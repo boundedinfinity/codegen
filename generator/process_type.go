@@ -13,7 +13,7 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 )
 
-func (t *Generator) processType(currNs o.Option[string], lctx ct.CodeGenTypeContext, schema ct.CodeGenType, rctx *rc.RenderContext) error {
+func (t *Generator) processType(currNs o.Option[string], lctx ct.CodeGenType, schema ct.CodeGenType, rctx *rc.RenderContext) error {
 	var err error
 	var base rc.RenderContextBase
 	found := t.typeManager.Resolve(schema)
@@ -23,9 +23,9 @@ func (t *Generator) processType(currNs o.Option[string], lctx ct.CodeGenTypeCont
 			return err
 		}
 	} else {
-		if err := t.convertBase(ct.CodeGenTypeContext{Schema: schema}, &base); err != nil {
-			return err
-		}
+		// if err := t.convertBase(ct.CodeGenTypeContext{Schema: schema}, &base); err != nil {
+		// 	return err
+		// }
 	}
 
 	if currNs.Empty() {
@@ -78,7 +78,7 @@ func (t *Generator) processType(currNs o.Option[string], lctx ct.CodeGenTypeCont
 		var ref rc.RenderContext
 
 		if found.Defined() {
-			if err = t.processType(currNs, lctx, found.Get().Schema, &ref); err != nil {
+			if err = t.processType(currNs, lctx, found.Get(), &ref); err != nil {
 				return err
 			}
 		}
@@ -109,9 +109,9 @@ func (t *Generator) processType(currNs o.Option[string], lctx ct.CodeGenTypeCont
 	return err
 }
 
-func (t *Generator) convertBase(lctx ct.CodeGenTypeContext, base *rc.RenderContextBase) error {
-	fileInfo := lctx.FileInfo
-	schemaBase := lctx.Schema.Base()
+func (t *Generator) convertBase(lctx ct.CodeGenType, base *rc.RenderContextBase) error {
+	fileInfo := lctx.Source()
+	schemaBase := lctx.Base()
 	rootNs := t.projectManager.Merged.Info.Namespace.Get()
 	var schemaNs string
 	var relNs string
@@ -142,8 +142,8 @@ func (t *Generator) convertBase(lctx ct.CodeGenTypeContext, base *rc.RenderConte
 			RelNs:    relNs,
 			CurrNs:   schemaNs,
 		},
-		SourceMeta:  fileInfo,
-		SchemaType:  lctx.Schema.SchemaType(),
+		SourceMeta:  *fileInfo,
+		SchemaType:  lctx.SchemaType(),
 		Id:          schemaBase.Id.Get(),
 		Name:        name.Get(),
 		Description: schemaBase.Description.Get(),

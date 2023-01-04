@@ -15,26 +15,20 @@ type CodeGenProjectTemplates struct {
 }
 
 type CodeGenProjectTemplateFile struct {
+	SourceMeta
+	RenderNamespace
 	Header  o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
-	Path    o.Option[string]                `json:"path,omitempty"`
 	Content o.Option[string]                `json:"content,omitempty"`
 }
 
-type TemplateContext struct {
-	FileInfo       SourceMeta
-	Namespace      RenderNamespace
+type TemplateMeta struct {
+	SourceMeta
+	RenderNamespace
 	OutputMimeType mime_type.MimeType
 	TemplateType   template_type.TemplateType
 	TypeId         codegen_type_id.CodgenTypeId
 	Template       *template.Template
 }
 
-func (t *TemplateContext) GetFileInfo() *SourceMeta {
-	return &t.FileInfo
-}
-
-func (t *TemplateContext) GetNamespace() *RenderNamespace {
-	return &t.Namespace
-}
-
-var _ LoaderContext = &TemplateContext{}
+var _ LoaderContext = &CodeGenProjectTemplateFile{}
+var _ LoaderContext = &TemplateMeta{}

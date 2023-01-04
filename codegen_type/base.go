@@ -5,6 +5,8 @@ import (
 )
 
 type CodeGenTypeBase struct {
+	SourceMeta
+	RenderNamespace
 	Id          o.Option[string] `json:"id,omitempty"`
 	Name        o.Option[string] `json:"name,omitempty"`
 	Description o.Option[string] `json:"description,omitempty"`
@@ -20,3 +22,5 @@ func (t *CodeGenTypeBase) Base() *CodeGenTypeBase {
 func (t CodeGenTypeBase) SchemaId() o.Option[string] {
 	return t.Id
 }
+
+var _ LoaderContext = &CodeGenTypeBase{}

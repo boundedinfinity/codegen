@@ -21,54 +21,54 @@ func (t *Loader) MergeProjects() error {
 	return nil
 }
 
-func (t *Loader) MergeProject(lc *codegen_type.ProjectContext) error {
+func (t *Loader) MergeProject(project *codegen_type.CodeGenProject) error {
 	merged := t.projectManager.Merged
 
-	if lc.Project.Info.Description.Defined() {
-		merged.Info.Description = lc.Project.Info.Description
+	if project.Info.Description.Defined() {
+		merged.Info.Description = project.Info.Description
 	}
 
-	if lc.Project.Info.Namespace.Defined() {
-		merged.Info.Namespace = lc.Project.Info.Namespace
+	if project.Info.Namespace.Defined() {
+		merged.Info.Namespace = project.Info.Namespace
 	}
 
-	if lc.Project.Info.DestDir.Defined() && lc.Project.Info.DestDir.Get() != "" {
-		merged.Info.DestDir = lc.Project.Info.DestDir
+	if project.Info.DestDir.Defined() && project.Info.DestDir.Get() != "" {
+		merged.Info.DestDir = project.Info.DestDir
 	}
 
-	if lc.Project.Info.FormatSource.Defined() {
-		merged.Info.FormatSource = lc.Project.Info.FormatSource
+	if project.Info.FormatSource.Defined() {
+		merged.Info.FormatSource = project.Info.FormatSource
 	}
 
-	if lc.Project.Info.TemplateDump.Defined() {
-		merged.Info.TemplateDump = lc.Project.Info.TemplateDump
+	if project.Info.TemplateDump.Defined() {
+		merged.Info.TemplateDump = project.Info.TemplateDump
 	}
 
-	if lc.Project.Info.Delimiter.Defined() {
-		merged.Info.Delimiter = lc.Project.Info.Delimiter
+	if project.Info.Delimiter.Defined() {
+		merged.Info.Delimiter = project.Info.Delimiter
 	}
 
-	for k, v := range lc.Project.Mappings {
+	for k, v := range project.Mappings {
 		t.projectManager.Merged.Mappings[k] = v
 	}
 
 	t.projectManager.Merged.Types = append(
 		t.projectManager.Merged.Types,
-		lc.Project.Types...,
+		project.Types...,
 	)
 
 	t.projectManager.Merged.Operations = append(
 		t.projectManager.Merged.Operations,
-		lc.Project.Operations...,
+		project.Operations...,
 	)
 
-	if lc.Project.Templates.Header.Defined() {
-		t.projectManager.Merged.Templates.Header = lc.Project.Templates.Header
+	if project.Templates.Header.Defined() {
+		t.projectManager.Merged.Templates.Header = project.Templates.Header
 	}
 
 	t.projectManager.Merged.Templates.Files = append(
 		t.projectManager.Merged.Templates.Files,
-		lc.Project.Templates.Files...,
+		project.Templates.Files...,
 	)
 
 	return nil
