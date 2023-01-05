@@ -84,6 +84,16 @@ func IsCodeGenSchemaFile(v string) bool {
 	})
 }
 
+func IsCodeGenFile(v string) bool {
+	var s []string
+	s = append(s, codegenProjectExts...)
+	s = append(s, codegenTypeExts...)
+
+	return slicer.ContainsFn(s, func(x string) bool {
+		return strings.HasSuffix(v, x)
+	})
+}
+
 func IsJsonSchemaFile(v string) bool {
 	return slicer.ContainsFn(jsonSchemaExts, func(x string) bool {
 		return strings.HasSuffix(v, x)

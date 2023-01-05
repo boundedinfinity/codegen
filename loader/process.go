@@ -1,21 +1,22 @@
 package loader
 
-func (t *Loader) ProcessTypes() error {
-	var schemaPaths []string
+import "boundedinfinity/codegen/codegen_type"
 
-	for _, lc := range t.projectManager.Projects {
-		for _, file := range lc.Types {
-			if file.Source().SourcePath.Defined() {
-				schemaPaths = append(schemaPaths, file.Source().SourcePath.Get())
+func (t *Loader) ExtractPaths(projects []codegen_type.CodeGenProject) []string {
+	var paths []string
+
+	codegen_type.Walker().Type(func(project codegen_type.CodeGenProject, typ codegen_type.CodeGenType) error {
+		switch c := typ.(type) {
+		case *codegen_type.CodeGenTypePath:
+			if c.SourcePath.Defined() {
+				paths = append(paths, c.SourcePath.Get())
 			}
 		}
-	}
 
-	if err := t.LoadProjectPaths(schemaPaths...); err != nil {
-		return err
-	}
+		return nil
+	}).Walk(projects...)
 
-	return nil
+	return paths
 }
 
 func (t *Loader) ProcessTemplates() error {

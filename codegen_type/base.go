@@ -23,4 +23,8 @@ func (t CodeGenTypeBase) SchemaId() o.Option[string] {
 	return t.Id
 }
 
+func (t CodeGenTypeBase) HasValidation() bool {
+	return false
+}
+
 var _ LoaderContext = &CodeGenTypeBase{}

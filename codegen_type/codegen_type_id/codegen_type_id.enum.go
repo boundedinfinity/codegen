@@ -13,7 +13,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/boundedinfinity/go-commoner/slicer"
+	"github.com/boundedinfinity/go-commoner/slicer" // v1.0.15
 )
 
 var (
@@ -39,6 +39,7 @@ var (
 		Time,
 		Uuid,
 		Url,
+		Path,
 	}
 )
 

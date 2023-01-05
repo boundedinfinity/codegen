@@ -34,23 +34,33 @@ func ProjectManager() *CodeGenProjectManager {
 	}
 }
 
-func (t *CodeGenProjectManager) RegisterProject(lc *ct.CodeGenProject) error {
-	t.Projects = append(t.Projects, lc)
-	t.source2proj[lc.SourcePath.Get()] = lc
-	t.source2Root[lc.RootPath.Get()] = lc.SourcePath.Get()
-
-	util.MapListAdd(t.root2Proj, lc.RootPath.Get(), lc)
-	util.MapListAdd(t.root2source, lc.RootPath.Get(), lc.SourcePath.Get())
-
-	if lc.Info.Id.Defined() {
-		t.id2proj[lc.Info.Id.Get()] = lc
+func (t *CodeGenProjectManager) RegisterProject(projects ...ct.CodeGenProject) error {
+	for _, project := range projects {
+		if err := t.registerProject(project); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (t *CodeGenProjectManager) RegisterOperation(lc *ct.CodeGenProjectOperation) error {
-	t.Operations = append(t.Operations, lc)
+func (t *CodeGenProjectManager) registerProject(project ct.CodeGenProject) error {
+	t.Projects = append(t.Projects, &project)
+	t.source2proj[project.SourcePath.Get()] = &project
+	t.source2Root[project.RootPath.Get()] = project.SourcePath.Get()
+
+	util.MapListAdd(t.root2Proj, project.RootPath.Get(), &project)
+	util.MapListAdd(t.root2source, project.RootPath.Get(), project.SourcePath.Get())
+
+	if project.Info.Id.Defined() {
+		t.id2proj[project.Info.Id.Get()] = &project
+	}
+
+	return nil
+}
+
+func (t *CodeGenProjectManager) RegisterOperation(operation ct.CodeGenProjectOperation) error {
+	t.Operations = append(t.Operations, &operation)
 	return nil
 }
 

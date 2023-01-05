@@ -1,6 +1,7 @@
 package loader
 
 import (
+	"boundedinfinity/codegen/codegen_type"
 	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/util"
 	"encoding/json"
@@ -11,13 +12,14 @@ import (
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
 	"github.com/boundedinfinity/go-commoner/slicer"
-	"github.com/boundedinfinity/go-jsonschema/model"
 	"github.com/boundedinfinity/go-marshaler"
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 	"github.com/ghodss/yaml"
 )
 
-func (t *Loader) LoadProjectPaths(paths ...string) error {
+func (t *Loader) LoadProjectPaths(paths ...string) ([]codegen_type.CodeGenProject, error) {
+	var projects []codegen_type.CodeGenProject
+
 	paths = slicer.Map(paths, environmenter.Sub)
 	paths = slicer.Map(paths, filepath.Clean)
 
@@ -25,137 +27,108 @@ func (t *Loader) LoadProjectPaths(paths ...string) error {
 		ok, err := pather.IsFile(path)
 
 		if err != nil {
-			return err
+			return projects, err
 		}
 
 		m, err := marshaler.ReadFromPath(path)
 
 		if err != nil {
-			return err
+			return projects, err
 		}
 
 		if ok {
-			lci := ct.SourceMeta{
+			sourceMeta := ct.SourceMeta{
 				RootPath:       o.Some(pather.Dir(path)),
 				SourcePath:     o.Some(path),
 				SourceMimeType: m[path].MimeType,
 			}
 
-			if err := t.LoadTypePath(lci, m[path].Data); err != nil {
-				return err
+			if project, err := t.LoadTypePath(sourceMeta, m[path].Data); err != nil {
+				return projects, err
+			} else {
+				projects = append(projects, project)
 			}
 
 			continue
 		}
 
 		for source, content := range m {
-			lci := ct.SourceMeta{
+			sourceMeta := ct.SourceMeta{
 				RootPath:       o.Some(path),
 				SourcePath:     o.Some(source),
 				SourceMimeType: content.MimeType,
 			}
 
-			if err := t.LoadTypePath(lci, content.Data); err != nil {
-				return err
+			if project, err := t.LoadTypePath(sourceMeta, content.Data); err != nil {
+				return projects, err
+			} else {
+				projects = append(projects, project)
 			}
 		}
 	}
 
-	return nil
+	return projects, nil
 }
 
-func (t *Loader) LoadTypePath(lci ct.SourceMeta, data []byte) error {
+func (t *Loader) LoadTypePath(sourceMeta ct.SourceMeta, data []byte) (codegen_type.CodeGenProject, error) {
+	var project codegen_type.CodeGenProject
 	var bs []byte
 	var err error
 
-	switch lci.SourceMimeType {
+	switch sourceMeta.SourceMimeType {
 	case mime_type.ApplicationXYaml:
 		bs, err = yaml.YAMLToJSON(data)
 
 		if err != nil {
-			return err
+			return project, err
 		}
 	case mime_type.ApplicationJson:
 		bs = data
 	default:
-		return ct.ErrMimeTypeUnsupportedv(lci.SourceMimeType)
+		return project, ct.ErrMimeTypeUnsupportedv(sourceMeta.SourceMimeType)
 	}
 
 	switch {
-	case util.IsCodeGenSchemaFile(lci.SourcePath.Get()):
-		var schema ct.CodeGenProject
-
-		if err := json.Unmarshal(bs, &schema); err != nil {
-			return err
+	case util.IsCodeGenFile(sourceMeta.SourcePath.Get()):
+		if err := json.Unmarshal(bs, &project); err != nil {
+			return project, err
 		}
 
-		if schema.Info.DestDir.Defined() {
-			schema.Info.DestDir = o.OfZ(util.EnsureAbs(pather.Dir(lci.SourcePath.Get()), schema.Info.DestDir))
+		project.SourceMeta = sourceMeta
+		var operations []codegen_type.CodeGenProjectOperation
+
+		for _, operation := range project.Operations {
+			operation.SourceMeta = sourceMeta
+			operations = append(operations, operation)
 		}
 
-		ctx := ct.CodeGenProject{
-			SourceMeta: lci,
-			Project:    schema,
-		}
+		project.Operations = operations
 
-		if err := t.projectManager.RegisterProject(&ctx); err != nil {
-			return err
-		}
+	case util.IsJsonSchemaFile(sourceMeta.SourcePath.Get()):
+		// js, err := model.UnmarshalSchema(bs)
 
-		for _, operation := range ctx.Operations {
-			opCtx := ct.CodeGenProjectOperation{
-				ProjectContext: &ctx,
-				Name:           operation.Name,
-				Description:    operation.Description,
-				Input:          operation.Input,
-				Output:         operation.Output,
-			}
+		// if err != nil {
+		// 	return err
+		// }
 
-			if err := t.projectManager.RegisterOperation(&opCtx); err != nil {
-				return err
-			}
-		}
+		// if err = t.jsonSchemas.Register(lci.RootPath.Get(), lci.SourcePath.Get(), js); err != nil {
+		// 	return err
+		// }
 
-	case util.IsCodeGenSchemaTypeFile(lci.SourcePath.Get()):
-		var schema ct.CodeGenType
+		// lc := ct.CodeGenType{
+		// 	FileInfo: lci,
+		// }
 
-		if err := ct.UnmarshalJson(bs, &schema); err != nil {
-			return err
-		} else {
-			lc := ct.CodeGenType{
-				// Sou: lci,
-				// Schema:   schema,
-			}
+		// if err = t.ConvertJsonSchema(&lc, js); err != nil {
+		// 	return err
+		// }
 
-			if err := t.typeManager.Register(lc); err != nil {
-				return err
-			}
-		}
-	case util.IsJsonSchemaFile(lci.SourcePath.Get()):
-		js, err := model.UnmarshalSchema(bs)
-
-		if err != nil {
-			return err
-		}
-
-		if err = t.jsonSchemas.Register(lci.RootPath.Get(), lci.SourcePath.Get(), js); err != nil {
-			return err
-		}
-
-		lc := ct.CodeGenType{
-			FileInfo: lci,
-		}
-
-		if err = t.ConvertJsonSchema(&lc, js); err != nil {
-			return err
-		}
-
-		if err := t.typeManager.Register(lc); err != nil {
-			return err
-		}
+		// if err := t.typeManager.Register(lc); err != nil {
+		// 	return err
+		// }
 	default:
-		fmt.Printf("didn't process %v", lci.SourcePath)
+		fmt.Printf("didn't process %v", sourceMeta.SourcePath)
 	}
 
-	return nil
+	return project, nil
 }

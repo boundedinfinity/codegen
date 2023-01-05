@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/ghodss/yaml"
 )
 
 type codeGenDiscriminator struct {
-	Type string `json:"type,omitempty"`
-	Ref  string `json:"ref,omitempty"`
+	SourceMeta
+	Type optioner.Option[string] `json:"type,omitempty"`
+	Ref  optioner.Option[string] `json:"ref,omitempty"`
 }
 
 func UnmarshalYaml(data []byte, v *CodeGenType) error {
@@ -24,7 +26,7 @@ func UnmarshalYaml(data []byte, v *CodeGenType) error {
 func UnmarshalJson(data []byte, v *CodeGenType) error {
 	var c CodeGenType
 	var err error
-	var id codegen_type_id.CodgenTypeId
+	var typ codegen_type_id.CodgenTypeId
 
 	d, err := unmarshalConcrete[codeGenDiscriminator](data)
 
@@ -32,14 +34,15 @@ func UnmarshalJson(data []byte, v *CodeGenType) error {
 		return err
 	}
 
-	if d.Ref == "" {
-		id, err = codegen_type_id.Parse(d.Type)
+	switch {
+	case d.Type.Defined():
+		typ, err = codegen_type_id.Parse(d.Type.Get())
 
 		if err != nil {
 			return err
 		}
 
-		switch id {
+		switch typ {
 		case codegen_type_id.Array:
 			c, err = unmarshalConcrete[CodeGenTypeArray](data)
 		case codegen_type_id.Coordinate:
@@ -80,11 +83,16 @@ func UnmarshalJson(data []byte, v *CodeGenType) error {
 			c, err = unmarshalConcrete[CodeGenTypeUrl](data)
 		case codegen_type_id.Uuid:
 			c, err = unmarshalConcrete[CodeGenTypeUuid](data)
-		default:
-			err = fmt.Errorf("%v not implemented", id)
+
 		}
-	} else {
+	case d.Ref.Defined():
 		c, err = unmarshalConcrete[CodeGenTypeRef](data)
+	case d.SourcePath.Defined() || d.RootPath.Defined():
+		c = &CodeGenTypePath{
+			SourceMeta: d.SourceMeta,
+		}
+	default:
+		err = fmt.Errorf("%v not implemented", typ)
 	}
 
 	*v = c

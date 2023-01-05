@@ -26,4 +26,5 @@ const (
 	Time             CodgenTypeId = "time"
 	Uuid             CodgenTypeId = "uuid"
 	Url              CodgenTypeId = "url"
+	Path             CodgenTypeId = "path"
 )

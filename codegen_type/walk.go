@@ -5,22 +5,22 @@ import "errors"
 var ErrExit = errors.New("walker exit")
 
 type projectWalker struct {
-	infoFn           func(*CodeGenProject, *CodeGenInfo) error
-	operationFn      func(*CodeGenProject, *CodeGenProjectOperation) error
-	templateFn       func(*CodeGenProject, *CodeGenProjectTemplates, *CodeGenProjectTemplateFile) error
-	typeFn           func(*CodeGenProject, CodeGenType) error
-	typeStringFn     func(*CodeGenProject, *CodeGenTypeString) error
-	typeArrayFn      func(*CodeGenProject, *CodeGenTypeArray) error
-	typeArrayItemsFn func(*CodeGenProject, *CodeGenTypeArray, CodeGenType) error
-	typeObjectFn     func(*CodeGenProject, *CodeGenTypeObject) error
-	typeObjectPropFn func(*CodeGenProject, *CodeGenTypeObject, CodeGenType) error
+	infoFn           func(CodeGenProject, CodeGenInfo) error
+	operationFn      func(CodeGenProject, CodeGenProjectOperation) error
+	templateFn       func(CodeGenProject, CodeGenProjectTemplates, CodeGenProjectTemplateFile) error
+	typeFn           func(CodeGenProject, CodeGenType) error
+	typeStringFn     func(CodeGenProject, *CodeGenTypeString) error
+	typeArrayFn      func(CodeGenProject, *CodeGenTypeArray) error
+	typeArrayItemsFn func(CodeGenProject, *CodeGenTypeArray, CodeGenType) error
+	typeObjectFn     func(CodeGenProject, *CodeGenTypeObject) error
+	typeObjectPropFn func(CodeGenProject, *CodeGenTypeObject, CodeGenType) error
 }
 
 func Walker() *projectWalker {
 	return &projectWalker{}
 }
 
-func (w *projectWalker) Walk(projects ...*CodeGenProject) error {
+func (w *projectWalker) Walk(projects ...CodeGenProject) error {
 	for _, project := range projects {
 		if err := w.walk(project); err != nil {
 			if errors.Is(err, ErrExit) {
@@ -34,13 +34,9 @@ func (w *projectWalker) Walk(projects ...*CodeGenProject) error {
 	return nil
 }
 
-func (w *projectWalker) walk(project *CodeGenProject) error {
-	if project == nil {
-		return nil
-	}
-
+func (w *projectWalker) walk(project CodeGenProject) error {
 	if w.infoFn != nil {
-		if err := w.infoFn(project, &project.Info); err != nil {
+		if err := w.infoFn(project, project.Info); err != nil {
 			return err
 		}
 	}
@@ -95,7 +91,7 @@ func (w *projectWalker) walk(project *CodeGenProject) error {
 				continue
 			}
 
-			if err := w.templateFn(project, &project.Templates, file); err != nil {
+			if err := w.templateFn(project, project.Templates, *file); err != nil {
 				return err
 			}
 		}
@@ -104,47 +100,47 @@ func (w *projectWalker) walk(project *CodeGenProject) error {
 	return nil
 }
 
-func (w *projectWalker) Info(fn func(*CodeGenProject, *CodeGenInfo) error) *projectWalker {
+func (w *projectWalker) Info(fn func(CodeGenProject, CodeGenInfo) error) *projectWalker {
 	w.infoFn = fn
 	return w
 }
 
-func (w *projectWalker) Operation(fn func(*CodeGenProject, *CodeGenProjectOperation) error) *projectWalker {
+func (w *projectWalker) Operation(fn func(CodeGenProject, CodeGenProjectOperation) error) *projectWalker {
 	w.operationFn = fn
 	return w
 }
 
-func (w *projectWalker) Schema(fn func(*CodeGenProject, CodeGenType) error) *projectWalker {
+func (w *projectWalker) Type(fn func(CodeGenProject, CodeGenType) error) *projectWalker {
 	w.typeFn = fn
 	return w
 }
 
-func (t *projectWalker) SchemaString(v func(*CodeGenProject, *CodeGenTypeString) error) *projectWalker {
+func (t *projectWalker) TypeString(v func(CodeGenProject, *CodeGenTypeString) error) *projectWalker {
 	t.typeStringFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaArray(v func(*CodeGenProject, *CodeGenTypeArray) error) *projectWalker {
+func (t *projectWalker) TypeArray(v func(CodeGenProject, *CodeGenTypeArray) error) *projectWalker {
 	t.typeArrayFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaArrayItems(v func(*CodeGenProject, *CodeGenTypeArray, CodeGenType) error) *projectWalker {
+func (t *projectWalker) TypeArrayItems(v func(CodeGenProject, *CodeGenTypeArray, CodeGenType) error) *projectWalker {
 	t.typeArrayItemsFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaObject(v func(*CodeGenProject, *CodeGenTypeObject) error) *projectWalker {
+func (t *projectWalker) TypeObject(v func(CodeGenProject, *CodeGenTypeObject) error) *projectWalker {
 	t.typeObjectFn = v
 	return t
 }
 
-func (t *projectWalker) SchemaObjectProperty(v func(*CodeGenProject, *CodeGenTypeObject, CodeGenType) error) *projectWalker {
+func (t *projectWalker) TypeObjectProperty(v func(CodeGenProject, *CodeGenTypeObject, CodeGenType) error) *projectWalker {
 	t.typeObjectPropFn = v
 	return t
 }
 
-func (w *projectWalker) Template(fn func(*CodeGenProject, *CodeGenProjectTemplates, *CodeGenProjectTemplateFile) error) *projectWalker {
+func (w *projectWalker) Template(fn func(CodeGenProject, CodeGenProjectTemplates, CodeGenProjectTemplateFile) error) *projectWalker {
 	w.templateFn = fn
 	return w
 }
