@@ -1,37 +1,44 @@
 package loader
 
-import "boundedinfinity/codegen/codegen_type"
+import ct "boundedinfinity/codegen/codegen_type"
 
-func (t *Loader) ExtractPaths(projects []codegen_type.CodeGenProject) []string {
-	var paths []string
+func (t *Loader) ProcessTemplates() error {
+	var typePaths []string
 
-	codegen_type.Walker().Type(func(project codegen_type.CodeGenProject, typ codegen_type.CodeGenType) error {
-		switch c := typ.(type) {
-		case *codegen_type.CodeGenTypePath:
-			if c.SourcePath.Defined() {
-				paths = append(paths, c.SourcePath.Get())
-			}
+	err := ct.Walker().TemplateType(func(project *ct.CodeGenProject, template *ct.CodeGenProjectTemplates, file *ct.CodeGenProjectTypeTemplateFile) error {
+		if file.SourcePath.Defined() {
+			typePaths = append(typePaths, file.SourcePath.Get())
 		}
 
 		return nil
-	}).Walk(projects...)
+	}).Walk(t.projectManager.Projects...)
 
-	return paths
-}
-
-func (t *Loader) ProcessTemplates() error {
-	var templatePaths []string
-
-	for _, lc := range t.projectManager.Projects {
-		for _, file := range lc.Templates.Files {
-			if file.SourcePath.Defined() {
-				templatePaths = append(templatePaths, file.SourcePath.Get())
-			}
-		}
+	if err != nil {
+		return err
 	}
 
-	if err := t.LoadTemplatePaths(templatePaths...); err != nil {
+	var operationPaths []string
+
+	err = ct.Walker().TemplateOperation(func(project *ct.CodeGenProject, template *ct.CodeGenProjectTemplates, file *ct.CodeGenProjectTypeTemplateFile) error {
+		if file.SourcePath.Defined() {
+			operationPaths = append(operationPaths, file.SourcePath.Get())
+		}
+
+		return nil
+	}).Walk(t.projectManager.Projects...)
+
+	if err != nil {
 		return err
+	}
+
+	metas, err := t.LoadTemplatePath(typePaths...)
+
+	if err != nil {
+		return err
+	}
+
+	for _, meta := range metas {
+		t.templateManager.Register(&meta)
 	}
 
 	return nil

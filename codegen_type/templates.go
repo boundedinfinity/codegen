@@ -9,26 +9,35 @@ import (
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
-type CodeGenProjectTemplates struct {
-	Header o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
-	Files  []*CodeGenProjectTemplateFile   `json:"files,omitempty"`
-}
-
-type CodeGenProjectTemplateFile struct {
+type TemplateMeta struct {
 	SourceMeta
 	RenderNamespace
+	Type           codegen_type_id.CodgenTypeId
+	OutputMimeType mime_type.MimeType
+	TemplateType   template_type.TemplateType
+	Template       *template.Template
+}
+
+type CodeGenProjectTypeTemplateFile struct {
+	SourceMeta
+	RenderNamespace
+	TemplateMeta
 	Header  o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
 	Content o.Option[string]                `json:"content,omitempty"`
 }
 
-type TemplateMeta struct {
+type CodeGenProjectOperationTemplateFile struct {
 	SourceMeta
+	TemplateMeta
 	RenderNamespace
-	OutputMimeType mime_type.MimeType
-	TemplateType   template_type.TemplateType
-	TypeId         codegen_type_id.CodgenTypeId
-	Template       *template.Template
+	Header o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
 }
 
-var _ LoaderContext = &CodeGenProjectTemplateFile{}
+type CodeGenProjectTemplates struct {
+	Header     o.Option[CodeGenTemplateHeader]   `json:"header,omitempty"`
+	Types      []*CodeGenProjectTypeTemplateFile `json:"types,omitempty"`
+	Operations []*CodeGenProjectTypeTemplateFile `json:"operations,omitempty"`
+}
+
+var _ LoaderContext = &CodeGenProjectTypeTemplateFile{}
 var _ LoaderContext = &TemplateMeta{}

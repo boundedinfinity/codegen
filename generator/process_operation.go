@@ -27,7 +27,7 @@ func (t *Generator) processOperation(po ct.CodeGenProjectOperation, rctx *rc.Ren
 	relNs = strings.ReplaceAll(schemaNs, rootNs, "")
 	relNs = strings.Replace(relNs, "/", "", 1)
 
-	input := t.typeManager.Find(po.Input)
+	input := t.typeManager.Find(po.Input.Get().Base().Id)
 
 	if input.Empty() {
 		// TODO
@@ -39,7 +39,7 @@ func (t *Generator) processOperation(po ct.CodeGenProjectOperation, rctx *rc.Ren
 		return err
 	}
 
-	output := t.typeManager.Find(po.Output)
+	output := t.typeManager.Find(po.Output.Get().Base().Id)
 
 	if output.Empty() {
 		// TODO

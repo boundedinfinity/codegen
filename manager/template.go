@@ -40,7 +40,7 @@ func (t *CodeGenTemplateManager) Register(lc *ct.TemplateMeta) {
 	util.MapListAdd(t.root2template, lc.RootPath.Get(), lc)
 	util.MapListAdd(t.root2source, lc.RootPath.Get(), lc.SourcePath.Get())
 	util.MapListAdd(t.tt2template, lc.TemplateType, lc)
-	util.MapListAdd(t.tId2template, lc.TypeId, lc)
+	util.MapListAdd(t.tId2template, lc.Type, lc)
 }
 
 func (t *CodeGenTemplateManager) Find(id any) optioner.Option[[]*ct.TemplateMeta] {

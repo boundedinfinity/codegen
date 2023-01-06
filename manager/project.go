@@ -34,7 +34,7 @@ func ProjectManager() *CodeGenProjectManager {
 	}
 }
 
-func (t *CodeGenProjectManager) RegisterProject(projects ...ct.CodeGenProject) error {
+func (t *CodeGenProjectManager) RegisterProject(projects ...*ct.CodeGenProject) error {
 	for _, project := range projects {
 		if err := t.registerProject(project); err != nil {
 			return err
@@ -44,16 +44,16 @@ func (t *CodeGenProjectManager) RegisterProject(projects ...ct.CodeGenProject) e
 	return nil
 }
 
-func (t *CodeGenProjectManager) registerProject(project ct.CodeGenProject) error {
-	t.Projects = append(t.Projects, &project)
-	t.source2proj[project.SourcePath.Get()] = &project
+func (t *CodeGenProjectManager) registerProject(project *ct.CodeGenProject) error {
+	t.Projects = append(t.Projects, project)
+	t.source2proj[project.SourcePath.Get()] = project
 	t.source2Root[project.RootPath.Get()] = project.SourcePath.Get()
 
-	util.MapListAdd(t.root2Proj, project.RootPath.Get(), &project)
+	util.MapListAdd(t.root2Proj, project.RootPath.Get(), project)
 	util.MapListAdd(t.root2source, project.RootPath.Get(), project.SourcePath.Get())
 
 	if project.Info.Id.Defined() {
-		t.id2proj[project.Info.Id.Get()] = &project
+		t.id2proj[project.Info.Id.Get()] = project
 	}
 
 	return nil
@@ -72,11 +72,29 @@ func (t *CodeGenProjectManager) FindRoot(id string) o.Option[string] {
 	return o.FirstOf(t.source2Root.Get(id))
 }
 
-func (t *CodeGenProjectManager) TemplateFiles() []*ct.CodeGenProjectTemplateFile {
-	files := make([]*ct.CodeGenProjectTemplateFile, 0)
+func (t *CodeGenProjectManager) TemplateFiles() []*ct.CodeGenProjectTypeTemplateFile {
+	files := make([]*ct.CodeGenProjectTypeTemplateFile, 0)
+	files = append(files, t.TemplateTypeFiles()...)
+	files = append(files, t.TemplateOperationFiles()...)
 
-	for _, lc := range t.Projects {
-		files = append(files, lc.Templates.Files...)
+	return files
+}
+
+func (t *CodeGenProjectManager) TemplateTypeFiles() []*ct.CodeGenProjectTypeTemplateFile {
+	files := make([]*ct.CodeGenProjectTypeTemplateFile, 0)
+
+	for _, project := range t.Projects {
+		files = append(files, project.Templates.Types...)
+	}
+
+	return files
+}
+
+func (t *CodeGenProjectManager) TemplateOperationFiles() []*ct.CodeGenProjectTypeTemplateFile {
+	files := make([]*ct.CodeGenProjectTypeTemplateFile, 0)
+
+	for _, project := range t.Projects {
+		files = append(files, project.Templates.Operations...)
 	}
 
 	return files

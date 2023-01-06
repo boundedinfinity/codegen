@@ -17,8 +17,25 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func (t *Loader) LoadProjectPaths(paths ...string) ([]codegen_type.CodeGenProject, error) {
-	var projects []codegen_type.CodeGenProject
+func (t *Loader) ExtractProjectPaths(projects []*ct.CodeGenProject) []string {
+	var paths []string
+
+	ct.Walker().Type(func(project *ct.CodeGenProject, typ ct.CodeGenType) error {
+		switch c := typ.(type) {
+		case *ct.CodeGenTypePath:
+			if c.SourcePath.Defined() {
+				paths = append(paths, c.SourcePath.Get())
+			}
+		}
+
+		return nil
+	}).Walk(projects...)
+
+	return paths
+}
+
+func (t *Loader) LoadProjectPaths(paths ...string) ([]*codegen_type.CodeGenProject, error) {
+	var projects []*codegen_type.CodeGenProject
 
 	paths = slicer.Map(paths, environmenter.Sub)
 	paths = slicer.Map(paths, filepath.Clean)
@@ -46,7 +63,7 @@ func (t *Loader) LoadProjectPaths(paths ...string) ([]codegen_type.CodeGenProjec
 			if project, err := t.LoadTypePath(sourceMeta, m[path].Data); err != nil {
 				return projects, err
 			} else {
-				projects = append(projects, project)
+				projects = append(projects, &project)
 			}
 
 			continue
@@ -62,7 +79,7 @@ func (t *Loader) LoadProjectPaths(paths ...string) ([]codegen_type.CodeGenProjec
 			if project, err := t.LoadTypePath(sourceMeta, content.Data); err != nil {
 				return projects, err
 			} else {
-				projects = append(projects, project)
+				projects = append(projects, &project)
 			}
 		}
 	}
@@ -95,7 +112,7 @@ func (t *Loader) LoadTypePath(sourceMeta ct.SourceMeta, data []byte) (codegen_ty
 		}
 
 		project.SourceMeta = sourceMeta
-		var operations []codegen_type.CodeGenProjectOperation
+		var operations []*codegen_type.CodeGenProjectOperation
 
 		for _, operation := range project.Operations {
 			operation.SourceMeta = sourceMeta

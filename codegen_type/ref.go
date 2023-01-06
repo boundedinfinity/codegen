@@ -10,7 +10,8 @@ type CodeGenTypeRef struct {
 	SourceMeta
 	RenderNamespace
 	CodeGenTypeBase
-	Ref o.Option[string] `json:"ref,omitempty"`
+	Ref      o.Option[string] `json:"ref,omitempty"`
+	Resolved CodeGenType      `json:"type,omitempty"`
 }
 
 func (t CodeGenTypeRef) HasValidation() bool {
@@ -23,6 +24,10 @@ func (t CodeGenTypeRef) SchemaType() codegen_type_id.CodgenTypeId {
 
 func (t CodeGenTypeRef) ValidateSchema() error {
 	return nil
+}
+
+func (t CodeGenTypeRef) String() string {
+	return t.Ref.Get()
 }
 
 var _ CodeGenType = &CodeGenTypeRef{}

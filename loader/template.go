@@ -13,7 +13,9 @@ import (
 	"github.com/boundedinfinity/go-mimetyper/file_extention"
 )
 
-func (t *Loader) LoadTemplatePaths(paths ...string) error {
+func (t *Loader) LoadTemplatePath(paths ...string) ([]ct.TemplateMeta, error) {
+	var templateMetas []ct.TemplateMeta
+
 	paths = slicer.Map(paths, environmenter.Sub)
 	paths = slicer.Map(paths, filepath.Clean)
 
@@ -21,17 +23,25 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 		ok, err := pather.IsFile(path)
 
 		if err != nil {
-			return err
+			return templateMetas, err
 		}
 
 		if ok {
-			lci := ct.SourceMeta{
+			sourceMeta := ct.SourceMeta{
 				RootPath:   o.Some(pather.Dir(path)),
 				SourcePath: o.Some(path),
 			}
 
-			if err := t.LoadTemplatePath(lci); err != nil {
-				return err
+			if mt, err := file_extention.FromPath(sourceMeta.SourcePath.Get()); err != nil {
+				return templateMetas, err
+			} else {
+				sourceMeta.SourceMimeType = mt
+			}
+
+			if templateMeta, err := t.loadTemplatePath(sourceMeta); err != nil {
+				return templateMetas, err
+			} else {
+				templateMetas = append(templateMetas, templateMeta)
 			}
 
 			continue
@@ -40,58 +50,58 @@ func (t *Loader) LoadTemplatePaths(paths ...string) error {
 		sources, err := pather.GetFiles(path)
 
 		if err != nil {
-			return err
+			return templateMetas, err
 		}
 
 		for _, source := range sources {
-			lci := ct.SourceMeta{
+			sourceMeta := ct.SourceMeta{
 				RootPath:   o.Some(path),
 				SourcePath: o.Some(source),
 			}
 
-			if err := t.LoadTemplatePath(lci); err != nil {
-				return err
+			if mt, err := file_extention.FromPath(sourceMeta.SourcePath.Get()); err != nil {
+				return templateMetas, err
+			} else {
+				sourceMeta.SourceMimeType = mt
+			}
+
+			if templateMeta, err := t.loadTemplatePath(sourceMeta); err != nil {
+				return templateMetas, err
+			} else {
+				templateMetas = append(templateMetas, templateMeta)
 			}
 		}
 	}
 
-	return nil
+	return templateMetas, nil
 }
 
-func (t *Loader) LoadTemplatePath(lci ct.SourceMeta) error {
-	lc := ct.TemplateMeta{
-		SourceMeta: lci,
+func (t *Loader) loadTemplatePath(sourceMeta ct.SourceMeta) (ct.TemplateMeta, error) {
+	templateMeta := ct.TemplateMeta{
+		SourceMeta: sourceMeta,
 	}
 
-	if mt, err := file_extention.FromPath(lc.SourcePath.Get()); err != nil {
-		return err
+	if try := util.GetOutputType(templateMeta.SourcePath.Get()); try.Failure() {
+		return templateMeta, try.Error
 	} else {
-		lc.SourceMimeType = mt
+		templateMeta.OutputMimeType = try.Result
 	}
 
-	if try := util.GetOutputType(lc.SourcePath.Get()); try.Failure() {
-		return try.Error
+	if tt, err := template_type.FromUrl(templateMeta.SourcePath.Get()); err != nil {
+		return templateMeta, err
 	} else {
-		lc.OutputMimeType = try.Result
+		templateMeta.TemplateType = tt
 	}
 
-	if tt, err := template_type.FromUrl(lc.SourcePath.Get()); err != nil {
-		return err
-	} else {
-		lc.TemplateType = tt
+	typ := util.GetSchemaTypeId(templateMeta.SourcePath.Get())
+
+	if typ.Defined() {
+		templateMeta.Type = typ.Get()
 	}
 
-	typeId := util.GetSchemaTypeId(lc.SourcePath.Get())
-
-	if typeId.Defined() {
-		lc.TypeId = typeId.Get()
+	if err := t.renderer.Load(&templateMeta); err != nil {
+		return templateMeta, err
 	}
 
-	if err := t.renderer.Load(&lc); err != nil {
-		return err
-	}
-
-	t.templateManager.Register(&lc)
-
-	return nil
+	return templateMeta, nil
 }
