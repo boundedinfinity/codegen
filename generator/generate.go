@@ -1,7 +1,7 @@
 package generator
 
 import (
-	rc "boundedinfinity/codegen/render_context"
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/renderer"
 	"boundedinfinity/codegen/util"
 	"os"
@@ -29,7 +29,7 @@ func (t *Generator) Generate() error {
 	return nil
 }
 
-func (t *Generator) GenerateModel(schema rc.RenderContext) error {
+func (t *Generator) GenerateModel(schema ct.CodeGenType) error {
 	renders, err := t.renderer.RenderModel(schema)
 
 	if err != nil {
@@ -79,7 +79,7 @@ func (t *Generator) GenerateModel(schema rc.RenderContext) error {
 	return nil
 }
 
-func (t *Generator) GenerateOperation(schema rc.RenderContextOperation) error {
+func (t *Generator) GenerateOperation(schema ct.CodeGenProjectOperationTemplateFile) error {
 
 	return nil
 }

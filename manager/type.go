@@ -63,15 +63,46 @@ func (t CodeGenTypeManager) Find(id o.Option[string]) o.Option[ct.CodeGenType] {
 	return o.FirstOf(a, b)
 }
 
-func (t CodeGenTypeManager) Resolve(schema ct.CodeGenType) o.Option[ct.CodeGenType] {
-	switch c := schema.(type) {
+func (t CodeGenTypeManager) Resolve(schema o.Option[ct.CodeGenType]) o.Option[ct.CodeGenType] {
+	if schema.Empty() {
+		return schema
+	}
+
+	switch c := schema.Get().(type) {
 	case *ct.CodeGenTypeRef:
 		return t.Find(c.Ref)
 	case *ct.CodeGenTypeArray:
-		return t.Resolve(c.Items)
+		return t.Resolve(o.Some(c.Items))
 	default:
-		return t.Find(schema.Base().Id)
+		return t.Find(schema.Get().Base().Id)
 	}
+}
+
+func (t CodeGenTypeManager) ResolveRef(typ ct.CodeGenType) error {
+	if typ == nil {
+		return ct.ErrCodeGenRefNotFound
+	}
+
+	switch c := typ.(type) {
+	case *ct.CodeGenTypeRef:
+		found := t.Find(c.Ref)
+
+		if found.Defined() {
+			c.Resolved = found.Get()
+		} else {
+			ct.ErrCodeGenRefNotFoundv(typ)
+		}
+	case *ct.CodeGenTypeArray:
+		return t.ResolveRef(c.Items)
+	case *ct.CodeGenTypeObject:
+		for _, property := range c.Properties {
+			if err := t.ResolveRef(property); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func (t CodeGenTypeManager) FindSource(id o.Option[string]) o.Option[string] {

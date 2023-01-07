@@ -1,8 +1,8 @@
 package generator
 
 import (
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/manager"
-	"boundedinfinity/codegen/render_context"
 	"boundedinfinity/codegen/renderer"
 	"io/fs"
 )
@@ -12,15 +12,15 @@ type Generator struct {
 	typeManager     *manager.CodeGenTypeManager
 	projectManager  *manager.CodeGenProjectManager
 	templateManager *manager.CodeGenTemplateManager
-	types           []render_context.RenderContext
-	operations      []render_context.RenderContextOperation
+	types           []ct.CodeGenType
+	operations      []ct.CodeGenProjectOperationTemplateFile
 	renderer        *renderer.Renderer
 	fileMode        fs.FileMode
 }
 
 func New(args ...Arg) (*Generator, error) {
 	g := &Generator{
-		types: make([]render_context.RenderContext, 0),
+		types: make([]ct.CodeGenType, 0),
 	}
 
 	for _, arg := range args {

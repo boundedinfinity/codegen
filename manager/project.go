@@ -72,16 +72,16 @@ func (t *CodeGenProjectManager) FindRoot(id string) o.Option[string] {
 	return o.FirstOf(t.source2Root.Get(id))
 }
 
-func (t *CodeGenProjectManager) TemplateFiles() []*ct.CodeGenProjectTypeTemplateFile {
-	files := make([]*ct.CodeGenProjectTypeTemplateFile, 0)
+func (t *CodeGenProjectManager) TemplateFiles() []*ct.CodeGenProjectTemplateFile {
+	files := make([]*ct.CodeGenProjectTemplateFile, 0)
 	files = append(files, t.TemplateTypeFiles()...)
 	files = append(files, t.TemplateOperationFiles()...)
 
 	return files
 }
 
-func (t *CodeGenProjectManager) TemplateTypeFiles() []*ct.CodeGenProjectTypeTemplateFile {
-	files := make([]*ct.CodeGenProjectTypeTemplateFile, 0)
+func (t *CodeGenProjectManager) TemplateTypeFiles() []*ct.CodeGenProjectTemplateFile {
+	files := make([]*ct.CodeGenProjectTemplateFile, 0)
 
 	for _, project := range t.Projects {
 		files = append(files, project.Templates.Types...)
@@ -90,8 +90,8 @@ func (t *CodeGenProjectManager) TemplateTypeFiles() []*ct.CodeGenProjectTypeTemp
 	return files
 }
 
-func (t *CodeGenProjectManager) TemplateOperationFiles() []*ct.CodeGenProjectTypeTemplateFile {
-	files := make([]*ct.CodeGenProjectTypeTemplateFile, 0)
+func (t *CodeGenProjectManager) TemplateOperationFiles() []*ct.CodeGenProjectTemplateFile {
+	files := make([]*ct.CodeGenProjectTemplateFile, 0)
 
 	for _, project := range t.Projects {
 		files = append(files, project.Templates.Operations...)

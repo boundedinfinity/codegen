@@ -1,7 +1,7 @@
 package renderer
 
 import (
-	rc "boundedinfinity/codegen/render_context"
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/renderer/dumper"
 	"fmt"
 	"path/filepath"
@@ -16,31 +16,16 @@ func dumpJson(obj any) string {
 	return dumper.New().Dump(obj)
 }
 
-func (t *Renderer) resolveSchemaNs(schema rc.RenderContext) string {
-	var found string
-
-	rc.NewWalker().Base(func(_ rc.RenderContext, base *rc.RenderContextBase) error {
-		if found != "" {
-			return rc.ErrExit
-		}
-
-		if base.SchemaNs != "" {
-			found = base.SchemaNs
-			return rc.ErrExit
-		}
-
-		return nil
-	})
-
-	return found
+func (t *Renderer) resolveSchemaNs(schema ct.RenderNamespace) string {
+	return schema.Namespace().SchemaNs
 }
 
-func (t *Renderer) resolveSchema(schema rc.RenderContext) rc.RenderContext {
+func (t *Renderer) resolveSchema(schema ct.CodeGenType) ct.CodeGenType {
 	switch c := schema.(type) {
-	case *rc.RenderContextArray:
-		return t.resolveSchema(c.Items)
-	case *rc.RenderContextRef:
-		return t.resolveSchema(c.Ref)
+	case *ct.CodeGenTypeArray:
+		return c.Items
+	case *ct.CodeGenTypeRef:
+		return c.Resolved
 	default:
 		return schema
 	}

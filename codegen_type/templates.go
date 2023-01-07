@@ -18,7 +18,7 @@ type TemplateMeta struct {
 	Template       *template.Template
 }
 
-type CodeGenProjectTypeTemplateFile struct {
+type CodeGenProjectTemplateFile struct {
 	SourceMeta
 	RenderNamespace
 	TemplateMeta
@@ -34,10 +34,11 @@ type CodeGenProjectOperationTemplateFile struct {
 }
 
 type CodeGenProjectTemplates struct {
-	Header     o.Option[CodeGenTemplateHeader]   `json:"header,omitempty"`
-	Types      []*CodeGenProjectTypeTemplateFile `json:"types,omitempty"`
-	Operations []*CodeGenProjectTypeTemplateFile `json:"operations,omitempty"`
+	Header     o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
+	Types      []*CodeGenProjectTemplateFile   `json:"types,omitempty"`
+	TypeList   []*CodeGenProjectTemplateFile   `json:"type-list,omitempty"`
+	Operations []*CodeGenProjectTemplateFile   `json:"operations,omitempty"`
 }
 
-var _ LoaderContext = &CodeGenProjectTypeTemplateFile{}
+var _ LoaderContext = &CodeGenProjectTemplateFile{}
 var _ LoaderContext = &TemplateMeta{}

@@ -4,20 +4,46 @@ import (
 	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/codegen_type/template_type"
 	"boundedinfinity/codegen/util"
-	"path/filepath"
 
-	"github.com/boundedinfinity/go-commoner/environmenter"
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
-	"github.com/boundedinfinity/go-commoner/slicer"
 	"github.com/boundedinfinity/go-mimetyper/file_extention"
 )
 
-func (t *Loader) LoadTemplatePath(paths ...string) ([]ct.TemplateMeta, error) {
+func (t *Loader) ProcessTemplates() error {
+	processTemplate := func(project *ct.CodeGenProject, _ *ct.CodeGenProjectTemplates, file *ct.CodeGenProjectTemplateFile) error {
+		if file.SourcePath.Defined() {
+			if metas, err := t.LoadTemplatePath(project.RootPath, file.SourcePath.Get()); err != nil {
+				return err
+			} else {
+				for _, meta := range metas {
+					t.templateManager.Register(&meta)
+				}
+			}
+		}
+
+		return nil
+	}
+
+	if err := ct.WalkTemplateType(processTemplate, t.projectManager.Projects...); err != nil {
+		return err
+	}
+
+	if err := ct.WalkTemplateOperation(processTemplate, t.projectManager.Projects...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *Loader) LoadTemplatePath(root o.Option[string], paths ...string) ([]ct.TemplateMeta, error) {
 	var templateMetas []ct.TemplateMeta
 
-	paths = slicer.Map(paths, environmenter.Sub)
-	paths = slicer.Map(paths, filepath.Clean)
+	paths, err := normalizePath(root, paths...)
+
+	if err != nil {
+		return templateMetas, err
+	}
 
 	for _, path := range paths {
 		ok, err := pather.IsFile(path)

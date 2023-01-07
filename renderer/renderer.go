@@ -1,21 +1,20 @@
 package renderer
 
 import (
-	"boundedinfinity/codegen/codegen_type"
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/manager"
-	"boundedinfinity/codegen/render_context"
 	"text/template"
 )
 
 type TemplateOutput struct {
-	codegen_type.TemplateMeta
+	ct.TemplateMeta
 	Output []byte
 }
 
 type ModelOutput struct {
 	OutputPath string
 	TemplateOutput
-	Schema render_context.RenderContext
+	Schema ct.CodeGenType
 }
 
 type Renderer struct {

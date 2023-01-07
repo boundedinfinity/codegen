@@ -8,43 +8,29 @@ import (
 )
 
 func (t *Loader) Resolve() error {
-	err := ct.Walker().
-		Type(func(project *ct.CodeGenProject, typ ct.CodeGenType) error {
-			switch c := typ.(type) {
-			case *ct.CodeGenTypeRef:
-				resolved := t.typeManager.Resolve(typ)
+	err := ct.WalkType(func(_ *ct.CodeGenProject, typ ct.CodeGenType) error {
+		return t.typeManager.ResolveRef(typ)
+	}, t.projectManager.Merged)
 
-				if resolved.Defined() {
-					c.Resolved = resolved.Get()
-				} else {
-					ct.ErrCodeGenRefNotFoundv(typ)
-				}
+	if err != nil {
+		return err
+	}
+
+	err = ct.WalkOperation(func(_ *ct.CodeGenProject, operation *ct.CodeGenProjectOperation) error {
+		if operation.Input.Defined() {
+			if err := t.typeManager.ResolveRef(operation.Input.Get()); err != nil {
+				return err
 			}
+		}
 
-			return nil
-		}).
-		Operation(func(project *ct.CodeGenProject, operation *ct.CodeGenProjectOperation) error {
-			switch c := operation.Input.Get().(type) {
-			case *ct.CodeGenTypeRef:
-				resolved := t.typeManager.Resolve(operation.Input.Get())
-
-				if resolved.Defined() {
-					c.Resolved = resolved.Get()
-				}
+		if operation.Output.Defined() {
+			if err := t.typeManager.ResolveRef(operation.Output.Get()); err != nil {
+				return err
 			}
+		}
 
-			switch c := operation.Output.Get().(type) {
-			case *ct.CodeGenTypeRef:
-				resolved := t.typeManager.Resolve(operation.Output.Get())
-
-				if resolved.Defined() {
-					c.Resolved = resolved.Get()
-				}
-			}
-
-			return nil
-		}).
-		Walk(t.projectManager.Merged)
+		return nil
+	}, t.projectManager.Merged)
 
 	if err != nil {
 		return err

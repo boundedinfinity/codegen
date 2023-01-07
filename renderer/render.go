@@ -1,17 +1,16 @@
 package renderer
 
 import (
-	"boundedinfinity/codegen/codegen_type"
-	"boundedinfinity/codegen/render_context"
+	ct "boundedinfinity/codegen/codegen_type"
 	"bytes"
 	"go/format"
 
 	"github.com/boundedinfinity/go-mimetyper/mime_type"
 )
 
-func (t *Renderer) RenderModel(schema render_context.RenderContext) ([]ModelOutput, error) {
+func (t *Renderer) RenderModel(schema ct.CodeGenType) ([]ModelOutput, error) {
 	outputs := make([]ModelOutput, 0)
-	tmpls := t.templateManager.Find(schema.Base().SchemaType)
+	tmpls := t.templateManager.Find(schema.Base().Id.Get())
 
 	if tmpls.Empty() {
 		return outputs, nil
@@ -31,7 +30,7 @@ func (t *Renderer) RenderModel(schema render_context.RenderContext) ([]ModelOutp
 	return outputs, nil
 }
 
-func (t *Renderer) RenderOperation(schema render_context.RenderContextOperation) ([]TemplateOutput, error) {
+func (t *Renderer) RenderOperation(schema ct.CodeGenProjectOperationTemplateFile) ([]TemplateOutput, error) {
 	outputs := make([]TemplateOutput, 0)
 
 	// for _, tmpl := range t.FindTemplateType(template_type.Operation) {
@@ -45,7 +44,7 @@ func (t *Renderer) RenderOperation(schema render_context.RenderContextOperation)
 	return outputs, nil
 }
 
-func (t *Renderer) RenderNamespace(schema codegen_type.CodeGenProjectOperation) ([]TemplateOutput, error) {
+func (t *Renderer) RenderNamespace(schema ct.CodeGenProjectOperation) ([]TemplateOutput, error) {
 	outputs := make([]TemplateOutput, 0)
 
 	// for _, tmpl := range t.FindTemplateType(template_type.Namespace) {
@@ -59,7 +58,7 @@ func (t *Renderer) RenderNamespace(schema codegen_type.CodeGenProjectOperation) 
 	return outputs, nil
 }
 
-func (t *Renderer) render(tmpl codegen_type.TemplateMeta, data any) (TemplateOutput, error) {
+func (t *Renderer) render(tmpl ct.TemplateMeta, data any) (TemplateOutput, error) {
 	output := TemplateOutput{
 		TemplateMeta: tmpl,
 	}

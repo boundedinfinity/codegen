@@ -17,28 +17,46 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func (t *Loader) ExtractProjectPaths(projects []*ct.CodeGenProject) []string {
-	var paths []string
+func typePath(project *ct.CodeGenProject, typ ct.CodeGenType) error {
+	*typ.Source() = project.SourceMeta
+	return nil
+}
 
-	ct.Walker().Type(func(project *ct.CodeGenProject, typ ct.CodeGenType) error {
-		switch c := typ.(type) {
-		case *ct.CodeGenTypePath:
-			if c.SourcePath.Defined() {
-				paths = append(paths, c.SourcePath.Get())
+func operationPath(project *ct.CodeGenProject, operation *ct.CodeGenProjectOperation) error {
+	operation.SourceMeta = project.SourceMeta
+	return nil
+}
+
+func normalizePath(root o.Option[string], paths ...string) ([]string, error) {
+	var ns []string
+	paths = slicer.Dedup(paths)
+
+	for _, path := range paths {
+		path = environmenter.Sub(path)
+		path = filepath.Clean(path)
+
+		if !filepath.IsAbs(path) && root.Defined() {
+			if abs, err := filepath.Abs(path); err != nil {
+				return ns, err
+			} else {
+				path = abs
 			}
 		}
 
-		return nil
-	}).Walk(projects...)
+		ns = append(ns, path)
+	}
 
-	return paths
+	return ns, nil
 }
 
-func (t *Loader) LoadProjectPaths(paths ...string) ([]*codegen_type.CodeGenProject, error) {
+func (t *Loader) LoadProjectPath(root o.Option[string], paths ...string) ([]*codegen_type.CodeGenProject, error) {
 	var projects []*codegen_type.CodeGenProject
 
-	paths = slicer.Map(paths, environmenter.Sub)
-	paths = slicer.Map(paths, filepath.Clean)
+	paths, err := normalizePath(root, paths...)
+
+	if err != nil {
+		return projects, err
+	}
 
 	for _, path := range paths {
 		ok, err := pather.IsFile(path)
@@ -60,7 +78,7 @@ func (t *Loader) LoadProjectPaths(paths ...string) ([]*codegen_type.CodeGenProje
 				SourceMimeType: m[path].MimeType,
 			}
 
-			if project, err := t.LoadTypePath(sourceMeta, m[path].Data); err != nil {
+			if project, err := t.loadProjectPath(sourceMeta, m[path].Data); err != nil {
 				return projects, err
 			} else {
 				projects = append(projects, &project)
@@ -76,7 +94,7 @@ func (t *Loader) LoadProjectPaths(paths ...string) ([]*codegen_type.CodeGenProje
 				SourceMimeType: content.MimeType,
 			}
 
-			if project, err := t.LoadTypePath(sourceMeta, content.Data); err != nil {
+			if project, err := t.loadProjectPath(sourceMeta, content.Data); err != nil {
 				return projects, err
 			} else {
 				projects = append(projects, &project)
@@ -84,10 +102,68 @@ func (t *Loader) LoadProjectPaths(paths ...string) ([]*codegen_type.CodeGenProje
 		}
 	}
 
+	var typeProjects []*codegen_type.CodeGenProject
+
+	typeLoad := func(project *ct.CodeGenProject, typ ct.CodeGenType) error {
+		switch c := typ.(type) {
+		case *ct.CodeGenTypePath:
+			if c.SourcePath.Defined() {
+				if ps, err := t.LoadProjectPath(project.RootPath, c.SourcePath.Get()); err != nil {
+					return err
+				} else {
+					typeProjects = append(typeProjects, ps...)
+				}
+			}
+		}
+
+		return nil
+	}
+
+	var operationProjects []*codegen_type.CodeGenProject
+
+	operationLoad := func(project *ct.CodeGenProject, operation *ct.CodeGenProjectOperation) error {
+		if operation.SourcePath.Defined() {
+			if ps, err := t.LoadProjectPath(project.RootPath, operation.SourcePath.Get()); err != nil {
+				return err
+			} else {
+				operationProjects = append(operationProjects, ps...)
+			}
+		}
+
+		return nil
+	}
+
+	if err := ct.WalkType(typeLoad, projects...); err != nil {
+		return projects, err
+	}
+
+	if err := ct.WalkType(typePath, typeProjects...); err != nil {
+		return projects, err
+	}
+
+	if err := ct.WalkType(typePath, projects...); err != nil {
+		return projects, err
+	}
+
+	if err := ct.WalkOperation(operationLoad, projects...); err != nil {
+		return projects, err
+	}
+
+	if err := ct.WalkOperation(operationPath, operationProjects...); err != nil {
+		return projects, err
+	}
+
+	if err := ct.WalkOperation(operationPath, projects...); err != nil {
+		return projects, err
+	}
+
+	projects = append(projects, typeProjects...)
+	projects = append(projects, operationProjects...)
+
 	return projects, nil
 }
 
-func (t *Loader) LoadTypePath(sourceMeta ct.SourceMeta, data []byte) (codegen_type.CodeGenProject, error) {
+func (t *Loader) loadProjectPath(sourceMeta ct.SourceMeta, data []byte) (codegen_type.CodeGenProject, error) {
 	var project codegen_type.CodeGenProject
 	var bs []byte
 	var err error
@@ -112,15 +188,6 @@ func (t *Loader) LoadTypePath(sourceMeta ct.SourceMeta, data []byte) (codegen_ty
 		}
 
 		project.SourceMeta = sourceMeta
-		var operations []*codegen_type.CodeGenProjectOperation
-
-		for _, operation := range project.Operations {
-			operation.SourceMeta = sourceMeta
-			operations = append(operations, operation)
-		}
-
-		project.Operations = operations
-
 	case util.IsJsonSchemaFile(sourceMeta.SourcePath.Get()):
 		// js, err := model.UnmarshalSchema(bs)
 

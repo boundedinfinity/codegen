@@ -22,9 +22,9 @@ func (t *SourceMeta) Source() *SourceMeta {
 
 type RenderNamespace struct {
 	RootNs   string
-	CurrNs   string
 	SchemaNs string
 	RelNs    string
+	CurrNs   string
 }
 
 func (t *RenderNamespace) Namespace() *RenderNamespace {

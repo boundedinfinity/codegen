@@ -8,16 +8,17 @@ import (
 	"text/template"
 )
 
-func (t *Renderer) Load(lc *ct.TemplateMeta) error {
-	bs, err := ioutil.ReadFile(lc.SourcePath.Get())
+func (t *Renderer) Load(meta *ct.TemplateMeta) error {
+	merged := t.projectManager.Merged
+	bs, err := ioutil.ReadFile(meta.SourcePath.Get())
 
 	if err != nil {
 		return err
 	}
 
-	l, r := template_delimiter.Get(t.projectManager.Merged.Info.Delimiter.Get())
+	l, r := template_delimiter.Get(merged.Info.Delimiter.Get())
 
-	if t.projectManager.Merged.Info.TemplateDump.Defined() && t.projectManager.Merged.Info.TemplateDump.Get() {
+	if merged.Info.TemplateDump.Defined() && merged.Info.TemplateDump.Get() {
 		tmp := string(bs)
 		tmp += fmt.Sprintf("\n\n%v DUMP . %v", l, r)
 		bs = []byte(tmp)
@@ -26,7 +27,7 @@ func (t *Renderer) Load(lc *ct.TemplateMeta) error {
 	if tmpl, err := template.New("").Funcs(t.funcs).Delims(l, r).Parse(string(bs)); err != nil {
 		return err
 	} else {
-		lc.Template = tmpl
+		meta.Template = tmpl
 	}
 
 	return nil

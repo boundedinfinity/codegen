@@ -1,25 +1,21 @@
 package system
 
-import "boundedinfinity/codegen/codegen_type"
+import (
+	o "github.com/boundedinfinity/go-commoner/optioner"
+)
 
 func (t *System) Process(paths ...string) error {
-	var allProjects []*codegen_type.CodeGenProject
+	projects, err := t.loader.LoadProjectPath(o.None[string](), paths...)
 
-	for len(paths) > 0 {
-		projects, err := t.loader.LoadProjectPaths(paths...)
-
-		if err != nil {
-			return err
-		}
-
-		allProjects = append(allProjects, projects...)
-
-		if paths = t.loader.ExtractProjectPaths(projects); err != nil {
-			return err
-		}
+	if err != nil {
+		return err
 	}
 
-	if err := t.loader.MergeProjects(allProjects...); err != nil {
+	if err := t.loader.MergeProjects(projects...); err != nil {
+		return err
+	}
+
+	if err := t.loader.Resolve(); err != nil {
 		return err
 	}
 
@@ -27,7 +23,7 @@ func (t *System) Process(paths ...string) error {
 		return err
 	}
 
-	if err := t.loader.Resolve(); err != nil {
+	if err := t.loader.ProcessNamespace(); err != nil {
 		return err
 	}
 
