@@ -114,8 +114,13 @@ func IsJsonSchemaTemplate(typ o.Option[schematype.SchemaType], path string) bool
 	return strings.HasPrefix(base, ts)
 }
 
-func GetSchemaTypeId(path string) o.Option[codegen_type_id.CodgenTypeId] {
-	filename := pather.Base(path)
+func GetSchemaTypeId(path o.Option[string]) o.Option[codegen_type_id.CodgenTypeId] {
+	if path.Empty() {
+		return o.None[codegen_type_id.CodgenTypeId]()
+	}
+
+	filename := pather.Base(path.Get())
+
 	found, ok := slicer.FindFn(codegen_type_id.All, func(v codegen_type_id.CodgenTypeId) bool {
 		return strings.HasPrefix(filename, string(v))
 	})

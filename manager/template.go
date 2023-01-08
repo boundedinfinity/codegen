@@ -33,21 +33,24 @@ func TemplateManager() *CodeGenTemplateManager {
 	}
 }
 
-func (t *CodeGenTemplateManager) Register(lc *ct.TemplateMeta) {
-	t.All = append(t.All, lc)
-	t.source2template[lc.SourcePath.Get()] = lc
-	t.source2root[lc.SourcePath.Get()] = lc.RootPath.Get()
-	util.MapListAdd(t.root2template, lc.RootPath.Get(), lc)
-	util.MapListAdd(t.root2source, lc.RootPath.Get(), lc.SourcePath.Get())
-	util.MapListAdd(t.tt2template, lc.TemplateType, lc)
-	util.MapListAdd(t.tId2template, lc.Type, lc)
+func (t *CodeGenTemplateManager) Register(meta *ct.TemplateMeta) {
+	t.All = append(t.All, meta)
+	t.source2template[meta.SourcePath.Get()] = meta
+	t.source2root[meta.SourcePath.Get()] = meta.RootPath.Get()
+	util.MapListAdd(t.root2template, meta.RootPath.Get(), meta)
+	util.MapListAdd(t.root2source, meta.RootPath.Get(), meta.SourcePath.Get())
+	util.MapListAdd(t.tt2template, meta.TemplateType, meta)
+
+	if meta.Type.Defined() {
+		util.MapListAdd(t.tId2template, meta.Type.Get(), meta)
+	}
 }
 
 func (t *CodeGenTemplateManager) Find(id any) optioner.Option[[]*ct.TemplateMeta] {
 	s := fmt.Sprintf("%v", id)
 
-	return optioner.FirstOf(
-		t.tId2template.Get(codegen_type_id.CodgenTypeId(s)),
-		t.tt2template.Get(template_type.TemplateType(s)),
-	)
+	r1 := t.tId2template.Get(codegen_type_id.CodgenTypeId(s))
+	r2 := t.tt2template.Get(template_type.TemplateType(s))
+
+	return optioner.FirstOf(r1, r2)
 }

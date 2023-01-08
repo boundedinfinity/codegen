@@ -4,19 +4,41 @@ import (
 	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/codegen_type/template_type"
 	"boundedinfinity/codegen/util"
+	"fmt"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-commoner/pather"
 	"github.com/boundedinfinity/go-mimetyper/file_extention"
 )
 
-func (t *Loader) ProcessTemplates() error {
+func templatePath(project *ct.CodeGenProject, _ *ct.CodeGenProjectTemplates, file *ct.CodeGenProjectTemplateFile) error {
+	*file.Source() = project.SourceMeta
+	return nil
+}
+
+func (t *Loader) ProcessTemplates(projects ...*ct.CodeGenProject) error {
+	merged := t.projectManager.Merged
+
 	processTemplate := func(project *ct.CodeGenProject, _ *ct.CodeGenProjectTemplates, file *ct.CodeGenProjectTemplateFile) error {
 		if file.SourcePath.Defined() {
 			if metas, err := t.LoadTemplatePath(project.RootPath, file.SourcePath.Get()); err != nil {
 				return err
 			} else {
 				for _, meta := range metas {
+					new := &ct.CodeGenProjectTemplateFile{
+						TemplateMeta: meta,
+						Header:       file.Header,
+					}
+
+					switch meta.TemplateType {
+					case template_type.Model:
+						merged.Templates.Types = append(merged.Templates.Types, new)
+					case template_type.Operation:
+						merged.Templates.Operations = append(merged.Templates.Operations, new)
+					default:
+						fmt.Printf("template type %v not implemented\n", meta.TemplateType)
+					}
+
 					t.templateManager.Register(&meta)
 				}
 			}
@@ -25,11 +47,11 @@ func (t *Loader) ProcessTemplates() error {
 		return nil
 	}
 
-	if err := ct.WalkTemplateType(processTemplate, t.projectManager.Projects...); err != nil {
+	if err := ct.WalkTemplate(processTemplate, projects...); err != nil {
 		return err
 	}
 
-	if err := ct.WalkTemplateOperation(processTemplate, t.projectManager.Projects...); err != nil {
+	if err := ct.WalkTemplate(templatePath, projects...); err != nil {
 		return err
 	}
 
@@ -119,11 +141,7 @@ func (t *Loader) loadTemplatePath(sourceMeta ct.SourceMeta) (ct.TemplateMeta, er
 		templateMeta.TemplateType = tt
 	}
 
-	typ := util.GetSchemaTypeId(templateMeta.SourcePath.Get())
-
-	if typ.Defined() {
-		templateMeta.Type = typ.Get()
-	}
+	templateMeta.Type = util.GetSchemaTypeId(templateMeta.SourcePath)
 
 	if err := t.renderer.Load(&templateMeta); err != nil {
 		return templateMeta, err

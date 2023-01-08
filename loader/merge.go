@@ -82,8 +82,6 @@ func (t *Loader) MergeProjects(projects ...*ct.CodeGenProject) error {
 			}
 		}
 
-		merged.Templates.Types = append(merged.Templates.Types, project.Templates.Types...)
-
 		return nil
 	}, projects...)
 

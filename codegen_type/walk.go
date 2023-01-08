@@ -63,6 +63,14 @@ func WalkOperation(fn func(*CodeGenProject, *CodeGenProjectOperation) error, pro
 	return WalkProject(w, projects...)
 }
 
+func WalkTemplate(fn func(*CodeGenProject, *CodeGenProjectTemplates, *CodeGenProjectTemplateFile) error, projects ...*CodeGenProject) error {
+	if err := WalkTemplateType(fn, projects...); err != nil {
+		return err
+	}
+
+	return WalkTemplateOperation(fn, projects...)
+}
+
 func WalkTemplateType(fn func(*CodeGenProject, *CodeGenProjectTemplates, *CodeGenProjectTemplateFile) error, projects ...*CodeGenProject) error {
 	w := func(project *CodeGenProject) error {
 		for _, typ := range project.Templates.Types {

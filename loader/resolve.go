@@ -7,10 +7,10 @@ import (
 	"github.com/boundedinfinity/go-commoner/optioner"
 )
 
-func (t *Loader) Resolve() error {
+func (t *Loader) Resolve(projects ...*ct.CodeGenProject) error {
 	err := ct.WalkType(func(_ *ct.CodeGenProject, typ ct.CodeGenType) error {
 		return t.typeManager.ResolveRef(typ)
-	}, t.projectManager.Merged)
+	}, projects...)
 
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (t *Loader) Resolve() error {
 		}
 
 		return nil
-	}, t.projectManager.Merged)
+	}, projects...)
 
 	if err != nil {
 		return err

@@ -24,6 +24,15 @@ func typePath(project *ct.CodeGenProject, typ ct.CodeGenType) error {
 
 func operationPath(project *ct.CodeGenProject, operation *ct.CodeGenProjectOperation) error {
 	operation.SourceMeta = project.SourceMeta
+
+	if operation.Input.Defined() {
+		*operation.Input.Get().Source() = project.SourceMeta
+	}
+
+	if operation.Output.Defined() {
+		*operation.Output.Get().Source() = project.SourceMeta
+	}
+
 	return nil
 }
 

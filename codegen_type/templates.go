@@ -12,15 +12,13 @@ import (
 type TemplateMeta struct {
 	SourceMeta
 	RenderNamespace
-	Type           codegen_type_id.CodgenTypeId
+	Type           o.Option[codegen_type_id.CodgenTypeId]
 	OutputMimeType mime_type.MimeType
 	TemplateType   template_type.TemplateType
 	Template       *template.Template
 }
 
 type CodeGenProjectTemplateFile struct {
-	SourceMeta
-	RenderNamespace
 	TemplateMeta
 	Header  o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
 	Content o.Option[string]                `json:"content,omitempty"`

@@ -15,11 +15,11 @@ func (t *System) Process(paths ...string) error {
 		return err
 	}
 
-	if err := t.loader.Resolve(); err != nil {
+	if err := t.loader.Resolve(projects...); err != nil {
 		return err
 	}
 
-	if err := t.loader.ProcessTemplates(); err != nil {
+	if err := t.loader.ProcessTemplates(projects...); err != nil {
 		return err
 	}
 
@@ -27,13 +27,9 @@ func (t *System) Process(paths ...string) error {
 		return err
 	}
 
-	// if err := t.generator.Process(); err != nil {
-	// 	return err
-	// }
-
-	// if err := t.generator.Generate(); err != nil {
-	// 	return err
-	// }
+	if err := t.generator.Generate(); err != nil {
+		return err
+	}
 
 	return nil
 }

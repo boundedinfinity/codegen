@@ -90,7 +90,7 @@ func (t CodeGenTypeManager) ResolveRef(typ ct.CodeGenType) error {
 		if found.Defined() {
 			c.Resolved = found.Get()
 		} else {
-			ct.ErrCodeGenRefNotFoundv(typ)
+			return ct.ErrCodeGenRefNotFoundv(typ)
 		}
 	case *ct.CodeGenTypeArray:
 		return t.ResolveRef(c.Items)

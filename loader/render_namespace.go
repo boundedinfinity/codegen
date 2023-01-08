@@ -19,12 +19,14 @@ func (t *Loader) ProcessNamespace() error {
 	}
 
 	err = ct.WalkOperation(func(_ *ct.CodeGenProject, operation *ct.CodeGenProjectOperation) error {
+		t.operationNamespace(operation)
+
 		if operation.Input.Defined() {
-			*operation.Input.Get().Namespace() = t.typeNamespace(operation.Input.Get())
+			t.operationIoNamespace(*operation, operation.Input.Get())
 		}
 
 		if operation.Output.Defined() {
-			*operation.Output.Get().Namespace() = t.typeNamespace(operation.Output.Get())
+			t.operationIoNamespace(*operation, operation.Output.Get())
 		}
 
 		return nil
@@ -37,12 +39,16 @@ func (t *Loader) namespace(meta ct.SourceMeta) ct.RenderNamespace {
 	var ns ct.RenderNamespace
 
 	ns.RootNs = t.projectManager.Merged.Info.Namespace.Get()
-	ns.SchemaNs = meta.SourcePath.Get()
-	ns.SchemaNs = strings.Replace(ns.SchemaNs, meta.RootPath.Get(), "", 1)
-	ns.SchemaNs = extentioner.Strip(ns.SchemaNs)
-	ns.SchemaNs = extentioner.Strip(ns.SchemaNs)
+	ns.SchemaNs = path.Base(meta.SourcePath.Get())
 
-	if strings.HasPrefix(ns.CurrNs, "/") {
+	for strings.Contains(ns.SchemaNs, ".") {
+		ns.SchemaNs = extentioner.Strip(ns.SchemaNs)
+	}
+
+	ns.SchemaNs = path.Join(path.Dir(meta.SourcePath.Get()), ns.SchemaNs)
+	ns.SchemaNs = strings.Replace(ns.SchemaNs, meta.RootPath.Get(), "", 1)
+
+	if strings.HasPrefix(ns.SchemaNs, "/") {
 		ns.SchemaNs = strings.Replace(ns.SchemaNs, "/", "", 1)
 	}
 
@@ -53,5 +59,25 @@ func (t *Loader) namespace(meta ct.SourceMeta) ct.RenderNamespace {
 }
 
 func (t *Loader) typeNamespace(typ ct.CodeGenType) ct.RenderNamespace {
-	return t.namespace(*typ.Source())
+	ns := t.namespace(*typ.Source())
+	ns.CurrNs = ns.SchemaNs
+	return ns
+}
+
+func (t *Loader) operationNamespace(operation *ct.CodeGenProjectOperation) {
+	operation.RenderNamespace = t.namespace(operation.SourceMeta)
+	operation.CurrNs = operation.SchemaNs
+}
+
+func (t *Loader) operationIoNamespace(operation ct.CodeGenProjectOperation, typ ct.CodeGenType) {
+	switch c := typ.(type) {
+	case *ct.CodeGenTypeArray:
+		*c.Namespace() = *operation.Namespace()
+		t.operationIoNamespace(operation, c.Items)
+	case *ct.CodeGenTypeRef:
+		*c.Namespace() = *operation.Namespace()
+		t.operationIoNamespace(operation, c.Resolved)
+	default:
+		typ.Namespace().CurrNs = operation.SchemaNs
+	}
 }

@@ -10,7 +10,7 @@ import (
 
 func (t *Renderer) RenderModel(schema ct.CodeGenType) ([]ModelOutput, error) {
 	outputs := make([]ModelOutput, 0)
-	tmpls := t.templateManager.Find(schema.Base().Id.Get())
+	tmpls := t.templateManager.Find(schema.SchemaType())
 
 	if tmpls.Empty() {
 		return outputs, nil

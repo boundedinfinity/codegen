@@ -14,14 +14,16 @@ import (
 )
 
 func (t *Generator) Generate() error {
-	for _, typ := range t.types {
+	merged := t.projectManager.Merged
+
+	for _, typ := range merged.Types {
 		if err := t.GenerateModel(typ); err != nil {
 			return err
 		}
 	}
 
-	for _, ops := range t.operations {
-		if err := t.GenerateOperation(ops); err != nil {
+	for _, operation := range merged.Operations {
+		if err := t.GenerateOperation(*operation); err != nil {
 			return err
 		}
 	}
@@ -41,6 +43,7 @@ func (t *Generator) GenerateModel(schema ct.CodeGenType) error {
 		var output string
 
 		outputExts, err := file_extention.GetExts(render.OutputMimeType)
+
 		if err != nil {
 			return err
 		}
@@ -79,7 +82,7 @@ func (t *Generator) GenerateModel(schema ct.CodeGenType) error {
 	return nil
 }
 
-func (t *Generator) GenerateOperation(schema ct.CodeGenProjectOperationTemplateFile) error {
+func (t *Generator) GenerateOperation(schema ct.CodeGenProjectOperation) error {
 
 	return nil
 }
