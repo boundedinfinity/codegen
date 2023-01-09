@@ -32,6 +32,12 @@ func (t *Loader) ProcessNamespace() error {
 		return nil
 	}, t.projectManager.Merged)
 
+	err = ct.WalkTemplateType(func(_ *ct.CodeGenProject, _ *ct.CodeGenProjectTemplates, file *ct.CodeGenProjectTemplateFile) error {
+		ns := t.namespace(file.SourceMeta)
+		*file.Namespace() = ns
+		return nil
+	}, t.projectManager.Merged)
+
 	return nil
 }
 

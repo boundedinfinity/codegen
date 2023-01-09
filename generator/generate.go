@@ -6,11 +6,8 @@ import (
 	"boundedinfinity/codegen/util"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/boundedinfinity/go-commoner/extentioner"
 	"github.com/boundedinfinity/go-commoner/pather"
-	"github.com/boundedinfinity/go-mimetyper/file_extention"
 )
 
 func (t *Generator) Generate() error {
@@ -39,40 +36,11 @@ func (t *Generator) GenerateModel(schema ct.CodeGenType) error {
 	}
 
 	for _, render := range renders {
-		var outputExt string
-		var output string
-
-		outputExts, err := file_extention.GetExts(render.OutputMimeType)
-
-		if err != nil {
-			return err
+		if outputPath := util.GetOutputPath(t.projectManager.Merged.Info.DestDir.Get(), render.CodeGenProjectTemplateFile, render.Schema); outputPath.Failure() {
+			return outputPath.Error
+		} else {
+			render.OutputPath = outputPath.Result
 		}
-
-		inputExts, err := file_extention.GetExts(schema.Base().SourceMimeType)
-
-		if err != nil {
-			return err
-		}
-
-		if len(outputExts) > 0 {
-			outputExt = outputExts[0].String()
-		}
-
-		output = schema.Base().SourcePath.Get()
-		output = strings.Replace(
-			output,
-			schema.Base().RootPath.Get(),
-			t.projectManager.Merged.Info.DestDir.Get(),
-			1,
-		)
-
-		output = util.RemoveSchema(output)
-
-		for _, inputExt := range inputExts {
-			output = extentioner.Swap(output, inputExt.String(), outputExt)
-		}
-
-		render.OutputPath = output
 
 		if err := t.writeModel(render); err != nil {
 			return err

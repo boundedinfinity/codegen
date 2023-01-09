@@ -7,7 +7,7 @@ import (
 )
 
 type TemplateOutput struct {
-	ct.TemplateMeta
+	ct.CodeGenProjectTemplateFile
 	Output []byte
 }
 

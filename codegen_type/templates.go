@@ -12,23 +12,19 @@ import (
 type TemplateMeta struct {
 	SourceMeta
 	RenderNamespace
-	Type           o.Option[codegen_type_id.CodgenTypeId]
-	OutputMimeType mime_type.MimeType
-	TemplateType   template_type.TemplateType
-	Template       *template.Template
+	Type             o.Option[codegen_type_id.CodgenTypeId]
+	OutputMimeType   mime_type.MimeType
+	OutputExt        string
+	TemplateType     template_type.TemplateType
+	TemplateMimeTime mime_type.MimeType
+	TemplateExt      string
+	Template         *template.Template
 }
 
 type CodeGenProjectTemplateFile struct {
 	TemplateMeta
 	Header  o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
 	Content o.Option[string]                `json:"content,omitempty"`
-}
-
-type CodeGenProjectOperationTemplateFile struct {
-	SourceMeta
-	TemplateMeta
-	RenderNamespace
-	Header o.Option[CodeGenTemplateHeader] `json:"header,omitempty"`
 }
 
 type CodeGenProjectTemplates struct {

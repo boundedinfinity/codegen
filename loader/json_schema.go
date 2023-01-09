@@ -2,6 +2,7 @@ package loader
 
 import (
 	ct "boundedinfinity/codegen/codegen_type"
+	type_visibility "boundedinfinity/codegen/codegen_type/type_visability"
 
 	o "github.com/boundedinfinity/go-commoner/optioner"
 	"github.com/boundedinfinity/go-jsonschema"
@@ -25,11 +26,13 @@ func (t *Loader) convertJsonSchema(v model.JsonSchema, name o.Option[string]) (c
 
 	w := jsonschema.Walk().
 		Base(func(js *model.JsonSchemaBase) error {
+			visibility := type_visibility.Public
+
 			base = ct.CodeGenTypeBase{
 				Id:          js.Id,
 				Name:        o.FirstOf(name, js.Title),
 				Description: js.Description,
-				Public:      o.Some(true),
+				Visibility:  o.Some(visibility),
 			}
 
 			return nil

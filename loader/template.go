@@ -25,6 +25,10 @@ func (t *Loader) ProcessTemplates(projects ...*ct.CodeGenProject) error {
 				return err
 			} else {
 				for _, meta := range metas {
+					if meta.SourcePath.Empty() {
+						continue
+					}
+
 					new := &ct.CodeGenProjectTemplateFile{
 						TemplateMeta: meta,
 						Header:       file.Header,
@@ -39,7 +43,7 @@ func (t *Loader) ProcessTemplates(projects ...*ct.CodeGenProject) error {
 						fmt.Printf("template type %v not implemented\n", meta.TemplateType)
 					}
 
-					t.templateManager.Register(&meta)
+					t.templateManager.Register(new)
 				}
 			}
 		}
@@ -129,10 +133,28 @@ func (t *Loader) loadTemplatePath(sourceMeta ct.SourceMeta) (ct.TemplateMeta, er
 		SourceMeta: sourceMeta,
 	}
 
-	if try := util.GetOutputType(templateMeta.SourcePath.Get()); try.Failure() {
+	if try := util.GetOutputMimeType(templateMeta.SourcePath.Get()); try.Failure() {
 		return templateMeta, try.Error
 	} else {
 		templateMeta.OutputMimeType = try.Result
+	}
+
+	if try := util.GetTemplateMimeType(templateMeta.SourcePath.Get()); try.Failure() {
+		return templateMeta, try.Error
+	} else {
+		templateMeta.TemplateMimeTime = try.Result
+	}
+
+	if try := util.GetTemplateExt(templateMeta.SourcePath.Get()); try.Failure() {
+		return templateMeta, try.Error
+	} else {
+		templateMeta.TemplateExt = try.Result
+	}
+
+	if try := util.GetOutputExt(templateMeta.SourcePath.Get()); try.Failure() {
+		return templateMeta, try.Error
+	} else {
+		templateMeta.OutputExt = try.Result
 	}
 
 	if tt, err := template_type.FromUrl(templateMeta.SourcePath.Get()); err != nil {

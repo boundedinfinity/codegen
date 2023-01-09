@@ -3,7 +3,7 @@ module boundedinfinity/codegen
 go 1.18
 
 require (
-	github.com/boundedinfinity/go-commoner v1.0.22
+	github.com/boundedinfinity/go-commoner v1.0.23
 	github.com/boundedinfinity/go-jsonschema v1.0.8
 	github.com/boundedinfinity/go-marshaler v1.0.6
 	github.com/boundedinfinity/go-mimetyper v1.0.16

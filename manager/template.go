@@ -12,28 +12,28 @@ import (
 )
 
 type CodeGenTemplateManager struct {
-	All             []*ct.TemplateMeta
-	source2template mapper.Mapper[string, *ct.TemplateMeta]
-	root2template   mapper.Mapper[string, []*ct.TemplateMeta]
+	All             []*ct.CodeGenProjectTemplateFile
+	source2template mapper.Mapper[string, *ct.CodeGenProjectTemplateFile]
+	root2template   mapper.Mapper[string, []*ct.CodeGenProjectTemplateFile]
 	source2root     mapper.Mapper[string, string]
 	root2source     mapper.Mapper[string, []string]
-	tt2template     mapper.Mapper[template_type.TemplateType, []*ct.TemplateMeta]
-	tId2template    mapper.Mapper[codegen_type_id.CodgenTypeId, []*ct.TemplateMeta]
+	tt2template     mapper.Mapper[template_type.TemplateType, []*ct.CodeGenProjectTemplateFile]
+	tId2template    mapper.Mapper[codegen_type_id.CodgenTypeId, []*ct.CodeGenProjectTemplateFile]
 }
 
 func TemplateManager() *CodeGenTemplateManager {
 	return &CodeGenTemplateManager{
-		All:             make([]*ct.TemplateMeta, 0),
-		source2template: make(mapper.Mapper[string, *ct.TemplateMeta]),
+		All:             make([]*ct.CodeGenProjectTemplateFile, 0),
+		source2template: make(mapper.Mapper[string, *ct.CodeGenProjectTemplateFile]),
 		source2root:     make(mapper.Mapper[string, string]),
-		root2template:   make(mapper.Mapper[string, []*ct.TemplateMeta]),
+		root2template:   make(mapper.Mapper[string, []*ct.CodeGenProjectTemplateFile]),
 		root2source:     make(mapper.Mapper[string, []string]),
-		tt2template:     make(mapper.Mapper[template_type.TemplateType, []*ct.TemplateMeta]),
-		tId2template:    make(mapper.Mapper[codegen_type_id.CodgenTypeId, []*ct.TemplateMeta]),
+		tt2template:     make(mapper.Mapper[template_type.TemplateType, []*ct.CodeGenProjectTemplateFile]),
+		tId2template:    make(mapper.Mapper[codegen_type_id.CodgenTypeId, []*ct.CodeGenProjectTemplateFile]),
 	}
 }
 
-func (t *CodeGenTemplateManager) Register(meta *ct.TemplateMeta) {
+func (t *CodeGenTemplateManager) Register(meta *ct.CodeGenProjectTemplateFile) {
 	t.All = append(t.All, meta)
 	t.source2template[meta.SourcePath.Get()] = meta
 	t.source2root[meta.SourcePath.Get()] = meta.RootPath.Get()
@@ -46,7 +46,7 @@ func (t *CodeGenTemplateManager) Register(meta *ct.TemplateMeta) {
 	}
 }
 
-func (t *CodeGenTemplateManager) Find(id any) optioner.Option[[]*ct.TemplateMeta] {
+func (t *CodeGenTemplateManager) Find(id any) optioner.Option[[]*ct.CodeGenProjectTemplateFile] {
 	s := fmt.Sprintf("%v", id)
 
 	r1 := t.tId2template.Get(codegen_type_id.CodgenTypeId(s))

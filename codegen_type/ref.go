@@ -11,7 +11,7 @@ type CodeGenTypeRef struct {
 	RenderNamespace
 	CodeGenTypeBase
 	Ref      o.Option[string] `json:"ref,omitempty"`
-	Resolved CodeGenType      `json:"type,omitempty"`
+	Resolved CodeGenType
 }
 
 func (t CodeGenTypeRef) HasValidation() bool {

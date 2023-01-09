@@ -1,11 +1,13 @@
 package util
 
 import (
+	ct "boundedinfinity/codegen/codegen_type"
 	"boundedinfinity/codegen/codegen_type/codegen_type_id"
 	"fmt"
 	"path/filepath"
 	"strings"
 
+	"github.com/boundedinfinity/go-commoner/caser"
 	"github.com/boundedinfinity/go-commoner/environmenter"
 	"github.com/boundedinfinity/go-commoner/extentioner"
 	o "github.com/boundedinfinity/go-commoner/optioner"
@@ -132,10 +134,76 @@ func GetSchemaTypeId(path o.Option[string]) o.Option[codegen_type_id.CodgenTypeI
 	return o.None[codegen_type_id.CodgenTypeId]()
 }
 
-func GetOutputType(path string) trier.Try[mime_type.MimeType] {
+func GetTemplateMimeType(path string) trier.Try[mime_type.MimeType] {
+	ext := path
+	ext = extentioner.Ext(ext)
+	tm, err := file_extention.FromExt(ext)
+	return trier.Complete(tm, err)
+}
+
+func GetTemplateExt(path string) trier.Try[string] {
+	mimeType := GetTemplateMimeType(path)
+	return getExt(path, mimeType)
+}
+
+func GetOutputMimeType(path string) trier.Try[mime_type.MimeType] {
 	ext := path
 	ext = extentioner.Strip(ext)
 	ext = extentioner.Ext(ext)
 	tm, err := file_extention.FromExt(ext)
 	return trier.Complete(tm, err)
+}
+
+func getExt(path string, mimeType trier.Try[mime_type.MimeType]) trier.Try[string] {
+	if mimeType.Failure() {
+		return trier.Failure[string](mimeType.Error)
+	}
+
+	exts, err := file_extention.GetExts(mimeType.Result)
+
+	if err != nil {
+		return trier.Failure[string](err)
+	}
+
+	name := pather.Base(path)
+	var found string
+
+	for _, ext := range exts {
+		if strings.Contains(name, ext.String()) {
+			found = ext.String()
+			break
+		}
+	}
+
+	if found == "" {
+		return trier.Failure[string](fmt.Errorf("can't find extention"))
+	}
+
+	return trier.Success(found)
+}
+
+func GetOutputExt(path string) trier.Try[string] {
+	mimeType := GetOutputMimeType(path)
+	return getExt(path, mimeType)
+}
+
+func GetOutputPath(outputDir string, file ct.CodeGenProjectTemplateFile, typ ct.CodeGenType) trier.Try[string] {
+	if file.SourcePath.Empty() {
+		return trier.Failuref[string]("sourcePath missing")
+	}
+
+	var name string
+	var path string
+
+	name = typ.Namespace().SchemaNs
+	name = pather.Base(name)
+	name = caser.KebabToPascal(name)
+	name = name + extentioner.Ext(extentioner.Strip(file.SourcePath.Get()))
+
+	path = file.SourcePath.Get()
+	path = strings.ReplaceAll(path, file.RootPath.Get(), "")
+	path = pather.Dir(path)
+	path = pather.Join(outputDir, path, name)
+
+	return trier.Success(path)
 }
