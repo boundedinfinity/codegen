@@ -5,11 +5,12 @@ package type_id
 type TypeId string
 
 const (
-	Ref     TypeId = "ref"
 	Array   TypeId = "array"
 	Boolean TypeId = "boolean"
+	Enum    TypeId = "enum"
 	Float   TypeId = "float"
 	Integer TypeId = "integer"
 	Object  TypeId = "object"
+	Ref     TypeId = "ref"
 	String  TypeId = "string"
 )
