@@ -7,10 +7,18 @@ import (
 )
 
 type String struct {
-	common
+	Common
 	Min   optioner.Option[int]    `json:"min,omitempty"`
 	Max   optioner.Option[int]    `json:"max,omitempty"`
 	Regex optioner.Option[string] `json:"regex,omitempty"`
+}
+
+func NewString(params ...ParamFunc[String]) String {
+	t := String{}
+
+	// handleParams(&t, params)
+
+	return t
 }
 
 func (t String) TypeId() type_id.TypeId {

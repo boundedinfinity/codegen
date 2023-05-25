@@ -7,7 +7,7 @@ import (
 )
 
 type number[T int | float64] struct {
-	common
+	Common
 	Min        optioner.Option[T] `json:"min,omitempty"`
 	Max        optioner.Option[T] `json:"max,omitempty"`
 	MultipleOf optioner.Option[T] `json:"multiple-of,omitempty"`

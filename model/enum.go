@@ -5,7 +5,7 @@ import (
 )
 
 type Enum struct {
-	common
+	Common
 }
 
 func (t Enum) TypeId() type_id.TypeId {

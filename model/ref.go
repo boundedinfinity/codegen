@@ -3,7 +3,7 @@ package model
 import "boundedinfinity/codegen/model/type_id"
 
 type Ref struct {
-	common
+	Common
 	Ref string
 }
 
