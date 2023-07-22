@@ -1,11 +1,17 @@
 package model_test
 
 import (
+	"boundedinfinity/codegen/model"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_String_Marshal(t *testing.T) {
-	// input := model.NewString()
+	input := model.BuildString().Min(1).Done()
+	input.Common = model.BuildCommon(&input.Common).Done()
+	actual := ``
+	expected := ``
 
-	// assert.True(t, actual.Id.Defined())
+	assert.Equal(t, expected, actual)
 }

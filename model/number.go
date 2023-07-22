@@ -13,6 +13,33 @@ type number[T int | float64] struct {
 	MultipleOf optioner.Option[T] `json:"multiple-of,omitempty"`
 }
 
+type numberBuilder[T int | float64] struct {
+	t *number[T]
+}
+
+func buildNumber[T int | float64]() *numberBuilder[T] {
+	return &numberBuilder[T]{}
+}
+
+func (b *numberBuilder[T]) Done() number[T] {
+	return *b.t
+}
+
+func (b *numberBuilder[T]) Min(v T) *numberBuilder[T] {
+	b.t.Min = optioner.Some(v)
+	return b
+}
+
+func (b *numberBuilder[T]) Max(v T) *numberBuilder[T] {
+	b.t.Max = optioner.Some(v)
+	return b
+}
+
+func (b *numberBuilder[T]) MultipleOf(v T) *numberBuilder[T] {
+	b.t.MultipleOf = optioner.Some(v)
+	return b
+}
+
 type Int number[int]
 
 func (t Int) TypeId() type_id.TypeId {
@@ -21,6 +48,10 @@ func (t Int) TypeId() type_id.TypeId {
 
 var _ Type = &Int{}
 
+func BuildInt() *numberBuilder[int] {
+	return buildNumber[int]()
+}
+
 type Float number[float64]
 
 func (t Float) TypeId() type_id.TypeId {
@@ -28,3 +59,7 @@ func (t Float) TypeId() type_id.TypeId {
 }
 
 var _ Type = &Float{}
+
+func BuildFloat() *numberBuilder[float64] {
+	return buildNumber[float64]()
+}

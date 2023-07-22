@@ -8,7 +8,7 @@ type Object struct {
 }
 
 func (t Object) TypeId() type_id.TypeId {
-	return type_id.Float
+	return type_id.Object
 }
 
 var _ Type = &Object{}

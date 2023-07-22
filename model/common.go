@@ -3,50 +3,65 @@ package model
 import (
 	"boundedinfinity/codegen/model/type_id"
 
-	"github.com/boundedinfinity/go-commoner/optioner"
+	o "github.com/boundedinfinity/go-commoner/optioner"
 )
+
+type Source struct {
+	Path string `json:"path,omitempty"`
+}
 
 type Type interface {
 	TypeId() type_id.TypeId
 }
 
 type Common struct {
-	Name        optioner.Option[string] `json:"name,omitempty"`
-	Description optioner.Option[string] `json:"description,omitempty"`
-	Required    optioner.Option[bool]   `json:"required,omitempty"`
-	// Default     optioner.Option[T]      `json:"default,omitempty"`
+	Name         o.Option[string] `json:"name,omitempty"`
+	Desc         o.Option[string] `json:"desc,omitempty"`
+	Version      o.Option[string] `json:"version,omitempty"`
+	Required     o.Option[bool]   `json:"required,omitempty"`
+	Header       o.Option[string] `json:"header,omitempty"`
+	FormatSource o.Option[bool]   `json:"format-source,omitempty"`
+	Source       Source           `json:"source,omitempty"`
 }
 
-type ParamT interface {
-	Common | String
+type commonBuilder struct {
+	v *Common
 }
 
-type ParamFunc[T ParamT] func(t *T)
-
-func handleParams[T ParamT](t *T, params ...ParamFunc[T]) {
-	for _, param := range params {
-		param(t)
-	}
+func BuildCommon(v *Common) *commonBuilder {
+	return &commonBuilder{v: v}
 }
 
-func Name(v string) func(t *Common) {
-	return NameOf(optioner.Some(v))
+func (b *commonBuilder) Done() Common {
+	return *b.v
 }
 
-func NameOf(v optioner.Option[string]) func(t *Common) {
-	return func(t *Common) {
-		t.Name = v
-	}
+func (b *commonBuilder) Name(v string) *commonBuilder {
+	b.v.Name = o.Some(v)
+	return b
 }
 
-func Description(v string) func(t *Common) {
-	return func(t *Common) {
-		t.Description = optioner.Some(v)
-	}
+func (b *commonBuilder) Desc(v string) *commonBuilder {
+	b.v.Desc = o.Some(v)
+	return b
 }
 
-func Required(v bool) func(t *Common) {
-	return func(t *Common) {
-		t.Required = optioner.Some(v)
-	}
+func (b *commonBuilder) Required(v bool) *commonBuilder {
+	b.v.Required = o.Some(v)
+	return b
+}
+
+func (b *commonBuilder) Version(v string) *commonBuilder {
+	b.v.Version = o.Some(v)
+	return b
+}
+
+func (b *commonBuilder) Header(v string) *commonBuilder {
+	b.v.Header = o.Some(v)
+	return b
+}
+
+func (b *commonBuilder) FormatSource(v bool) *commonBuilder {
+	b.v.FormatSource = o.Some(v)
+	return b
 }

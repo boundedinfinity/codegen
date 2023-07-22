@@ -1,0 +1,69 @@
+# The project's package information.
+project:
+    
+    # The root package name.
+    #   This needs to be a root project package.  The name needs to be
+    #   appropriate for the language to be generated.
+    root-package: boundedinfinity
+    # The schema ID replacement string
+    #   The portion of the schema ID from the types to be replaced by
+    #   root-package.  Anything under the schema will be used by the
+    #   templates and the reminder of the remplate names will be 
+    #   sub-packages (or modules) under the root-pacakge.
+    #   E.g.: If the given the root package of:
+    #       boundedinfinity
+    #   and a schema-replacement value of:
+    #       https://www.boundedinfinity.com/schema
+    #   and a schema ID of:
+    #       https://www.boundedinfinity.com/schema/util/description
+    #   a resulting type package path will be:
+    #       boundedinfinity/util/description (for a language like go)
+    #   or
+    #       boundedinfinity.util.description (for a language like typescript/javascript)
+    schema-replace:
+        -   https://www.boundedinfinity.com/schema
+    dest-dir: $HOME/stuff
+    format-source: true
+    template-dump: true
+# The list of types contained in the system.
+types:
+        # The schema ID.
+        #   Required.
+        #   This must be unique across the entire schema
+        #   execution context.  This should usually be unique across all
+        #   codegen schemas.  It is up to the user to ensure schema IDs are
+        #   unique.  The system will throw and error during the schema load
+        #   process if a duplicate schema ID is encountered.
+        #   The schema ID format is expected to be an URL.
+    -   id: https://www.boundedinfinity.com/schema/util/description
+        # The type of the object.
+        #   This can be one of the following:
+        #       -   string
+        #       -   integer
+        #       -   float
+        #       -   object
+        #       -   boolean
+        #       -   array
+        #       -   ref
+    -   type:
+        # The schema name.
+        #   Optional
+        #   The name will be used during the code generation process for the
+        #   language specific variable name. If the value is not given, then 
+        #   the last part of the schema ID will be used for the name.
+        name: description
+        # The description of the object.
+        # 
+        desc: This describes and example descriptioin object.
+        # The minimum value.
+        #   Optional.
+        #   This value is only valid for string, integer, float and array 
+        #   types.
+        # 
+        #   For string types, this represents the minimum length of the
+        #   string inclusive.  If not given, this defaults to 0.
+        #   For integer and float types this represents the minimum value of
+        #   iteger or float.
+        #   For array types this represents the minimum lenght of the array.
+        #   If not given, this defaults to 0.
+    -   min:
