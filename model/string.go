@@ -20,7 +20,7 @@ func (t String) TypeId() type_id.TypeId {
 var _ Type = &String{}
 
 type stringBuilder struct {
-	t *String
+	t String
 }
 
 func BuildString() *stringBuilder {
@@ -28,7 +28,7 @@ func BuildString() *stringBuilder {
 }
 
 func (b *stringBuilder) Done() String {
-	return *b.t
+	return b.t
 }
 
 func (b *stringBuilder) Min(v int) *stringBuilder {
@@ -43,5 +43,10 @@ func (b *stringBuilder) Max(v int) *stringBuilder {
 
 func (b *stringBuilder) Regex(v string) *stringBuilder {
 	b.t.Regex = o.Some(v)
+	return b
+}
+
+func (b *stringBuilder) Common(v Common) *stringBuilder {
+	b.t.Common = v
 	return b
 }

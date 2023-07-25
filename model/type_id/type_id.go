@@ -5,12 +5,14 @@ package type_id
 type TypeId string
 
 const (
-	Array   TypeId = "array"
-	Boolean TypeId = "boolean"
-	Enum    TypeId = "enum"
-	Float   TypeId = "float"
-	Integer TypeId = "integer"
-	Object  TypeId = "object"
-	Ref     TypeId = "ref"
-	String  TypeId = "string"
+	Array     TypeId = "array"
+	Boolean   TypeId = "boolean"
+	Enum      TypeId = "enum"
+	Float     TypeId = "float"
+	Integer   TypeId = "integer"
+	Object    TypeId = "object"
+	Ref       TypeId = "ref"
+	String    TypeId = "string"
+	Operation TypeId = "operation"
+	Template  TypeId = "template"
 )

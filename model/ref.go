@@ -18,7 +18,7 @@ func (t Ref) TypeId() type_id.TypeId {
 var _ Type = &Ref{}
 
 type refBuilder struct {
-	t *Ref
+	t Ref
 }
 
 func BuildRef() *refBuilder {
@@ -26,7 +26,7 @@ func BuildRef() *refBuilder {
 }
 
 func (b *refBuilder) Done() Ref {
-	return *b.t
+	return b.t
 }
 
 func (b *refBuilder) Ref(v string) *refBuilder {

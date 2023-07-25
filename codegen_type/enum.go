@@ -1,30 +1,23 @@
 package codegen_type
 
-import (
-	"boundedinfinity/codegen/codegen_type/codegen_type_id"
+// type CodeGenTypeEnum struct {
+// 	SourceMeta
+// 	RenderNamespace
+// 	CodeGenTypeBase
+// 	Values        mapper.Mapper[string, string] `json:"values,omitempty"`
+// 	CaseSensitive o.Option[bool]                `json:"caseSensitive,omitempty"`
+// }
 
-	o "github.com/boundedinfinity/go-commoner/optioner"
-	"github.com/boundedinfinity/go-commoner/optioner/mapper"
-)
+// func (t CodeGenTypeEnum) HasValidation() bool {
+// 	return t.CaseSensitive.Defined()
+// }
 
-type CodeGenTypeEnum struct {
-	SourceMeta
-	RenderNamespace
-	CodeGenTypeBase
-	Values        mapper.Mapper[string, string] `json:"values,omitempty"`
-	CaseSensitive o.Option[bool]                `json:"caseSensitive,omitempty"`
-}
+// func (t CodeGenTypeEnum) SchemaType() codegen_type_id.CodgenTypeId {
+// 	return codegen_type_id.Enum
+// }
 
-func (t CodeGenTypeEnum) HasValidation() bool {
-	return t.CaseSensitive.Defined()
-}
+// func (t CodeGenTypeEnum) ValidateSchema() error {
+// 	return nil
+// }
 
-func (t CodeGenTypeEnum) SchemaType() codegen_type_id.CodgenTypeId {
-	return codegen_type_id.Enum
-}
-
-func (t CodeGenTypeEnum) ValidateSchema() error {
-	return nil
-}
-
-var _ CodeGenType = &CodeGenTypeEnum{}
+// var _ CodeGenType = &CodeGenTypeEnum{}

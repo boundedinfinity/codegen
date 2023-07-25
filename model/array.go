@@ -20,7 +20,7 @@ func (t Array) TypeId() type_id.TypeId {
 var _ Type = &Array{}
 
 type arrayBuilder struct {
-	t *Array
+	t Array
 }
 
 func BuildArray() *arrayBuilder {
@@ -28,7 +28,7 @@ func BuildArray() *arrayBuilder {
 }
 
 func (b *arrayBuilder) Done() Array {
-	return *b.t
+	return b.t
 }
 
 func (b *arrayBuilder) Min(v int) *arrayBuilder {

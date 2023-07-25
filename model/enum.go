@@ -16,7 +16,7 @@ func (t Enum) TypeId() type_id.TypeId {
 var _ Type = &Enum{}
 
 type enumBuilder struct {
-	t *Enum
+	t Enum
 }
 
 func BuildEnum() *enumBuilder {
@@ -24,7 +24,7 @@ func BuildEnum() *enumBuilder {
 }
 
 func (b *enumBuilder) Done() Enum {
-	return *b.t
+	return b.t
 }
 
 func (b *enumBuilder) Values(v ...string) *enumBuilder {
