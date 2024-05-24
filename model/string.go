@@ -1,52 +1,66 @@
 package model
 
-import (
-	"boundedinfinity/codegen/model/type_id"
+import "github.com/boundedinfinity/go-commoner/functional/optioner"
 
-	o "github.com/boundedinfinity/go-commoner/optioner"
-)
+///////////////////////////////////////////////////////////////////
+// Type
+//////////////////////////////////////////////////////////////////
 
-type String struct {
-	Common
-	Min   o.Option[int]    `json:"min,omitempty"`
-	Max   o.Option[int]    `json:"max,omitempty"`
-	Regex o.Option[string] `json:"regex,omitempty"`
+type CodeGenString struct {
+	CodeGenCommon
+	Min   optioner.Option[int]    `json:"min,omitempty"`
+	Max   optioner.Option[int]    `json:"max,omitempty"`
+	Regex optioner.Option[string] `json:"regex,omitempty"`
 }
 
-func (t String) TypeId() type_id.TypeId {
-	return type_id.String
+func (t CodeGenString) TypeId() string {
+	return "string"
 }
 
-var _ Type = &String{}
+var _ CodeGenType = &CodeGenString{}
 
-type stringBuilder struct {
-	t String
+// /////////////////////////////////////////////////////////////////
+// Builder
+// ////////////////////////////////////////////////////////////////
+
+func BuildString() *codeGenStringBuilder {
+	return &codeGenStringBuilder{}
 }
 
-func BuildString() *stringBuilder {
-	return &stringBuilder{}
+type codeGenStringBuilder struct {
+	v CodeGenString
 }
 
-func (b *stringBuilder) Done() String {
-	return b.t
+func (t *codeGenStringBuilder) Value() CodeGenType {
+	return &t.v
 }
 
-func (b *stringBuilder) Min(v int) *stringBuilder {
-	b.t.Min = o.Some(v)
-	return b
+func (t *codeGenStringBuilder) Name(v string) *codeGenStringBuilder {
+	t.v.CodeGenCommon.Name = optioner.OfZero(v)
+	return t
 }
 
-func (b *stringBuilder) Max(v int) *stringBuilder {
-	b.t.Max = o.Some(v)
-	return b
+func (t *codeGenStringBuilder) Description(v string) *codeGenStringBuilder {
+	t.v.CodeGenCommon.Description = optioner.OfZero(v)
+	return t
 }
 
-func (b *stringBuilder) Regex(v string) *stringBuilder {
-	b.t.Regex = o.Some(v)
-	return b
+func (t *codeGenStringBuilder) Required(v bool) *codeGenStringBuilder {
+	t.v.CodeGenCommon.Required = optioner.OfZero(v)
+	return t
 }
 
-func (b *stringBuilder) Common(v Common) *stringBuilder {
-	b.t.Common = v
-	return b
+func (t *codeGenStringBuilder) Min(v int) *codeGenStringBuilder {
+	t.v.Min = optioner.OfZero(v)
+	return t
+}
+
+func (t *codeGenStringBuilder) Max(v int) *codeGenStringBuilder {
+	t.v.Max = optioner.OfZero(v)
+	return t
+}
+
+func (t *codeGenStringBuilder) Regex(v string) *codeGenStringBuilder {
+	t.v.Regex = optioner.OfZero(v)
+	return t
 }

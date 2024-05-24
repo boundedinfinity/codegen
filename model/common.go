@@ -1,86 +1,82 @@
 package model
 
 import (
-	"boundedinfinity/codegen/model/type_id"
+	"encoding/json"
 
-	type_visibility "boundedinfinity/codegen/codegen_type/type_visability"
-
-	o "github.com/boundedinfinity/go-commoner/optioner"
-	"github.com/boundedinfinity/go-mimetyper/mime_type"
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
-type Type interface {
-	TypeId() type_id.TypeId
+///////////////////////////////////////////////////////////////////
+// Interface
+//////////////////////////////////////////////////////////////////
+
+type CodeGenType interface {
+	TypeId() string
 }
 
-type Meta struct {
-	Source    Source    `json:"source,omitempty"`
-	Namespace Namespace `json:"namespace,omitempty"`
+///////////////////////////////////////////////////////////////////
+// Common
+//////////////////////////////////////////////////////////////////
+
+type CodeGenCommon struct {
+	Name        optioner.Option[string]        `json:"name,omitempty"`
+	Description optioner.Option[string]        `json:"description,omitempty"`
+	Required    optioner.Option[bool]          `json:"required,omitempty"`
+	Default     optioner.Option[CodeGenType]   `json:"default,omitempty"`
+	Inherit     optioner.Option[string]        `json:"inherit,omitempty"`
+	Links       optioner.Option[[]CodeGenLink] `json:"links,omitempty"`
 }
 
-type Source struct {
-	SourcePath     o.Option[string]   `json:"source-path,omitempty"`
-	RootPath       o.Option[string]   `json:"root-path,omitempty"`
-	SourceMimeType mime_type.MimeType `json:"source-mime-type,omitempty"`
+///////////////////////////////////////////////////////////////////
+// Marshal
+//////////////////////////////////////////////////////////////////
+
+type codeGenCommonMarshal struct {
+	Name        *string      `json:"name,omitempty"`
+	Description *string      `json:"description,omitempty"`
+	Required    *bool        `json:"required,omitempty"`
+	Default     *CodeGenType `json:"default,omitempty"`
 }
 
-type Namespace struct {
-	RootNs   string
-	SchemaNs string
-	RelNs    string
-	CurrNs   string
+func (t *CodeGenCommon) MarshalJSON() ([]byte, error) {
+	v := codeGenCommonMarshal{
+		Name:        t.Name.OrNil(),
+		Description: t.Description.OrNil(),
+		Required:    t.Required.OrNil(),
+		Default:     t.Default.OrNil(),
+	}
+
+	return json.Marshal(&v)
 }
 
-type Common struct {
-	Name         o.Option[string]                         `json:"name,omitempty"`
-	Desc         o.Option[string]                         `json:"desc,omitempty"`
-	Version      o.Option[string]                         `json:"version,omitempty"`
-	Required     o.Option[bool]                           `json:"required,omitempty"`
-	Header       o.Option[string]                         `json:"header,omitempty"`
-	FormatSource o.Option[bool]                           `json:"format-source,omitempty"`
-	Deprecated   o.Option[bool]                           `json:"deprecated,omitempty"`
-	Visibility   o.Option[type_visibility.TypeVisibility] `json:"visibility,omitempty"`
-	Meta         Meta                                     `json:"meta,omitempty"`
+///////////////////////////////////////////////////////////////////
+// Builder
+///////////////////////////////////////////////////////////////////
+
+func BuildCommon(v *CodeGenCommon) *codeGenCommonBuilder {
+	return &codeGenCommonBuilder{v: v}
 }
 
-type commonBuilder struct {
-	v Common
+type codeGenCommonBuilder struct {
+	v *CodeGenCommon
 }
 
-func BuildCommon() *commonBuilder {
-	return &commonBuilder{}
+func (t *codeGenCommonBuilder) Name(v string) *codeGenCommonBuilder {
+	t.v.Name = optioner.OfZero(v)
+	return t
 }
 
-func (b *commonBuilder) Done() Common {
-	return b.v
+func (t *codeGenCommonBuilder) Description(v string) *codeGenCommonBuilder {
+	t.v.Description = optioner.OfZero(v)
+	return t
 }
 
-func (b *commonBuilder) Name(v string) *commonBuilder {
-	b.v.Name = o.Some(v)
-	return b
+func (t *codeGenCommonBuilder) Required(v bool) *codeGenCommonBuilder {
+	t.v.Required = optioner.OfZero(v)
+	return t
 }
 
-func (b *commonBuilder) Desc(v string) *commonBuilder {
-	b.v.Desc = o.Some(v)
-	return b
-}
-
-func (b *commonBuilder) Required(v bool) *commonBuilder {
-	b.v.Required = o.Some(v)
-	return b
-}
-
-func (b *commonBuilder) Version(v string) *commonBuilder {
-	b.v.Version = o.Some(v)
-	return b
-}
-
-func (b *commonBuilder) Header(v string) *commonBuilder {
-	b.v.Header = o.Some(v)
-	return b
-}
-
-func (b *commonBuilder) FormatSource(v bool) *commonBuilder {
-	b.v.FormatSource = o.Some(v)
-	return b
+func (t *codeGenCommonBuilder) Default(v CodeGenType) *codeGenCommonBuilder {
+	t.v.Default = optioner.OfZero(v)
+	return t
 }

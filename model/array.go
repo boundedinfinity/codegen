@@ -1,42 +1,81 @@
 package model
 
 import (
-	"boundedinfinity/codegen/model/type_id"
+	"encoding/json"
 
-	o "github.com/boundedinfinity/go-commoner/optioner"
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
-type Array struct {
-	Common
-	Items Type
-	Min   o.Option[int] `json:"min,omitempty"`
-	Max   o.Option[int] `json:"max,omitempty"`
+///////////////////////////////////////////////////////////////////
+// Type
+//////////////////////////////////////////////////////////////////
+
+type CodeGenArray struct {
+	CodeGenCommon
+	Items CodeGenType          `json:"items,omitempty"`
+	Min   optioner.Option[int] `json:"min,omitempty"`
+	Max   optioner.Option[int] `json:"max,omitempty"`
 }
 
-func (t Array) TypeId() type_id.TypeId {
-	return type_id.Array
+func (t CodeGenArray) TypeId() string {
+	return "array"
 }
 
-var _ Type = &Array{}
+var _ CodeGenType = &CodeGenArray{}
 
-type arrayBuilder struct {
-	t Array
+//////////////////////////////////////////////////////////////////
+// Marshal
+//////////////////////////////////////////////////////////////////
+
+type codeGenArray struct {
+	CodeGenCommon
+	Items CodeGenType `json:"items,omitempty"`
 }
 
-func BuildArray() *arrayBuilder {
-	return &arrayBuilder{}
+func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
+	dto := typedDto{
+		TypeId: t.TypeId(),
+		Value: codeGenArray{
+			CodeGenCommon: t.CodeGenCommon,
+			Items:         t.Items,
+		},
+	}
+
+	return json.Marshal(dto)
 }
 
-func (b *arrayBuilder) Done() Array {
-	return b.t
+//////////////////////////////////////////////////////////////////
+// Builder
+//////////////////////////////////////////////////////////////////
+
+func BuildArray() *codeGenArrayBuilder {
+	return &codeGenArrayBuilder{}
 }
 
-func (b *arrayBuilder) Min(v int) *arrayBuilder {
-	b.t.Min = o.Some(v)
-	return b
+type codeGenArrayBuilder struct {
+	v CodeGenArray
 }
 
-func (b *arrayBuilder) Max(v int) *arrayBuilder {
-	b.t.Max = o.Some(v)
-	return b
+func (t *codeGenArrayBuilder) Value() CodeGenType {
+	return &t.v
+}
+
+func (t *codeGenArrayBuilder) Name(v string) *codeGenArrayBuilder {
+	t.v.Name = optioner.OfZero(v)
+	return t
+}
+
+func (t *codeGenArrayBuilder) Description(v string) *codeGenArrayBuilder {
+	t.v.Description = optioner.OfZero(v)
+	return t
+}
+
+func (t *codeGenArrayBuilder) Required(v bool) *codeGenArrayBuilder {
+	t.v.Required = optioner.OfZero(v)
+	return t
+}
+
+func (t *codeGenArrayBuilder) Items(v CodeGenType) *codeGenArrayBuilder {
+	t.v.Items = v
+	return t
 }

@@ -1,14 +1,12 @@
 package model
 
-import "boundedinfinity/codegen/model/type_id"
-
-type Object struct {
-	Common
-	Properties []Type
+type CodeGenObject struct {
+	CodeGenCommon
+	Properties []CodeGenType
 }
 
-func (t Object) TypeId() type_id.TypeId {
-	return type_id.Object
+func (t CodeGenObject) TypeId() string {
+	return "object"
 }
 
-var _ Type = &Object{}
+var _ CodeGenType = &CodeGenObject{}
