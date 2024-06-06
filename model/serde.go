@@ -3,29 +3,27 @@ package model
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
-var ErrInvalidMarshalCodeGenObject = errors.New("invalid code gen object")
+var (
+	ErrInvalidMarshalCodeGenObject   = errors.New("invalid code gen object")
+	ErrCodeGenTypeTypeIdMissing      = errors.New("type-id missing")
+	ErrCodeGenTypeTypeIdNotSupported = errors.New("type-id not supported")
+	ErrCodeGenTypeUnmarshal          = errors.New("unmarshal error")
 
-type typedDto struct {
-	TypeId string `json:"type-id"`
-	Value  any    `json:"value"`
-}
+	errCodeGenTypeUnmarshalFn = func(err error) error {
+		return errors.Join(err, ErrCodeGenTypeUnmarshal)
+	}
+)
 
-type unmarshalWrapper struct {
+type unmarshalDto struct {
 	TypeId string          `json:"type-id"`
 	Value  json.RawMessage `json:"value"`
 }
 
-var ErrCodeGenTypeTypeIdMissing = errors.New("type-id missing")
-var ErrCodeGenTypeUnmarshal = errors.New("unmarshal error")
-
-func errCodeGenTypeUnmarshalFn(err error) error {
-	return errors.Join(ErrCodeGenTypeUnmarshal, err)
-}
-
-func UnmarshalCodeGenObject(data []byte) (CodeGenType, error) {
-	wrapper := unmarshalWrapper{}
+func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
+	wrapper := unmarshalDto{}
 	var v CodeGenType
 
 	if err := json.Unmarshal(data, &wrapper); err != nil {
@@ -34,52 +32,62 @@ func UnmarshalCodeGenObject(data []byte) (CodeGenType, error) {
 
 	if wrapper.TypeId == "" {
 		return nil, ErrCodeGenTypeTypeIdMissing
-
 	}
+
+	var err error
 
 	switch wrapper.TypeId {
-	case "string":
+	case CodeGenString{}.TypeId():
 		var obj CodeGenString
 
-		if err := json.Unmarshal(wrapper.Value, &obj); err != nil {
-			return nil, errCodeGenTypeUnmarshalFn(err)
+		if err = json.Unmarshal(wrapper.Value, &obj); err != nil {
+			err = errCodeGenTypeUnmarshalFn(err)
+		} else {
+			v = &obj
 		}
-
-		v = &obj
-	case "integer":
+	case CodeGenInteger{}.TypeId():
 		var obj CodeGenInteger
 
-		if err := json.Unmarshal(wrapper.Value, &obj); err != nil {
-			return nil, errCodeGenTypeUnmarshalFn(err)
+		if err = json.Unmarshal(wrapper.Value, &obj); err != nil {
+			err = errCodeGenTypeUnmarshalFn(err)
+		} else {
+			v = &obj
 		}
-
-		v = &obj
-	case "float":
+	case CodeGenFloat{}.TypeId():
 		var obj CodeGenFloat
 
-		if err := json.Unmarshal(wrapper.Value, &obj); err != nil {
-			return nil, errCodeGenTypeUnmarshalFn(err)
+		if err = json.Unmarshal(wrapper.Value, &obj); err != nil {
+			err = errCodeGenTypeUnmarshalFn(err)
+		} else {
+			v = &obj
 		}
-
-		v = &obj
-	case "boolean":
+	case CodeGenBoolean{}.TypeId():
 		var obj CodeGenBoolean
 
-		if err := json.Unmarshal(wrapper.Value, &obj); err != nil {
-			return nil, errCodeGenTypeUnmarshalFn(err)
+		if err = json.Unmarshal(data, &obj); err != nil {
+			err = errCodeGenTypeUnmarshalFn(err)
+		} else {
+			v = &obj
 		}
-
-		v = &obj
-	case "array":
+	case CodeGenArray{}.TypeId():
 		var obj CodeGenArray
 
-		if err := json.Unmarshal(wrapper.Value, &obj); err != nil {
-			return nil, errCodeGenTypeUnmarshalFn(err)
+		if err = json.Unmarshal(wrapper.Value, &obj); err != nil {
+			err = errCodeGenTypeUnmarshalFn(err)
+		} else {
+			v = &obj
 		}
+	case CodeGenObject{}.TypeId():
+		var obj CodeGenObject
 
-		v = &obj
+		if err = json.Unmarshal(wrapper.Value, &obj); err != nil {
+			err = errCodeGenTypeUnmarshalFn(err)
+		} else {
+			v = &obj
+		}
 	default:
+		err = fmt.Errorf("%v : %w", wrapper.TypeId, ErrCodeGenTypeTypeIdNotSupported)
 	}
 
-	return v, nil
+	return v, err
 }

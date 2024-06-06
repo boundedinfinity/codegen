@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
@@ -19,64 +17,56 @@ type CodeGenType interface {
 //////////////////////////////////////////////////////////////////
 
 type CodeGenCommon struct {
-	Name        optioner.Option[string]        `json:"name,omitempty"`
-	Description optioner.Option[string]        `json:"description,omitempty"`
-	Required    optioner.Option[bool]          `json:"required,omitempty"`
-	Default     optioner.Option[CodeGenType]   `json:"default,omitempty"`
-	Inherit     optioner.Option[string]        `json:"inherit,omitempty"`
-	Links       optioner.Option[[]CodeGenLink] `json:"links,omitempty"`
+	// Name is the name of the type.
+	Name optioner.Option[string] `json:"name,omitempty"`
+
+	// Description description of the type
+	Description optioner.Option[string] `json:"description,omitempty"`
+
+	// Required true if this types is required, false otherwise
+	Required optioner.Option[bool] `json:"required,omitempty"`
+
+	// Default is the default value of this type if it's not set
+	// Note that this value is mutually exclusive with the Required option.
+	Default optioner.Option[CodeGenType] `json:"default,omitempty"`
+
+	// Ref inherits all properties from the base type.
+	// Any items can be overridden in this type.
+	Ref optioner.Option[string] `json:"ref,omitempty"`
+
+	// Eager will load this type if it's containted inside another type.
+	Eager optioner.Option[bool] `json:"eager,omitempty"`
+
+	// Package is the language pack designation used during code generation.
+	//  This will be translated into a language appropriate formatted name.
+	Package optioner.Option[string] `json:"package,omitempty"`
 }
 
 ///////////////////////////////////////////////////////////////////
-// Marshal
-//////////////////////////////////////////////////////////////////
-
-type codeGenCommonMarshal struct {
-	Name        *string      `json:"name,omitempty"`
-	Description *string      `json:"description,omitempty"`
-	Required    *bool        `json:"required,omitempty"`
-	Default     *CodeGenType `json:"default,omitempty"`
-}
-
-func (t *CodeGenCommon) MarshalJSON() ([]byte, error) {
-	v := codeGenCommonMarshal{
-		Name:        t.Name.OrNil(),
-		Description: t.Description.OrNil(),
-		Required:    t.Required.OrNil(),
-		Default:     t.Default.OrNil(),
-	}
-
-	return json.Marshal(&v)
-}
-
-///////////////////////////////////////////////////////////////////
-// Builder
+// Builders
 ///////////////////////////////////////////////////////////////////
 
-func BuildCommon(v *CodeGenCommon) *codeGenCommonBuilder {
-	return &codeGenCommonBuilder{v: v}
-}
-
-type codeGenCommonBuilder struct {
-	v *CodeGenCommon
-}
-
-func (t *codeGenCommonBuilder) Name(v string) *codeGenCommonBuilder {
-	t.v.Name = optioner.OfZero(v)
+func (t *CodeGenCommon) WithName(v string) *CodeGenCommon {
+	t.Name = optioner.OfZero(v)
 	return t
 }
 
-func (t *codeGenCommonBuilder) Description(v string) *codeGenCommonBuilder {
-	t.v.Description = optioner.OfZero(v)
+func (t *CodeGenCommon) WithDescription(v string) *CodeGenCommon {
+	t.Description = optioner.OfZero(v)
 	return t
 }
 
-func (t *codeGenCommonBuilder) Required(v bool) *codeGenCommonBuilder {
-	t.v.Required = optioner.OfZero(v)
+func (t *CodeGenCommon) WithRequired(v bool) *CodeGenCommon {
+	t.Required = optioner.OfZero(v)
 	return t
 }
 
-func (t *codeGenCommonBuilder) Default(v CodeGenType) *codeGenCommonBuilder {
-	t.v.Default = optioner.OfZero(v)
+func (t *CodeGenCommon) WithDefault(v CodeGenType) *CodeGenCommon {
+	t.Default = optioner.OfZero(v)
+	return t
+}
+
+func (t *CodeGenCommon) WithEager(v bool) *CodeGenCommon {
+	t.Eager = optioner.OfZero(v)
 	return t
 }

@@ -16,94 +16,104 @@ func Test_Marshal_Boolean(t *testing.T) {
 		err      error
 	}{
 		{
-			name:  "Serialize boolean",
-			input: model.BuildBoolean().Value(),
+			name:  "Marshal boolean",
+			input: model.NewBoolean(),
 			err:   nil,
 			expected: `{
-                "type-id": "boolean",
-                "value":{}
-            }`,
+		        "type-id": "boolean",
+                "name": null,
+                "description": null,
+                "required": null,
+                "default": null,
+                "inherit": null,
+                "links": null
+		    }`,
 		},
 		{
-			name:  "Serialize boolean with name",
-			input: model.BuildBoolean().Name("A_NAME").Value(),
+			name:  "Marshal boolean with name",
+			input: model.NewBoolean().WithName("A_BOOLEAN"),
 			err:   nil,
 			expected: `{
-                "type-id": "boolean",
-                "value":{
-                    "name": "A_NAME"
-                }
-            }`,
+		        "type-id": "boolean",
+                "name": "A_BOOLEAN",
+                "description": null,
+                "required": null,
+                "default": null,
+                "inherit": null,
+                "links": null
+		    }`,
 		},
 		{
-			name:  "Serialize boolean with name and required",
-			input: model.BuildBoolean().Name("A_NAME").Required(true).Value(),
+			name:  "Marshal boolean with name and required",
+			input: model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
 			err:   nil,
 			expected: `{
-                "type-id": "boolean",
-                "value":{
-                    "name": "A_NAME",
-                    "required": true
-                }
-            }`,
+		        "type-id": "boolean",
+                "name": "A_BOOLEAN",
+                "description": null,
+                "required": true,
+                "default": null,
+                "inherit": null,
+                "links": null
+		    }`,
 		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
-			// bs, err := model.MarshalCodeGenObject(tc.input)
 			bs, err := json.MarshalIndent(tc.input, "", "    ")
 			actual := string(bs)
 
 			if tc.err != nil {
-				assert.Equal(t, tc.err, err, "%v : %v", tc.name, actual)
+				assert.Equalf(t, tc.err, err, "%v : %v", tc.name, actual)
 			} else {
 				assert.Nil(t, err, tc.name, actual)
 			}
 
-			assert.JSONEq(t, tc.expected, actual, "%v : %v", tc.name, actual)
+			assert.JSONEqf(t, tc.expected, actual, "%v : %v", tc.name, actual)
 		})
 	}
 }
 
 func Test_Unmarshal_Boolean(t *testing.T) {
 	tcs := []struct {
-		name     string
-		input    string
-		expected model.CodeGenType
-		err      error
+		name string
+		obj  *model.CodeGenBoolean
+		err  error
 	}{
 		{
-			name:     "Serialize boolean",
-			input:    `{"type-id":"boolean","value":{}}`,
-			expected: model.BuildBoolean().Value(),
-			err:      nil,
+			name: "Marshal boolean",
+			obj:  model.NewBoolean(),
+			err:  nil,
 		},
 		{
-			name:     "Serialize boolean",
-			input:    `{"type-id":"boolean","value":{"name":"A_NAME"}}`,
-			expected: model.BuildBoolean().Name("A_NAME").Value(),
-			err:      nil,
+			name: "Marshal boolean",
+			obj:  model.NewBoolean().WithName("A_BOOLEAN"),
+			err:  nil,
 		},
 		{
-			name:     "Serialize boolean",
-			input:    `{"type-id":"boolean","value":{"name":"A_NAME", "required":true}}`,
-			expected: model.BuildBoolean().Name("A_NAME").Required(true).Value(),
-			err:      nil,
+			name: "Marshal boolean",
+			obj:  model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
+			err:  nil,
 		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
-			actual, err := model.UnmarshalCodeGenObject([]byte(tc.input))
+			data, err := json.MarshalIndent(tc.obj, "", "    ")
+			assert.Nil(t, err, tc.name, string(data))
+
+			var actual model.CodeGenBoolean
+
+			err = json.Unmarshal(data, &actual)
 
 			if tc.err != nil {
-				assert.Equal(t, tc.err, err, tc.name, tc.input)
+				assert.Equal(t, tc.err, err, tc.name, string(data))
 			} else {
-				assert.Nil(t, err, tc.name, tc.input)
+				assert.Nil(t, err, tc.name, string(data))
 			}
 
-			assert.Equal(t, tc.expected, actual, tc.name, tc.input)
+			assert.EqualValuesf(t, tc.obj, &actual, "%v : %v", tc.name, string(data))
 		})
 	}
 }

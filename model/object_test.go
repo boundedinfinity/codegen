@@ -8,75 +8,73 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Marshal_Array(t *testing.T) {
+func Test_Marshal_Object(t *testing.T) {
 	tcs := []struct {
 		name     string
-		input    *model.CodeGenArray
+		input    *model.CodeGenObject
 		expected string
 		err      error
 	}{
 		{
 			name:  "Serialize boolean",
-			input: model.NewArray(),
+			input: model.NewObject(),
 			err:   nil,
 			expected: `{
-		        "type-id": "array",
+		        "type-id": "object",
                 "name": null,
                 "description": null,
                 "required": null,
                 "default": null,
                 "inherit": null,
                 "links": null,
-                "min": null,
-                "max": null
+                "properties": []
 		    }`,
 		},
 		{
 			name: "Serialize boolean",
-			input: model.NewArray().
-				WithName("AN_ARRAY").
-				WithDescription("an array description"),
+			input: model.NewObject().
+				WithName("AN_OBJECT").
+				WithDescription("an object description"),
 			err: nil,
 			expected: `{
-		        "type-id": "array",
-                "name": "AN_ARRAY",
-                "description": "an array description",
+		        "type-id": "object",
+                "name": "AN_OBJECT",
+                "description": "an object description",
                 "required": null,
                 "default": null,
                 "inherit": null,
                 "links": null,
-                "min": null,
-                "max": null
+                "properties": []
 		    }`,
 		},
 		{
-			name: "Serialize array with boolean",
+			name: "Serialize object with boolean",
 			err:  nil,
-			input: model.NewArray().
-				WithName("AN_ARRAY").
-				WithDescription("an array description").
-				WithItems(model.NewBoolean().
+			input: model.NewObject().
+				WithName("AN_OBJECT").
+				WithDescription("an object description").
+				WithProperties(model.NewBoolean().
 					WithName("A_BOOLEAN").
 					WithDescription("a bool description")),
 			expected: `{
-		        "type-id": "array",
-                "name": "AN_ARRAY",
-                "description": "an array description",
+		        "type-id": "object",
+                "name": "AN_OBJECT",
+                "description": "an object description",
                 "required": null,
                 "default": null,
                 "inherit": null,
                 "links": null,
-                "items": {
-                    "type-id": "boolean",
-                    "name": "A_BOOLEAN",
-                    "description": "a bool description",
-                    "required": null,
-                    "default": null,
-                    "inherit": null,
-                    "links": null
-                },
-                "min": null,
-                "max": null
+                "properties": [
+                    {
+                        "type-id": "boolean",
+                        "name": "A_BOOLEAN",
+                        "description": "a bool description",
+                        "required": null,
+                        "default": null,
+                        "inherit": null,
+                        "links": null
+                    }
+                ]
 		    }`,
 		},
 	}
@@ -98,20 +96,21 @@ func Test_Marshal_Array(t *testing.T) {
 	}
 }
 
-func Test_Unmarshal_Array(t *testing.T) {
+func Test_Unmarshal_Object(t *testing.T) {
 	tcs := []struct {
 		name string
-		obj  *model.CodeGenArray
+		obj  *model.CodeGenObject
 		err  error
 	}{
 		{
-			name: "Unmarshal array and boolean item",
-			obj: model.NewArray().
-				WithName("AN_ARRAY").
-				WithDescription("an array description").
-				WithItems(model.NewBoolean().
-					WithName("A_BOOLEAN").
-					WithDescription("a bool description")),
+			name: "Unmarshal object and boolean item",
+			obj: model.NewObject().
+				WithName("AN_OBJECT").
+				WithDescription("an object description").
+				WithProperties(
+					model.NewBoolean().WithName("A_BOOLEAN").WithDescription("a bool description"),
+					// model.NewInteger().WithName("A_INT").WithDescription("a int description"),
+				),
 			err: nil,
 		},
 	}
@@ -121,7 +120,7 @@ func Test_Unmarshal_Array(t *testing.T) {
 			input, err := json.Marshal(&tc.obj)
 			assert.Nilf(t, err, tc.name, "%v : %v", tc.name, string(input))
 
-			var actual model.CodeGenArray
+			var actual model.CodeGenObject
 
 			err = json.Unmarshal(input, &actual)
 

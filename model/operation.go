@@ -1,58 +1,76 @@
 package model
 
-// type Operation struct {
-// 	Meta
-// 	Name        o.Option[string] `json:"name,omitempty"`
-// 	Description o.Option[string] `json:"description,omitempty"`
-// 	Input       o.Option[Type]   `json:"input,omitempty"`
-// 	Output      o.Option[Type]   `json:"output,omitempty"`
-// }
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
 
-// func (t Operation) TypeId() type_id.TypeId {
-// 	return type_id.Operation
-// }
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
+)
 
-// var _ Type = &Operation{}
+///////////////////////////////////////////////////////////////////
+// Type
+//////////////////////////////////////////////////////////////////
 
-// type marshalOperation struct {
-// 	Meta
-// 	Name        o.Option[string]          `json:"name,omitempty"`
-// 	Description o.Option[string]          `json:"description,omitempty"`
-// 	Input       o.Option[json.RawMessage] `json:"input,omitempty"`
-// 	Output      o.Option[json.RawMessage] `json:"output,omitempty"`
-// }
+type CodeGenOperation struct {
+	Name        optioner.Option[string]        `json:"name,omitempty"`
+	Description optioner.Option[string]        `json:"description,omitempty"`
+	Inputs      optioner.Option[[]CodeGenType] `json:"inputs,omitempty"`
+	Outputs     optioner.Option[[]CodeGenType] `json:"outputs,omitempty"`
+}
 
-// func (t *Operation) UnmarshalJSON(data []byte) error {
-// 	var d marshalOperation
+func (t CodeGenOperation) TypeId() string {
+	return "operation"
+}
 
-// 	if err := json.Unmarshal(data, &d); err != nil {
-// 		return err
-// 	}
+var _ CodeGenType = &CodeGenOperation{}
 
-// 	t.Meta.Source = d.Meta.Source
-// 	t.Meta.Namespace = d.Meta.Namespace
-// 	t.Name = d.Name
-// 	t.Description = d.Description
+//////////////////////////////////////////////////////////////////
+// Marshal
+//////////////////////////////////////////////////////////////////
 
-// 	if d.Input.Defined() {
-// 		var typ CodeGenType
+func (t *CodeGenOperation) MarshalJSON() ([]byte, error) {
+	dto := struct {
+		TypeId           string `json:"type-id"`
+		CodeGenOperation `json:",inline"`
+	}{
+		TypeId:           t.TypeId(),
+		CodeGenOperation: *t,
+	}
 
-// 		if err := UnmarshalJson(d.Input.Get(), &typ); err != nil {
-// 			return err
-// 		}
+	return json.Marshal(dto)
+}
 
-// 		t.Input = o.Some(typ)
-// 	}
+func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
+	dto := struct {
+		Name        optioner.Option[string] `json:"name,omitempty"`
+		Description optioner.Option[string] `json:"description,omitempty"`
+		Inputs      []json.RawMessage       `json:"inputs,omitempty"`
+		Outputs     []json.RawMessage       `json:"outputs,omitempty"`
+	}{}
 
-// 	if d.Output.Defined() {
-// 		var typ CodeGenType
+	if err := json.Unmarshal(data, &dto); err != nil {
+		return err
+	} else {
+		t.Name = dto.Name
+		t.Description = dto.Description
+	}
 
-// 		if err := UnmarshalJson(d.Output.Get(), &typ); err != nil {
-// 			return err
-// 		}
+	for i, rawInput := range dto.Inputs {
+		if input, err := UnmarshalCodeGenType(rawInput); err != nil {
+			return errors.Join(fmt.Errorf("input[%v]", i), err)
+		} else {
+			t.Inputs = optioner.Some(append(t.Inputs.Get(), input))
+		}
+	}
 
-// 		t.Output = o.Some(typ)
-// 	}
+	for i, rawOutput := range dto.Inputs {
+		if output, err := UnmarshalCodeGenType(rawOutput); err != nil {
+			return errors.Join(fmt.Errorf("input[%v]", i), err)
+		} else {
+			t.Outputs = optioner.Some(append(t.Outputs.Get(), output))
+		}
+	}
 
-// 	return nil
-// }
+	return nil
+}

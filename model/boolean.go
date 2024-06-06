@@ -1,10 +1,6 @@
 package model
 
-import (
-	"encoding/json"
-
-	"github.com/boundedinfinity/go-commoner/functional/optioner"
-)
+import "encoding/json"
 
 ///////////////////////////////////////////////////////////////////
 // Type
@@ -24,48 +20,42 @@ var _ CodeGenType = &CodeGenBoolean{}
 // Marshal
 //////////////////////////////////////////////////////////////////
 
-type codeGenBoolean struct {
-	CodeGenCommon
-}
-
 func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
-	dto := typedDto{
-		TypeId: t.TypeId(),
-		Value: codeGenBoolean{
-			CodeGenCommon: t.CodeGenCommon,
-		},
+	dto := struct {
+		TypeId         string `json:"type-id"`
+		CodeGenBoolean `json:",inline"`
+	}{
+		TypeId:         t.TypeId(),
+		CodeGenBoolean: *t,
 	}
 
 	return json.Marshal(dto)
 }
 
 //////////////////////////////////////////////////////////////////
-// Builder
+// Builders
 //////////////////////////////////////////////////////////////////
 
-func BuildBoolean() *codeGenBooleanBuilder {
-	return &codeGenBooleanBuilder{}
+func NewBoolean() *CodeGenBoolean {
+	return &CodeGenBoolean{}
 }
 
-type codeGenBooleanBuilder struct {
-	v CodeGenBoolean
-}
-
-func (t *codeGenBooleanBuilder) Value() CodeGenType {
-	return &t.v
-}
-
-func (t *codeGenBooleanBuilder) Name(v string) *codeGenBooleanBuilder {
-	t.v.Name = optioner.OfZero(v)
+func (t *CodeGenBoolean) WithName(v string) *CodeGenBoolean {
+	t.CodeGenCommon.WithName(v)
 	return t
 }
 
-func (t *codeGenBooleanBuilder) Description(v string) *codeGenBooleanBuilder {
-	t.v.Description = optioner.OfZero(v)
+func (t *CodeGenBoolean) WithDescription(v string) *CodeGenBoolean {
+	t.CodeGenCommon.WithDescription(v)
 	return t
 }
 
-func (t *codeGenBooleanBuilder) Required(v bool) *codeGenBooleanBuilder {
-	t.v.Required = optioner.OfZero(v)
+func (t *CodeGenBoolean) WithRequired(v bool) *CodeGenBoolean {
+	t.CodeGenCommon.WithRequired(v)
+	return t
+}
+
+func (t *CodeGenBoolean) WithDefault(v CodeGenBoolean) *CodeGenBoolean {
+	t.CodeGenCommon.WithDefault(&v)
 	return t
 }
