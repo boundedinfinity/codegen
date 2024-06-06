@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
@@ -26,9 +27,33 @@ func (t CodeGenArray) TypeId() string {
 
 var _ CodeGenType = &CodeGenArray{}
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+func (t CodeGenArray) Validate() error {
+	if err := t.CodeGenCommon.Validate(); err != nil {
+		return err
+	}
+
+	if err := t.Items.Validate(); err != nil {
+		return err
+	}
+
+	if t.Min.Defined() && t.ExclusiveMin.Defined() {
+		return errors.New("min and exclusive-min are multually exclusive")
+	}
+
+	if t.Max.Defined() && t.ExclusiveMax.Defined() {
+		return errors.New("max and exclusive-max are multually exclusive")
+	}
+
+	return nil
+}
+
+//----------------------------------------------------------------
 // Marshal
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 	dto := struct {
@@ -73,9 +98,9 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 // Builders
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func NewArray() *CodeGenArray {
 	return &CodeGenArray{}

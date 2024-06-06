@@ -10,10 +10,11 @@ import (
 
 type CodeGenType interface {
 	TypeId() string
+	Validate() error
 }
 
 ///////////////////////////////////////////////////////////////////
-// Common
+// Type
 //////////////////////////////////////////////////////////////////
 
 type CodeGenCommon struct {
@@ -42,9 +43,17 @@ type CodeGenCommon struct {
 	Package optioner.Option[string] `json:"package,omitempty"`
 }
 
-///////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+func (t CodeGenCommon) Validate() error {
+	return nil
+}
+
+//----------------------------------------------------------------
 // Builders
-///////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func (t *CodeGenCommon) WithName(v string) *CodeGenCommon {
 	t.Name = optioner.OfZero(v)

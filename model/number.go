@@ -2,13 +2,15 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
 ///////////////////////////////////////////////////////////////////
-// NumberRange Type
-//////////////////////////////////////////////////////////////////
+// NumberRange
+///////////////////////////////////////////////////////////////////
 
 type NumberRange[T numberType] struct {
 	Min          optioner.Option[T] `json:"min,omitempty"`
@@ -37,9 +39,25 @@ func (t *NumberRange[T]) WithExclusiveMax(v T) *NumberRange[T] {
 	return t
 }
 
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+func (t *NumberRange[T]) Validate() error {
+	if t.Min.Defined() && t.ExclusiveMin.Defined() {
+		return errors.New("min and exclusive-min are multually exclusive")
+	}
+
+	if t.Max.Defined() && t.ExclusiveMax.Defined() {
+		return errors.New("max and exclusive-max are multually exclusive")
+	}
+
+	return nil
+}
+
 ///////////////////////////////////////////////////////////////////
-// number Type
-//////////////////////////////////////////////////////////////////
+// numberType
+///////////////////////////////////////////////////////////////////
 
 type numberType interface {
 	int | float64
@@ -47,13 +65,31 @@ type numberType interface {
 
 type number[T numberType] struct {
 	CodeGenCommon
-	MultipleOf optioner.Option[T]                `json:"multiple-of,omitempty"`
-	Ranges     optioner.Option[[]NumberRange[T]] `json:"ranges,omitempty"`
+	MultipleOf optioner.Option[T] `json:"multiple-of,omitempty"`
+	Ranges     []NumberRange[T]   `json:"ranges,omitempty"`
 }
 
-///////////////////////////////////////////////////////////////////
-// number Builders
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+func (t *number[T]) Validate() error {
+	if err := t.CodeGenCommon.Validate(); err != nil {
+		return err
+	}
+
+	for i, rng := range t.Ranges {
+		if err := rng.Validate(); err != nil {
+			return errors.Join(fmt.Errorf("range[%v]", i))
+		}
+	}
+
+	return nil
+}
+
+//----------------------------------------------------------------
+// Builders
+//----------------------------------------------------------------
 
 func (t *number[T]) WithName(v string) *number[T] {
 	t.CodeGenCommon.WithName(v)
@@ -71,13 +107,13 @@ func (t *number[T]) WithRequired(v bool) *number[T] {
 }
 
 func (t *number[T]) WithRanges(v ...NumberRange[T]) *number[T] {
-	t.Ranges = optioner.OfSlice(v)
+	t.Ranges = append(t.Ranges, v...)
 	return t
 }
 
 ///////////////////////////////////////////////////////////////////
-// Integer type
-//////////////////////////////////////////////////////////////////
+// Integer
+///////////////////////////////////////////////////////////////////
 
 type CodeGenInteger number[int]
 
@@ -104,8 +140,8 @@ func NewInteger() *CodeGenInteger {
 }
 
 ///////////////////////////////////////////////////////////////////
-// Float type
-//////////////////////////////////////////////////////////////////
+// Float
+///////////////////////////////////////////////////////////////////
 
 type CodeGenFloat number[float64]
 

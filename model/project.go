@@ -1,55 +1,49 @@
 package model
 
-// type CodeGenProject struct {
-// 	Meta
-// 	Info       CodeGenInfo                   `json:"info,omitempty"`
-// 	Mappings   mapper.Mapper[string, string] `json:"mappings,omitempty"`
-// 	Operations []*CodeGenProjectOperation    `json:"operations,omitempty"`
-// 	Templates  CodeGenProjectTemplates       `json:"templates,omitempty"`
-// 	Types      []CodeGenType                 `json:"types,omitempty"`
-// }
+import (
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"github.com/boundedinfinity/go-commoner/idiomatic/mapper"
+)
 
-// func NewProject() *CodeGenProject {
-// 	return &CodeGenProject{
-// 		Info:       NewInfo(),
-// 		Mappings:   mapper.Mapper[string, string]{},
-// 		Operations: make([]*CodeGenProjectOperation, 0),
-// 	}
-// }
+///////////////////////////////////////////////////////////////////
+// Type
+//////////////////////////////////////////////////////////////////
 
-// var _ LoaderContext = &CodeGenProject{}
+type CodeGenProject struct {
+	Name        optioner.Option[string]       `json:"name,omitempty"`
+	Description optioner.Option[string]       `json:"description,omitempty"`
+	Mappings    mapper.Mapper[string, string] `json:"mappings,omitempty"`
+	Operations  []CodeGenProject              `json:"operations,omitempty"`
+	Templates   CodeGenProjectTemplates       `json:"templates,omitempty"`
+	Types       []CodeGenType                 `json:"types,omitempty"`
+	Source      optioner.Option[string]       `json:"source,omitempty"`
+	LocalSource optioner.Option[string]       `json:"local-source,omitempty"`
+}
 
-// type marshalProject struct {
-// 	Meta
-// 	Info       CodeGenInfo                   `json:"info,omitempty"`
-// 	Mappings   mapper.Mapper[string, string] `json:"mappings,omitempty"`
-// 	Operations []*CodeGenProjectOperation    `json:"operations,omitempty"`
-// 	Templates  CodeGenProjectTemplates       `json:"templates,omitempty"`
-// 	Types      []json.RawMessage             `json:"types,omitempty"`
-// }
+//////////////////////////////////////////////////////////////////
+// Builders
+//////////////////////////////////////////////////////////////////
 
-// func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
-// 	var d marshalProject
+func NewProject() *CodeGenProject {
+	return &CodeGenProject{}
+}
 
-// 	if err := json.Unmarshal(data, &d); err != nil {
-// 		return err
-// 	}
+func (t *CodeGenProject) WithName(v string) *CodeGenProject {
+	t.Name = optioner.OfZero(v)
+	return t
+}
 
-// 	t.Meta.Source = d.Meta.Source
-// 	t.Meta.Namespace = d.Meta.Namespace
-// 	t.Info = d.Info
-// 	t.Operations = d.Operations
-// 	t.Templates = d.Templates
+func (t *CodeGenProject) WithDescription(v string) *CodeGenProject {
+	t.Description = optioner.OfZero(v)
+	return t
+}
 
-// 	for _, raw := range d.Types {
-// 		var typ CodeGenType
+func (t *CodeGenProject) WithOperations(v ...CodeGenProject) *CodeGenProject {
+	t.Operations = append(t.Operations, v...)
+	return t
+}
 
-// 		if err := UnmarshalJson(raw, &typ); err != nil {
-// 			return err
-// 		}
-
-// 		t.Types = append(t.Types, typ)
-// 	}
-
-// 	return nil
-// }
+func (t *CodeGenProject) WithTypes(v ...CodeGenType) *CodeGenProject {
+	t.Types = append(t.Types, v...)
+	return t
+}

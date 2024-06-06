@@ -13,17 +13,15 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenOperation struct {
-	Name        optioner.Option[string]        `json:"name,omitempty"`
-	Description optioner.Option[string]        `json:"description,omitempty"`
-	Inputs      optioner.Option[[]CodeGenType] `json:"inputs,omitempty"`
-	Outputs     optioner.Option[[]CodeGenType] `json:"outputs,omitempty"`
+	Name        optioner.Option[string] `json:"name,omitempty"`
+	Description optioner.Option[string] `json:"description,omitempty"`
+	Inputs      []CodeGenType           `json:"inputs,omitempty"`
+	Outputs     []CodeGenType           `json:"outputs,omitempty"`
 }
 
 func (t CodeGenOperation) TypeId() string {
 	return "operation"
 }
-
-var _ CodeGenType = &CodeGenOperation{}
 
 //////////////////////////////////////////////////////////////////
 // Marshal
@@ -60,7 +58,7 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 		if input, err := UnmarshalCodeGenType(rawInput); err != nil {
 			return errors.Join(fmt.Errorf("input[%v]", i), err)
 		} else {
-			t.Inputs = optioner.Some(append(t.Inputs.Get(), input))
+			t.Inputs = append(t.Inputs, input)
 		}
 	}
 
@@ -68,9 +66,37 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 		if output, err := UnmarshalCodeGenType(rawOutput); err != nil {
 			return errors.Join(fmt.Errorf("input[%v]", i), err)
 		} else {
-			t.Outputs = optioner.Some(append(t.Outputs.Get(), output))
+			t.Outputs = append(t.Outputs, output)
 		}
 	}
 
 	return nil
+}
+
+//////////////////////////////////////////////////////////////////
+// Builders
+//////////////////////////////////////////////////////////////////
+
+func NewOperation() *CodeGenOperation {
+	return &CodeGenOperation{}
+}
+
+func (t *CodeGenOperation) WithName(v string) *CodeGenOperation {
+	t.Name = optioner.OfZero(v)
+	return t
+}
+
+func (t *CodeGenOperation) WithDescription(v string) *CodeGenOperation {
+	t.Description = optioner.OfZero(v)
+	return t
+}
+
+func (t *CodeGenOperation) WithInputs(v ...CodeGenType) *CodeGenOperation {
+	t.Inputs = append(t.Inputs, v...)
+	return t
+}
+
+func (t *CodeGenOperation) WithOutputs(v ...CodeGenType) *CodeGenOperation {
+	t.Outputs = append(t.Outputs, v...)
+	return t
 }

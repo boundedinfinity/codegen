@@ -21,9 +21,27 @@ func (t CodeGenObject) TypeId() string {
 
 var _ CodeGenType = &CodeGenObject{}
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+func (t CodeGenObject) Validate() error {
+	if err := t.CodeGenCommon.Validate(); err != nil {
+		return err
+	}
+
+	for i, prop := range t.Properties {
+		if err := prop.Validate(); err != nil {
+			return errors.Join(fmt.Errorf("prop[%v]", i))
+		}
+	}
+
+	return nil
+}
+
+//----------------------------------------------------------------
 // Marshal
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 	dto := struct {
@@ -60,9 +78,9 @@ func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 // Builders
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func NewObject() *CodeGenObject {
 	return &CodeGenObject{
