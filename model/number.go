@@ -91,6 +91,11 @@ func (t *number[T]) Validate() error {
 // Builders
 //----------------------------------------------------------------
 
+func (t *number[T]) WithSchemaId(v string) *number[T] {
+	t.CodeGenCommon.WithTypeId(v)
+	return t
+}
+
 func (t *number[T]) WithName(v string) *number[T] {
 	t.CodeGenCommon.WithName(v)
 	return t
@@ -117,7 +122,7 @@ func (t *number[T]) WithRanges(v ...NumberRange[T]) *number[T] {
 
 type CodeGenInteger number[int]
 
-func (t CodeGenInteger) TypeId() string {
+func (t CodeGenInteger) CodeGenId() string {
 	return "integer"
 }
 
@@ -125,10 +130,10 @@ var _ CodeGenType = &CodeGenInteger{}
 
 func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId         string `json:"type-id"`
+		TypeId         string `json:"codegen-id"`
 		CodeGenInteger `json:",inline"`
 	}{
-		TypeId:         t.TypeId(),
+		TypeId:         t.CodeGenId(),
 		CodeGenInteger: *t,
 	}
 
@@ -145,7 +150,7 @@ func NewInteger() *CodeGenInteger {
 
 type CodeGenFloat number[float64]
 
-func (t CodeGenFloat) TypeId() string {
+func (t CodeGenFloat) CodeGenId() string {
 	return "float"
 }
 
@@ -153,10 +158,10 @@ var _ CodeGenType = &CodeGenFloat{}
 
 func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId       string `json:"type-id"`
+		TypeId       string `json:"codegen-id"`
 		CodeGenFloat `json:",inline"`
 	}{
-		TypeId:       t.TypeId(),
+		TypeId:       t.CodeGenId(),
 		CodeGenFloat: *t,
 	}
 

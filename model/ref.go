@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
@@ -11,11 +12,11 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenRef struct {
-	CodeGenCommon `json:",inline,omitempty"`
 	Ref           optioner.Option[string] `json:"ref,omitempty"`
+	CodeGenCommon `json:",inline,omitempty"`
 }
 
-func (t CodeGenRef) TypeId() string {
+func (t CodeGenRef) CodeGenId() string {
 	return "ref"
 }
 
@@ -27,10 +28,10 @@ var _ CodeGenType = &CodeGenRef{}
 
 func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 	dto := struct {
+		TypeId string `json:"codegen-id"`
 		CodeGenRef
-		TypeId string `json:"type-id"`
 	}{
-		TypeId:     t.TypeId(),
+		TypeId:     t.CodeGenId(),
 		CodeGenRef: *t,
 	}
 
@@ -43,6 +44,14 @@ func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 
 func NewRef() *CodeGenRef {
 	return &CodeGenRef{}
+}
+
+func (t CodeGenCommon) NewRefFromType(typ CodeGenType) (CodeGenType, error) {
+	if typ.TypeId().Empty() {
+		return nil, errors.New("invalid ref target")
+	}
+
+	return NewRef().WithRef(typ.TypeId().Get()), nil
 }
 
 func (t *CodeGenRef) WithName(v string) *CodeGenRef {

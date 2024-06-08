@@ -17,7 +17,7 @@ func Test_Unmarshal_CodeGenType(t *testing.T) {
 		{
 			name: "Unmarshal boolean",
 			input: `{
-		        "type-id": "boolean",
+		        "codegen-id": "boolean",
 		        "value":{
                     "name": null,
                     "description": null,

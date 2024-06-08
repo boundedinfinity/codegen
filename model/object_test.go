@@ -20,7 +20,7 @@ func Test_Marshal_Object(t *testing.T) {
 			input: model.NewObject(),
 			err:   nil,
 			expected: `{
-		        "type-id": "object",
+		        "codegen-id": "object",
                 "name": null,
                 "description": null,
                 "required": null,
@@ -37,7 +37,7 @@ func Test_Marshal_Object(t *testing.T) {
 				WithDescription("an object description"),
 			err: nil,
 			expected: `{
-		        "type-id": "object",
+		        "codegen-id": "object",
                 "name": "AN_OBJECT",
                 "description": "an object description",
                 "required": null,
@@ -57,7 +57,7 @@ func Test_Marshal_Object(t *testing.T) {
 					WithName("A_BOOLEAN").
 					WithDescription("a bool description")),
 			expected: `{
-		        "type-id": "object",
+		        "codegen-id": "object",
                 "name": "AN_OBJECT",
                 "description": "an object description",
                 "required": null,
@@ -66,7 +66,7 @@ func Test_Marshal_Object(t *testing.T) {
                 "links": null,
                 "properties": [
                     {
-                        "type-id": "boolean",
+                        "codegen-id": "boolean",
                         "name": "A_BOOLEAN",
                         "description": "a bool description",
                         "required": null,

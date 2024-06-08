@@ -17,6 +17,7 @@ type CodeGenOperation struct {
 	Description optioner.Option[string] `json:"description,omitempty"`
 	Inputs      []CodeGenType           `json:"inputs,omitempty"`
 	Outputs     []CodeGenType           `json:"outputs,omitempty"`
+	CodeGenMeta
 }
 
 func (t CodeGenOperation) TypeId() string {
@@ -29,7 +30,7 @@ func (t CodeGenOperation) TypeId() string {
 
 func (t *CodeGenOperation) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId           string `json:"type-id"`
+		TypeId           string `json:"codegen-id"`
 		CodeGenOperation `json:",inline"`
 	}{
 		TypeId:           t.TypeId(),

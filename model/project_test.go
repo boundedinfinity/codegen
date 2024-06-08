@@ -8,50 +8,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Marshal_Boolean(t *testing.T) {
+func Test_Marshal_Project(t *testing.T) {
 	tcs := []struct {
 		name     string
-		input    model.CodeGenType
+		input    *model.CodeGenProject
 		expected string
 		err      error
 	}{
 		{
-			name:  "Marshal boolean",
-			input: model.NewBoolean(),
-			err:   nil,
+			name: "Marshal project",
+			input: model.NewProject().
+				WithName("A_PROJECT").
+				WithOperations(
+					model.NewOperation().WithInputs(
+						model.NewRef().WithRef("label").WithName("A_LABEL"),
+					),
+				).
+				WithTypes(
+					model.NewObject().
+						WithName("label").
+						WithDescription("A simple label").
+						WithProperties(
+							model.NewString().
+								WithName("name").
+								WithDescription("The label name").
+								WithMin(0).
+								WithMax(50),
+						),
+				),
+			err: nil,
 			expected: `{
 		        "codegen-id": "boolean",
                 "name": null,
                 "description": null,
                 "required": null,
-                "default": null,
-                "inherit": null,
-                "links": null
-		    }`,
-		},
-		{
-			name:  "Marshal boolean with name",
-			input: model.NewBoolean().WithName("A_BOOLEAN"),
-			err:   nil,
-			expected: `{
-		        "codegen-id": "boolean",
-                "name": "A_BOOLEAN",
-                "description": null,
-                "required": null,
-                "default": null,
-                "inherit": null,
-                "links": null
-		    }`,
-		},
-		{
-			name:  "Marshal boolean with name and required",
-			input: model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
-			err:   nil,
-			expected: `{
-		        "codegen-id": "boolean",
-                "name": "A_BOOLEAN",
-                "description": null,
-                "required": true,
                 "default": null,
                 "inherit": null,
                 "links": null
@@ -75,22 +65,12 @@ func Test_Marshal_Boolean(t *testing.T) {
 	}
 }
 
-func Test_Unmarshal_Boolean(t *testing.T) {
+func Test_Unmarshal_Project(t *testing.T) {
 	tcs := []struct {
 		name string
 		obj  *model.CodeGenBoolean
 		err  error
 	}{
-		{
-			name: "Marshal boolean",
-			obj:  model.NewBoolean(),
-			err:  nil,
-		},
-		{
-			name: "Marshal boolean",
-			obj:  model.NewBoolean().WithName("A_BOOLEAN"),
-			err:  nil,
-		},
 		{
 			name: "Marshal boolean",
 			obj:  model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),

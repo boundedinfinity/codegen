@@ -5,12 +5,15 @@ import (
 )
 
 ///////////////////////////////////////////////////////////////////
-// Interface
+// Type
 //////////////////////////////////////////////////////////////////
 
 type CodeGenType interface {
-	TypeId() string
+	CodeGenId() string
+	TypeId() optioner.Option[string]
 	Validate() error
+	Meta() *CodeGenMeta
+	Common() *CodeGenCommon
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -18,6 +21,9 @@ type CodeGenType interface {
 //////////////////////////////////////////////////////////////////
 
 type CodeGenCommon struct {
+	// Type ID is the type of this type definition.
+	Type_Id optioner.Option[string] `json:"type-id,omitempty"`
+
 	// Name is the name of the type.
 	Name optioner.Option[string] `json:"name,omitempty"`
 
@@ -31,16 +37,22 @@ type CodeGenCommon struct {
 	// Note that this value is mutually exclusive with the Required option.
 	Default optioner.Option[CodeGenType] `json:"default,omitempty"`
 
-	// Ref inherits all properties from the base type.
-	// Any items can be overridden in this type.
-	Ref optioner.Option[string] `json:"ref,omitempty"`
-
 	// Eager will load this type if it's containted inside another type.
 	Eager optioner.Option[bool] `json:"eager,omitempty"`
 
-	// Package is the language pack designation used during code generation.
-	//  This will be translated into a language appropriate formatted name.
-	Package optioner.Option[string] `json:"package,omitempty"`
+	CodeGenMeta
+}
+
+func (t *CodeGenCommon) TypeId() optioner.Option[string] {
+	return t.Type_Id
+}
+
+func (t *CodeGenCommon) Meta() *CodeGenMeta {
+	return &t.CodeGenMeta
+}
+
+func (t *CodeGenCommon) Common() *CodeGenCommon {
+	return t
 }
 
 //----------------------------------------------------------------
@@ -54,6 +66,11 @@ func (t CodeGenCommon) Validate() error {
 //----------------------------------------------------------------
 // Builders
 //----------------------------------------------------------------
+
+func (t *CodeGenCommon) WithTypeId(v string) *CodeGenCommon {
+	t.Type_Id = optioner.OfZero(v)
+	return t
+}
 
 func (t *CodeGenCommon) WithName(v string) *CodeGenCommon {
 	t.Name = optioner.OfZero(v)
@@ -78,4 +95,16 @@ func (t *CodeGenCommon) WithDefault(v CodeGenType) *CodeGenCommon {
 func (t *CodeGenCommon) WithEager(v bool) *CodeGenCommon {
 	t.Eager = optioner.OfZero(v)
 	return t
+}
+
+///////////////////////////////////////////////////////////////////
+// Type
+//////////////////////////////////////////////////////////////////
+
+type CodeGenMeta struct {
+	Sources []string `json:"-"`
+
+	// Package is the language pack designation used during code generation.
+	//  This will be translated into a language appropriate formatted name.
+	Package optioner.Option[string] `json:"package,omitempty"`
 }

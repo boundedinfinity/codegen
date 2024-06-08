@@ -21,7 +21,7 @@ type CodeGenArray struct {
 	ManyToMany    optioner.Option[bool] `json:"many-to-many,omitempty"`
 }
 
-func (t CodeGenArray) TypeId() string {
+func (t CodeGenArray) CodeGenId() string {
 	return "array"
 }
 
@@ -57,10 +57,10 @@ func (t CodeGenArray) Validate() error {
 
 func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId       string `json:"type-id"`
+		TypeId       string `json:"codegen-id"`
 		CodeGenArray `json:",inline"`
 	}{
-		TypeId:       t.TypeId(),
+		TypeId:       t.CodeGenId(),
 		CodeGenArray: *t,
 	}
 
@@ -104,6 +104,11 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 
 func NewArray() *CodeGenArray {
 	return &CodeGenArray{}
+}
+
+func (t *CodeGenArray) WithSchemaId(v string) *CodeGenArray {
+	t.CodeGenCommon.WithTypeId(v)
+	return t
 }
 
 func (t *CodeGenArray) WithName(v string) *CodeGenArray {

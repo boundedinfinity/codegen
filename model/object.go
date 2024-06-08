@@ -15,7 +15,7 @@ type CodeGenObject struct {
 	Properties []CodeGenType `json:"properties"`
 }
 
-func (t CodeGenObject) TypeId() string {
+func (t CodeGenObject) CodeGenId() string {
 	return "object"
 }
 
@@ -45,10 +45,10 @@ func (t CodeGenObject) Validate() error {
 
 func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId        string `json:"type-id"`
+		TypeId        string `json:"codegen-id"`
 		CodeGenObject `json:",inline"`
 	}{
-		TypeId:        t.TypeId(),
+		TypeId:        t.CodeGenId(),
 		CodeGenObject: *t,
 	}
 
@@ -86,6 +86,11 @@ func NewObject() *CodeGenObject {
 	return &CodeGenObject{
 		Properties: []CodeGenType{},
 	}
+}
+
+func (t *CodeGenObject) WithSchemaId(v string) *CodeGenObject {
+	t.CodeGenCommon.WithTypeId(v)
+	return t
 }
 
 func (t *CodeGenObject) WithName(v string) *CodeGenObject {
