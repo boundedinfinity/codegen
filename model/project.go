@@ -7,6 +7,7 @@ import (
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/mapper"
+	"github.com/boundedinfinity/go-commoner/idiomatic/slicer"
 )
 
 ///////////////////////////////////////////////////////////////////
@@ -20,7 +21,77 @@ type CodeGenProject struct {
 	Operations  []CodeGenOperation            `json:"operations,omitempty"`
 	Templates   CodeGenProjectTemplates       `json:"templates,omitempty"`
 	Types       []CodeGenType                 `json:"types,omitempty"`
+	Package     optioner.Option[string]       `json:"package,omitempty"`
 	CodeGenMeta
+}
+
+//----------------------------------------------------------------
+// Validate
+//----------------------------------------------------------------
+
+var (
+	ErrCodeGenProjectEmptyName        = errors.New("empty name")
+	ErrCodeGenProjectInvalidMapping   = errors.New("invalid mapping")
+	ErrCodeGenProjectInvalidMappingFn = func(k, v string) error {
+		return fmt.Errorf("key: %v, val: %v, %w", k, v, ErrCodeGenProjectInvalidMapping)
+	}
+)
+
+func (t *CodeGenProject) Validate() error {
+	if t.Name.Empty() {
+		return ErrCodeGenProjectEmptyName
+	}
+
+	for k, v := range t.Mappings {
+		if k == "" || v == "" {
+			return ErrCodeGenProjectInvalidMappingFn(k, v)
+		}
+	}
+
+	for i, operation := range t.Operations {
+		if err := operation.Validate(); err != nil {
+			return fmt.Errorf("operation[%v] %w", i, err)
+		}
+	}
+
+	if err := t.Templates.Validate(); err != nil {
+		return err
+	}
+
+	for i, typ := range t.Types {
+		if err := typ.Validate(); err != nil {
+			return fmt.Errorf("type[%v] %w", i, err)
+		}
+	}
+
+	return nil
+}
+
+//----------------------------------------------------------------
+// Merge
+//----------------------------------------------------------------
+
+func (t *CodeGenProject) Merge(obj CodeGenProject) error {
+	t.Name = obj.Name
+	t.Description = mergeDescription(t.Description, obj.Description)
+	mapper.MergeInto(t.Mappings, obj.Mappings)
+
+	operationG := slicer.GroupFn(func(operation CodeGenOperation) string {
+		return operation.Name.Get()
+	}, t.Operations...)
+
+	for _, operation := range obj.Operations {
+		if found, ok := operationG[operation.Name.Get()]; ok {
+			if err := found.Merge(operation); err != nil {
+				return err
+			}
+		} else {
+			t.Operations = append(t.Operations, operation)
+		}
+	}
+
+	t.CodeGenMeta.Merge(obj.CodeGenMeta)
+	return nil
 }
 
 //----------------------------------------------------------------
@@ -35,6 +106,7 @@ func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
 		Operations  []CodeGenOperation            `json:"operations,omitempty"`
 		Templates   CodeGenProjectTemplates       `json:"templates,omitempty"`
 		Types       []json.RawMessage             `json:"types,omitempty"`
+		Package     optioner.Option[string]       `json:"package,omitempty"`
 		CodeGenMeta
 	}{}
 
@@ -46,6 +118,7 @@ func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
 		t.Mappings = dto.Mappings
 		t.Operations = dto.Operations
 		t.Templates = dto.Templates
+		t.Package = dto.Package
 		t.CodeGenMeta = dto.CodeGenMeta
 	}
 

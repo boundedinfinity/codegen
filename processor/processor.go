@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/environmenter"
 	"github.com/boundedinfinity/go-commoner/idiomatic/extentioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
+	"github.com/boundedinfinity/go-commoner/idiomatic/slicer"
 	"github.com/invopop/yaml"
 )
 
@@ -124,6 +126,27 @@ func (t *Processor) pass03() error {
 		if err := t.checkType(typ); err != nil {
 			return err
 		}
+	}
+
+	for _, typ := range t.combined.Types {
+		if typ.Common().Package.Defined() {
+			continue
+		}
+
+		var pkg string
+
+		source, ok := slicer.Last(typ.Common().Meta().Sources...)
+
+		if ok {
+			pkg = extentioner.Strip(source)
+			pkg = pather.Paths.Dir(pkg)
+		}
+
+		if t.combined.Package.Defined() {
+			pkg = pather.Join(t.combined.Package.Get(), pkg)
+		}
+
+		typ.Common().Package = optioner.Some(pkg)
 	}
 
 	return nil

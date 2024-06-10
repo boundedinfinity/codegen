@@ -24,9 +24,51 @@ func (t CodeGenOperation) TypeId() string {
 	return "operation"
 }
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
+// Validate
+//----------------------------------------------------------------
+
+var (
+	ErrCodeGenOperationEmptyName     = errors.New("empty name")
+	ErrCodeGenOperationInvalidInput  = errors.New("invalid input")
+	ErrCodeGenOperationInvalidOutput = errors.New("invalid output")
+)
+
+func (t *CodeGenOperation) Validate() error {
+	if t.Name.Empty() {
+		return ErrCodeGenOperationEmptyName
+	}
+
+	for i, input := range t.Inputs {
+		if err := input.Validate(); err != nil {
+			return fmt.Errorf("inputs[%v]: %w", i, ErrCodeGenOperationInvalidInput)
+		}
+	}
+
+	for i, output := range t.Outputs {
+		if err := output.Validate(); err != nil {
+			return fmt.Errorf("outputs[%v]: %w", i, ErrCodeGenOperationInvalidOutput)
+		}
+	}
+
+	if err := t.CodeGenMeta.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//----------------------------------------------------------------
+// Merge
+//----------------------------------------------------------------
+
+func (t *CodeGenOperation) Merge(obj CodeGenOperation) error {
+	return nil
+}
+
+//----------------------------------------------------------------
 // Marshal
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func (t *CodeGenOperation) MarshalJSON() ([]byte, error) {
 	dto := struct {
@@ -74,9 +116,9 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 // Builders
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func NewOperation() *CodeGenOperation {
 	return &CodeGenOperation{}

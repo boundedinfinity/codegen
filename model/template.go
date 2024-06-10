@@ -29,3 +29,12 @@ type CodeGenProjectTemplates struct {
 
 // var _ LoaderContext = &CodeGenProjectTemplateFile{}
 // var _ LoaderContext = &TemplateMeta{}
+
+//----------------------------------------------------------------
+// Validate
+//----------------------------------------------------------------
+
+func (t CodeGenProjectTemplates) Validate() error {
+
+	return nil
+}
