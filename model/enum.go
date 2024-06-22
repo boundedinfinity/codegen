@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
@@ -22,9 +23,13 @@ type CodeGenEnumValue struct {
 // Validation
 //----------------------------------------------------------------
 
+var (
+	errCodeGenEnumValueMustBeDefined = errorer.New("name or value must be defined")
+)
+
 func (t CodeGenEnumValue) Validate() error {
 	if t.Name.Empty() && t.Value.Empty() {
-		return errors.New("name or value must be defined")
+		return errCodeGenEnumValueMustBeDefined
 	}
 
 	return nil

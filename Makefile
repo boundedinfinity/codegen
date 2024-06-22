@@ -12,6 +12,7 @@ generate: purge
 	go generate ./...
 
 build: generate
+	go mod tidy
 	go build
 
 install: generate
@@ -28,6 +29,10 @@ commit:
 tag:
 	git tag -a $(tag) -m "$(tag)"
 	git push origin $(tag)
+
+tag-list:
+	git fetch --tags
+	git tag -l | sort -V
 
 publish: generate
 	@if ack replace go.mod ;then echo 'Remove the "replace" line from the go.mod file'; exit 1; fi

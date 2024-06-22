@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"github.com/boundedinfinity/go-commoner/errorer"
 )
 
 var (
-	ErrInvalidMarshalCodeGenObject   = errors.New("invalid code gen object")
-	ErrCodeGenTypeTypeIdMissing      = errors.New("codegen-id missing")
-	ErrCodeGenTypeTypeIdNotSupported = errors.New("codegen-id not supported")
-	ErrCodeGenTypeUnmarshal          = errors.New("unmarshal error")
+	ErrInvalidMarshalCodeGenObject   = errorer.New("invalid code gen object")
+	ErrCodeGenTypeTypeIdMissing      = errorer.New("codegen-id missing")
+	ErrCodeGenTypeTypeIdNotSupported = errorer.New("codegen-id not supported")
+	ErrCodeGenTypeUnmarshal          = errorer.New("unmarshal error")
 
 	errCodeGenTypeUnmarshalFn = func(err error) error {
 		return errors.Join(err, ErrCodeGenTypeUnmarshal)

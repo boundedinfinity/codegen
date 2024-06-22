@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
@@ -29,9 +30,9 @@ func (t CodeGenOperation) TypeId() string {
 //----------------------------------------------------------------
 
 var (
-	ErrCodeGenOperationEmptyName     = errors.New("empty name")
-	ErrCodeGenOperationInvalidInput  = errors.New("invalid input")
-	ErrCodeGenOperationInvalidOutput = errors.New("invalid output")
+	ErrCodeGenOperationEmptyName     = errorer.New("empty name")
+	ErrCodeGenOperationInvalidInput  = errorer.New("invalid input")
+	ErrCodeGenOperationInvalidOutput = errorer.New("invalid output")
 )
 
 func (t *CodeGenOperation) Validate() error {

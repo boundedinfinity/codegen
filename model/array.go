@@ -2,8 +2,8 @@ package model
 
 import (
 	"encoding/json"
-	"errors"
 
+	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
@@ -31,6 +31,11 @@ var _ CodeGenType = &CodeGenArray{}
 // Validation
 //----------------------------------------------------------------
 
+var (
+	errCodeGenArrayMinAndExclusiveMinMutuallyExclusive = errorer.New("min and exclusive-min are multually exclusive")
+	errCodeGenArrayMaxAndExclusiveMaxMutuallyExclusive = errorer.New("max and exclusive-max are multually exclusive")
+)
+
 func (t CodeGenArray) Validate() error {
 	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
@@ -41,11 +46,11 @@ func (t CodeGenArray) Validate() error {
 	}
 
 	if t.Min.Defined() && t.ExclusiveMin.Defined() {
-		return errors.New("min and exclusive-min are multually exclusive")
+		return errCodeGenArrayMinAndExclusiveMinMutuallyExclusive
 	}
 
 	if t.Max.Defined() && t.ExclusiveMax.Defined() {
-		return errors.New("max and exclusive-max are multually exclusive")
+		return errCodeGenArrayMaxAndExclusiveMaxMutuallyExclusive
 	}
 
 	return nil

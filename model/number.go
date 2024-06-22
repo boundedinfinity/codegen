@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
@@ -43,13 +44,18 @@ func (t *NumberRange[T]) WithExclusiveMax(v T) *NumberRange[T] {
 // Validation
 //----------------------------------------------------------------
 
+var (
+	errCodeGenNumberMinAndExclusiveMinMutuallyExclusive = errorer.New("min and exclusive-min are multually exclusive")
+	errCodeGenNumberMaxAndExclusiveMaxMutuallyExclusive = errorer.New("max and exclusive-max are multually exclusive")
+)
+
 func (t *NumberRange[T]) Validate() error {
 	if t.Min.Defined() && t.ExclusiveMin.Defined() {
-		return errors.New("min and exclusive-min are multually exclusive")
+		return errCodeGenNumberMinAndExclusiveMinMutuallyExclusive
 	}
 
 	if t.Max.Defined() && t.ExclusiveMax.Defined() {
-		return errors.New("max and exclusive-max are multually exclusive")
+		return errCodeGenNumberMaxAndExclusiveMaxMutuallyExclusive
 	}
 
 	return nil

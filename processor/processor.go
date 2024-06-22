@@ -9,23 +9,21 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/environmenter"
 	"github.com/boundedinfinity/go-commoner/idiomatic/extentioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
-	"github.com/boundedinfinity/go-commoner/idiomatic/slicer"
+	"github.com/boundedinfinity/go-mimetyper/file_extention"
 	"github.com/invopop/yaml"
 )
 
 func New() *Processor {
 	return &Processor{
-		projects:   []*model.CodeGenProject{},
-		sourcesMap: map[string][]string{},
-		typeIdMap:  map[string]model.CodeGenType{},
+		projects:  []*model.CodeGenProject{},
+		typeIdMap: map[string]model.CodeGenType{},
 	}
 }
 
 type Processor struct {
-	combined   model.CodeGenProject
-	projects   []*model.CodeGenProject
-	sourcesMap map[string][]string
-	typeIdMap  map[string]model.CodeGenType
+	combined  model.CodeGenProject
+	projects  []*model.CodeGenProject
+	typeIdMap map[string]model.CodeGenType
 }
 
 func (t *Processor) ProcessFiles(paths ...string) error {
@@ -37,21 +35,20 @@ func (t *Processor) ProcessFiles(paths ...string) error {
 	}
 
 	for _, path := range paths {
-		path = environmenter.Sub(path)
-
+		path = environmenter.Substitue(path)
 		if !pather.Paths.IsAbs(path) {
-			path = pather.Join(wd, path)
+			path = pather.Paths.Join(wd, path)
 		}
 
 		var project model.CodeGenProject
-		bs, err := os.ReadFile(path)
 
+		bs, err := os.ReadFile(path)
 		if err != nil {
 			return ErrCodeGenCantReadFileFn(path, err)
 		}
 
 		switch v := extentioner.Ext(path); v {
-		case ".yaml", ".yml":
+		case file_extention.FileExtentions.Yaml.String(), file_extention.FileExtentions.Yml.String():
 			if jbs, err := yaml.YAMLToJSON(bs); err != nil {
 				return ErrCodeGenCantReadFileFn(path, err)
 			} else {
@@ -59,7 +56,7 @@ func (t *Processor) ProcessFiles(paths ...string) error {
 					return ErrCodeGenCantReadFileFn(path, err)
 				}
 			}
-		case ".json":
+		case file_extention.FileExtentions.Json.String():
 			if err := json.Unmarshal(bs, &project); err != nil {
 				return ErrCodeGenCantReadFileFn(path, err)
 			}
@@ -67,7 +64,6 @@ func (t *Processor) ProcessFiles(paths ...string) error {
 			return ErrCodeGenUnsupportedFileTypeFn(v)
 		}
 
-		project.Sources = append(project.Sources, path)
 		projects = append(projects, project)
 	}
 
@@ -79,74 +75,42 @@ func (t *Processor) ProcessProjects(projects ...model.CodeGenProject) error {
 		t.projects = append(t.projects, &project)
 	}
 
-	if err := t.pass01(); err != nil {
+	if err := t.processOutputRoot(t.projects...); err != nil {
 		return err
 	}
 
-	if err := t.pass02(); err != nil {
+	if err := t.processPackage(t.projects...); err != nil {
 		return err
 	}
 
-	if err := t.pass03(); err != nil {
+	if err := t.processTypes(); err != nil {
+		return err
+	}
+
+	if err := t.checkCombinedTypes(); err != nil {
+		return err
+	}
+
+	if err := t.calculatePackageNames(); err != nil {
+		return err
+	}
+
+	if err := t.validate(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (t *Processor) pass01() error {
-	for _, project := range t.projects {
-		for _, source := range project.Sources {
-			if _, ok := t.sourcesMap[source]; !ok {
-				t.sourcesMap[source] = []string{source}
-			}
-		}
+func (t *Processor) validate() error {
+	if t.combined.OutputRoot.Empty() {
+		t.combined.OutputRoot = optioner.Some(".")
 	}
 
-	return nil
-}
-
-func (t *Processor) pass02() error {
-	for _, project := range t.projects {
-		for _, typ := range project.Types {
-			if _, ok := t.typeIdMap[typ.TypeId().Get()]; ok {
-				return ErrCodeGenTypeSchemaIdDuplicateFn(typ)
-			}
-
-			t.typeIdMap[typ.TypeId().Get()] = typ
-			t.combined.Types = append(t.combined.Types, typ)
-		}
-	}
-
-	return nil
-}
-
-func (t *Processor) pass03() error {
-	for _, typ := range t.combined.Types {
-		if err := t.checkType(typ); err != nil {
-			return err
-		}
-	}
-
-	for _, typ := range t.combined.Types {
-		if typ.Common().Package.Defined() {
-			continue
-		}
-
-		var pkg string
-
-		source, ok := slicer.Last(typ.Common().Meta().Sources...)
-
-		if ok {
-			pkg = extentioner.Strip(source)
-			pkg = pather.Paths.Dir(pkg)
-		}
-
-		if t.combined.Package.Defined() {
-			pkg = pather.Join(t.combined.Package.Get(), pkg)
-		}
-
-		typ.Common().Package = optioner.Some(pkg)
+	if abs, err := pather.Paths.AbsErr("."); err != nil {
+		return err
+	} else {
+		t.combined.OutputRoot = optioner.Some(abs)
 	}
 
 	return nil

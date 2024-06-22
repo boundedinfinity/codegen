@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/mapper"
-	"github.com/boundedinfinity/go-commoner/idiomatic/slicer"
 )
 
 ///////////////////////////////////////////////////////////////////
@@ -22,6 +22,7 @@ type CodeGenProject struct {
 	Templates   CodeGenProjectTemplates       `json:"templates,omitempty"`
 	Types       []CodeGenType                 `json:"types,omitempty"`
 	Package     optioner.Option[string]       `json:"package,omitempty"`
+	OutputRoot  optioner.Option[string]       `json:"output-root,omitempty"`
 	CodeGenMeta
 }
 
@@ -30,11 +31,9 @@ type CodeGenProject struct {
 //----------------------------------------------------------------
 
 var (
-	ErrCodeGenProjectEmptyName        = errors.New("empty name")
-	ErrCodeGenProjectInvalidMapping   = errors.New("invalid mapping")
-	ErrCodeGenProjectInvalidMappingFn = func(k, v string) error {
-		return fmt.Errorf("key: %v, val: %v, %w", k, v, ErrCodeGenProjectInvalidMapping)
-	}
+	ErrCodeGenProjectEmptyName        = errorer.New("empty name")
+	ErrCodeGenProjectInvalidMapping   = errorer.New("invalid mapping")
+	ErrCodeGenProjectInvalidMappingFn = ErrCodeGenProjectInvalidMapping.FormatFn("key: %v, val: %v, %w")
 )
 
 func (t *CodeGenProject) Validate() error {
@@ -76,21 +75,21 @@ func (t *CodeGenProject) Merge(obj CodeGenProject) error {
 	t.Description = mergeDescription(t.Description, obj.Description)
 	mapper.MergeInto(t.Mappings, obj.Mappings)
 
-	operationG := slicer.GroupFn(func(operation CodeGenOperation) string {
-		return operation.Name.Get()
-	}, t.Operations...)
+	// operationG := slicer.Group(func(_ int, operation CodeGenOperation) string {
+	// 	return operation.Name.Get()
+	// }, t.Operations...)
 
-	for _, operation := range obj.Operations {
-		if found, ok := operationG[operation.Name.Get()]; ok {
-			if err := found.Merge(operation); err != nil {
-				return err
-			}
-		} else {
-			t.Operations = append(t.Operations, operation)
-		}
-	}
+	// for _, operation := range obj.Operations {
+	// 	if found, ok := operationG[operation.Name.Get()]; ok {
+	// 		if err := found.Merge(operation); err != nil {
+	// 			return err
+	// 		}
+	// 	} else {
+	// 		t.Operations = append(t.Operations, operation)
+	// 	}
+	// }
 
-	t.CodeGenMeta.Merge(obj.CodeGenMeta)
+	// t.CodeGenMeta.Merge(obj.CodeGenMeta)
 	return nil
 }
 

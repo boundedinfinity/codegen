@@ -6,6 +6,21 @@ import (
 	"fmt"
 )
 
+func (t *Processor) processTypes() error {
+	for _, project := range t.projects {
+		for _, typ := range project.Types {
+			if _, ok := t.typeIdMap[typ.TypeId().Get()]; ok {
+				return ErrCodeGenTypeSchemaIdDuplicateFn(typ)
+			}
+
+			t.typeIdMap[typ.TypeId().Get()] = typ
+			t.combined.Types = append(t.combined.Types, typ)
+		}
+	}
+
+	return nil
+}
+
 func (t *Processor) resolveType(typ model.CodeGenType) (model.CodeGenType, error) {
 	var found model.CodeGenType
 	var err error
@@ -31,6 +46,16 @@ func (t *Processor) resolveType(typ model.CodeGenType) (model.CodeGenType, error
 	}
 
 	return found, err
+}
+
+func (t *Processor) checkCombinedTypes() error {
+	for _, typ := range t.combined.Types {
+		if err := t.checkType(typ); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (t *Processor) checkType(typ model.CodeGenType) error {

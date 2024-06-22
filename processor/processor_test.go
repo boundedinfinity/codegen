@@ -26,9 +26,9 @@ func Test_Process_Files(t *testing.T) {
 			err := processor.New().ProcessFiles(tc.inputs...)
 
 			if tc.err != nil {
-				assert.Equal(t, tc.err, err, tc.name)
+				assert.Equal(tt, tc.err, err, tc.name)
 			} else {
-				assert.Nil(t, err, tc.name)
+				assert.Nil(tt, err, tc.name)
 			}
 		})
 	}

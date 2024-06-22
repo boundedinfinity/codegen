@@ -2,32 +2,29 @@ package processor
 
 import (
 	"boundedinfinity/codegen/model"
-	"errors"
+
+	"github.com/boundedinfinity/go-commoner/errorer"
 )
 
 var (
-	ErrCodeGenSourceDuplicate   = errors.New("duplicate source")
-	ErrCodeGenSourceDuplicateFn = func(path string) error {
-		return errors.Join(errors.New(path), ErrCodeGenSourceDuplicate)
-	}
+	ErrCodeGenSourceDuplicate   = errorer.New("duplicate source")
+	ErrCodeGenSourceDuplicateFn = ErrCodeGenSourceDuplicate.ValueFn()
 
-	ErrCodeGenTypeSchemaIdDuplicate   = errors.New("duplicate schema-id")
+	ErrCodeGenTypeSchemaIdDuplicate   = errorer.New("duplicate schema-id")
 	ErrCodeGenTypeSchemaIdDuplicateFn = func(obj model.CodeGenType) error {
-		return errors.Join(errors.New(obj.TypeId().Get()), ErrCodeGenTypeSchemaIdDuplicate)
+		return ErrCodeGenTypeSchemaIdDuplicate.WithValue(obj.TypeId().Get())
 	}
 
-	ErrCodeGenCantReadFile   = errors.New("can't read file")
+	ErrCodeGenCantReadFile   = errorer.New("can't read file")
 	ErrCodeGenCantReadFileFn = func(path string, err error) error {
-		return errors.Join(errors.New(path), ErrCodeGenCantReadFile)
+		return ErrCodeGenUnsupportedFileType.Sub(err).WithValue(path)
 	}
 
-	ErrCodeGenUnsupportedFileType   = errors.New("unsupported file type")
-	ErrCodeGenUnsupportedFileTypeFn = func(ext string) error {
-		return errors.Join(errors.New(ext), ErrCodeGenUnsupportedFileType)
-	}
+	ErrCodeGenUnsupportedFileType   = errorer.New("unsupported file type")
+	ErrCodeGenUnsupportedFileTypeFn = ErrCodeGenUnsupportedFileType.ValueFn()
 
-	ErrCodeGenUnsupportedType   = errors.New("unsupported file type")
+	ErrCodeGenUnsupportedType   = errorer.New("unsupported file type")
 	ErrCodeGenUnsupportedTypeFn = func(typ model.CodeGenType) error {
-		return errors.Join(errors.New(typ.CodeGenId()), ErrCodeGenUnsupportedType)
+		return ErrCodeGenUnsupportedType.WithValue(typ.CodeGenId())
 	}
 )
