@@ -8,21 +8,22 @@ import (
 	"embed"
 	"fmt"
 	"text/template"
+
+	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
 )
 
 //go:embed templates/*.go.tpl
 var embeddedTemplates embed.FS
 
 func New(lang string) (*Generator, error) {
-	gen := &Generator{lang: lang}
-
-	tmpl, err := template.ParseFS(embeddedTemplates)
-	if err != nil {
-		return nil, err
+	gen := &Generator{
+		lang:  lang,
+		templ: template.New(""),
 	}
 
-	tmpl.Funcs(gen.getHelpers())
-	gen.templ = tmpl
+	if err := gen.loadTemplates(); err != nil {
+		return gen, err
+	}
 
 	return gen, nil
 }
@@ -63,4 +64,33 @@ func (t *Generator) generateType(typ model.CodeGenType) (string, error) {
 	}
 
 	return result, nil
+}
+
+func (t *Generator) templateNames() []string {
+	var names []string
+
+	for _, templ := range t.templ.Templates() {
+		names = append(names, templ.Name())
+	}
+
+	return names
+}
+
+func (t *Generator) loadTemplates() error {
+	t.templ.Funcs(t.getHelpers())
+
+	entries, err := embeddedTemplates.ReadDir("templates")
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		path := pather.Paths.Join("templates", entry.Name())
+
+		_, err := t.templ.ParseFS(embeddedTemplates, path)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
