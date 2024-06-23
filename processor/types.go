@@ -2,8 +2,10 @@ package processor
 
 import (
 	"boundedinfinity/codegen/model"
-	"errors"
-	"fmt"
+
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
 func (t *Processor) processTypes() error {
@@ -18,6 +20,44 @@ func (t *Processor) processTypes() error {
 		}
 	}
 
+	for _, typ := range t.combined.Types {
+		if err := t.checkType(typ); err != nil {
+			return err
+		}
+	}
+
+	translations := map[string]string{}
+
+	for _, typ := range t.combined.Types {
+		if err := t.processTypePackageAndQualifiedName(typ, translations); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (t *Processor) processTypePackageAndQualifiedName(typ model.CodeGenType, translations map[string]string) error {
+	var qualifedName string
+
+	if typ.Common().Package.Defined() {
+		qualifedName = typ.Common().Package.Get()
+	} else {
+		if t.combined.Package.Defined() {
+			qualifedName = t.combined.Package.Get()
+		}
+
+		qualifedName = pather.Paths.Join(qualifedName, typ.TypeId().Get())
+	}
+
+	for from, to := range translations {
+		qualifedName = stringer.Replace(qualifedName, to, from)
+	}
+
+	packageName := pather.Paths.Dir(qualifedName)
+	typ.Common().QualifiedName = optioner.Some(qualifedName)
+	typ.Common().Package = optioner.Some(packageName)
+
 	return nil
 }
 
@@ -28,12 +68,12 @@ func (t *Processor) resolveType(typ model.CodeGenType) (model.CodeGenType, error
 	switch obj := typ.(type) {
 	case *model.CodeGenRef:
 		if obj.Ref.Empty() {
-			err = errors.New("invalid reference")
+			err = model.ErrRefEmpty
 			break
 		}
 
 		if target, ok := t.typeIdMap[obj.Ref.Get()]; !ok {
-			err = fmt.Errorf("invalid reference %v", obj.Ref.Get())
+			err = model.ErrRefNotFound.WithValue(obj.Ref.Get())
 		} else {
 			found = target
 		}
@@ -48,32 +88,22 @@ func (t *Processor) resolveType(typ model.CodeGenType) (model.CodeGenType, error
 	return found, err
 }
 
-func (t *Processor) checkCombinedTypes() error {
-	for _, typ := range t.combined.Types {
-		if err := t.checkType(typ); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (t *Processor) checkType(typ model.CodeGenType) error {
+	var err error
+	var found model.CodeGenType
+
 	switch obj := typ.(type) {
 	case *model.CodeGenRef:
-		if obj.Ref.Empty() {
-			return errors.New("invalid reference")
-		}
-
-		if _, ok := t.typeIdMap[obj.Ref.Get()]; !ok {
-			return fmt.Errorf("invalid reference %v", obj.Ref.Get())
-		}
+		found, err = t.resolveType(typ)
+		obj.Found = found
 	case *model.CodeGenArray:
-		return t.checkType(obj.Items)
+		_, err = t.resolveType(obj.Items)
 	case *model.CodeGenObject:
 		for _, prop := range obj.Properties {
-			if err := t.checkType(prop); err != nil {
-				return err
+			err = t.checkType(prop)
+
+			if err != nil {
+				break
 			}
 		}
 	case *model.CodeGenBoolean, *model.CodeGenEnum, *model.CodeGenFloat,
@@ -83,5 +113,5 @@ func (t *Processor) checkType(typ model.CodeGenType) error {
 		return ErrCodeGenUnsupportedTypeFn(typ)
 	}
 
-	return nil
+	return err
 }

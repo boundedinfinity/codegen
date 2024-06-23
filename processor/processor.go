@@ -75,23 +75,15 @@ func (t *Processor) ProcessProjects(projects ...model.CodeGenProject) error {
 		t.projects = append(t.projects, &project)
 	}
 
-	if err := t.processOutputRoot(t.projects...); err != nil {
+	if err := t.processProjectOutputRoot(t.projects...); err != nil {
 		return err
 	}
 
-	if err := t.processPackage(t.projects...); err != nil {
+	if err := t.processProjectPackage(t.projects...); err != nil {
 		return err
 	}
 
 	if err := t.processTypes(); err != nil {
-		return err
-	}
-
-	if err := t.checkCombinedTypes(); err != nil {
-		return err
-	}
-
-	if err := t.calculatePackageNames(); err != nil {
 		return err
 	}
 

@@ -21,4 +21,6 @@ var (
 	ErrCodeGenTemplateFilePathDuplicate = errorer.Errorf("duplicate codegen.templates.file.path")
 	ErrMinMax                           = errorer.Errorf("max is less than min")
 	ErrProjectPackageAlreadyDefined     = errorer.New("project package already defined")
+	ErrRefNotFound                      = errorer.New("reference not found")
+	ErrRefEmpty                         = errorer.New("empty reference")
 )

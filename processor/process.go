@@ -13,7 +13,7 @@ var (
 	ErrCodeGenPackageMoreThanOne = errorer.New("more than one package found")
 )
 
-func (t *Processor) processPackage(projects ...*model.CodeGenProject) error {
+func (t *Processor) processProjectPackage(projects ...*model.CodeGenProject) error {
 	filtered := slicer.Filter(
 		func(_ int, p *model.CodeGenProject) bool { return p.Package.Defined() },
 		projects...,
@@ -39,7 +39,7 @@ var (
 	ErrCodeGenOutputRootMoreThanOne = errorer.New("more than one output root found")
 )
 
-func (t *Processor) processOutputRoot(projects ...*model.CodeGenProject) error {
+func (t *Processor) processProjectOutputRoot(projects ...*model.CodeGenProject) error {
 	filtered := slicer.Filter(
 		func(_ int, p *model.CodeGenProject) bool { return p.OutputRoot.Defined() },
 		projects...,

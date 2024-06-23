@@ -39,6 +39,16 @@ func (t *Generator) Generate(project *model.CodeGenProject) (map[string]string, 
 		return results, nil
 	}
 
+	for _, typ := range project.Types {
+		result, err := t.generateType(typ)
+
+		if err != nil {
+			return results, err
+		}
+
+		results[typ.CodeGenId()] = result
+	}
+
 	return results, nil
 }
 
@@ -46,6 +56,8 @@ func (t *Generator) generateType(typ model.CodeGenType) (string, error) {
 	var result string
 
 	switch i := typ.(type) {
+	case *model.CodeGenString:
+
 	default:
 		fmt.Println(i)
 	}

@@ -44,9 +44,8 @@ type CodeGenCommon struct {
 	//  This will be translated into a language appropriate formatted name.
 	Package optioner.Option[string] `json:"package,omitempty"`
 
-	// Package is the language pack designation used during code generation.
-	//  This will be translated into a language appropriate formatted name.
-	FilePath optioner.Option[string] `json:"file-path,omitempty"`
+	// QualifiedName
+	QualifiedName optioner.Option[string] `json:"-"`
 
 	CodeGenMeta
 }

@@ -13,6 +13,7 @@ import (
 
 type CodeGenRef struct {
 	Ref           optioner.Option[string] `json:"ref,omitempty"`
+	Found         CodeGenType             `json:"-"`
 	CodeGenCommon `json:",inline,omitempty"`
 }
 
