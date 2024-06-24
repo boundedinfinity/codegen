@@ -28,6 +28,9 @@ type CodeGenCommon struct {
 	// Name is the name of the type.
 	Name optioner.Option[string] `json:"name,omitempty"`
 
+	// Package
+	Package optioner.Option[string] `json:"package,omitempty"`
+
 	// Description description of the type
 	Description optioner.Option[string] `json:"description,omitempty"`
 
@@ -40,9 +43,6 @@ type CodeGenCommon struct {
 
 	// Eager will load this type if it's containted inside another type.
 	Eager optioner.Option[bool] `json:"eager,omitempty"`
-
-	// Package
-	Package optioner.Option[string] `json:"package,omitempty"`
 
 	CodeGenMeta
 }
@@ -64,6 +64,7 @@ func (t *CodeGenCommon) Common() *CodeGenCommon {
 //----------------------------------------------------------------
 
 func (t CodeGenCommon) Validate() error {
+
 	return nil
 }
 
@@ -80,32 +81,32 @@ func (t CodeGenCommon) HasValidation() bool {
 //----------------------------------------------------------------
 
 func (t *CodeGenCommon) WithQName(v string) *CodeGenCommon {
-	t.QName_ = optioner.OfZero(v)
+	t.QName_ = optioner.Some(v)
 	return t
 }
 
 func (t *CodeGenCommon) WithName(v string) *CodeGenCommon {
-	t.Name = optioner.OfZero(v)
+	t.Name = optioner.Some(v)
 	return t
 }
 
 func (t *CodeGenCommon) WithDescription(v string) *CodeGenCommon {
-	t.Description = optioner.OfZero(v)
+	t.Description = optioner.Some(v)
 	return t
 }
 
 func (t *CodeGenCommon) WithRequired(v bool) *CodeGenCommon {
-	t.Required = optioner.OfZero(v)
+	t.Required = optioner.Some(v)
 	return t
 }
 
 func (t *CodeGenCommon) WithDefault(v CodeGenType) *CodeGenCommon {
-	t.Default = optioner.OfZero(v)
+	t.Default = optioner.Some(v)
 	return t
 }
 
 func (t *CodeGenCommon) WithEager(v bool) *CodeGenCommon {
-	t.Eager = optioner.OfZero(v)
+	t.Eager = optioner.Some(v)
 	return t
 }
 
