@@ -32,6 +32,13 @@ func Test_Generate(t *testing.T) {
 				WithMax(50).WithMin(1).WithRegex(".*"),
 			expected: map[string]string{},
 		},
+		{
+			name:            "case 2",
+			lang:            "go",
+			caserConversion: "kebab-to-pascal",
+			input:           model.NewInteger(),
+			expected:        map[string]string{},
+		},
 	}
 
 	for _, tc := range tcs {
