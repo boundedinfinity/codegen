@@ -17,42 +17,64 @@ type CodeGenRef struct {
 	CodeGenCommon `json:",inline,omitempty"`
 }
 
-func (t CodeGenRef) CodeGenId() string {
+func (t CodeGenRef) BaseType() string {
 	return "ref"
 }
 
 var _ CodeGenType = &CodeGenRef{}
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+func (t CodeGenRef) HashValidation() bool {
+	return false
+}
+
+func (t CodeGenRef) Validate() error {
+	if err := t.CodeGenCommon.Validate(); err != nil {
+		return err
+	}
+
+	if t.Found != nil {
+		if err := t.Found.Validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+//----------------------------------------------------------------
 // Marshal
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId string `json:"codegen-id"`
+		TypeId string `json:"base-type"`
 		CodeGenRef
 	}{
-		TypeId:     t.CodeGenId(),
+		TypeId:     t.BaseType(),
 		CodeGenRef: *t,
 	}
 
 	return json.Marshal(dto)
 }
 
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 // Builders
-//////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------
 
 func NewRef() *CodeGenRef {
 	return &CodeGenRef{}
 }
 
 func (t CodeGenCommon) NewRefFromType(typ CodeGenType) (CodeGenType, error) {
-	if typ.TypeId().Empty() {
+	if typ.QName().Empty() {
 		return nil, errors.New("invalid ref target")
 	}
 
-	return NewRef().WithRef(typ.TypeId().Get()), nil
+	return NewRef().WithRef(typ.QName().Get()), nil
 }
 
 func (t *CodeGenRef) WithName(v string) *CodeGenRef {

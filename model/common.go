@@ -9,9 +9,10 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenType interface {
-	CodeGenId() string
-	TypeId() optioner.Option[string]
+	BaseType() string
+	QName() optioner.Option[string]
 	Validate() error
+	HasValidation() bool
 	Meta() *CodeGenMeta
 	Common() *CodeGenCommon
 }
@@ -22,7 +23,7 @@ type CodeGenType interface {
 
 type CodeGenCommon struct {
 	// Type ID is the type of this type definition.
-	Type_Id optioner.Option[string] `json:"type-id,omitempty"`
+	QName_ optioner.Option[string] `json:"q-name,omitempty"`
 
 	// Name is the name of the type.
 	Name optioner.Option[string] `json:"name,omitempty"`
@@ -40,18 +41,14 @@ type CodeGenCommon struct {
 	// Eager will load this type if it's containted inside another type.
 	Eager optioner.Option[bool] `json:"eager,omitempty"`
 
-	// Package is the language pack designation used during code generation.
-	//  This will be translated into a language appropriate formatted name.
+	// Package
 	Package optioner.Option[string] `json:"package,omitempty"`
-
-	// QualifiedName
-	QualifiedName optioner.Option[string] `json:"-"`
 
 	CodeGenMeta
 }
 
-func (t *CodeGenCommon) TypeId() optioner.Option[string] {
-	return t.Type_Id
+func (t *CodeGenCommon) QName() optioner.Option[string] {
+	return t.QName_
 }
 
 func (t *CodeGenCommon) Meta() *CodeGenMeta {
@@ -70,6 +67,10 @@ func (t CodeGenCommon) Validate() error {
 	return nil
 }
 
+func (t CodeGenCommon) HasValidation() bool {
+	return false
+}
+
 //----------------------------------------------------------------
 // Functions
 //----------------------------------------------------------------
@@ -78,8 +79,8 @@ func (t CodeGenCommon) Validate() error {
 // Builders
 //----------------------------------------------------------------
 
-func (t *CodeGenCommon) WithTypeId(v string) *CodeGenCommon {
-	t.Type_Id = optioner.OfZero(v)
+func (t *CodeGenCommon) WithQName(v string) *CodeGenCommon {
+	t.QName_ = optioner.OfZero(v)
 	return t
 }
 
@@ -108,25 +109,7 @@ func (t *CodeGenCommon) WithEager(v bool) *CodeGenCommon {
 	return t
 }
 
-///////////////////////////////////////////////////////////////////
-// CodeGenMeta
-//////////////////////////////////////////////////////////////////
-
-type CodeGenMeta struct {
-}
-
-//----------------------------------------------------------------
-// Merge
-//----------------------------------------------------------------
-
-func (t *CodeGenMeta) Merge(obj CodeGenMeta) error {
-	return nil
-}
-
-//----------------------------------------------------------------
-// Validate
-//----------------------------------------------------------------
-
-func (t *CodeGenMeta) Validate() error {
-	return nil
+func (t *CodeGenCommon) WithPackage(v string) *CodeGenCommon {
+	t.Package = optioner.Some(v)
+	return t
 }

@@ -10,7 +10,7 @@ type CodeGenBoolean struct {
 	CodeGenCommon
 }
 
-func (t CodeGenBoolean) CodeGenId() string {
+func (t CodeGenBoolean) BaseType() string {
 	return "boolean"
 }
 
@@ -34,10 +34,10 @@ func (t CodeGenBoolean) Validate() error {
 
 func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId         string `json:"codegen-id"`
+		TypeId         string `json:"base-type"`
 		CodeGenBoolean `json:",inline"`
 	}{
-		TypeId:         t.CodeGenId(),
+		TypeId:         t.BaseType(),
 		CodeGenBoolean: *t,
 	}
 
@@ -53,7 +53,7 @@ func NewBoolean() *CodeGenBoolean {
 }
 
 func (t *CodeGenBoolean) WithSchemaId(v string) *CodeGenBoolean {
-	t.CodeGenCommon.WithTypeId(v)
+	t.CodeGenCommon.WithQName(v)
 	return t
 }
 

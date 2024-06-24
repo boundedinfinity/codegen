@@ -20,7 +20,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 			input: model.NewBoolean(),
 			err:   nil,
 			expected: `{
-		        "codegen-id": "boolean",
+		        "base-type": "boolean",
                 "name": null,
                 "description": null,
                 "required": null,
@@ -34,7 +34,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 			input: model.NewBoolean().WithName("A_BOOLEAN"),
 			err:   nil,
 			expected: `{
-		        "codegen-id": "boolean",
+		        "base-type": "boolean",
                 "name": "A_BOOLEAN",
                 "description": null,
                 "required": null,
@@ -48,7 +48,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 			input: model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
 			err:   nil,
 			expected: `{
-		        "codegen-id": "boolean",
+		        "base-type": "boolean",
                 "name": "A_BOOLEAN",
                 "description": null,
                 "required": true,

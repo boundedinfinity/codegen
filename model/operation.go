@@ -73,7 +73,7 @@ func (t *CodeGenOperation) Merge(obj CodeGenOperation) error {
 
 func (t *CodeGenOperation) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId           string `json:"codegen-id"`
+		TypeId           string `json:"base-type"`
 		CodeGenOperation `json:",inline"`
 	}{
 		TypeId:           t.TypeId(),

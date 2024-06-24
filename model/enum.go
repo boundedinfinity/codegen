@@ -44,7 +44,7 @@ type CodeGenEnum struct {
 	Values []CodeGenEnumValue `json:"values,omitempty"`
 }
 
-func (t CodeGenEnum) CodeGenId() string {
+func (t CodeGenEnum) BaseType() string {
 	return "enum"
 }
 
@@ -53,6 +53,10 @@ var _ CodeGenType = &CodeGenEnum{}
 //----------------------------------------------------------------
 // Validation
 //----------------------------------------------------------------
+
+func (t CodeGenEnum) HasValidation() bool {
+	return t.Common().HasValidation()
+}
 
 func (t CodeGenEnum) Validate() error {
 	if err := t.CodeGenCommon.Validate(); err != nil {
@@ -74,10 +78,10 @@ func (t CodeGenEnum) Validate() error {
 
 func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId      string `json:"codegen-id"`
+		TypeId      string `json:"base-type"`
 		CodeGenEnum `json:",inline"`
 	}{
-		TypeId:      t.CodeGenId(),
+		TypeId:      t.BaseType(),
 		CodeGenEnum: *t,
 	}
 
@@ -89,7 +93,7 @@ func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 //----------------------------------------------------------------
 
 func (t *CodeGenEnum) WithSchemaId(v string) *CodeGenEnum {
-	t.CodeGenCommon.WithTypeId(v)
+	t.CodeGenCommon.WithQName(v)
 	return t
 }
 

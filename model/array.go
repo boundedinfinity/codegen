@@ -21,7 +21,7 @@ type CodeGenArray struct {
 	ManyToMany    optioner.Option[bool] `json:"many-to-many,omitempty"`
 }
 
-func (t CodeGenArray) CodeGenId() string {
+func (t CodeGenArray) BaseType() string {
 	return "array"
 }
 
@@ -35,6 +35,12 @@ var (
 	errCodeGenArrayMinAndExclusiveMinMutuallyExclusive = errorer.New("min and exclusive-min are multually exclusive")
 	errCodeGenArrayMaxAndExclusiveMaxMutuallyExclusive = errorer.New("max and exclusive-max are multually exclusive")
 )
+
+func (t CodeGenArray) HasValidation() bool {
+	return t.Common().HasValidation() ||
+		t.Min.Defined() || t.ExclusiveMin.Defined() ||
+		t.Max.Defined() || t.ExclusiveMax.Defined()
+}
 
 func (t CodeGenArray) Validate() error {
 	if err := t.CodeGenCommon.Validate(); err != nil {
@@ -62,10 +68,10 @@ func (t CodeGenArray) Validate() error {
 
 func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId       string `json:"codegen-id"`
+		TypeId       string `json:"base-type"`
 		CodeGenArray `json:",inline"`
 	}{
-		TypeId:       t.CodeGenId(),
+		TypeId:       t.BaseType(),
 		CodeGenArray: *t,
 	}
 
@@ -112,7 +118,7 @@ func NewArray() *CodeGenArray {
 }
 
 func (t *CodeGenArray) WithSchemaId(v string) *CodeGenArray {
-	t.CodeGenCommon.WithTypeId(v)
+	t.CodeGenCommon.WithQName(v)
 	return t
 }
 

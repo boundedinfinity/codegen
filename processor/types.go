@@ -11,11 +11,11 @@ import (
 func (t *Processor) processTypes() error {
 	for _, project := range t.projects {
 		for _, typ := range project.Types {
-			if _, ok := t.typeIdMap[typ.TypeId().Get()]; ok {
+			if _, ok := t.typeIdMap[typ.QName().Get()]; ok {
 				return ErrCodeGenTypeSchemaIdDuplicateFn(typ)
 			}
 
-			t.typeIdMap[typ.TypeId().Get()] = typ
+			t.typeIdMap[typ.QName().Get()] = typ
 			t.combined.Types = append(t.combined.Types, typ)
 		}
 	}
@@ -47,7 +47,7 @@ func (t *Processor) processTypePackageAndQualifiedName(typ model.CodeGenType, tr
 			qualifedName = t.combined.Package.Get()
 		}
 
-		qualifedName = pather.Paths.Join(qualifedName, typ.TypeId().Get())
+		qualifedName = pather.Paths.Join(qualifedName, typ.QName().Get())
 	}
 
 	for from, to := range translations {
@@ -55,7 +55,7 @@ func (t *Processor) processTypePackageAndQualifiedName(typ model.CodeGenType, tr
 	}
 
 	packageName := pather.Paths.Dir(qualifedName)
-	typ.Common().QualifiedName = optioner.Some(qualifedName)
+	typ.Common().QName_ = optioner.Some(qualifedName)
 	typ.Common().Package = optioner.Some(packageName)
 
 	return nil

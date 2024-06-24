@@ -15,7 +15,7 @@ type CodeGenObject struct {
 	Properties []CodeGenType `json:"properties"`
 }
 
-func (t CodeGenObject) CodeGenId() string {
+func (t CodeGenObject) BaseType() string {
 	return "object"
 }
 
@@ -24,6 +24,10 @@ var _ CodeGenType = &CodeGenObject{}
 //----------------------------------------------------------------
 // Validation
 //----------------------------------------------------------------
+
+func (t CodeGenObject) HasValidation() bool {
+	return t.Common().HasValidation()
+}
 
 func (t CodeGenObject) Validate() error {
 	if err := t.CodeGenCommon.Validate(); err != nil {
@@ -45,10 +49,10 @@ func (t CodeGenObject) Validate() error {
 
 func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId        string `json:"codegen-id"`
+		TypeId        string `json:"base-type"`
 		CodeGenObject `json:",inline"`
 	}{
-		TypeId:        t.CodeGenId(),
+		TypeId:        t.BaseType(),
 		CodeGenObject: *t,
 	}
 
@@ -89,7 +93,7 @@ func NewObject() *CodeGenObject {
 }
 
 func (t *CodeGenObject) WithSchemaId(v string) *CodeGenObject {
-	t.CodeGenCommon.WithTypeId(v)
+	t.CodeGenCommon.WithQName(v)
 	return t
 }
 

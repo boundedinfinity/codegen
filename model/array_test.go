@@ -20,7 +20,7 @@ func Test_Marshal_Array(t *testing.T) {
 			input: model.NewArray(),
 			err:   nil,
 			expected: `{
-		        "codegen-id": "array",
+		        "base-type": "array",
                 "name": null,
                 "description": null,
                 "required": null,
@@ -38,7 +38,7 @@ func Test_Marshal_Array(t *testing.T) {
 				WithDescription("an array description"),
 			err: nil,
 			expected: `{
-		        "codegen-id": "array",
+		        "base-type": "array",
                 "name": "AN_ARRAY",
                 "description": "an array description",
                 "required": null,
@@ -59,7 +59,7 @@ func Test_Marshal_Array(t *testing.T) {
 					WithName("A_BOOLEAN").
 					WithDescription("a bool description")),
 			expected: `{
-		        "codegen-id": "array",
+		        "base-type": "array",
                 "name": "AN_ARRAY",
                 "description": "an array description",
                 "required": null,
@@ -67,7 +67,7 @@ func Test_Marshal_Array(t *testing.T) {
                 "inherit": null,
                 "links": null,
                 "items": {
-                    "codegen-id": "boolean",
+                    "base-type": "boolean",
                     "name": "A_BOOLEAN",
                     "description": "a bool description",
                     "required": null,

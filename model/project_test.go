@@ -38,7 +38,7 @@ func Test_Marshal_Project(t *testing.T) {
 				),
 			err: nil,
 			expected: `{
-		        "codegen-id": "boolean",
+		        "base-type": "boolean",
                 "name": null,
                 "description": null,
                 "required": null,

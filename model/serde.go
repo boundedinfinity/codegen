@@ -10,8 +10,8 @@ import (
 
 var (
 	ErrInvalidMarshalCodeGenObject   = errorer.New("invalid code gen object")
-	ErrCodeGenTypeTypeIdMissing      = errorer.New("codegen-id missing")
-	ErrCodeGenTypeTypeIdNotSupported = errorer.New("codegen-id not supported")
+	ErrCodeGenTypeTypeIdMissing      = errorer.New("base-type missing")
+	ErrCodeGenTypeTypeIdNotSupported = errorer.New("base-type not supported")
 	ErrCodeGenTypeUnmarshal          = errorer.New("unmarshal error")
 
 	errCodeGenTypeUnmarshalFn = func(err error) error {
@@ -20,7 +20,7 @@ var (
 )
 
 type descriminator struct {
-	CodeGenId string `json:"codegen-id"`
+	CodeGenId string `json:"base-type"`
 }
 
 func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
@@ -38,7 +38,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 	var err error
 
 	switch descrim.CodeGenId {
-	case CodeGenString{}.CodeGenId():
+	case CodeGenString{}.BaseType():
 		var obj CodeGenString
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -46,7 +46,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenInteger{}.CodeGenId():
+	case CodeGenInteger{}.BaseType():
 		var obj CodeGenInteger
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -54,7 +54,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenFloat{}.CodeGenId():
+	case CodeGenFloat{}.BaseType():
 		var obj CodeGenFloat
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -62,7 +62,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenBoolean{}.CodeGenId():
+	case CodeGenBoolean{}.BaseType():
 		var obj CodeGenBoolean
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -70,7 +70,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenArray{}.CodeGenId():
+	case CodeGenArray{}.BaseType():
 		var obj CodeGenArray
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -78,7 +78,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenObject{}.CodeGenId():
+	case CodeGenObject{}.BaseType():
 		var obj CodeGenObject
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -86,7 +86,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenRef{}.CodeGenId():
+	case CodeGenRef{}.BaseType():
 		var obj CodeGenRef
 
 		if err = json.Unmarshal(data, &obj); err != nil {
