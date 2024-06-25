@@ -11,13 +11,17 @@ import (
 // Integer
 ///////////////////////////////////////////////////////////////////
 
+func NewInteger() *CodeGenInteger {
+	return &CodeGenInteger{}
+}
+
 type CodeGenInteger number[int]
+
+var _ CodeGenType = &CodeGenInteger{}
 
 func (t CodeGenInteger) BaseType() string {
 	return "integer"
 }
-
-var _ CodeGenType = &CodeGenInteger{}
 
 func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 	dto := struct {
@@ -31,21 +35,21 @@ func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 	return json.Marshal(dto)
 }
 
-func NewInteger() *CodeGenInteger {
-	return &CodeGenInteger{}
-}
-
 ///////////////////////////////////////////////////////////////////
 // Float
 ///////////////////////////////////////////////////////////////////
 
+func NewFloat() *CodeGenFloat {
+	return &CodeGenFloat{}
+}
+
 type CodeGenFloat number[float64]
+
+var _ CodeGenType = &CodeGenFloat{}
 
 func (t CodeGenFloat) BaseType() string {
 	return "float"
 }
-
-var _ CodeGenType = &CodeGenFloat{}
 
 func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 	dto := struct {
@@ -59,19 +63,11 @@ func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 	return json.Marshal(dto)
 }
 
-func NewFloat() *CodeGenFloat {
-	return &CodeGenFloat{}
-}
-
 ///////////////////////////////////////////////////////////////////
 // numberType
 ///////////////////////////////////////////////////////////////////
 
-type numberType interface {
-	int | float64
-}
-
-type number[T numberType] struct {
+type number[T int | float64] struct {
 	CodeGenCommon
 	MultipleOf optioner.Option[T] `json:"multiple-of,omitempty"`
 	Ranges     []NumberRange[T]   `json:"ranges,omitempty"`
@@ -137,8 +133,8 @@ func (t *number[T]) WithRequired(v bool) *number[T] {
 	return t
 }
 
-func (t *number[T]) WithRanges(v ...NumberRange[T]) *number[T] {
-	t.Ranges = append(t.Ranges, v...)
+func (t *number[T]) WithMultipleOf(v T) *number[T] {
+	t.MultipleOf = optioner.Some(v)
 	return t
 }
 
@@ -146,7 +142,7 @@ func (t *number[T]) WithRanges(v ...NumberRange[T]) *number[T] {
 // NumberRange
 ///////////////////////////////////////////////////////////////////
 
-type NumberRange[T numberType] struct {
+type NumberRange[T int | float64] struct {
 	Min          optioner.Option[T] `json:"min,omitempty"`
 	ExclusiveMin optioner.Option[T] `json:"exclusive-min,omitempty"`
 	Max          optioner.Option[T] `json:"max,omitempty"`

@@ -13,19 +13,18 @@ import (
 
 type CodeGenArray struct {
 	CodeGenCommon `json:",inline,omitempty"`
-	Min           optioner.Option[int]  `json:"min,omitempty"`
-	ExclusiveMin  optioner.Option[int]  `json:"exclusive-min,omitempty"`
-	Max           optioner.Option[int]  `json:"max,omitempty"`
-	ExclusiveMax  optioner.Option[int]  `json:"exclusive-max,omitempty"`
-	Items         CodeGenType           `json:"items,omitempty"`
-	ManyToMany    optioner.Option[bool] `json:"many-to-many,omitempty"`
+	Min           optioner.Option[int] `json:"min,omitempty"`
+	ExclusiveMin  optioner.Option[int] `json:"exclusive-min,omitempty"`
+	Max           optioner.Option[int] `json:"max,omitempty"`
+	ExclusiveMax  optioner.Option[int] `json:"exclusive-max,omitempty"`
+	Items         CodeGenType          `json:"items,omitempty"`
 }
+
+var _ CodeGenType = &CodeGenArray{}
 
 func (t CodeGenArray) BaseType() string {
 	return "array"
 }
-
-var _ CodeGenType = &CodeGenArray{}
 
 //----------------------------------------------------------------
 // Validation
@@ -81,12 +80,11 @@ func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	dto := struct {
 		CodeGenCommon
-		Min          optioner.Option[int]  `json:"min,omitempty"`
-		ExclusiveMin optioner.Option[int]  `json:"exclusive-min,omitempty"`
-		Max          optioner.Option[int]  `json:"max,omitempty"`
-		ExclusiveMax optioner.Option[int]  `json:"exclusive-max,omitempty"`
-		Items        json.RawMessage       `json:"items,omitempty"`
-		ManyToMany   optioner.Option[bool] `json:"many-to-many,omitempty"`
+		Min          optioner.Option[int] `json:"min,omitempty"`
+		ExclusiveMin optioner.Option[int] `json:"exclusive-min,omitempty"`
+		Max          optioner.Option[int] `json:"max,omitempty"`
+		ExclusiveMax optioner.Option[int] `json:"exclusive-max,omitempty"`
+		Items        json.RawMessage      `json:"items,omitempty"`
 	}{}
 
 	if err := json.Unmarshal(data, &dto); err != nil {
@@ -97,7 +95,7 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 		t.Max = dto.Max
 		t.ExclusiveMax = dto.ExclusiveMax
 		t.ExclusiveMin = dto.ExclusiveMin
-		t.ManyToMany = dto.ManyToMany
+
 	}
 
 	if items, err := UnmarshalCodeGenType(dto.Items); err != nil {

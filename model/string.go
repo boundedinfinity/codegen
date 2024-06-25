@@ -19,11 +19,11 @@ type CodeGenString struct {
 	Regex optioner.Option[string] `json:"regex,omitempty"`
 }
 
+var _ CodeGenType = &CodeGenString{}
+
 func (t CodeGenString) BaseType() string {
 	return "string"
 }
-
-var _ CodeGenType = &CodeGenString{}
 
 //----------------------------------------------------------------
 // Validation

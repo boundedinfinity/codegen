@@ -15,11 +15,11 @@ type CodeGenObject struct {
 	Properties []CodeGenType `json:"properties"`
 }
 
+var _ CodeGenType = &CodeGenObject{}
+
 func (t CodeGenObject) BaseType() string {
 	return "object"
 }
-
-var _ CodeGenType = &CodeGenObject{}
 
 //----------------------------------------------------------------
 // Validation

@@ -10,11 +10,11 @@ type CodeGenBoolean struct {
 	CodeGenCommon
 }
 
+var _ CodeGenType = &CodeGenBoolean{}
+
 func (t CodeGenBoolean) BaseType() string {
 	return "boolean"
 }
-
-var _ CodeGenType = &CodeGenBoolean{}
 
 //----------------------------------------------------------------
 // Validation
