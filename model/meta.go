@@ -22,3 +22,7 @@ func (t *CodeGenMeta) Merge(obj CodeGenMeta) error {
 func (t *CodeGenMeta) Validate() error {
 	return nil
 }
+
+func (t *CodeGenMeta) HasValidation() bool {
+	return false
+}

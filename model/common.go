@@ -64,17 +64,17 @@ func (t *CodeGenCommon) Common() *CodeGenCommon {
 //----------------------------------------------------------------
 
 func (t CodeGenCommon) Validate() error {
+	if err := t.Meta().Validate(); err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (t CodeGenCommon) HasValidation() bool {
-	return false
+	return t.Required.Defined() &&
+		t.Meta().HasValidation()
 }
-
-//----------------------------------------------------------------
-// Functions
-//----------------------------------------------------------------
 
 //----------------------------------------------------------------
 // Builders
@@ -82,6 +82,11 @@ func (t CodeGenCommon) HasValidation() bool {
 
 func (t *CodeGenCommon) WithQName(v string) *CodeGenCommon {
 	t.QName_ = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenCommon) WithPackage(v string) *CodeGenCommon {
+	t.Package = optioner.Some(v)
 	return t
 }
 
@@ -107,10 +112,5 @@ func (t *CodeGenCommon) WithDefault(v CodeGenType) *CodeGenCommon {
 
 func (t *CodeGenCommon) WithEager(v bool) *CodeGenCommon {
 	t.Eager = optioner.Some(v)
-	return t
-}
-
-func (t *CodeGenCommon) WithPackage(v string) *CodeGenCommon {
-	t.Package = optioner.Some(v)
 	return t
 }
