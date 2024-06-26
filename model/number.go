@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
@@ -15,7 +13,9 @@ func NewInteger() *CodeGenInteger {
 	return &CodeGenInteger{}
 }
 
-type CodeGenInteger number[int]
+type CodeGenInteger struct {
+	number[int]
+}
 
 var _ CodeGenType = &CodeGenInteger{}
 
@@ -32,7 +32,47 @@ func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 		CodeGenInteger: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
+}
+
+func (t *CodeGenInteger) WithQName(v string) *CodeGenInteger {
+	t.withQName(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithName(v string) *CodeGenInteger {
+	t.withName(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithPackage(v string) *CodeGenInteger {
+	t.withPackage(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithDescription(v string) *CodeGenInteger {
+	t.withDescription(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithRequired(v bool) *CodeGenInteger {
+	t.withRequired(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithMultipleOf(v int) *CodeGenInteger {
+	t.withMultipleOf(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithRange(v *NumberRange[int]) *CodeGenInteger {
+	t.withRange(v)
+	return t
+}
+
+func (t *CodeGenInteger) WithList(elems ...int) *CodeGenInteger {
+	t.withList(elems...)
+	return t
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -43,7 +83,9 @@ func NewFloat() *CodeGenFloat {
 	return &CodeGenFloat{}
 }
 
-type CodeGenFloat number[float64]
+type CodeGenFloat struct {
+	number[float64]
+}
 
 var _ CodeGenType = &CodeGenFloat{}
 
@@ -60,15 +102,50 @@ func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 		CodeGenFloat: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
+}
+
+func (t *CodeGenFloat) WithQName(v string) *CodeGenFloat {
+	t.codeGenCommon.withQName(v)
+	return t
+}
+
+func (t *CodeGenFloat) WithName(v string) *CodeGenFloat {
+	t.codeGenCommon.withName(v)
+	return t
+}
+
+func (t *CodeGenFloat) WithPackage(v string) *CodeGenFloat {
+	t.codeGenCommon.withPackage(v)
+	return t
+}
+
+func (t *CodeGenFloat) WithDescription(v string) *CodeGenFloat {
+	t.codeGenCommon.withDescription(v)
+	return t
+}
+
+func (t *CodeGenFloat) WithRequired(v bool) *CodeGenFloat {
+	t.codeGenCommon.withRequired(v)
+	return t
+}
+
+func (t *CodeGenFloat) WithMultipleOf(v float64) *CodeGenFloat {
+	t.MultipleOf = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenFloat) WithRange(v NumberRange[float64]) *CodeGenFloat {
+	t.Ranges = append(t.Ranges, v)
+	return t
 }
 
 ///////////////////////////////////////////////////////////////////
-// numberType
+// number
 ///////////////////////////////////////////////////////////////////
 
 type number[T int | float64] struct {
-	CodeGenCommon
+	codeGenCommon
 	MultipleOf optioner.Option[T] `json:"multiple-of,omitempty"`
 	Ranges     []NumberRange[T]   `json:"ranges,omitempty"`
 }
@@ -83,7 +160,7 @@ var (
 )
 
 func (t number[T]) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -91,9 +168,9 @@ func (t number[T]) Validate() error {
 		return ErrNumberMultipleOfBelow1.WithValue(t.MultipleOf.Get())
 	}
 
-	for i, rng := range t.Ranges {
+	for _, rng := range t.Ranges {
 		if err := rng.Validate(); err != nil {
-			return ErrNumberRange.FormatFn("%s [%i]")(err.Error(), i)
+			return err
 		}
 	}
 
@@ -108,39 +185,35 @@ func (t number[T]) HasValidation() bool {
 // Builders
 //----------------------------------------------------------------
 
-func (t *number[T]) WithQName(v string) *number[T] {
-	t.CodeGenCommon.WithQName(v)
+func (t *number[T]) withName(v string) *number[T] {
+	t.codeGenCommon.withName(v)
 	return t
 }
 
-func (t *number[T]) WithName(v string) *number[T] {
-	t.CodeGenCommon.WithName(v)
+func (t *number[T]) withList(elems ...T) *number[T] {
+	for _, elem := range elems {
+		t.withRange(NewRange[T]().WithMin(elem).WithMax(elem))
+	}
 	return t
 }
 
-func (t *number[T]) WithPackage(v string) *number[T] {
-	t.CodeGenCommon.WithPackage(v)
-	return t
-}
-
-func (t *number[T]) WithDescription(v string) *number[T] {
-	t.CodeGenCommon.WithDescription(v)
-	return t
-}
-
-func (t *number[T]) WithRequired(v bool) *number[T] {
-	t.CodeGenCommon.WithRequired(v)
-	return t
-}
-
-func (t *number[T]) WithMultipleOf(v T) *number[T] {
+func (t *number[T]) withMultipleOf(v T) *number[T] {
 	t.MultipleOf = optioner.Some(v)
+	return t
+}
+
+func (t *number[T]) withRange(v *NumberRange[T]) *number[T] {
+	t.Ranges = append(t.Ranges, *v)
 	return t
 }
 
 ///////////////////////////////////////////////////////////////////
 // NumberRange
 ///////////////////////////////////////////////////////////////////
+
+func NewRange[T int | float64]() *NumberRange[T] {
+	return &NumberRange[T]{}
+}
 
 type NumberRange[T int | float64] struct {
 	Min          optioner.Option[T] `json:"min,omitempty"`
@@ -170,44 +243,58 @@ func (t *NumberRange[T]) WithExclusiveMax(v T) *NumberRange[T] {
 }
 
 //----------------------------------------------------------------
+// Marshal
+//----------------------------------------------------------------
+
+func (t *NumberRange[T]) MarshalJSON() ([]byte, error) {
+	type internal NumberRange[T]
+	return marshalCodeGenType(internal(*t))
+}
+
+//----------------------------------------------------------------
 // Validation
 //----------------------------------------------------------------
 
 var (
 	ErrNumberRangeMinAndExclusiveMinMutuallyExclusive = errorer.New("min and exclusive-min are multually exclusive")
+	ErrNumberRangeMinOrExclusiveMinRequired           = errorer.New("min or exclusive-min required")
 	ErrNumberRangeMaxAndExclusiveMaxMutuallyExclusive = errorer.New("max and exclusive-max are multually exclusive")
+	ErrNumberRangeMaxOrExclusiveMaxRequired           = errorer.New("max or exclusive-max required")
 	ErrNumberRangeMaxLessThanMin                      = errorer.New("max less than min")
 )
 
 func (t NumberRange[T]) Validate() error {
-	if t.Min.Defined() && t.ExclusiveMin.Defined() {
+	switch {
+	case t.Min.Defined() && t.ExclusiveMin.Defined():
 		return ErrNumberRangeMinAndExclusiveMinMutuallyExclusive
-	}
-
-	if t.Max.Defined() && t.ExclusiveMax.Defined() {
+	case t.Min.Empty() && t.ExclusiveMin.Empty():
+		return ErrNumberRangeMinOrExclusiveMinRequired
+	case t.Max.Defined() && t.ExclusiveMax.Defined():
 		return ErrNumberRangeMaxAndExclusiveMaxMutuallyExclusive
+	case t.Max.Empty() && t.ExclusiveMax.Empty():
+		return ErrNumberRangeMaxOrExclusiveMaxRequired
 	}
 
 	switch {
 	case t.Max.Defined(), t.Min.Defined():
-		if t.Min.Get() < t.Max.Get() {
+		if t.Min.Get() > t.Max.Get() {
 			return ErrNumberRangeMaxLessThanMin.
-				FormatFn("max %s, min %s")(t.Max.Get(), t.Min.Get())
+				FormatFn("max %d, min %d")(t.Max.Get(), t.Min.Get())
 		}
 	case t.Max.Defined(), t.ExclusiveMin.Defined():
-		if t.Min.Get() < t.ExclusiveMax.Get() {
+		if t.Min.Get() >= t.ExclusiveMax.Get() {
 			return ErrNumberRangeMaxLessThanMin.
-				FormatFn("max %s, min %s")(t.Max.Get(), t.ExclusiveMin.Get())
+				FormatFn("max %d, min %d")(t.Max.Get(), t.ExclusiveMin.Get())
 		}
 	case t.ExclusiveMax.Defined(), t.Min.Defined():
-		if t.Min.Get() < t.ExclusiveMax.Get() {
+		if t.ExclusiveMin.Get() > t.ExclusiveMax.Get() {
 			return ErrNumberRangeMaxLessThanMin.
-				FormatFn("max %s, min %s")(t.ExclusiveMax.Get(), t.Min.Get())
+				FormatFn("max %d, min %d")(t.ExclusiveMax.Get(), t.Min.Get())
 		}
 	case t.ExclusiveMax.Defined(), t.ExclusiveMin.Defined():
-		if t.Min.Get() < t.ExclusiveMax.Get() {
+		if t.ExclusiveMin.Get() < t.ExclusiveMax.Get() {
 			return ErrNumberRangeMaxLessThanMin.
-				FormatFn("max %s, min %s")(t.ExclusiveMax.Get(), t.ExclusiveMin.Get())
+				FormatFn("max %d, min %d")(t.ExclusiveMax.Get(), t.ExclusiveMin.Get())
 		}
 	}
 

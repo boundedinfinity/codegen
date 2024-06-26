@@ -20,15 +20,7 @@ func Test_Marshal_Array(t *testing.T) {
 			input: model.NewArray(),
 			err:   nil,
 			expected: `{
-		        "base-type": "array",
-                "name": null,
-                "description": null,
-                "required": null,
-                "default": null,
-                "inherit": null,
-                "links": null,
-                "min": null,
-                "max": null
+		        "base-type": "array"
 		    }`,
 		},
 		{
@@ -40,13 +32,7 @@ func Test_Marshal_Array(t *testing.T) {
 			expected: `{
 		        "base-type": "array",
                 "name": "AN_ARRAY",
-                "description": "an array description",
-                "required": null,
-                "default": null,
-                "inherit": null,
-                "links": null,
-                "min": null,
-                "max": null
+                "description": "an array description"
 		    }`,
 		},
 		{
@@ -62,38 +48,22 @@ func Test_Marshal_Array(t *testing.T) {
 		        "base-type": "array",
                 "name": "AN_ARRAY",
                 "description": "an array description",
-                "required": null,
-                "default": null,
-                "inherit": null,
-                "links": null,
                 "items": {
                     "base-type": "boolean",
                     "name": "A_BOOLEAN",
-                    "description": "a bool description",
-                    "required": null,
-                    "default": null,
-                    "inherit": null,
-                    "links": null
-                },
-                "min": null,
-                "max": null
+                    "description": "a bool description"
+                }
 		    }`,
 		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
-			// bs, err := model.MarshalCodeGenObject(tc.input)
 			bs, err := json.MarshalIndent(&tc.input, "", "    ")
 			actual := string(bs)
 
-			if tc.err != nil {
-				assert.Equal(t, tc.err, err, tc.name, actual)
-			} else {
-				assert.Nil(t, err, tc.name, actual)
-			}
-
-			assert.JSONEqf(t, tc.expected, actual, "%v = %v", tc.name, actual)
+			assert.ErrorIs(tt, err, tc.err)
+			assert.JSONEqf(tt, tc.expected, actual, actual)
 		})
 	}
 }
@@ -119,19 +89,14 @@ func Test_Unmarshal_Array(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
 			input, err := json.Marshal(&tc.obj)
-			assert.Nilf(t, err, tc.name, "%v : %v", tc.name, string(input))
+			assert.ErrorIs(tt, err, tc.err, string(input))
 
 			var actual model.CodeGenArray
 
 			err = json.Unmarshal(input, &actual)
 
-			if tc.err != nil {
-				assert.Equalf(t, tc.err, err, "%v : %v", tc.name, string(input))
-			} else {
-				assert.Nilf(t, err, tc.name, "%v : %v", tc.name, string(input))
-			}
-
-			assert.Equalf(t, tc.obj, &actual, "%v : %v", tc.name, string(input))
+			assert.ErrorIs(tt, err, tc.err, string(input))
+			assert.Equalf(tt, tc.obj, &actual, string(input))
 		})
 	}
 }

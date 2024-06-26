@@ -7,6 +7,7 @@ import (
 	"boundedinfinity/codegen/model"
 	"bytes"
 	"fmt"
+	"go/format"
 	"os"
 	"text/template"
 
@@ -23,6 +24,7 @@ func New(lang string, caserConversion string) (*Generator, error) {
 		caserConversion:     caserConversion,
 		templ:               template.New(""),
 		templateDescriptors: []templateDescriptor{},
+		formatSource:        true,
 	}
 
 	return gen, nil
@@ -32,6 +34,7 @@ type Generator struct {
 	templ               *template.Template
 	lang                string
 	caserConversion     string
+	formatSource        bool
 	templateDescriptors []templateDescriptor
 }
 
@@ -65,7 +68,7 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 	var templateDescriptors []templateDescriptor
 
 	switch i := typ.(type) {
-	case *model.CodeGenString:
+	case *model.CodeGenString, *model.CodeGenInteger, *model.CodeGenFloat:
 		templateDescriptors = slicer.Filter(
 			func(_ int, td templateDescriptor) bool { return includeTemplate(params, td) },
 			t.templateDescriptors...,
@@ -80,6 +83,19 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 		err := t.templ.ExecuteTemplate(&buffer, td.name, typ)
 		if err != nil {
 			return results, err
+		}
+
+		if t.formatSource {
+			formatted, err := format.Source(buffer.Bytes())
+			if err != nil {
+				return results, err
+			}
+
+			buffer.Reset()
+			_, err = buffer.Write(formatted)
+			if err != nil {
+				return results, err
+			}
 		}
 
 		var dir string

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"regexp"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -13,7 +12,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenString struct {
-	CodeGenCommon
+	codeGenCommon
 	Min   optioner.Option[int]    `json:"min,omitempty"`
 	Max   optioner.Option[int]    `json:"max,omitempty"`
 	Regex optioner.Option[string] `json:"regex,omitempty"`
@@ -40,7 +39,7 @@ var (
 )
 
 func (t CodeGenString) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -83,7 +82,7 @@ func (t *CodeGenString) MarshalJSON() ([]byte, error) {
 		CodeGenString: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
 }
 
 //----------------------------------------------------------------
@@ -95,37 +94,37 @@ func NewString() *CodeGenString {
 }
 
 func (t *CodeGenString) WithQName(v string) *CodeGenString {
-	t.CodeGenCommon.WithQName(v)
+	t.codeGenCommon.withQName(v)
 	return t
 }
 
 func (t *CodeGenString) WithName(v string) *CodeGenString {
-	t.CodeGenCommon.WithName(v)
+	t.codeGenCommon.withName(v)
 	return t
 }
 
 func (t *CodeGenString) WithPackage(v string) *CodeGenString {
-	t.Package = optioner.Some(v)
+	t.codeGenCommon.withPackage(v)
 	return t
 }
 
 func (t *CodeGenString) WithDescription(v string) *CodeGenString {
-	t.CodeGenCommon.WithDescription(v)
+	t.codeGenCommon.withDescription(v)
 	return t
 }
 
 func (t *CodeGenString) WithRequired(v bool) *CodeGenString {
-	t.CodeGenCommon.WithRequired(v)
+	t.codeGenCommon.withRequired(v)
 	return t
 }
 
-func (t *CodeGenString) WithDefault(v CodeGenString) *CodeGenString {
-	t.CodeGenCommon.WithDefault(&v)
-	return t
-}
+// func (t *CodeGenString) WithDefault(v CodeGenString) *CodeGenString {
+// 	t.codeGenCommon.withDefault(&v)
+// 	return t
+// }
 
 func (t *CodeGenString) WithMin(v int) *CodeGenString {
-	t.Min = optioner.Some(0)
+	t.Min = optioner.Some(v)
 	return t
 }
 

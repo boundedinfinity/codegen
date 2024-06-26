@@ -54,13 +54,8 @@ func Test_Marshal_Project(t *testing.T) {
 			bs, err := json.MarshalIndent(tc.input, "", "    ")
 			actual := string(bs)
 
-			if tc.err != nil {
-				assert.Equalf(t, tc.err, err, "%v : %v", tc.name, actual)
-			} else {
-				assert.Nil(t, err, tc.name, actual)
-			}
-
-			assert.JSONEqf(t, tc.expected, actual, "%v : %v", tc.name, actual)
+			assert.ErrorIs(tt, err, tc.err)
+			assert.JSONEqf(tt, tc.expected, actual, actual)
 		})
 	}
 }
@@ -81,19 +76,14 @@ func Test_Unmarshal_Project(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
 			data, err := json.MarshalIndent(tc.obj, "", "    ")
-			assert.Nil(t, err, tc.name, string(data))
+			assert.Nil(tt, err, string(data))
 
 			var actual model.CodeGenBoolean
 
 			err = json.Unmarshal(data, &actual)
 
-			if tc.err != nil {
-				assert.Equal(t, tc.err, err, tc.name, string(data))
-			} else {
-				assert.Nil(t, err, tc.name, string(data))
-			}
-
-			assert.EqualValuesf(t, tc.obj, &actual, "%v : %v", tc.name, string(data))
+			assert.ErrorIs(tt, err, tc.err)
+			assert.EqualValuesf(tt, tc.obj, &actual, "%v : %v", string(data))
 		})
 	}
 }

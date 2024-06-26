@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -40,7 +39,7 @@ func (t CodeGenEnumValue) Validate() error {
 //////////////////////////////////////////////////////////////////
 
 type CodeGenEnum struct {
-	CodeGenCommon
+	codeGenCommon
 	Values []CodeGenEnumValue `json:"values,omitempty"`
 }
 
@@ -59,7 +58,7 @@ func (t CodeGenEnum) HasValidation() bool {
 }
 
 func (t CodeGenEnum) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -85,29 +84,29 @@ func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 		CodeGenEnum: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
 }
 
 //----------------------------------------------------------------
 // Builders
 //----------------------------------------------------------------
 
-func (t *CodeGenEnum) WithSchemaId(v string) *CodeGenEnum {
-	t.CodeGenCommon.WithQName(v)
+func (t *CodeGenEnum) WithQName(v string) *CodeGenEnum {
+	t.codeGenCommon.withQName(v)
 	return t
 }
 
 func (t *CodeGenEnum) WithName(v string) *CodeGenEnum {
-	t.CodeGenCommon.WithName(v)
+	t.codeGenCommon.withName(v)
 	return t
 }
 
 func (t *CodeGenEnum) WithDescription(v string) *CodeGenEnum {
-	t.CodeGenCommon.WithDescription(v)
+	t.codeGenCommon.withDescription(v)
 	return t
 }
 
 func (t *CodeGenEnum) WithRequired(v bool) *CodeGenEnum {
-	t.CodeGenCommon.WithRequired(v)
+	t.codeGenCommon.withRequired(v)
 	return t
 }

@@ -1,4 +1,5 @@
 makefile_dir		:= $(abspath $(shell pwd))
+template_dir		:= $(makefile_dir)/generator/templates
 
 .PHONY: list purge build install generate test commit tag publish
 
@@ -10,6 +11,8 @@ purge:
 
 generate: purge
 	go generate ./...
+	cp $(template_dir)/integer.type.go.tpl $(template_dir)/float.type.go.tpl
+	cp $(template_dir)/integer.persistence.go.tpl $(template_dir)/float.persistence.go.tpl
 
 build: generate
 	go mod tidy

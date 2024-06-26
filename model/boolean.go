@@ -1,13 +1,11 @@
 package model
 
-import "encoding/json"
-
 ///////////////////////////////////////////////////////////////////
 // Type
 //////////////////////////////////////////////////////////////////
 
 type CodeGenBoolean struct {
-	CodeGenCommon
+	codeGenCommon
 }
 
 var _ CodeGenType = &CodeGenBoolean{}
@@ -21,7 +19,7 @@ func (t CodeGenBoolean) BaseType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenBoolean) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -41,7 +39,7 @@ func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
 		CodeGenBoolean: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
 }
 
 //----------------------------------------------------------------
@@ -52,27 +50,27 @@ func NewBoolean() *CodeGenBoolean {
 	return &CodeGenBoolean{}
 }
 
-func (t *CodeGenBoolean) WithSchemaId(v string) *CodeGenBoolean {
-	t.CodeGenCommon.WithQName(v)
+func (t *CodeGenBoolean) WithQName(v string) *CodeGenBoolean {
+	t.codeGenCommon.withQName(v)
 	return t
 }
 
 func (t *CodeGenBoolean) WithName(v string) *CodeGenBoolean {
-	t.CodeGenCommon.WithName(v)
+	t.codeGenCommon.withName(v)
 	return t
 }
 
 func (t *CodeGenBoolean) WithDescription(v string) *CodeGenBoolean {
-	t.CodeGenCommon.WithDescription(v)
+	t.codeGenCommon.withDescription(v)
 	return t
 }
 
 func (t *CodeGenBoolean) WithRequired(v bool) *CodeGenBoolean {
-	t.CodeGenCommon.WithRequired(v)
+	t.codeGenCommon.withRequired(v)
 	return t
 }
 
-func (t *CodeGenBoolean) WithDefault(v CodeGenBoolean) *CodeGenBoolean {
-	t.CodeGenCommon.WithDefault(&v)
-	return t
-}
+// func (t *CodeGenBoolean) WithDefault(v CodeGenBoolean) *CodeGenBoolean {
+// 	t.codeGenCommon.withDefault(&v)
+// 	return t
+// }

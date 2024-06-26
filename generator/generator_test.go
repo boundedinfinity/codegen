@@ -5,13 +5,10 @@ import (
 	"boundedinfinity/codegen/model"
 	"testing"
 
-	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Generate(t *testing.T) {
-	qname := "test-output/codegen/schema/util/name-50"
-
 	tcs := []struct {
 		name            string
 		lang            string
@@ -22,22 +19,68 @@ func Test_Generate(t *testing.T) {
 		newErr          error
 	}{
 		{
-			name:            "case 1",
+			name:            "string 01",
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
 			input: model.NewString().
-				WithQName(qname).
-				WithName(pather.Paths.Base(qname)).
-				WithPackage(pather.Paths.Dir(qname)).
+				WithQName("test-output/codegen/schema/util/string-01"),
+			expected: map[string]string{},
+		},
+		{
+			name:            "string 02",
+			lang:            "go",
+			caserConversion: "kebab-to-pascal",
+			input: model.NewString().
+				WithQName("test-output/codegen/schema/util/string-02").
 				WithMax(50).WithMin(1).WithRegex(".*"),
 			expected: map[string]string{},
 		},
 		{
-			name:            "case 2",
+			name:            "integer 01",
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
-			input:           model.NewInteger(),
-			expected:        map[string]string{},
+			input: model.NewInteger().
+				WithQName("test-output/codegen/schema/util/integer-01"),
+			expected: map[string]string{},
+		},
+		{
+			name:            "integer 02",
+			lang:            "go",
+			caserConversion: "kebab-to-pascal",
+			input: model.NewInteger().
+				WithQName("test-output/codegen/schema/util/integer-02").
+				WithMultipleOf(5),
+			expected: map[string]string{},
+		},
+		{
+			name:            "integer 03",
+			lang:            "go",
+			caserConversion: "kebab-to-pascal",
+			input: model.NewInteger().
+				WithQName("test-output/codegen/schema/util/integer-03").
+				WithRange(model.NewRange[int]().WithMax(10).WithMin(1)),
+			expected: map[string]string{},
+		},
+		{
+			name:            "integer 04",
+			lang:            "go",
+			caserConversion: "kebab-to-pascal",
+			input: model.NewInteger().
+				WithQName("test-output/codegen/schema/util/integer-04").
+				WithMultipleOf(5).
+				WithRange(model.NewRange[int]().WithMax(10).WithMin(1)),
+			expected: map[string]string{},
+		},
+		{
+			name:            "integer 05",
+			lang:            "go",
+			caserConversion: "kebab-to-pascal",
+			input: model.NewInteger().
+				WithQName("test-output/codegen/schema/util/integer-05").
+				WithMultipleOf(5).
+				WithRange(model.NewRange[int]().WithMax(10).WithMin(1)).
+				WithRange(model.NewRange[int]().WithExclusiveMax(20).WithExclusiveMin(15)),
+			expected: map[string]string{},
 		},
 	}
 
@@ -49,7 +92,7 @@ func Test_Generate(t *testing.T) {
 			// actual, err := gen.GenerateType(tc.input)
 			actual, err := gen.WriteType(tc.input)
 			assert.ErrorIs(tt, err, tc.err)
-			assert.ElementsMatch(tt, tc.expected, actual)
+			assert.Equal(tt, tc.expected, actual)
 		})
 	}
 }

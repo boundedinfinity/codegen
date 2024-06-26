@@ -36,13 +36,8 @@ func Test_Unmarshal_CodeGenType(t *testing.T) {
 		t.Run(tc.name, func(tt *testing.T) {
 			actual, err := model.UnmarshalCodeGenType([]byte(tc.input))
 
-			if tc.err != nil {
-				assert.Equalf(t, tc.err, err, "%v : %v", tc.name, actual)
-			} else {
-				assert.Nil(t, err, tc.name, actual)
-			}
-
-			assert.Equalf(t, tc.expected, actual, "%v : %v", tc.name, actual)
+			assert.ErrorIs(tt, err, tc.err)
+			assert.Equal(tt, tc.expected, actual)
 		})
 	}
 }

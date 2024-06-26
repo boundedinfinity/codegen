@@ -12,7 +12,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenArray struct {
-	CodeGenCommon `json:",inline,omitempty"`
+	codeGenCommon `json:",inline,omitempty"`
 	Min           optioner.Option[int] `json:"min,omitempty"`
 	ExclusiveMin  optioner.Option[int] `json:"exclusive-min,omitempty"`
 	Max           optioner.Option[int] `json:"max,omitempty"`
@@ -42,7 +42,7 @@ func (t CodeGenArray) HasValidation() bool {
 }
 
 func (t CodeGenArray) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -74,12 +74,12 @@ func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 		CodeGenArray: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
 }
 
 func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	dto := struct {
-		CodeGenCommon
+		codeGenCommon
 		Min          optioner.Option[int] `json:"min,omitempty"`
 		ExclusiveMin optioner.Option[int] `json:"exclusive-min,omitempty"`
 		Max          optioner.Option[int] `json:"max,omitempty"`
@@ -90,7 +90,7 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.CodeGenCommon = dto.CodeGenCommon
+		t.codeGenCommon = dto.codeGenCommon
 		t.Min = dto.Min
 		t.Max = dto.Max
 		t.ExclusiveMax = dto.ExclusiveMax
@@ -116,34 +116,34 @@ func NewArray() *CodeGenArray {
 }
 
 func (t *CodeGenArray) WithSchemaId(v string) *CodeGenArray {
-	t.CodeGenCommon.WithQName(v)
+	t.codeGenCommon.withQName(v)
 	return t
 }
 
 func (t *CodeGenArray) WithName(v string) *CodeGenArray {
-	t.CodeGenCommon.WithName(v)
+	t.codeGenCommon.withName(v)
 	return t
 }
 
 func (t *CodeGenArray) WithDescription(v string) *CodeGenArray {
-	t.CodeGenCommon.WithDescription(v)
+	t.codeGenCommon.withDescription(v)
 	return t
 }
 
 func (t *CodeGenArray) WithRequired(v bool) *CodeGenArray {
-	t.CodeGenCommon.WithRequired(v)
+	t.codeGenCommon.withRequired(v)
 	return t
 }
 
-func (t *CodeGenArray) WithDefault(v CodeGenArray) *CodeGenArray {
-	t.CodeGenCommon.WithDefault(&v)
-	return t
-}
+// func (t *CodeGenArray) WithDefault(v CodeGenArray) *CodeGenArray {
+// 	t.codeGenCommon.withDefault(&v)
+// 	return t
+// }
 
-func (t *CodeGenArray) WithEager(v bool) *CodeGenArray {
-	t.CodeGenCommon.WithEager(v)
-	return t
-}
+// func (t *CodeGenArray) WithEager(v bool) *CodeGenArray {
+// 	t.codeGenCommon.withEager(v)
+// 	return t
+// }
 
 func (t *CodeGenArray) WithMin(v int) *CodeGenArray {
 	t.Min = optioner.OfZero(v)

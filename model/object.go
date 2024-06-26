@@ -11,7 +11,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenObject struct {
-	CodeGenCommon
+	codeGenCommon
 	Properties []CodeGenType `json:"properties"`
 }
 
@@ -30,7 +30,7 @@ func (t CodeGenObject) HasValidation() bool {
 }
 
 func (t CodeGenObject) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -56,19 +56,19 @@ func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 		CodeGenObject: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
 }
 
 func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 	dto := struct {
-		CodeGenCommon
+		codeGenCommon
 		Properties []json.RawMessage `json:"properties"`
 	}{}
 
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.CodeGenCommon = dto.CodeGenCommon
+		t.codeGenCommon = dto.codeGenCommon
 	}
 
 	for i, rawProp := range dto.Properties {
@@ -92,30 +92,30 @@ func NewObject() *CodeGenObject {
 	}
 }
 
-func (t *CodeGenObject) WithSchemaId(v string) *CodeGenObject {
-	t.CodeGenCommon.WithQName(v)
+func (t *CodeGenObject) WithQName(v string) *CodeGenObject {
+	t.codeGenCommon.withQName(v)
 	return t
 }
 
 func (t *CodeGenObject) WithName(v string) *CodeGenObject {
-	t.CodeGenCommon.WithName(v)
+	t.codeGenCommon.withName(v)
 	return t
 }
 
 func (t *CodeGenObject) WithDescription(v string) *CodeGenObject {
-	t.CodeGenCommon.WithDescription(v)
+	t.codeGenCommon.withDescription(v)
 	return t
 }
 
 func (t *CodeGenObject) WithRequired(v bool) *CodeGenObject {
-	t.CodeGenCommon.WithRequired(v)
+	t.codeGenCommon.withRequired(v)
 	return t
 }
 
-func (t *CodeGenObject) WithDefault(v CodeGenObject) *CodeGenObject {
-	t.CodeGenCommon.WithDefault(&v)
-	return t
-}
+// func (t *CodeGenObject) WithDefault(v CodeGenObject) *CodeGenObject {
+// 	t.codeGenCommon.withDefault(&v)
+// 	return t
+// }
 
 func (t *CodeGenObject) WithProperties(v ...CodeGenType) *CodeGenObject {
 	t.Properties = append(t.Properties, v...)

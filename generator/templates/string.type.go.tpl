@@ -5,8 +5,6 @@ import (
     "regexp"
 )
 
-type {{ typeName . }} {{ .BaseType }}
-
 {{ if .HasValidation -}}
 var (
     {{ if .Min.Defined -}}
@@ -20,6 +18,8 @@ var (
     {{- end }}
 )
 {{- end }}
+
+type {{ typeName . }} {{ langType . }}
 
 {{ if .Regex.Defined -}}
 var (

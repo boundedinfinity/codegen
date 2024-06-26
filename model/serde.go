@@ -19,6 +19,28 @@ var (
 	}
 )
 
+func marshalCodeGenType(v any) ([]byte, error) {
+	data, err := json.Marshal(v)
+
+	if err != nil {
+		return data, err
+	}
+
+	var temp map[string]any
+
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return data, err
+	}
+
+	for k, v := range temp {
+		if v == nil {
+			delete(temp, k)
+		}
+	}
+
+	return json.Marshal(temp)
+}
+
 type descriminator struct {
 	CodeGenId string `json:"base-type"`
 }

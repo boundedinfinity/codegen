@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"errors"
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
@@ -14,7 +13,7 @@ import (
 type CodeGenRef struct {
 	Ref           optioner.Option[string] `json:"ref,omitempty"`
 	Found         CodeGenType             `json:"-"`
-	CodeGenCommon `json:",inline,omitempty"`
+	codeGenCommon `json:",inline,omitempty"`
 }
 
 func (t CodeGenRef) BaseType() string {
@@ -32,7 +31,7 @@ func (t CodeGenRef) HashValidation() bool {
 }
 
 func (t CodeGenRef) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+	if err := t.codeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -58,7 +57,7 @@ func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 		CodeGenRef: *t,
 	}
 
-	return json.Marshal(dto)
+	return marshalCodeGenType(dto)
 }
 
 //----------------------------------------------------------------
@@ -69,7 +68,7 @@ func NewRef() *CodeGenRef {
 	return &CodeGenRef{}
 }
 
-func (t CodeGenCommon) NewRefFromType(typ CodeGenType) (CodeGenType, error) {
+func (t codeGenCommon) NewRefFromType(typ CodeGenType) (CodeGenType, error) {
 	if typ.QName().Empty() {
 		return nil, errors.New("invalid ref target")
 	}
@@ -78,29 +77,29 @@ func (t CodeGenCommon) NewRefFromType(typ CodeGenType) (CodeGenType, error) {
 }
 
 func (t *CodeGenRef) WithName(v string) *CodeGenRef {
-	t.CodeGenCommon.WithName(v)
+	t.codeGenCommon.withName(v)
 	return t
 }
 
 func (t *CodeGenRef) WithDescription(v string) *CodeGenRef {
-	t.CodeGenCommon.WithDescription(v)
+	t.codeGenCommon.withDescription(v)
 	return t
 }
 
 func (t *CodeGenRef) WithRequired(v bool) *CodeGenRef {
-	t.CodeGenCommon.WithRequired(v)
+	t.codeGenCommon.withRequired(v)
 	return t
 }
 
-func (t *CodeGenRef) WithDefault(v CodeGenRef) *CodeGenRef {
-	t.CodeGenCommon.WithDefault(&v)
-	return t
-}
+// func (t *CodeGenRef) WithDefault(v CodeGenRef) *CodeGenRef {
+// 	t.codeGenCommon.withDefault(&v)
+// 	return t
+// }
 
-func (t *CodeGenRef) WithEager(v bool) *CodeGenRef {
-	t.CodeGenCommon.WithEager(v)
-	return t
-}
+// func (t *CodeGenRef) WithEager(v bool) *CodeGenRef {
+// 	t.codeGenCommon.withEager(v)
+// 	return t
+// }
 
 func (t *CodeGenRef) WithRef(v string) *CodeGenRef {
 	t.Ref = optioner.OfZero(v)
