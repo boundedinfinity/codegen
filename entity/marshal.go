@@ -6,64 +6,43 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (t *entityBase) toMap() (map[string]any, error) {
-	data := map[string]any{}
-
-	if t.entityType != noneType {
-		data["entity-type"] = type2String[t.entityType]
-	}
-
-	if t.name != "" {
-		data["name"] = t.name
-	}
-
-	if t.description != "" {
-		data["description"] = t.description
-	}
-
-	if t.required {
-		data["required"] = t.required
-	}
-
-	if t.defaultValue != nil {
-		val, err := t.defaultValue.toMap()
-
-		if err != nil {
-			return data, err
-		}
-
-		data["default"] = val
-	}
-
-	return data, nil
+type Marshalable interface {
+	ToMap() (map[string]any, error)
+	ToJson() ([]byte, error)
+	ToJsonIndent() ([]byte, error)
+	ToYaml() ([]byte, error)
 }
 
-func (t *entityBase) ToJson() ([]byte, error) {
-	data, err := t.toMap()
+func marshal(e Marshalable, marshal func(any) ([]byte, error)) ([]byte, error) {
+	data, err := e.ToMap()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return json.Marshal(data)
+	return marshal(data)
 }
 
-func (t *entityBase) ToJsonIndent() ([]byte, error) {
-	data, err := t.toMap()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return json.MarshalIndent(data, "", "    ")
+func ToJson(e Marshalable) ([]byte, error) {
+	return marshal(e, json.Marshal)
 }
 
-func (t *entityBase) ToYaml() ([]byte, error) {
-	data, err := t.toMap()
+func ToJsonIndent(e Marshalable) ([]byte, error) {
+	return marshal(e, func(data any) ([]byte, error) {
+		return json.MarshalIndent(data, "", "    ")
+	})
+}
 
-	if err != nil {
-		return nil, err
-	}
+func ToYaml(e Marshalable) ([]byte, error) {
+	return marshal(e, yaml.Marshal)
+}
 
-	return yaml.Marshal(data)
+func ToJsonSchema(e Marshalable) ([]byte, error) {
+	return marshal(e, json.Marshal)
+}
+
+func ToJsonSchemaIndent(e Marshalable) ([]byte, error) {
+	return marshal(e, func(data any) ([]byte, error) {
+		return json.MarshalIndent(data, "", "    ")
+	})
 }
