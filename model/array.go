@@ -95,7 +95,6 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 		t.Max = dto.Max
 		t.ExclusiveMax = dto.ExclusiveMax
 		t.ExclusiveMin = dto.ExclusiveMin
-
 	}
 
 	if items, err := UnmarshalCodeGenType(dto.Items); err != nil {
