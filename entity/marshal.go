@@ -37,12 +37,22 @@ func ToYaml(e Marshalable) ([]byte, error) {
 	return marshal(e, yaml.Marshal)
 }
 
-func ToJsonSchema(e Marshalable) ([]byte, error) {
-	return marshal(e, json.Marshal)
+func ToJsonSchema(e Entity) ([]byte, error) {
+	data, err := e.AsJsonSchema()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(data)
 }
 
-func ToJsonSchemaIndent(e Marshalable) ([]byte, error) {
-	return marshal(e, func(data any) ([]byte, error) {
-		return json.MarshalIndent(data, "", "    ")
-	})
+func ToJsonSchemaIndent(e Entity) ([]byte, error) {
+	data, err := e.AsJsonSchema()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return json.MarshalIndent(data, "", "    ")
 }

@@ -62,15 +62,15 @@ func (t operationEntity) HasValidation() bool {
 	return t.common.HasValidation()
 }
 
-func (t *operationEntity) QName(s string) *operationEntity       { t.qname = s; return t }
-func (t *operationEntity) License(s License) *operationEntity    { t.license = s; return t }
-func (t *operationEntity) Copyright(s string) *operationEntity   { t.copyright = s; return t }
-func (t *operationEntity) Comments(s string) *operationEntity    { t.comments = s; return t }
-func (t *operationEntity) Description(s string) *operationEntity { t.description = s; return t }
-func (t *operationEntity) Serde(s string) *operationEntity       { t.serde = s; return t }
-func (t *operationEntity) Json(s string) *operationEntity        { t.json = s; return t }
-func (t *operationEntity) Yaml(s string) *operationEntity        { t.yaml = s; return t }
-func (t *operationEntity) Sql(s string) *operationEntity         { t.sql = s; return t }
+func (t *operationEntity) QName(s string) *operationEntity           { t.qname = s; return t }
+func (t *operationEntity) License(s License) *operationEntity        { t.license = s; return t }
+func (t *operationEntity) Copyright(s string) *operationEntity       { t.copyright = s; return t }
+func (t *operationEntity) Comments(s string) *operationEntity        { t.comments = s; return t }
+func (t *operationEntity) LongDescription(s string) *operationEntity { t.longDescription = s; return t }
+func (t *operationEntity) Serde(s string) *operationEntity           { t.serde = s; return t }
+func (t *operationEntity) Json(s string) *operationEntity            { t.json = s; return t }
+func (t *operationEntity) Yaml(s string) *operationEntity            { t.yaml = s; return t }
+func (t *operationEntity) Sql(s string) *operationEntity             { t.sql = s; return t }
 
 func (t *operationEntity) Input(v ...Entity) *operationEntity {
 	t.inputs = append(t.inputs, v...)

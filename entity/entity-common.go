@@ -1,15 +1,16 @@
 package entity
 
 type common struct {
-	qname       string
-	description string
-	comments    string
-	copyright   string
-	license     License
-	serde       string
-	json        string
-	yaml        string
-	sql         string
+	qname            string
+	shortDescription string
+	longDescription  string
+	comments         string
+	copyright        string
+	license          License
+	serde            string
+	json             string
+	yaml             string
+	sql              string
 }
 
 func (t common) Validate() error {
@@ -24,7 +25,8 @@ func (t common) ToMap() (map[string]any, error) {
 	data := map[string]any{}
 
 	sparam(data, "q-name", t.qname)
-	sparam(data, "description", t.description)
+	sparam(data, "long-description", t.longDescription)
+	sparam(data, "short-description", t.shortDescription)
 	sparam(data, "serde", t.serde)
 	sparam(data, "json", t.json)
 	sparam(data, "yaml", t.yaml)

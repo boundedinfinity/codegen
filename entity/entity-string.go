@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func String() *stringEntity {
@@ -73,21 +74,26 @@ func (t stringEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
+func (t stringEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+	schema := &json_schema.JsonSchemaArray{}
+	return schema, nil
+}
+
 func (t stringEntity) ToJson() ([]byte, error)             { return ToJson(t) }
 func (t stringEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
 func (t stringEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
 func (t stringEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
 func (t stringEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
 
-func (t *stringEntity) QName(s string) *stringEntity       { t.qname = s; return t }
-func (t *stringEntity) License(s License) *stringEntity    { t.license = s; return t }
-func (t *stringEntity) Copyright(s string) *stringEntity   { t.copyright = s; return t }
-func (t *stringEntity) Comments(s string) *stringEntity    { t.comments = s; return t }
-func (t *stringEntity) Description(s string) *stringEntity { t.description = s; return t }
-func (t *stringEntity) Serde(s string) *stringEntity       { t.serde = s; return t }
-func (t *stringEntity) Json(s string) *stringEntity        { t.json = s; return t }
-func (t *stringEntity) Yaml(s string) *stringEntity        { t.yaml = s; return t }
-func (t *stringEntity) Sql(s string) *stringEntity         { t.sql = s; return t }
+func (t *stringEntity) QName(s string) *stringEntity           { t.qname = s; return t }
+func (t *stringEntity) License(s License) *stringEntity        { t.license = s; return t }
+func (t *stringEntity) Copyright(s string) *stringEntity       { t.copyright = s; return t }
+func (t *stringEntity) Comments(s string) *stringEntity        { t.comments = s; return t }
+func (t *stringEntity) LongDescription(s string) *stringEntity { t.longDescription = s; return t }
+func (t *stringEntity) Serde(s string) *stringEntity           { t.serde = s; return t }
+func (t *stringEntity) Json(s string) *stringEntity            { t.json = s; return t }
+func (t *stringEntity) Yaml(s string) *stringEntity            { t.yaml = s; return t }
+func (t *stringEntity) Sql(s string) *stringEntity             { t.sql = s; return t }
 
 func (t *stringEntity) Required(b bool) *stringEntity          { t.required = b; return t }
 func (t *stringEntity) Default(m map[string]any) *stringEntity { t.defaultValue = m; return t }

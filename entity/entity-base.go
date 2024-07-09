@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 type Entity interface {
@@ -11,8 +12,7 @@ type Entity interface {
 	GetQName() string
 	Marshalable
 	Validatable
-	ToJsonSchema() ([]byte, error)
-	ToJsonSchemaIndent() ([]byte, error)
+	AsJsonSchema() (json_schema.JsonSchema, error)
 }
 
 type entityBase struct {

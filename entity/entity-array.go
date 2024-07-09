@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/boundedinfinity/go-commoner/errorer"
+import (
+	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
+)
 
 func Array() *arrayEntity {
 	return &arrayEntity{
@@ -78,21 +81,26 @@ func (t arrayEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
+func (t arrayEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+	schema := &json_schema.JsonSchemaArray{}
+	return schema, nil
+}
+
 func (t arrayEntity) ToJson() ([]byte, error)             { return ToJson(t) }
 func (t arrayEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
 func (t arrayEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t arrayEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
+func (t arrayEntity) ToJsonSchema() ([]byte, error)       { return ToJsonSchema(t) }
 func (t arrayEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
 
-func (t *arrayEntity) QName(s string) *arrayEntity       { t.qname = s; return t }
-func (t *arrayEntity) License(s License) *arrayEntity    { t.license = s; return t }
-func (t *arrayEntity) Copyright(s string) *arrayEntity   { t.copyright = s; return t }
-func (t *arrayEntity) Comments(s string) *arrayEntity    { t.comments = s; return t }
-func (t *arrayEntity) Description(s string) *arrayEntity { t.description = s; return t }
-func (t *arrayEntity) Serde(s string) *arrayEntity       { t.serde = s; return t }
-func (t *arrayEntity) Json(s string) *arrayEntity        { t.json = s; return t }
-func (t *arrayEntity) Yaml(s string) *arrayEntity        { t.yaml = s; return t }
-func (t *arrayEntity) Sql(s string) *arrayEntity         { t.sql = s; return t }
+func (t *arrayEntity) QName(s string) *arrayEntity           { t.qname = s; return t }
+func (t *arrayEntity) License(s License) *arrayEntity        { t.license = s; return t }
+func (t *arrayEntity) Copyright(s string) *arrayEntity       { t.copyright = s; return t }
+func (t *arrayEntity) Comments(s string) *arrayEntity        { t.comments = s; return t }
+func (t *arrayEntity) LongDescription(s string) *arrayEntity { t.longDescription = s; return t }
+func (t *arrayEntity) Serde(s string) *arrayEntity           { t.serde = s; return t }
+func (t *arrayEntity) Json(s string) *arrayEntity            { t.json = s; return t }
+func (t *arrayEntity) Yaml(s string) *arrayEntity            { t.yaml = s; return t }
+func (t *arrayEntity) Sql(s string) *arrayEntity             { t.sql = s; return t }
 
 func (t *arrayEntity) Required(b bool) *arrayEntity             { t.required = b; return t }
 func (t *arrayEntity) AdditionalValidation(b bool) *arrayEntity { t.additionalValidation = b; return t }

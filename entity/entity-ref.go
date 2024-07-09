@@ -2,6 +2,7 @@ package entity
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func Ref() *refEntity {
@@ -22,7 +23,7 @@ var (
 	ErrRefEntityInvalidRef = errorer.New("invalid ref")
 )
 
-func (t *refEntity) Validate() error {
+func (t refEntity) Validate() error {
 	if err := t.entityBase.Validate(); err != nil {
 		return err
 	}
@@ -46,20 +47,25 @@ func (t refEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
+func (t refEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+	schema := &json_schema.JsonSchemaArray{}
+	return schema, nil
+}
+
 func (t refEntity) ToJson() ([]byte, error)             { return ToJson(t) }
 func (t refEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
 func (t refEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
 func (t refEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
 func (t refEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
 
-func (t *refEntity) License(s License) *refEntity    { t.license = s; return t }
-func (t *refEntity) Copyright(s string) *refEntity   { t.copyright = s; return t }
-func (t *refEntity) Comments(s string) *refEntity    { t.comments = s; return t }
-func (t *refEntity) Description(s string) *refEntity { t.description = s; return t }
-func (t *refEntity) Serde(s string) *refEntity       { t.serde = s; return t }
-func (t *refEntity) Json(s string) *refEntity        { t.json = s; return t }
-func (t *refEntity) Yaml(s string) *refEntity        { t.yaml = s; return t }
-func (t *refEntity) Sql(s string) *refEntity         { t.sql = s; return t }
+func (t *refEntity) License(s License) *refEntity        { t.license = s; return t }
+func (t *refEntity) Copyright(s string) *refEntity       { t.copyright = s; return t }
+func (t *refEntity) Comments(s string) *refEntity        { t.comments = s; return t }
+func (t *refEntity) LongDescription(s string) *refEntity { t.longDescription = s; return t }
+func (t *refEntity) Serde(s string) *refEntity           { t.serde = s; return t }
+func (t *refEntity) Json(s string) *refEntity            { t.json = s; return t }
+func (t *refEntity) Yaml(s string) *refEntity            { t.yaml = s; return t }
+func (t *refEntity) Sql(s string) *refEntity             { t.sql = s; return t }
 
 func (t *refEntity) Required(b bool) *refEntity             { t.required = b; return t }
 func (t *refEntity) Default(m map[string]any) *refEntity    { t.defaultValue = m; return t }

@@ -2,6 +2,7 @@ package entity
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func Integer() *integerEntity {
@@ -34,7 +35,7 @@ var (
 	ErrIntegerEntityPosAndNegMutEx = errorer.New("positive and negative are mutually exclusive")
 )
 
-func (t *integerEntity) Validate() error {
+func (t integerEntity) Validate() error {
 	if err := t.entityBase.Validate(); err != nil {
 		return err
 	}
@@ -97,21 +98,34 @@ func (t integerEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
+func (t integerEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+	schema := &json_schema.JsonSchemaInteger{
+		JsonSchemaCore: json_schema.JsonSchemaCore{
+			Schema:      json_schema.SCHEMA_VERSION_2020_12,
+			Id:          t.qname,
+			Comment:     t.comments,
+			Title:       t.shortDescription,
+			Description: t.longDescription,
+		},
+	}
+	return schema, nil
+}
+
 func (t integerEntity) ToJson() ([]byte, error)             { return ToJson(t) }
 func (t integerEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
 func (t integerEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
 func (t integerEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
 func (t integerEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
 
-func (t *integerEntity) QName(s string) *integerEntity       { t.qname = s; return t }
-func (t *integerEntity) License(s License) *integerEntity    { t.license = s; return t }
-func (t *integerEntity) Copyright(s string) *integerEntity   { t.copyright = s; return t }
-func (t *integerEntity) Comments(s string) *integerEntity    { t.comments = s; return t }
-func (t *integerEntity) Description(s string) *integerEntity { t.description = s; return t }
-func (t *integerEntity) Serde(s string) *integerEntity       { t.serde = s; return t }
-func (t *integerEntity) Json(s string) *integerEntity        { t.json = s; return t }
-func (t *integerEntity) Yaml(s string) *integerEntity        { t.yaml = s; return t }
-func (t *integerEntity) Sql(s string) *integerEntity         { t.sql = s; return t }
+func (t *integerEntity) QName(s string) *integerEntity           { t.qname = s; return t }
+func (t *integerEntity) License(s License) *integerEntity        { t.license = s; return t }
+func (t *integerEntity) Copyright(s string) *integerEntity       { t.copyright = s; return t }
+func (t *integerEntity) Comments(s string) *integerEntity        { t.comments = s; return t }
+func (t *integerEntity) LongDescription(s string) *integerEntity { t.longDescription = s; return t }
+func (t *integerEntity) Serde(s string) *integerEntity           { t.serde = s; return t }
+func (t *integerEntity) Json(s string) *integerEntity            { t.json = s; return t }
+func (t *integerEntity) Yaml(s string) *integerEntity            { t.yaml = s; return t }
+func (t *integerEntity) Sql(s string) *integerEntity             { t.sql = s; return t }
 
 func (t *integerEntity) Required(b bool) *integerEntity          { t.required = b; return t }
 func (t *integerEntity) Default(m map[string]any) *integerEntity { t.defaultValue = m; return t }

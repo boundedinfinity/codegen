@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func DateTime() *dateTimeEntity {
@@ -75,20 +76,26 @@ func (t dateTimeEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
+func (t dateTimeEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+	schema := &json_schema.JsonSchemaArray{}
+	return schema, nil
+}
+
 func (t dateTimeEntity) ToJson() ([]byte, error)             { return ToJson(t) }
 func (t dateTimeEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
 func (t dateTimeEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
 func (t dateTimeEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
 func (t dateTimeEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
 
-func (t *dateTimeEntity) License(s License) *dateTimeEntity    { t.license = s; return t }
-func (t *dateTimeEntity) Copyright(s string) *dateTimeEntity   { t.copyright = s; return t }
-func (t *dateTimeEntity) Comments(s string) *dateTimeEntity    { t.comments = s; return t }
-func (t *dateTimeEntity) Description(s string) *dateTimeEntity { t.description = s; return t }
-func (t *dateTimeEntity) Serde(s string) *dateTimeEntity       { t.serde = s; return t }
-func (t *dateTimeEntity) Json(s string) *dateTimeEntity        { t.json = s; return t }
-func (t *dateTimeEntity) Yaml(s string) *dateTimeEntity        { t.yaml = s; return t }
-func (t *dateTimeEntity) Sql(s string) *dateTimeEntity         { t.sql = s; return t }
+func (t *dateTimeEntity) License(s License) *dateTimeEntity         { t.license = s; return t }
+func (t *dateTimeEntity) Copyright(s string) *dateTimeEntity        { t.copyright = s; return t }
+func (t *dateTimeEntity) Comments(s string) *dateTimeEntity         { t.comments = s; return t }
+func (t *dateTimeEntity) LongDescription(s string) *dateTimeEntity  { t.longDescription = s; return t }
+func (t *dateTimeEntity) ShortDescription(s string) *dateTimeEntity { t.shortDescription = s; return t }
+func (t *dateTimeEntity) Serde(s string) *dateTimeEntity            { t.serde = s; return t }
+func (t *dateTimeEntity) Json(s string) *dateTimeEntity             { t.json = s; return t }
+func (t *dateTimeEntity) Yaml(s string) *dateTimeEntity             { t.yaml = s; return t }
+func (t *dateTimeEntity) Sql(s string) *dateTimeEntity              { t.sql = s; return t }
 
 func (t *dateTimeEntity) Required(b bool) *dateTimeEntity          { t.required = b; return t }
 func (t *dateTimeEntity) Default(m map[string]any) *dateTimeEntity { t.defaultValue = m; return t }
