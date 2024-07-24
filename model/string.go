@@ -16,10 +16,12 @@ type CodeGenString struct {
 	Min      optioner.Option[int]      `json:"min,omitempty"`
 	Max      optioner.Option[int]      `json:"max,omitempty"`
 	Regex    optioner.Option[string]   `json:"regex,omitempty"`
+	Abnf     optioner.Option[string]   `json:"abnf,omitempty"`
 	Includes optioner.Option[[]string] `json:"includes,omitempty"`
 	Excludes optioner.Option[[]string] `json:"excludes,omitempty"`
 	OneOf    optioner.Option[[]string] `json:"one-of,omitempty"`
 	NoneOf   optioner.Option[[]string] `json:"none-of,omitempty"`
+	// upper case, lower case, snake case, kebab case, etc...
 }
 
 var _ CodeGenType = &CodeGenString{}
@@ -140,5 +142,30 @@ func (t *CodeGenString) WithMax(v int) *CodeGenString {
 
 func (t *CodeGenString) WithRegex(v string) *CodeGenString {
 	t.Regex = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenString) WithAbnf(v string) *CodeGenString {
+	t.Abnf = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenString) WithIncludes(v []string) *CodeGenString {
+	t.Includes = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenString) WithExcludes(v []string) *CodeGenString {
+	t.Excludes = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenString) WithOneOf(v []string) *CodeGenString {
+	t.OneOf = optioner.Some(v)
+	return t
+}
+
+func (t *CodeGenString) WithNoneOf(v []string) *CodeGenString {
+	t.NoneOf = optioner.Some(v)
 	return t
 }
