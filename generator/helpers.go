@@ -3,6 +3,7 @@ package generator
 import (
 	"boundedinfinity/codegen/model"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -20,11 +21,12 @@ var (
 
 func (t *Generator) getHelpers(lang string) template.FuncMap {
 	helpers := map[string]template.FuncMap{
-		"go": template.FuncMap{
+		"go": {
 			"optPtr":      t.optPtr,
 			"typeName":    t.typeName,
 			"typePackage": t.typePackage,
 			"langType":    t.langType,
+			"sjoin":       strings.Join,
 		},
 	}
 

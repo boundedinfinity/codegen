@@ -13,9 +13,13 @@ import (
 
 type CodeGenString struct {
 	codeGenCommon
-	Min   optioner.Option[int]    `json:"min,omitempty"`
-	Max   optioner.Option[int]    `json:"max,omitempty"`
-	Regex optioner.Option[string] `json:"regex,omitempty"`
+	Min      optioner.Option[int]      `json:"min,omitempty"`
+	Max      optioner.Option[int]      `json:"max,omitempty"`
+	Regex    optioner.Option[string]   `json:"regex,omitempty"`
+	Includes optioner.Option[[]string] `json:"includes,omitempty"`
+	Excludes optioner.Option[[]string] `json:"excludes,omitempty"`
+	OneOf    optioner.Option[[]string] `json:"one-of,omitempty"`
+	NoneOf   optioner.Option[[]string] `json:"none-of,omitempty"`
 }
 
 var _ CodeGenType = &CodeGenString{}
@@ -29,7 +33,8 @@ func (t CodeGenString) BaseType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenString) HasValidation() bool {
-	return t.Common().HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined()
+	return t.Common().HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined() ||
+		t.Includes.Defined() || t.Excludes.Defined() || t.OneOf.Defined() || t.NoneOf.Defined()
 }
 
 var (
