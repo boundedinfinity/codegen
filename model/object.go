@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
 ///////////////////////////////////////////////////////////////////
@@ -12,12 +14,12 @@ import (
 
 type CodeGenObject struct {
 	codeGenCommon
-	Properties []CodeGenType `json:"properties"`
+	Properties optioner.Option[[]CodeGenType] `json:"properties"`
 }
 
 var _ CodeGenType = &CodeGenObject{}
 
-func (t CodeGenObject) BaseType() string {
+func (t CodeGenObject) GetType() string {
 	return "object"
 }
 
@@ -26,7 +28,7 @@ func (t CodeGenObject) BaseType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenObject) HasValidation() bool {
-	return t.Common().HasValidation()
+	return t.codeGenCommon.HasValidation()
 }
 
 func (t CodeGenObject) Validate() error {
@@ -34,7 +36,7 @@ func (t CodeGenObject) Validate() error {
 		return err
 	}
 
-	for i, prop := range t.Properties {
+	for i, prop := range t.Properties.Get() {
 		if err := prop.Validate(); err != nil {
 			return errors.Join(fmt.Errorf("prop[%v]", i))
 		}
@@ -52,7 +54,7 @@ func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 		TypeId        string `json:"base-type"`
 		CodeGenObject `json:",inline"`
 	}{
-		TypeId:        t.BaseType(),
+		TypeId:        t.GetType(),
 		CodeGenObject: *t,
 	}
 
@@ -75,7 +77,9 @@ func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 		if prop, err := UnmarshalCodeGenType(rawProp); err != nil {
 			return errors.Join(fmt.Errorf("property[%v]", i), err)
 		} else {
-			t.Properties = append(t.Properties, prop)
+			if t.Properties.Defined() {
+				t.Properties = optioner.Some(append(t.Properties.Get(), prop))
+			}
 		}
 	}
 
@@ -86,38 +90,47 @@ func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 // Builders
 //----------------------------------------------------------------
 
-func NewObject() *CodeGenObject {
-	return &CodeGenObject{
-		Properties: []CodeGenType{},
-	}
+func BuildObject() ObjectBuilder {
+	return &codeGenObjectBuilder{}
 }
 
-func (t *CodeGenObject) WithQName(v string) *CodeGenObject {
-	t.codeGenCommon.withQName(v)
-	return t
+type codeGenObjectBuilder struct {
+	obj CodeGenObject
 }
 
-func (t *CodeGenObject) WithName(v string) *CodeGenObject {
-	t.codeGenCommon.withName(v)
-	return t
+var _ ObjectBuilder = &codeGenObjectBuilder{}
+
+// Build implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Build() *CodeGenObject {
+	return &t.obj
 }
 
-func (t *CodeGenObject) WithDescription(v string) *CodeGenObject {
-	t.codeGenCommon.withDescription(v)
-	return t
+// Description implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Description(v string) ObjectBuilder {
+	return setO(t, &t.obj.Description, v)
 }
 
-func (t *CodeGenObject) WithRequired(v bool) *CodeGenObject {
-	t.codeGenCommon.withRequired(v)
-	return t
+// Name implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Name(v string) ObjectBuilder {
+	return setO(t, &t.obj.Name, v)
 }
 
-// func (t *CodeGenObject) WithDefault(v CodeGenObject) *CodeGenObject {
-// 	t.codeGenCommon.withDefault(&v)
-// 	return t
-// }
+// Package implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Package(v string) ObjectBuilder {
+	return setO(t, &t.obj.Package, v)
+}
 
-func (t *CodeGenObject) WithProperties(v ...CodeGenType) *CodeGenObject {
-	t.Properties = append(t.Properties, v...)
-	return t
+// Property implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Properties(v ...CodeGenType) ObjectBuilder {
+	return setO(t, &t.obj.Properties, v)
+}
+
+// QName implements ObjectBuilder.
+func (t *codeGenObjectBuilder) QName(v string) ObjectBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+// Required implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Required(v bool) ObjectBuilder {
+	return setO(t, &t.obj.Required, v)
 }

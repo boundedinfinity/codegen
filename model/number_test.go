@@ -17,7 +17,7 @@ func Test_Marshal_Integer(t *testing.T) {
 	}{
 		{
 			name:  "case 1",
-			input: model.NewInteger(),
+			input: model.BuildInteger().Build(),
 			err:   nil,
 			expected: `{
 		        "base-type": "integer"
@@ -25,9 +25,10 @@ func Test_Marshal_Integer(t *testing.T) {
 		},
 		{
 			name: "case 2",
-			input: model.NewInteger().
-				WithName("AN_INTEGER").
-				WithDescription("an integer description"),
+			input: model.BuildInteger().
+				Name("AN_INTEGER").
+				Description("an integer description").
+				Build(),
 			err: nil,
 			expected: `{
 		        "base-type": "integer",
@@ -37,10 +38,11 @@ func Test_Marshal_Integer(t *testing.T) {
 		},
 		{
 			name: "case 3",
-			input: model.NewInteger().
-				WithName("AN_INTEGER").
-				WithDescription("an integer description").
-				WithMultipleOf(5),
+			input: model.BuildInteger().
+				Name("AN_INTEGER").
+				Description("an integer description").
+				MultipleOf(5).
+				Build(),
 			err: nil,
 			expected: `{
 		        "base-type": "integer",
@@ -51,13 +53,13 @@ func Test_Marshal_Integer(t *testing.T) {
 		},
 		{
 			name: "case 4",
-			input: model.NewInteger().
-				WithName("AN_INTEGER").
-				WithDescription("an integer description").
-				WithMultipleOf(5).
-				WithRange(model.NewRange[int]().
-					WithExclusiveMax(10).WithExclusiveMin(1),
-				),
+			input: model.BuildInteger().
+				Name("AN_INTEGER").
+				Description("an integer description").
+				MultipleOf(5).
+				Ranges(
+					model.BuildRange[int]().ExclusiveMax(10).ExclusiveMin(1).Build(),
+				).Build(),
 			err: nil,
 			expected: `{
                 "base-type": "integer",
@@ -93,53 +95,53 @@ func Test_Marshal_Validate(t *testing.T) {
 	}{
 		{
 			name:     "case 01",
-			input:    model.NewInteger(),
+			input:    model.BuildInteger().Build(),
 			expected: nil,
 		},
 
 		{
 			name:     "case 02",
-			input:    model.NewInteger().WithMultipleOf(5),
+			input:    model.BuildInteger().MultipleOf(5).Build(),
 			expected: nil,
 		},
 		{
 			name:     "case 03",
-			input:    model.NewInteger().WithMultipleOf(0),
+			input:    model.BuildInteger().MultipleOf(0).Build(),
 			expected: model.ErrNumberMultipleOfBelow1,
 		},
 		{
 			name:     "case 04",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMax(4)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Max(4).Build()).Build(),
 			expected: model.ErrNumberRangeMinOrExclusiveMinRequired,
 		},
 		{
 			name:     "case 05",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMin(4)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Min(4).Build()).Build(),
 			expected: model.ErrNumberRangeMaxOrExclusiveMaxRequired,
 		},
 		{
 			name:     "case 06",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMin(1).WithExclusiveMin(1)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Min(1).ExclusiveMin(1).Build()).Build(),
 			expected: model.ErrNumberRangeMinAndExclusiveMinMutuallyExclusive,
 		},
 		{
 			name:     "case 07",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMin(1).WithMax(10).WithExclusiveMax(10)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Min(1).Max(10).ExclusiveMax(10).Build()).Build(),
 			expected: model.ErrNumberRangeMaxAndExclusiveMaxMutuallyExclusive,
 		},
 		{
 			name:     "case 08",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMin(1).WithMax(1)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Min(1).Max(1).Build()).Build(),
 			expected: nil,
 		},
 		{
 			name:     "case 09",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMin(2).WithMax(1)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Min(2).Max(1).Build()).Build(),
 			expected: model.ErrNumberRangeMaxLessThanMin,
 		},
 		{
 			name:     "case 10",
-			input:    model.NewInteger().WithRange(model.NewRange[int]().WithMin(1).WithExclusiveMax(1)),
+			input:    model.BuildInteger().Ranges(model.BuildRange[int]().Min(1).ExclusiveMax(1).Build()).Build(),
 			expected: model.ErrNumberRangeMaxLessThanMin,
 		},
 	}

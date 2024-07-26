@@ -50,11 +50,11 @@ func (t *Generator) typeName(typ model.CodeGenType) (string, error) {
 	var result string
 	var err error
 
-	if typ.QName().Empty() {
+	if typ.GetQName().Empty() {
 		return result, ErrGeneratorQNameEmpty
 	}
 
-	result = typ.QName().Get()
+	result = typ.GetQName().Get()
 	result = pather.Paths.Base(result)
 	result, err = langer.Go.WithCaserConversion(t.caserConversion).Identifier(result)
 
@@ -65,11 +65,11 @@ func (t *Generator) typePackage(typ model.CodeGenType) (string, error) {
 	var result string
 	var err error
 
-	if typ.QName().Empty() {
+	if typ.GetQName().Empty() {
 		return result, ErrGeneratorPackageEmpty
 	}
 
-	result = typ.Common().QName().Get()
+	result = typ.GetQName().Get()
 	result = pather.Paths.Dir(result)
 	result = pather.Paths.Base(result)
 
@@ -80,17 +80,17 @@ func (t *Generator) langType(typ model.CodeGenType) (string, error) {
 	var result string
 	var err error
 
-	switch typ.BaseType() {
-	case model.CodeGenString{}.BaseType():
+	switch typ.GetType() {
+	case model.CodeGenString{}.GetType():
 		result = "string"
-	case model.CodeGenInteger{}.BaseType():
+	case model.CodeGenInteger{}.GetType():
 		result = "int"
-	case model.CodeGenFloat{}.BaseType():
+	case model.CodeGenFloat{}.GetType():
 		result = "float64"
-	case model.CodeGenBoolean{}.BaseType():
+	case model.CodeGenBoolean{}.GetType():
 		result = "bool"
 	default:
-		return result, ErrGeneratorLangTypeUnsupported.WithValue(typ.BaseType())
+		return result, ErrGeneratorLangTypeUnsupported.WithValue(typ.GetType())
 	}
 
 	return result, err

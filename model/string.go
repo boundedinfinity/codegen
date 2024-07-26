@@ -26,7 +26,7 @@ type CodeGenString struct {
 
 var _ CodeGenType = &CodeGenString{}
 
-func (t CodeGenString) BaseType() string {
+func (t CodeGenString) GetType() string {
 	return "string"
 }
 
@@ -35,7 +35,7 @@ func (t CodeGenString) BaseType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenString) HasValidation() bool {
-	return t.Common().HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined() ||
+	return t.codeGenCommon.HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined() ||
 		t.Includes.Defined() || t.Excludes.Defined() || t.OneOf.Defined() || t.NoneOf.Defined()
 }
 
@@ -82,10 +82,10 @@ func (t CodeGenString) Validate() error {
 
 func (t *CodeGenString) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId        string `json:"base-type"`
+		TypeId        string `json:"type"`
 		CodeGenString `json:",inline"`
 	}{
-		TypeId:        t.BaseType(),
+		TypeId:        t.GetType(),
 		CodeGenString: *t,
 	}
 
@@ -93,79 +93,90 @@ func (t *CodeGenString) MarshalJSON() ([]byte, error) {
 }
 
 //----------------------------------------------------------------
-// Builders
+// Builder
 //----------------------------------------------------------------
 
-func NewString() *CodeGenString {
-	return &CodeGenString{}
+func BuildString() StringBuilder {
+	return &codeGenStringBuilder{}
 }
 
-func (t *CodeGenString) WithQName(v string) *CodeGenString {
-	t.codeGenCommon.withQName(v)
-	return t
+type codeGenStringBuilder struct {
+	obj CodeGenString
 }
 
-func (t *CodeGenString) WithName(v string) *CodeGenString {
-	t.codeGenCommon.withName(v)
-	return t
+var _ StringBuilder = &codeGenStringBuilder{}
+
+// Build implements StringBuilder.
+func (t *codeGenStringBuilder) Build() *CodeGenString {
+	return &t.obj
 }
 
-func (t *CodeGenString) WithPackage(v string) *CodeGenString {
-	t.codeGenCommon.withPackage(v)
-	return t
+// Abnf implements StringBuilder.
+func (t *codeGenStringBuilder) Abnf(v string) StringBuilder {
+	return setO(t, &t.obj.Abnf, v)
 }
 
-func (t *CodeGenString) WithDescription(v string) *CodeGenString {
-	t.codeGenCommon.withDescription(v)
-	return t
+// Description implements StringBuilder.
+func (t *codeGenStringBuilder) Description(v string) StringBuilder {
+	return setO(t, &t.obj.Description, v)
 }
 
-func (t *CodeGenString) WithRequired(v bool) *CodeGenString {
-	t.codeGenCommon.withRequired(v)
-	return t
+// Excludes implements StringBuilder.
+func (t *codeGenStringBuilder) Excludes(v ...string) StringBuilder {
+	return setO(t, &t.obj.Excludes, v)
 }
 
-// func (t *CodeGenString) WithDefault(v CodeGenString) *CodeGenString {
-// 	t.codeGenCommon.withDefault(&v)
-// 	return t
-// }
-
-func (t *CodeGenString) WithMin(v int) *CodeGenString {
-	t.Min = optioner.Some(v)
-	return t
+// Includes implements StringBuilder.
+func (t *codeGenStringBuilder) Includes(v ...string) StringBuilder {
+	return setO(t, &t.obj.Includes, v)
 }
 
-func (t *CodeGenString) WithMax(v int) *CodeGenString {
-	t.Max = optioner.Some(v)
-	return t
+// Max implements StringBuilder.
+func (t *codeGenStringBuilder) Max(v int) StringBuilder {
+	return setO(t, &t.obj.Max, v)
 }
 
-func (t *CodeGenString) WithRegex(v string) *CodeGenString {
-	t.Regex = optioner.Some(v)
-	return t
+// Min implements StringBuilder.
+func (t *codeGenStringBuilder) Min(v int) StringBuilder {
+	return setO(t, &t.obj.Min, v)
 }
 
-func (t *CodeGenString) WithAbnf(v string) *CodeGenString {
-	t.Abnf = optioner.Some(v)
-	return t
+// Name implements StringBuilder.
+func (t *codeGenStringBuilder) Name(v string) StringBuilder {
+	return setO(t, &t.obj.Name, v)
 }
 
-func (t *CodeGenString) WithIncludes(v []string) *CodeGenString {
-	t.Includes = optioner.Some(v)
-	return t
+// NoneOf implements StringBuilder.
+func (t *codeGenStringBuilder) NoneOf(v ...string) StringBuilder {
+	return setO(t, &t.obj.NoneOf, v)
 }
 
-func (t *CodeGenString) WithExcludes(v []string) *CodeGenString {
-	t.Excludes = optioner.Some(v)
-	return t
+// OneOf implements StringBuilder.
+func (t *codeGenStringBuilder) OneOf(v ...string) StringBuilder {
+	return setO(t, &t.obj.OneOf, v)
 }
 
-func (t *CodeGenString) WithOneOf(v []string) *CodeGenString {
-	t.OneOf = optioner.Some(v)
-	return t
+// Package implements StringBuilder.
+func (t *codeGenStringBuilder) Package(v string) StringBuilder {
+	return setO(t, &t.obj.Package, v)
 }
 
-func (t *CodeGenString) WithNoneOf(v []string) *CodeGenString {
-	t.NoneOf = optioner.Some(v)
-	return t
+// QName implements StringBuilder.
+func (t *codeGenStringBuilder) QName(v string) StringBuilder {
+	panic("unimplemented")
+}
+
+// Ref implements StringBuilder.
+func (t *codeGenStringBuilder) Ref() RefBuilder {
+	panic("unimplemented")
+}
+
+// Regex implements StringBuilder.
+func (t *codeGenStringBuilder) Regex(v string) StringBuilder {
+	return setO(t, &t.obj.Regex, v)
+}
+
+// Required implements StringBuilder.
+func (t *codeGenStringBuilder) Required(v bool) StringBuilder {
+	return setO(t, &t.obj.Required, v)
 }

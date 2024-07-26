@@ -107,6 +107,9 @@
 
     required: **false**
 
+## Bool type specification
+
+There are no additional items for this type
 
 ## Integer type speficiation
 
@@ -139,20 +142,16 @@
 -   `positive`: Constrains the number to be greater than `0`
 
     This constraints is mutually exclusive with the `negative` constraint.
--   `excludes`: 
+-   `none-of`: 
 
     List of integers which are not value.
 
     NOTE: These values are combined with values for from other contraints.
--   `includes`: 
+-   `one-of`: 
 
     List of integrars which are considered valid.
 
     NOTE: These values are combined with values for from other contraints.
-
-## Bool type specification
-
-There are no additional items for this type
 
 ## Float type speficiation
 
@@ -210,6 +209,25 @@ following additions:
     -   `description`:
 
         The description of this item.
+
+## Array type specification
+
+-   `min`: 
+
+    The inclusive minimum length of the array
+-   `max`: 
+
+    The inclusive maximum lenght of the array
+
+
+## Object type specification
+
+-   `min`: 
+
+    The inclusive minimum length of the array
+-   `max`: 
+
+    The inclusive maximum lenght of the array
 
 # Reference:
 - https://www.learnjsonschema.com/2020-12/core/

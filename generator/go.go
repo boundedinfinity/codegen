@@ -59,7 +59,7 @@ func (t *Generator) GenerateProject(project *model.CodeGenProject) (map[string]s
 
 func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, error) {
 	results := map[string]string{}
-	params := templateDescriptor{lang: "go", baseType: typ.BaseType()}
+	params := templateDescriptor{lang: "go", baseType: typ.GetType()}
 
 	if err := t.loadTemplates(params); err != nil {
 		return results, err
@@ -74,7 +74,7 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 			t.templateDescriptors...,
 		)
 	default:
-		fmt.Printf("unsupported %v", i.BaseType())
+		fmt.Printf("unsupported %v", i.GetType())
 	}
 
 	for _, td := range templateDescriptors {
@@ -99,13 +99,13 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 		}
 
 		var dir string
-		dir = typ.Common().QName().Get()
+		dir = typ.GetName().Get()
 		dir = pather.Paths.Dir(dir)
 
 		var filename string
 		filename = td.path
 		filename = pather.Paths.Base(filename)
-		filename = stringer.Replace(filename, typ.Common().Name.Get(), typ.BaseType())
+		filename = stringer.Replace(filename, typ.GetName().Get(), typ.GetType())
 		filename = extentioner.Strip(filename)
 
 		path := pather.Paths.Join(dir, filename)

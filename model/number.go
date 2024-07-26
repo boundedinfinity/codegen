@@ -19,7 +19,7 @@ type CodeGenInteger struct {
 
 var _ CodeGenType = &CodeGenInteger{}
 
-func (t CodeGenInteger) BaseType() string {
+func (t CodeGenInteger) GetType() string {
 	return "integer"
 }
 
@@ -28,51 +28,90 @@ func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 		TypeId         string `json:"base-type"`
 		CodeGenInteger `json:",inline"`
 	}{
-		TypeId:         t.BaseType(),
+		TypeId:         t.GetType(),
 		CodeGenInteger: *t,
 	}
 
 	return marshalCodeGenType(dto)
 }
 
-func (t *CodeGenInteger) WithQName(v string) *CodeGenInteger {
-	t.withQName(v)
-	return t
+//----------------------------------------------------------------
+// Builder
+//----------------------------------------------------------------
+
+func BuildInteger() IntBuilder {
+	return &codeGenIntBuilder{}
 }
 
-func (t *CodeGenInteger) WithName(v string) *CodeGenInteger {
-	t.withName(v)
-	return t
+type codeGenIntBuilder struct {
+	obj CodeGenInteger
 }
 
-func (t *CodeGenInteger) WithPackage(v string) *CodeGenInteger {
-	t.withPackage(v)
-	return t
+var _ IntBuilder = &codeGenIntBuilder{}
+
+// Build implements IntBuilder.
+func (t *codeGenIntBuilder) Build() *CodeGenInteger {
+	return &t.obj
 }
 
-func (t *CodeGenInteger) WithDescription(v string) *CodeGenInteger {
-	t.withDescription(v)
-	return t
+// Description implements IntBuilder.
+func (t *codeGenIntBuilder) Description(v string) IntBuilder {
+	return setO(t, &t.obj.Description, v)
 }
 
-func (t *CodeGenInteger) WithRequired(v bool) *CodeGenInteger {
-	t.withRequired(v)
-	return t
+// MultipleOf implements IntBuilder.
+func (t *codeGenIntBuilder) MultipleOf(v int) IntBuilder {
+	return setO(t, &t.obj.MultipleOf, v)
 }
 
-func (t *CodeGenInteger) WithMultipleOf(v int) *CodeGenInteger {
-	t.withMultipleOf(v)
-	return t
+// Name implements IntBuilder.
+func (t *codeGenIntBuilder) Name(v string) IntBuilder {
+	return setO(t, &t.obj.Name, v)
 }
 
-func (t *CodeGenInteger) WithRange(v *NumberRange[int]) *CodeGenInteger {
-	t.withRange(v)
-	return t
+// Negative implements IntBuilder.
+func (t *codeGenIntBuilder) Negative() IntBuilder {
+	return setO(t, &t.obj.Negative, true)
 }
 
-func (t *CodeGenInteger) WithList(elems ...int) *CodeGenInteger {
-	t.withList(elems...)
-	return t
+// NoneOf implements IntBuilder.
+func (t *codeGenIntBuilder) NoneOf(v ...int) IntBuilder {
+	return setO(t, &t.obj.NoneOf, v)
+}
+
+// OneOf implements IntBuilder.
+func (t *codeGenIntBuilder) OneOf(v ...int) IntBuilder {
+	return setO(t, &t.obj.OneOf, v)
+}
+
+// Package implements IntBuilder.
+func (t *codeGenIntBuilder) Package(v string) IntBuilder {
+	return setO(t, &t.obj.Package, v)
+}
+
+// Positive implements IntBuilder.
+func (t *codeGenIntBuilder) Positive() IntBuilder {
+	return setO(t, &t.obj.Positive, true)
+}
+
+// QName implements IntBuilder.
+func (t *codeGenIntBuilder) QName(string) IntBuilder {
+	panic("unimplemented")
+}
+
+// Ranges implements IntBuilder.
+func (t *codeGenIntBuilder) Ranges(v ...NumberRange[int]) IntBuilder {
+	return setO(t, &t.obj.Ranges, v)
+}
+
+// Ref implements IntBuilder.
+func (t *codeGenIntBuilder) Ref() RefBuilder {
+	panic("unimplemented")
+}
+
+// Required implements IntBuilder.
+func (t *codeGenIntBuilder) Required(v bool) IntBuilder {
+	return setO(t, &t.obj.Required, v)
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -85,11 +124,13 @@ func NewFloat() *CodeGenFloat {
 
 type CodeGenFloat struct {
 	number[float64]
+	Precision optioner.Option[int]     `json:"precision,omitempty"`
+	Tolerance optioner.Option[float64] `json:"tolerance,omitempty"`
 }
 
 var _ CodeGenType = &CodeGenFloat{}
 
-func (t CodeGenFloat) BaseType() string {
+func (t CodeGenFloat) GetType() string {
 	return "float"
 }
 
@@ -98,46 +139,100 @@ func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 		TypeId       string `json:"base-type"`
 		CodeGenFloat `json:",inline"`
 	}{
-		TypeId:       t.BaseType(),
+		TypeId:       t.GetType(),
 		CodeGenFloat: *t,
 	}
 
 	return marshalCodeGenType(dto)
 }
 
-func (t *CodeGenFloat) WithQName(v string) *CodeGenFloat {
-	t.codeGenCommon.withQName(v)
-	return t
+//----------------------------------------------------------------
+// Builder
+//----------------------------------------------------------------
+
+func BuildFloat() FloatBuilder {
+	return &codeGenFloatBuilder{}
 }
 
-func (t *CodeGenFloat) WithName(v string) *CodeGenFloat {
-	t.codeGenCommon.withName(v)
-	return t
+type codeGenFloatBuilder struct {
+	obj CodeGenFloat
 }
 
-func (t *CodeGenFloat) WithPackage(v string) *CodeGenFloat {
-	t.codeGenCommon.withPackage(v)
-	return t
+var _ FloatBuilder = &codeGenFloatBuilder{}
+
+// Build implements FloatBuilder.
+func (t *codeGenFloatBuilder) Build() *CodeGenFloat {
+	return &t.obj
 }
 
-func (t *CodeGenFloat) WithDescription(v string) *CodeGenFloat {
-	t.codeGenCommon.withDescription(v)
-	return t
+// Description implements FloatBuilder.
+func (t *codeGenFloatBuilder) Description(v string) FloatBuilder {
+	return setO(t, &t.obj.Description, v)
 }
 
-func (t *CodeGenFloat) WithRequired(v bool) *CodeGenFloat {
-	t.codeGenCommon.withRequired(v)
-	return t
+// MultipleOf implements FloatBuilder.
+func (t *codeGenFloatBuilder) MultipleOf(v float64) FloatBuilder {
+	return setO(t, &t.obj.MultipleOf, v)
 }
 
-func (t *CodeGenFloat) WithMultipleOf(v float64) *CodeGenFloat {
-	t.MultipleOf = optioner.Some(v)
-	return t
+// Name implements FloatBuilder.
+func (t *codeGenFloatBuilder) Name(v string) FloatBuilder {
+	return setO(t, &t.obj.Name, v)
 }
 
-func (t *CodeGenFloat) WithRange(v NumberRange[float64]) *CodeGenFloat {
-	t.Ranges = append(t.Ranges, v)
-	return t
+// Negative implements FloatBuilder.
+func (t *codeGenFloatBuilder) Negative() FloatBuilder {
+	return setO(t, &t.obj.Negative, true)
+}
+
+// NoneOf implements FloatBuilder.
+func (t *codeGenFloatBuilder) NoneOf(v ...float64) FloatBuilder {
+	return setO(t, &t.obj.NoneOf, v)
+}
+
+// OneOf implements FloatBuilder.
+func (t *codeGenFloatBuilder) OneOf(v ...float64) FloatBuilder {
+	return setO(t, &t.obj.OneOf, v)
+}
+
+// Package implements FloatBuilder.
+func (t *codeGenFloatBuilder) Package(v string) FloatBuilder {
+	return setO(t, &t.obj.Package, v)
+}
+
+// Positive implements FloatBuilder.
+func (t *codeGenFloatBuilder) Positive() FloatBuilder {
+	return setO(t, &t.obj.Positive, true)
+}
+
+// Precision implements FloatBuilder.
+func (t *codeGenFloatBuilder) Precision(v int) FloatBuilder {
+	return setO(t, &t.obj.Precision, v)
+}
+
+// QName implements FloatBuilder.
+func (t *codeGenFloatBuilder) QName(v string) FloatBuilder {
+	panic("unimplemented")
+}
+
+// Ranges implements FloatBuilder.
+func (t *codeGenFloatBuilder) Ranges(v ...NumberRange[float64]) FloatBuilder {
+	return setO(t, &t.obj.Ranges, v)
+}
+
+// Ref implements FloatBuilder.
+func (t *codeGenFloatBuilder) Ref() RefBuilder {
+	panic("unimplemented")
+}
+
+// Required implements FloatBuilder.
+func (t *codeGenFloatBuilder) Required(v bool) FloatBuilder {
+	return setO(t, &t.obj.Required, v)
+}
+
+// Tolerance implements FloatBuilder.
+func (t *codeGenFloatBuilder) Tolerance(v float64) FloatBuilder {
+	return setO(t, &t.obj.Tolerance, v)
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -146,8 +241,12 @@ func (t *CodeGenFloat) WithRange(v NumberRange[float64]) *CodeGenFloat {
 
 type number[T int | float64] struct {
 	codeGenCommon
-	MultipleOf optioner.Option[T] `json:"multiple-of,omitempty"`
-	Ranges     []NumberRange[T]   `json:"ranges,omitempty"`
+	MultipleOf optioner.Option[T]                `json:"multiple-of,omitempty"`
+	Ranges     optioner.Option[[]NumberRange[T]] `json:"ranges,omitempty"`
+	NoneOf     optioner.Option[[]T]              `json:"one-of,omitempty"`
+	OneOf      optioner.Option[[]T]              `json:"some-of,omitempty"`
+	Positive   optioner.Option[bool]             `json:"positive,omitempty"`
+	Negative   optioner.Option[bool]             `json:"negative,omitempty"`
 }
 
 //----------------------------------------------------------------
@@ -155,8 +254,9 @@ type number[T int | float64] struct {
 //----------------------------------------------------------------
 
 var (
-	ErrNumberMultipleOfBelow1 = errorer.New("multiple of below 1")
-	ErrNumberRange            = errorer.New("number range")
+	ErrNumberMultipleOfBelow1                          = errorer.New("multiple of below 1")
+	ErrNumberRange                                     = errorer.New("number range")
+	ErrNumberRangePositiveAndNegativeMutuallyExclusive = errorer.New("positive and negative are multually exclusive")
 )
 
 func (t number[T]) Validate() error {
@@ -168,7 +268,11 @@ func (t number[T]) Validate() error {
 		return ErrNumberMultipleOfBelow1.WithValue(t.MultipleOf.Get())
 	}
 
-	for _, rng := range t.Ranges {
+	if t.Positive.Defined() && t.Negative.Defined() {
+		return ErrNumberRangePositiveAndNegativeMutuallyExclusive
+	}
+
+	for _, rng := range t.Ranges.Get() {
 		if err := rng.Validate(); err != nil {
 			return err
 		}
@@ -178,33 +282,7 @@ func (t number[T]) Validate() error {
 }
 
 func (t number[T]) HasValidation() bool {
-	return t.Common().HasValidation() || t.MultipleOf.Defined() || len(t.Ranges) > 0
-}
-
-//----------------------------------------------------------------
-// Builders
-//----------------------------------------------------------------
-
-func (t *number[T]) withName(v string) *number[T] {
-	t.codeGenCommon.withName(v)
-	return t
-}
-
-func (t *number[T]) withList(elems ...T) *number[T] {
-	for _, elem := range elems {
-		t.withRange(NewRange[T]().WithMin(elem).WithMax(elem))
-	}
-	return t
-}
-
-func (t *number[T]) withMultipleOf(v T) *number[T] {
-	t.MultipleOf = optioner.Some(v)
-	return t
-}
-
-func (t *number[T]) withRange(v *NumberRange[T]) *number[T] {
-	t.Ranges = append(t.Ranges, *v)
-	return t
+	return t.codeGenCommon.HasValidation() || t.MultipleOf.Defined() || t.Ranges.Defined()
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -222,24 +300,32 @@ type NumberRange[T int | float64] struct {
 	ExclusiveMax optioner.Option[T] `json:"exclusive-max,omitempty"`
 }
 
-func (t *NumberRange[T]) WithMin(v T) *NumberRange[T] {
-	t.Min = optioner.Some(v)
-	return t
+type NumberRangeBuilder[T int | float64] struct {
+	obj NumberRange[T]
 }
 
-func (t *NumberRange[T]) WithMax(v T) *NumberRange[T] {
-	t.Max = optioner.Some(v)
-	return t
+func BuildRange[T int | float64]() *NumberRangeBuilder[T] {
+	return &NumberRangeBuilder[T]{}
 }
 
-func (t *NumberRange[T]) WithExclusiveMin(v T) *NumberRange[T] {
-	t.ExclusiveMin = optioner.Some(v)
-	return t
+func (t *NumberRangeBuilder[T]) Build() NumberRange[T] {
+	return t.obj
 }
 
-func (t *NumberRange[T]) WithExclusiveMax(v T) *NumberRange[T] {
-	t.ExclusiveMax = optioner.Some(v)
-	return t
+func (t *NumberRangeBuilder[T]) Min(v T) *NumberRangeBuilder[T] {
+	return setO(t, &t.obj.Min, v)
+}
+
+func (t *NumberRangeBuilder[T]) Max(v T) *NumberRangeBuilder[T] {
+	return setO(t, &t.obj.Max, v)
+}
+
+func (t *NumberRangeBuilder[T]) ExclusiveMin(v T) *NumberRangeBuilder[T] {
+	return setO(t, &t.obj.ExclusiveMin, v)
+}
+
+func (t *NumberRangeBuilder[T]) ExclusiveMax(v T) *NumberRangeBuilder[T] {
+	return setO(t, &t.obj.ExclusiveMax, v)
 }
 
 //----------------------------------------------------------------

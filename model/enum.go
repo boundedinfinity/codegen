@@ -12,10 +12,10 @@ import (
 // EnumValue
 //////////////////////////////////////////////////////////////////
 
-type CodeGenEnumValue struct {
-	Name        optioner.Option[string] `json:"name,omitempty"`
-	Value       optioner.Option[string] `json:"value,omitempty"`
-	Description optioner.Option[string] `json:"description,omitempty"`
+type CodeGenEnumItem struct {
+	Name        optioner.Option[string]   `json:"name,omitempty"`
+	Items       optioner.Option[[]string] `json:"items,omitempty"`
+	Description optioner.Option[string]   `json:"description,omitempty"`
 }
 
 //----------------------------------------------------------------
@@ -26,8 +26,8 @@ var (
 	errCodeGenEnumValueMustBeDefined = errorer.New("name or value must be defined")
 )
 
-func (t CodeGenEnumValue) Validate() error {
-	if t.Name.Empty() && t.Value.Empty() {
+func (t CodeGenEnumItem) Validate() error {
+	if t.Name.Empty() || t.Items.Empty() || len(t.Items.Get()) < 1 {
 		return errCodeGenEnumValueMustBeDefined
 	}
 
@@ -40,10 +40,10 @@ func (t CodeGenEnumValue) Validate() error {
 
 type CodeGenEnum struct {
 	codeGenCommon
-	Values []CodeGenEnumValue `json:"values,omitempty"`
+	Values optioner.Option[[]CodeGenEnumItem] `json:"values,omitempty"`
 }
 
-func (t CodeGenEnum) BaseType() string {
+func (t CodeGenEnum) GetType() string {
 	return "enum"
 }
 
@@ -54,7 +54,7 @@ var _ CodeGenType = &CodeGenEnum{}
 //----------------------------------------------------------------
 
 func (t CodeGenEnum) HasValidation() bool {
-	return t.Common().HasValidation()
+	return t.codeGenCommon.HasValidation()
 }
 
 func (t CodeGenEnum) Validate() error {
@@ -62,7 +62,7 @@ func (t CodeGenEnum) Validate() error {
 		return err
 	}
 
-	for i, value := range t.Values {
+	for i, value := range t.Values.Get() {
 		if err := value.Validate(); err != nil {
 			return errors.Join(fmt.Errorf("value[%v]", i))
 		}
@@ -80,7 +80,7 @@ func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 		TypeId      string `json:"base-type"`
 		CodeGenEnum `json:",inline"`
 	}{
-		TypeId:      t.BaseType(),
+		TypeId:      t.GetType(),
 		CodeGenEnum: *t,
 	}
 
@@ -91,22 +91,52 @@ func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 // Builders
 //----------------------------------------------------------------
 
-func (t *CodeGenEnum) WithQName(v string) *CodeGenEnum {
-	t.codeGenCommon.withQName(v)
-	return t
+func BuildEnum() EnumBuilder {
+	return &codeGenEnumBuilder{}
 }
 
-func (t *CodeGenEnum) WithName(v string) *CodeGenEnum {
-	t.codeGenCommon.withName(v)
-	return t
+type codeGenEnumBuilder struct {
+	obj CodeGenEnum
 }
 
-func (t *CodeGenEnum) WithDescription(v string) *CodeGenEnum {
-	t.codeGenCommon.withDescription(v)
-	return t
+var _ EnumBuilder = &codeGenEnumBuilder{}
+
+// Ref implements EnumBuilder.
+func (t *codeGenEnumBuilder) Ref() RefBuilder {
+	panic("unimplemented")
 }
 
-func (t *CodeGenEnum) WithRequired(v bool) *CodeGenEnum {
-	t.codeGenCommon.withRequired(v)
-	return t
+// Build implements EnumBuilder.
+func (t *codeGenEnumBuilder) Build() *CodeGenEnum {
+	return &t.obj
+}
+
+// Description implements EnumBuilder.
+func (t *codeGenEnumBuilder) Description(v string) EnumBuilder {
+	return setO(t, &t.obj.Description, v)
+}
+
+// Items implements EnumBuilder.
+func (t *codeGenEnumBuilder) Values(v ...CodeGenEnumItem) EnumBuilder {
+	return setO(t, &t.obj.Values, v)
+}
+
+// Name implements EnumBuilder.
+func (t *codeGenEnumBuilder) Name(v string) EnumBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+// Package implements EnumBuilder.
+func (t *codeGenEnumBuilder) Package(v string) EnumBuilder {
+	return setO(t, &t.obj.Package, v)
+}
+
+// QName implements EnumBuilder.
+func (t *codeGenEnumBuilder) QName(v string) EnumBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+// Required implements EnumBuilder.
+func (t *codeGenEnumBuilder) Required(v bool) EnumBuilder {
+	return setO(t, &t.obj.Required, v)
 }

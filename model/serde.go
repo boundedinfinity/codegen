@@ -60,7 +60,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 	var err error
 
 	switch descrim.CodeGenId {
-	case CodeGenString{}.BaseType():
+	case CodeGenString{}.GetType():
 		var obj CodeGenString
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -68,7 +68,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenInteger{}.BaseType():
+	case CodeGenInteger{}.GetType():
 		var obj CodeGenInteger
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -76,7 +76,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenFloat{}.BaseType():
+	case CodeGenFloat{}.GetType():
 		var obj CodeGenFloat
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -84,7 +84,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenBoolean{}.BaseType():
+	case CodeGenBoolean{}.GetType():
 		var obj CodeGenBoolean
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -92,7 +92,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenArray{}.BaseType():
+	case CodeGenArray{}.GetType():
 		var obj CodeGenArray
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -100,7 +100,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenObject{}.BaseType():
+	case CodeGenObject{}.GetType():
 		var obj CodeGenObject
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -108,7 +108,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenRef{}.BaseType():
+	case CodeGenRef{}.GetType():
 		var obj CodeGenRef
 
 		if err = json.Unmarshal(data, &obj); err != nil {

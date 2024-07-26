@@ -17,7 +17,7 @@ func Test_Marshal_String(t *testing.T) {
 	}{
 		{
 			name:  "Serialize boolean",
-			input: model.NewString(),
+			input: model.BuildString().Build(),
 			err:   nil,
 			expected: `{
 		        "base-type": "string"
@@ -25,9 +25,10 @@ func Test_Marshal_String(t *testing.T) {
 		},
 		{
 			name: "Serialize boolean",
-			input: model.NewString().
-				WithName("A_STRING").
-				WithDescription("an object description"),
+			input: model.BuildString().
+				Name("A_STRING").
+				Description("an object description").
+				Build(),
 			err: nil,
 			expected: `{
 		        "base-type": "string",

@@ -1,8 +1,6 @@
 package model
 
 import (
-	"errors"
-
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
@@ -16,7 +14,7 @@ type CodeGenRef struct {
 	codeGenCommon `json:",inline,omitempty"`
 }
 
-func (t CodeGenRef) BaseType() string {
+func (t CodeGenRef) GetType() string {
 	return "ref"
 }
 
@@ -50,10 +48,10 @@ func (t CodeGenRef) Validate() error {
 
 func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId string `json:"base-type"`
+		TypeId string `json:"type"`
 		CodeGenRef
 	}{
-		TypeId:     t.BaseType(),
+		TypeId:     t.GetType(),
 		CodeGenRef: *t,
 	}
 
@@ -61,47 +59,59 @@ func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 }
 
 //----------------------------------------------------------------
-// Builders
+// Builder
 //----------------------------------------------------------------
 
-func NewRef() *CodeGenRef {
-	return &CodeGenRef{}
+func RefFromType(typ CodeGenType) (RefBuilder, error) {
+	return &codeGenRefBuilder{}, nil
+	// if typ.QName().Empty() {
+	// 	return nil, errors.New("invalid ref target")
+	// }
+
+	// return NewRef().WithRef(typ.QName().Get()), nil
 }
 
-func (t codeGenCommon) NewRefFromType(typ CodeGenType) (CodeGenType, error) {
-	if typ.QName().Empty() {
-		return nil, errors.New("invalid ref target")
-	}
-
-	return NewRef().WithRef(typ.QName().Get()), nil
+type codeGenRefBuilder struct {
+	obj CodeGenRef
 }
 
-func (t *CodeGenRef) WithName(v string) *CodeGenRef {
-	t.codeGenCommon.withName(v)
-	return t
+var _ RefBuilder = &codeGenRefBuilder{}
+
+func BuildRef() *codeGenRefBuilder {
+	return &codeGenRefBuilder{}
 }
 
-func (t *CodeGenRef) WithDescription(v string) *CodeGenRef {
-	t.codeGenCommon.withDescription(v)
-	return t
+// Build implements RefBuilder.
+func (t *codeGenRefBuilder) Build() CodeGenRef {
+	return t.obj
 }
 
-func (t *CodeGenRef) WithRequired(v bool) *CodeGenRef {
-	t.codeGenCommon.withRequired(v)
-	return t
+// Ref implements RefBuilder.
+func (t *codeGenRefBuilder) Ref(v string) RefBuilder {
+	return setO(t, &t.obj.Ref, v)
 }
 
-// func (t *CodeGenRef) WithDefault(v CodeGenRef) *CodeGenRef {
-// 	t.codeGenCommon.withDefault(&v)
-// 	return t
-// }
+// Description implements RefBuilder.
+func (t *codeGenRefBuilder) Description(v string) RefBuilder {
+	return setO(t, &t.obj.Description, v)
+}
 
-// func (t *CodeGenRef) WithEager(v bool) *CodeGenRef {
-// 	t.codeGenCommon.withEager(v)
-// 	return t
-// }
+// Name implements RefBuilder.
+func (t *codeGenRefBuilder) Name(v string) RefBuilder {
+	return setO(t, &t.obj.Name, v)
+}
 
-func (t *CodeGenRef) WithRef(v string) *CodeGenRef {
-	t.Ref = optioner.OfZero(v)
-	return t
+// Package implements RefBuilder.
+func (t *codeGenRefBuilder) Package(v string) RefBuilder {
+	return setO(t, &t.obj.Package, v)
+}
+
+// QName implements RefBuilder.
+func (t *codeGenRefBuilder) QName(v string) RefBuilder {
+	panic("unimplemented")
+}
+
+// Required implements RefBuilder.
+func (t *codeGenRefBuilder) Required(v bool) RefBuilder {
+	return setO(t, &t.obj.Required, v)
 }

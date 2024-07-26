@@ -5,32 +5,20 @@ import (
 )
 
 ///////////////////////////////////////////////////////////////////
-// Interfaces
-//////////////////////////////////////////////////////////////////
-
-type CodeGenType interface {
-	GetType() string
-	GetName() string
-	GetPackage() string
-	Validate() error
-	HasValidation() bool
-}
-
-type StringBuilder interface {
-}
-
-///////////////////////////////////////////////////////////////////
 // Common Type
 //////////////////////////////////////////////////////////////////
 
 type codeGenCommon struct {
 	// Type ID is the type of this type definition.
+	ID optioner.Option[string] `json:"id,omitempty"`
+
+	// QName is the qualified name of this type definition.
 	QName optioner.Option[string] `json:"q-name,omitempty"`
 
-	// Name is the name of the type.
+	//Name The unqualified (or base) name for this type
 	Name optioner.Option[string] `json:"name,omitempty"`
 
-	// Package
+	// The package for this type
 	Package optioner.Option[string] `json:"package,omitempty"`
 
 	// Description description of the type
@@ -38,25 +26,22 @@ type codeGenCommon struct {
 
 	// Required true if this types is required, false otherwise
 	Required optioner.Option[bool] `json:"required,omitempty"`
-
-	// // Default is the default value of this type if it's not set
-	// // Note that this value is mutually exclusive with the Required option.
-	// Default optioner.Option[CodeGenType] `json:"default,omitempty"`
-
-	// // Eager will load this type if it's containted inside another type.
-	// Eager optioner.Option[bool] `json:"eager,omitempty"`
 }
 
 //----------------------------------------------------------------
 // Validation
 //----------------------------------------------------------------
 
-func (t codeGenCommon) GetName() string {
-	return t.Name.Get()
+func (t codeGenCommon) GetQName() optioner.Option[string] {
+	return t.QName
 }
 
-func (t codeGenCommon) GetPackage() string {
-	return t.Package.Get()
+func (t codeGenCommon) GetName() optioner.Option[string] {
+	return t.Name
+}
+
+func (t codeGenCommon) GetPackage() optioner.Option[string] {
+	return t.Package
 }
 
 func (t codeGenCommon) Validate() error {
@@ -73,5 +58,10 @@ func (t codeGenCommon) HasValidation() bool {
 
 func setV[T any, V any](t T, c *V, n V) T {
 	*c = n
+	return t
+}
+
+func setO[T any, V any](t T, c *optioner.Option[V], n V) T {
+	*c = optioner.Some(n)
 	return t
 }

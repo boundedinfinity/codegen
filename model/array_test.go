@@ -17,7 +17,7 @@ func Test_Marshal_Array(t *testing.T) {
 	}{
 		{
 			name:  "Serialize boolean",
-			input: model.NewArray(),
+			input: model.BuildArray().Build(),
 			err:   nil,
 			expected: `{
 		        "base-type": "array"
@@ -25,9 +25,10 @@ func Test_Marshal_Array(t *testing.T) {
 		},
 		{
 			name: "Serialize boolean",
-			input: model.NewArray().
-				WithName("AN_ARRAY").
-				WithDescription("an array description"),
+			input: model.BuildArray().
+				Name("AN_ARRAY").
+				Description("an array description").
+				Build(),
 			err: nil,
 			expected: `{
 		        "base-type": "array",
@@ -38,12 +39,14 @@ func Test_Marshal_Array(t *testing.T) {
 		{
 			name: "Serialize array with boolean",
 			err:  nil,
-			input: model.NewArray().
-				WithName("AN_ARRAY").
-				WithDescription("an array description").
-				WithItems(model.NewBoolean().
-					WithName("A_BOOLEAN").
-					WithDescription("a bool description")),
+			input: model.BuildArray().
+				Name("AN_ARRAY").
+				Description("an array description").
+				Items(model.BuildBoolean().
+					Name("A_BOOLEAN").
+					Description("a bool description").
+					Build()).
+				Build(),
 			expected: `{
 		        "base-type": "array",
                 "name": "AN_ARRAY",
@@ -76,12 +79,14 @@ func Test_Unmarshal_Array(t *testing.T) {
 	}{
 		{
 			name: "Unmarshal array and boolean item",
-			obj: model.NewArray().
-				WithName("AN_ARRAY").
-				WithDescription("an array description").
-				WithItems(model.NewBoolean().
-					WithName("A_BOOLEAN").
-					WithDescription("a bool description")),
+			obj: model.BuildArray().
+				Name("AN_ARRAY").
+				Description("an array description").
+				Items(model.BuildBoolean().
+					Name("A_BOOLEAN").
+					Description("a bool description").
+					Build()).
+				Build(),
 			err: nil,
 		},
 	}

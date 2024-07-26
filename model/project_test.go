@@ -17,25 +17,26 @@ func Test_Marshal_Project(t *testing.T) {
 	}{
 		{
 			name: "Marshal project",
-			input: model.NewProject().
-				WithName("A_PROJECT").
-				WithOperations(
-					model.NewOperation().WithInputs(
-						model.NewRef().WithRef("label").WithName("A_LABEL"),
-					),
+			input: model.BuildProject().
+				Name("A_PROJECT").
+				Operations(
+					model.BuildOperation().WithInputs(
+						model.BuildRef().Ref("label").Name("A_LABEL").Build(),
+					).Build(),
 				).
-				WithTypes(
-					model.NewObject().
-						WithName("label").
-						WithDescription("A simple label").
-						WithProperties(
-							model.NewString().
-								WithName("name").
-								WithDescription("The label name").
-								WithMin(0).
-								WithMax(50),
-						),
-				),
+				Types(
+					model.BuildObject().
+						Name("label").
+						Description("A simple label").
+						Properties(
+							model.BuildString().
+								Name("name").
+								Description("The label name").
+								Min(0).
+								Max(50).
+								Build(),
+						).Build(),
+				).Build(),
 			err: nil,
 			expected: `{
 		        "base-type": "boolean",
@@ -68,7 +69,7 @@ func Test_Unmarshal_Project(t *testing.T) {
 	}{
 		{
 			name: "Marshal boolean",
-			obj:  model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
+			obj:  model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
 			err:  nil,
 		},
 	}

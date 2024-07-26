@@ -10,7 +10,7 @@ type CodeGenBoolean struct {
 
 var _ CodeGenType = &CodeGenBoolean{}
 
-func (t CodeGenBoolean) BaseType() string {
+func (t CodeGenBoolean) GetType() string {
 	return "boolean"
 }
 
@@ -35,7 +35,7 @@ func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
 		TypeId         string `json:"base-type"`
 		CodeGenBoolean `json:",inline"`
 	}{
-		TypeId:         t.BaseType(),
+		TypeId:         t.GetType(),
 		CodeGenBoolean: *t,
 	}
 
@@ -46,31 +46,42 @@ func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
 // Builders
 //----------------------------------------------------------------
 
-func NewBoolean() *CodeGenBoolean {
-	return &CodeGenBoolean{}
+func BuildBoolean() BooleanBuilder {
+	return &codeGenBooleanBuilder{}
 }
 
-func (t *CodeGenBoolean) WithQName(v string) *CodeGenBoolean {
-	t.codeGenCommon.withQName(v)
-	return t
+type codeGenBooleanBuilder struct {
+	obj CodeGenBoolean
 }
 
-func (t *CodeGenBoolean) WithName(v string) *CodeGenBoolean {
-	t.codeGenCommon.withName(v)
-	return t
+var _ BooleanBuilder = &codeGenBooleanBuilder{}
+
+// Build implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) Build() *CodeGenBoolean {
+	return &t.obj
 }
 
-func (t *CodeGenBoolean) WithDescription(v string) *CodeGenBoolean {
-	t.codeGenCommon.withDescription(v)
-	return t
+// Description implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) Description(v string) BooleanBuilder {
+	return setO(t, &t.obj.Description, v)
 }
 
-func (t *CodeGenBoolean) WithRequired(v bool) *CodeGenBoolean {
-	t.codeGenCommon.withRequired(v)
-	return t
+// Name implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) Name(v string) BooleanBuilder {
+	return setO(t, &t.obj.Name, v)
 }
 
-// func (t *CodeGenBoolean) WithDefault(v CodeGenBoolean) *CodeGenBoolean {
-// 	t.codeGenCommon.withDefault(&v)
-// 	return t
-// }
+// Package implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) Package(v string) BooleanBuilder {
+	return setO(t, &t.obj.Package, v)
+}
+
+// QName implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) QName(v string) BooleanBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+// Required implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) Required(v bool) BooleanBuilder {
+	return setO(t, &t.obj.Required, v)
+}

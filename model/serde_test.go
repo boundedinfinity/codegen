@@ -28,7 +28,7 @@ func Test_Unmarshal_CodeGenType(t *testing.T) {
                 }
 		    }`,
 			err:      nil,
-			expected: model.NewBoolean(),
+			expected: model.BuildBoolean().Build(),
 		},
 	}
 

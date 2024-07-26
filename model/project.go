@@ -23,7 +23,6 @@ type CodeGenProject struct {
 	Types       []CodeGenType                 `json:"types,omitempty"`
 	Package     optioner.Option[string]       `json:"package,omitempty"`
 	OutputRoot  optioner.Option[string]       `json:"output-root,omitempty"`
-	CodeGenMeta
 }
 
 //----------------------------------------------------------------
@@ -106,7 +105,6 @@ func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
 		Templates   CodeGenProjectTemplates       `json:"templates,omitempty"`
 		Types       []json.RawMessage             `json:"types,omitempty"`
 		Package     optioner.Option[string]       `json:"package,omitempty"`
-		CodeGenMeta
 	}{}
 
 	if err := json.Unmarshal(data, &dto); err != nil {
@@ -118,7 +116,6 @@ func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
 		t.Operations = dto.Operations
 		t.Templates = dto.Templates
 		t.Package = dto.Package
-		t.CodeGenMeta = dto.CodeGenMeta
 	}
 
 	for i, raw := range dto.Types {
@@ -136,29 +133,35 @@ func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
 // Builders
 //----------------------------------------------------------------
 
-func NewProject() *CodeGenProject {
-	return &CodeGenProject{}
+func BuildProject() *codeGenProjectBuilder {
+	return &codeGenProjectBuilder{}
 }
 
-func (t *CodeGenProject) WithName(v string) *CodeGenProject {
-	t.Name = optioner.OfZero(v)
-	return t
+type codeGenProjectBuilder struct {
+	obj CodeGenProject
 }
 
-func (t *CodeGenProject) WithDescription(v string) *CodeGenProject {
-	t.Description = optioner.OfZero(v)
-	return t
+func (t *codeGenProjectBuilder) Build() *CodeGenProject {
+	return &t.obj
 }
 
-func (t *CodeGenProject) WithOperations(v ...*CodeGenOperation) *CodeGenProject {
+func (t *codeGenProjectBuilder) Name(v string) *codeGenProjectBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+func (t *codeGenProjectBuilder) Description(v string) *codeGenProjectBuilder {
+	return setO(t, &t.obj.Description, v)
+}
+
+func (t *codeGenProjectBuilder) Operations(v ...*CodeGenOperation) *codeGenProjectBuilder {
 	for _, operation := range v {
-		t.Operations = append(t.Operations, *operation)
+		t.obj.Operations = append(t.obj.Operations, *operation)
 	}
 
 	return t
 }
 
-func (t *CodeGenProject) WithTypes(v ...CodeGenType) *CodeGenProject {
-	t.Types = append(t.Types, v...)
+func (t *codeGenProjectBuilder) Types(v ...CodeGenType) *codeGenProjectBuilder {
+	t.obj.Types = append(t.obj.Types, v...)
 	return t
 }

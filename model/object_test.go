@@ -17,7 +17,7 @@ func Test_Marshal_Object(t *testing.T) {
 	}{
 		{
 			name:  "Serialize boolean",
-			input: model.NewObject(),
+			input: model.BuildObject().Build(),
 			err:   nil,
 			expected: `{
 		        "base-type": "object",
@@ -26,9 +26,10 @@ func Test_Marshal_Object(t *testing.T) {
 		},
 		{
 			name: "Serialize boolean",
-			input: model.NewObject().
-				WithName("AN_OBJECT").
-				WithDescription("an object description"),
+			input: model.BuildObject().
+				Name("AN_OBJECT").
+				Description("an object description").
+				Build(),
 			err: nil,
 			expected: `{
 		        "base-type": "object",
@@ -40,12 +41,12 @@ func Test_Marshal_Object(t *testing.T) {
 		{
 			name: "Serialize object with boolean",
 			err:  nil,
-			input: model.NewObject().
-				WithName("AN_OBJECT").
-				WithDescription("an object description").
-				WithProperties(model.NewBoolean().
-					WithName("A_BOOLEAN").
-					WithDescription("a bool description")),
+			input: model.BuildObject().
+				Name("AN_OBJECT").
+				Description("an object description").
+				Properties(
+					model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
+				).Build(),
 			expected: `{
 		        "base-type": "object",
                 "name": "AN_OBJECT",
@@ -81,13 +82,13 @@ func Test_Unmarshal_Object(t *testing.T) {
 	}{
 		{
 			name: "Unmarshal object and boolean item",
-			obj: model.NewObject().
-				WithName("AN_OBJECT").
-				WithDescription("an object description").
-				WithProperties(
-					model.NewBoolean().WithName("A_BOOLEAN").WithDescription("a bool description"),
-					// model.NewInteger().WithName("A_INT").WithDescription("a int description"),
-				),
+			obj: model.BuildObject().
+				Name("AN_OBJECT").
+				Description("an object description").
+				Properties(
+					model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
+					// model.NewInteger().Name("A_INT").Description("a int description"),
+				).Build(),
 			err: nil,
 		},
 	}

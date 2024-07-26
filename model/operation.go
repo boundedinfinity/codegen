@@ -18,7 +18,6 @@ type CodeGenOperation struct {
 	Description optioner.Option[string] `json:"description,omitempty"`
 	Inputs      []CodeGenType           `json:"inputs,omitempty"`
 	Outputs     []CodeGenType           `json:"outputs,omitempty"`
-	CodeGenMeta
 }
 
 func (t CodeGenOperation) TypeId() string {
@@ -50,10 +49,6 @@ func (t *CodeGenOperation) Validate() error {
 		if err := output.Validate(); err != nil {
 			return fmt.Errorf("outputs[%v]: %w", i, ErrCodeGenOperationInvalidOutput)
 		}
-	}
-
-	if err := t.CodeGenMeta.Validate(); err != nil {
-		return err
 	}
 
 	return nil
@@ -121,26 +116,32 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 // Builders
 //----------------------------------------------------------------
 
-func NewOperation() *CodeGenOperation {
-	return &CodeGenOperation{}
+func BuildOperation() *codeGenOperationBuilder {
+	return &codeGenOperationBuilder{}
 }
 
-func (t *CodeGenOperation) WithName(v string) *CodeGenOperation {
-	t.Name = optioner.OfZero(v)
+type codeGenOperationBuilder struct {
+	obj CodeGenOperation
+}
+
+func (t *codeGenOperationBuilder) Build() *CodeGenOperation {
+	return &t.obj
+}
+
+func (t *codeGenOperationBuilder) Name(v string) *codeGenOperationBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+func (t *codeGenOperationBuilder) Description(v string) *codeGenOperationBuilder {
+	return setO(t, &t.obj.Description, v)
+}
+
+func (t *codeGenOperationBuilder) WithInputs(v ...CodeGenType) *codeGenOperationBuilder {
+	t.obj.Inputs = append(t.obj.Inputs, v...)
 	return t
 }
 
-func (t *CodeGenOperation) WithDescription(v string) *CodeGenOperation {
-	t.Description = optioner.OfZero(v)
-	return t
-}
-
-func (t *CodeGenOperation) WithInputs(v ...CodeGenType) *CodeGenOperation {
-	t.Inputs = append(t.Inputs, v...)
-	return t
-}
-
-func (t *CodeGenOperation) WithOutputs(v ...CodeGenType) *CodeGenOperation {
-	t.Outputs = append(t.Outputs, v...)
+func (t *codeGenOperationBuilder) WithOutputs(v ...CodeGenType) *codeGenOperationBuilder {
+	t.obj.Outputs = append(t.obj.Outputs, v...)
 	return t
 }

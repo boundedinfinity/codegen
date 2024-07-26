@@ -13,16 +13,14 @@ import (
 
 type CodeGenArray struct {
 	codeGenCommon `json:",inline,omitempty"`
-	Min           optioner.Option[int] `json:"min,omitempty"`
-	ExclusiveMin  optioner.Option[int] `json:"exclusive-min,omitempty"`
-	Max           optioner.Option[int] `json:"max,omitempty"`
-	ExclusiveMax  optioner.Option[int] `json:"exclusive-max,omitempty"`
-	Items         CodeGenType          `json:"items,omitempty"`
+	Min           optioner.Option[int]         `json:"min,omitempty"`
+	Max           optioner.Option[int]         `json:"max,omitempty"`
+	Items         optioner.Option[CodeGenType] `json:"items,omitempty"`
 }
 
 var _ CodeGenType = &CodeGenArray{}
 
-func (t CodeGenArray) BaseType() string {
+func (t CodeGenArray) GetType() string {
 	return "array"
 }
 
@@ -31,14 +29,12 @@ func (t CodeGenArray) BaseType() string {
 //----------------------------------------------------------------
 
 var (
-	errCodeGenArrayMinAndExclusiveMinMutuallyExclusive = errorer.New("min and exclusive-min are multually exclusive")
-	errCodeGenArrayMaxAndExclusiveMaxMutuallyExclusive = errorer.New("max and exclusive-max are multually exclusive")
+	errCodeGenArrayMinGreaterThanMax = errorer.New("min greater than max")
 )
 
 func (t CodeGenArray) HasValidation() bool {
-	return t.Common().HasValidation() ||
-		t.Min.Defined() || t.ExclusiveMin.Defined() ||
-		t.Max.Defined() || t.ExclusiveMax.Defined()
+	return t.codeGenCommon.HasValidation() || t.Min.Defined() || t.Min.Defined() || t.Max.Defined() ||
+		t.Max.Defined() || t.Items.Defined() && t.Items.Get().HasValidation()
 }
 
 func (t CodeGenArray) Validate() error {
@@ -46,16 +42,12 @@ func (t CodeGenArray) Validate() error {
 		return err
 	}
 
-	if err := t.Items.Validate(); err != nil {
+	if err := t.Items.Get().Validate(); err != nil {
 		return err
 	}
 
-	if t.Min.Defined() && t.ExclusiveMin.Defined() {
-		return errCodeGenArrayMinAndExclusiveMinMutuallyExclusive
-	}
-
-	if t.Max.Defined() && t.ExclusiveMax.Defined() {
-		return errCodeGenArrayMaxAndExclusiveMaxMutuallyExclusive
+	if t.Min.Defined() && t.Min.Defined() && t.Min.Get() > t.Max.Get() {
+		return errCodeGenArrayMinGreaterThanMax.FormatFn("min: %v, max: %v")(t.Min.Get(), t.Max.Get())
 	}
 
 	return nil
@@ -70,7 +62,7 @@ func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 		TypeId       string `json:"base-type"`
 		CodeGenArray `json:",inline"`
 	}{
-		TypeId:       t.BaseType(),
+		TypeId:       t.GetType(),
 		CodeGenArray: *t,
 	}
 
@@ -93,14 +85,12 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 		t.codeGenCommon = dto.codeGenCommon
 		t.Min = dto.Min
 		t.Max = dto.Max
-		t.ExclusiveMax = dto.ExclusiveMax
-		t.ExclusiveMin = dto.ExclusiveMin
 	}
 
 	if items, err := UnmarshalCodeGenType(dto.Items); err != nil {
 		return err
 	} else {
-		t.Items = items
+		t.Items = optioner.Some(items)
 	}
 
 	return nil
@@ -110,61 +100,57 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 // Builders
 //----------------------------------------------------------------
 
-func NewArray() *CodeGenArray {
-	return &CodeGenArray{}
+func BuildArray() ArrayBuilder {
+	return &codeGenArrayBuilder{}
 }
 
-func (t *CodeGenArray) WithSchemaId(v string) *CodeGenArray {
-	t.codeGenCommon.withQName(v)
-	return t
+type codeGenArrayBuilder struct {
+	obj CodeGenArray
 }
 
-func (t *CodeGenArray) WithName(v string) *CodeGenArray {
-	t.codeGenCommon.withName(v)
-	return t
+var _ ArrayBuilder = &codeGenArrayBuilder{}
+
+// Build implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Build() *CodeGenArray {
+	return &t.obj
 }
 
-func (t *CodeGenArray) WithDescription(v string) *CodeGenArray {
-	t.codeGenCommon.withDescription(v)
-	return t
+// Description implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Description(v string) ArrayBuilder {
+	return setO(t, &t.obj.Description, v)
 }
 
-func (t *CodeGenArray) WithRequired(v bool) *CodeGenArray {
-	t.codeGenCommon.withRequired(v)
-	return t
+// Items implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Items(v CodeGenType) ArrayBuilder {
+	return setO(t, &t.obj.Items, v)
 }
 
-// func (t *CodeGenArray) WithDefault(v CodeGenArray) *CodeGenArray {
-// 	t.codeGenCommon.withDefault(&v)
-// 	return t
-// }
-
-// func (t *CodeGenArray) WithEager(v bool) *CodeGenArray {
-// 	t.codeGenCommon.withEager(v)
-// 	return t
-// }
-
-func (t *CodeGenArray) WithMin(v int) *CodeGenArray {
-	t.Min = optioner.OfZero(v)
-	return t
+// Max implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Max(v int) ArrayBuilder {
+	return setO(t, &t.obj.Max, v)
 }
 
-func (t *CodeGenArray) WithMax(v int) *CodeGenArray {
-	t.Max = optioner.OfZero(v)
-	return t
+// Min implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Min(v int) ArrayBuilder {
+	return setO(t, &t.obj.Min, v)
 }
 
-func (t *CodeGenArray) WithExclusiveMin(v int) *CodeGenArray {
-	t.ExclusiveMin = optioner.OfZero(v)
-	return t
+// Name implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Name(v string) ArrayBuilder {
+	return setO(t, &t.obj.Name, v)
 }
 
-func (t *CodeGenArray) WithExclusiveMax(v int) *CodeGenArray {
-	t.ExclusiveMax = optioner.OfZero(v)
-	return t
+// Package implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Package(v string) ArrayBuilder {
+	return setO(t, &t.obj.Package, v)
 }
 
-func (t *CodeGenArray) WithItems(v CodeGenType) *CodeGenArray {
-	t.Items = v
-	return t
+// QName implements ArrayBuilder.
+func (t *codeGenArrayBuilder) QName(v string) ArrayBuilder {
+	return setO(t, &t.obj.Name, v)
+}
+
+// Required implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Required(v bool) ArrayBuilder {
+	return setO(t, &t.obj.Required, v)
 }

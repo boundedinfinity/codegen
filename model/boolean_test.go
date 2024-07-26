@@ -17,7 +17,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 	}{
 		{
 			name:  "Marshal boolean",
-			input: model.NewBoolean(),
+			input: model.BuildBoolean().Build(),
 			err:   nil,
 			expected: ` {
                 "base-type": "boolean"
@@ -25,7 +25,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 		},
 		{
 			name:  "Marshal boolean with name",
-			input: model.NewBoolean().WithName("A_BOOLEAN"),
+			input: model.BuildBoolean().Name("A_BOOLEAN").Build(),
 			err:   nil,
 			expected: `{
 		        "base-type": "boolean",
@@ -34,7 +34,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 		},
 		{
 			name:  "Marshal boolean with name and required",
-			input: model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
+			input: model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
 			err:   nil,
 			expected: `{
 		        "base-type": "boolean",
@@ -63,17 +63,17 @@ func Test_Unmarshal_Boolean(t *testing.T) {
 	}{
 		{
 			name: "Marshal boolean",
-			obj:  model.NewBoolean(),
+			obj:  model.BuildBoolean().Build(),
 			err:  nil,
 		},
 		{
 			name: "Marshal boolean",
-			obj:  model.NewBoolean().WithName("A_BOOLEAN"),
+			obj:  model.BuildBoolean().Name("A_BOOLEAN").Build(),
 			err:  nil,
 		},
 		{
 			name: "Marshal boolean",
-			obj:  model.NewBoolean().WithName("A_BOOLEAN").WithRequired(true),
+			obj:  model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
 			err:  nil,
 		},
 	}
