@@ -3,7 +3,6 @@ package processor
 import (
 	"boundedinfinity/codegen/model"
 
-	"github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
@@ -11,11 +10,11 @@ import (
 func (t *Processor) processTypes() error {
 	for _, project := range t.projects {
 		for _, typ := range project.Types {
-			if _, ok := t.typeIdMap[typ.QName().Get()]; ok {
+			if _, ok := t.typeIdMap[typ.GetQName().Get()]; ok {
 				return ErrCodeGenTypeSchemaIdDuplicateFn(typ)
 			}
 
-			t.typeIdMap[typ.QName().Get()] = typ
+			t.typeIdMap[typ.GetQName().Get()] = typ
 			t.combined.Types = append(t.combined.Types, typ)
 		}
 	}
@@ -40,23 +39,23 @@ func (t *Processor) processTypes() error {
 func (t *Processor) processTypePackageAndQualifiedName(typ model.CodeGenType, translations map[string]string) error {
 	var qualifedName string
 
-	if typ.Common().Package.Defined() {
-		qualifedName = typ.Common().Package.Get()
+	if typ.GetPackage().Defined() {
+		qualifedName = typ.GetPackage().Get()
 	} else {
 		if t.combined.Package.Defined() {
 			qualifedName = t.combined.Package.Get()
 		}
 
-		qualifedName = pather.Paths.Join(qualifedName, typ.QName().Get())
+		qualifedName = pather.Paths.Join(qualifedName, typ.GetQName().Get())
 	}
 
 	for from, to := range translations {
 		qualifedName = stringer.Replace(qualifedName, to, from)
 	}
 
-	packageName := pather.Paths.Dir(qualifedName)
-	typ.Common().QName_ = optioner.Some(qualifedName)
-	typ.Common().Package = optioner.Some(packageName)
+	// packageName := pather.Paths.Dir(qualifedName)
+	// typ.Common().QName_ = optioner.Some(qualifedName)
+	// typ.Common().Package = optioner.Some(packageName)
 
 	return nil
 }
@@ -97,9 +96,9 @@ func (t *Processor) checkType(typ model.CodeGenType) error {
 		found, err = t.resolveType(typ)
 		obj.Found = found
 	case *model.CodeGenArray:
-		_, err = t.resolveType(obj.Items)
+		_, err = t.resolveType(obj.Items.Get())
 	case *model.CodeGenObject:
-		for _, prop := range obj.Properties {
+		for _, prop := range obj.Properties.Get() {
 			err = t.checkType(prop)
 
 			if err != nil {

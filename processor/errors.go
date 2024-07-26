@@ -12,7 +12,7 @@ var (
 
 	ErrCodeGenTypeSchemaIdDuplicate   = errorer.New("duplicate schema-id")
 	ErrCodeGenTypeSchemaIdDuplicateFn = func(obj model.CodeGenType) error {
-		return ErrCodeGenTypeSchemaIdDuplicate.WithValue(obj.QName().Get())
+		return ErrCodeGenTypeSchemaIdDuplicate.WithValue(obj.GetQName().Get())
 	}
 
 	ErrCodeGenCantReadFile   = errorer.New("can't read file")
@@ -25,6 +25,6 @@ var (
 
 	ErrCodeGenUnsupportedType   = errorer.New("unsupported file type")
 	ErrCodeGenUnsupportedTypeFn = func(typ model.CodeGenType) error {
-		return ErrCodeGenUnsupportedType.WithValue(typ.BaseType())
+		return ErrCodeGenUnsupportedType.WithValue(typ.GetType())
 	}
 )
