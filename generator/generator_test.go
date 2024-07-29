@@ -22,7 +22,7 @@ func Test_Generate(t *testing.T) {
 			name:            "string 01",
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
-			input:           model.BuildString().Name("test-output/codegen/schema/util/string-01").Build(),
+			input:           model.BuildString().Id("test-output/codegen/schema/util/string-01").Build(),
 			expected:        map[string]string{},
 		},
 		{
@@ -30,7 +30,7 @@ func Test_Generate(t *testing.T) {
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
 			input: model.BuildString().
-				Name("test-output/codegen/schema/util/string-02").
+				Id("test-output/codegen/schema/util/string-02").
 				Max(50).Min(1).Regex(".*").Build(),
 			expected: map[string]string{},
 		},
@@ -38,7 +38,7 @@ func Test_Generate(t *testing.T) {
 			name:            "integer 01",
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
-			input:           model.BuildInteger().Name("test-output/codegen/schema/util/integer-01").Build(),
+			input:           model.BuildInteger().Id("test-output/codegen/schema/util/integer-01").Build(),
 			expected:        map[string]string{},
 		},
 		{
@@ -46,8 +46,9 @@ func Test_Generate(t *testing.T) {
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
 			input: model.BuildInteger().
-				QName("test-output/codegen/schema/util/integer-02").
-				MultipleOf(5).Build(),
+				Id("test-output/codegen/schema/util/integer-02").
+				MultipleOf(5).
+				Build(),
 			expected: map[string]string{},
 		},
 		{
@@ -55,8 +56,10 @@ func Test_Generate(t *testing.T) {
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
 			input: model.BuildInteger().
-				QName("test-output/codegen/schema/util/integer-03").
-				Ranges(model.BuildRange[int]().Max(10).Min(1).Build()).Build(),
+				Id("test-output/codegen/schema/util/integer-03").
+				Ranges(
+					model.BuildRange[int]().Max(10).Min(1).Build(),
+				).Build(),
 			expected: map[string]string{},
 		},
 		{
@@ -64,9 +67,11 @@ func Test_Generate(t *testing.T) {
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
 			input: model.BuildInteger().
-				QName("test-output/codegen/schema/util/integer-04").
+				Id("test-output/codegen/schema/util/integer-04").
 				MultipleOf(5).
-				Ranges(model.BuildRange[int]().Max(10).Min(1).Build()).
+				Ranges(
+					model.BuildRange[int]().Max(10).Min(1).Build(),
+				).
 				Build(),
 			expected: map[string]string{},
 		},
@@ -75,10 +80,12 @@ func Test_Generate(t *testing.T) {
 			lang:            "go",
 			caserConversion: "kebab-to-pascal",
 			input: model.BuildInteger().
-				QName("test-output/codegen/schema/util/integer-05").
+				Id("test-output/codegen/schema/util/integer-05").
 				MultipleOf(5).
-				Ranges(model.BuildRange[int]().Max(10).Min(1).Build()).
-				Ranges(model.BuildRange[int]().ExclusiveMax(20).ExclusiveMin(15).Build()).
+				Ranges(
+					model.BuildRange[int]().Max(10).Min(1).Build(),
+					model.BuildRange[int]().ExclusiveMax(20).ExclusiveMin(15).Build(),
+				).
 				Build(),
 			expected: map[string]string{},
 		},

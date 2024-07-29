@@ -99,13 +99,13 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 		}
 
 		var dir string
-		dir = typ.GetName().Get()
+		dir = typ.Common().Id.Get()
 		dir = pather.Paths.Dir(dir)
 
 		var filename string
 		filename = td.path
 		filename = pather.Paths.Base(filename)
-		filename = stringer.Replace(filename, typ.GetName().Get(), typ.GetType())
+		filename = stringer.Replace(filename, typ.Common().Id.Get(), typ.GetType())
 		filename = extentioner.Strip(filename)
 
 		path := pather.Paths.Join(dir, filename)

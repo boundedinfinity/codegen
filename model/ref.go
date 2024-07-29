@@ -9,9 +9,9 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenRef struct {
+	CodeGenCommon `json:",inline,omitempty"`
 	Ref           optioner.Option[string] `json:"ref,omitempty"`
-	Found         CodeGenType             `json:"-"`
-	codeGenCommon `json:",inline,omitempty"`
+	Resolved      CodeGenType             `json:"-"`
 }
 
 func (t CodeGenRef) GetType() string {
@@ -29,12 +29,12 @@ func (t CodeGenRef) HashValidation() bool {
 }
 
 func (t CodeGenRef) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
-	if t.Found != nil {
-		if err := t.Found.Validate(); err != nil {
+	if t.Resolved != nil {
+		if err := t.Resolved.Validate(); err != nil {
 			return err
 		}
 	}
@@ -62,28 +62,27 @@ func (t *CodeGenRef) MarshalJSON() ([]byte, error) {
 // Builder
 //----------------------------------------------------------------
 
-func RefFromType(typ CodeGenType) (RefBuilder, error) {
-	return &codeGenRefBuilder{}, nil
-	// if typ.QName().Empty() {
-	// 	return nil, errors.New("invalid ref target")
-	// }
-
-	// return NewRef().WithRef(typ.QName().Get()), nil
-}
-
 type codeGenRefBuilder struct {
 	obj CodeGenRef
 }
 
 var _ RefBuilder = &codeGenRefBuilder{}
 
-func BuildRef() *codeGenRefBuilder {
+func BuildRef() RefBuilder {
 	return &codeGenRefBuilder{}
 }
 
+func BuildRefWithResolved(typ CodeGenType) RefBuilder {
+	return BuildRef().Resolved(typ).Ref(typ.Common().Id.Get())
+}
+
 // Build implements RefBuilder.
-func (t *codeGenRefBuilder) Build() CodeGenRef {
-	return t.obj
+func (t *codeGenRefBuilder) Build() *CodeGenRef {
+	return &t.obj
+}
+
+func (t *codeGenRefBuilder) Resolved(typ CodeGenType) RefBuilder {
+	return setV(t, &t.obj.Resolved, typ)
 }
 
 // Ref implements RefBuilder.
@@ -106,9 +105,9 @@ func (t *codeGenRefBuilder) Package(v string) RefBuilder {
 	return setO(t, &t.obj.Package, v)
 }
 
-// QName implements RefBuilder.
-func (t *codeGenRefBuilder) QName(v string) RefBuilder {
-	panic("unimplemented")
+// Id implements RefBuilder.
+func (t *codeGenRefBuilder) Id(v string) RefBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Required implements RefBuilder.

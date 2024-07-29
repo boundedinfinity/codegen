@@ -39,7 +39,7 @@ func (t CodeGenEnumItem) Validate() error {
 //////////////////////////////////////////////////////////////////
 
 type CodeGenEnum struct {
-	codeGenCommon
+	CodeGenCommon
 	Values optioner.Option[[]CodeGenEnumItem] `json:"values,omitempty"`
 }
 
@@ -54,11 +54,11 @@ var _ CodeGenType = &CodeGenEnum{}
 //----------------------------------------------------------------
 
 func (t CodeGenEnum) HasValidation() bool {
-	return t.codeGenCommon.HasValidation()
+	return t.CodeGenCommon.HasValidation()
 }
 
 func (t CodeGenEnum) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -131,9 +131,9 @@ func (t *codeGenEnumBuilder) Package(v string) EnumBuilder {
 	return setO(t, &t.obj.Package, v)
 }
 
-// QName implements EnumBuilder.
-func (t *codeGenEnumBuilder) QName(v string) EnumBuilder {
-	return setO(t, &t.obj.Name, v)
+// Id implements EnumBuilder.
+func (t *codeGenEnumBuilder) Id(v string) EnumBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Required implements EnumBuilder.

@@ -12,7 +12,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenArray struct {
-	codeGenCommon `json:",inline,omitempty"`
+	CodeGenCommon `json:",inline,omitempty"`
 	Min           optioner.Option[int]         `json:"min,omitempty"`
 	Max           optioner.Option[int]         `json:"max,omitempty"`
 	Items         optioner.Option[CodeGenType] `json:"items,omitempty"`
@@ -33,12 +33,12 @@ var (
 )
 
 func (t CodeGenArray) HasValidation() bool {
-	return t.codeGenCommon.HasValidation() || t.Min.Defined() || t.Min.Defined() || t.Max.Defined() ||
+	return t.CodeGenCommon.HasValidation() || t.Min.Defined() || t.Min.Defined() || t.Max.Defined() ||
 		t.Max.Defined() || t.Items.Defined() && t.Items.Get().HasValidation()
 }
 
 func (t CodeGenArray) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 
 func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	dto := struct {
-		codeGenCommon
+		CodeGenCommon
 		Min          optioner.Option[int] `json:"min,omitempty"`
 		ExclusiveMin optioner.Option[int] `json:"exclusive-min,omitempty"`
 		Max          optioner.Option[int] `json:"max,omitempty"`
@@ -82,7 +82,7 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.codeGenCommon = dto.codeGenCommon
+		t.CodeGenCommon = dto.CodeGenCommon
 		t.Min = dto.Min
 		t.Max = dto.Max
 	}
@@ -145,9 +145,9 @@ func (t *codeGenArrayBuilder) Package(v string) ArrayBuilder {
 	return setO(t, &t.obj.Package, v)
 }
 
-// QName implements ArrayBuilder.
-func (t *codeGenArrayBuilder) QName(v string) ArrayBuilder {
-	return setO(t, &t.obj.Name, v)
+// Id implements ArrayBuilder.
+func (t *codeGenArrayBuilder) Id(v string) ArrayBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Required implements ArrayBuilder.

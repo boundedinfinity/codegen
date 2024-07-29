@@ -5,7 +5,7 @@ package model
 //////////////////////////////////////////////////////////////////
 
 type CodeGenBoolean struct {
-	codeGenCommon
+	CodeGenCommon
 }
 
 var _ CodeGenType = &CodeGenBoolean{}
@@ -19,7 +19,7 @@ func (t CodeGenBoolean) GetType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenBoolean) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -76,9 +76,9 @@ func (t *codeGenBooleanBuilder) Package(v string) BooleanBuilder {
 	return setO(t, &t.obj.Package, v)
 }
 
-// QName implements BooleanBuilder.
-func (t *codeGenBooleanBuilder) QName(v string) BooleanBuilder {
-	return setO(t, &t.obj.Name, v)
+// Id implements BooleanBuilder.
+func (t *codeGenBooleanBuilder) Id(v string) BooleanBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Required implements BooleanBuilder.

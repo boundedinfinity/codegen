@@ -13,7 +13,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenObject struct {
-	codeGenCommon
+	CodeGenCommon
 	Properties optioner.Option[[]CodeGenType] `json:"properties"`
 }
 
@@ -28,11 +28,11 @@ func (t CodeGenObject) GetType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenObject) HasValidation() bool {
-	return t.codeGenCommon.HasValidation()
+	return t.CodeGenCommon.HasValidation()
 }
 
 func (t CodeGenObject) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -63,14 +63,14 @@ func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 
 func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 	dto := struct {
-		codeGenCommon
+		CodeGenCommon
 		Properties []json.RawMessage `json:"properties"`
 	}{}
 
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.codeGenCommon = dto.codeGenCommon
+		t.CodeGenCommon = dto.CodeGenCommon
 	}
 
 	for i, rawProp := range dto.Properties {
@@ -125,9 +125,9 @@ func (t *codeGenObjectBuilder) Properties(v ...CodeGenType) ObjectBuilder {
 	return setO(t, &t.obj.Properties, v)
 }
 
-// QName implements ObjectBuilder.
-func (t *codeGenObjectBuilder) QName(v string) ObjectBuilder {
-	return setO(t, &t.obj.Name, v)
+// Id implements ObjectBuilder.
+func (t *codeGenObjectBuilder) Id(v string) ObjectBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Required implements ObjectBuilder.

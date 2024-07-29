@@ -94,9 +94,9 @@ func (t *codeGenIntBuilder) Positive() IntBuilder {
 	return setO(t, &t.obj.Positive, true)
 }
 
-// QName implements IntBuilder.
-func (t *codeGenIntBuilder) QName(string) IntBuilder {
-	panic("unimplemented")
+// Id implements IntBuilder.
+func (t *codeGenIntBuilder) Id(v string) IntBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Ranges implements IntBuilder.
@@ -210,9 +210,9 @@ func (t *codeGenFloatBuilder) Precision(v int) FloatBuilder {
 	return setO(t, &t.obj.Precision, v)
 }
 
-// QName implements FloatBuilder.
-func (t *codeGenFloatBuilder) QName(v string) FloatBuilder {
-	panic("unimplemented")
+// Id implements FloatBuilder.
+func (t *codeGenFloatBuilder) Id(v string) FloatBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Ranges implements FloatBuilder.
@@ -240,7 +240,7 @@ func (t *codeGenFloatBuilder) Tolerance(v float64) FloatBuilder {
 ///////////////////////////////////////////////////////////////////
 
 type number[T int | float64] struct {
-	codeGenCommon
+	CodeGenCommon
 	MultipleOf optioner.Option[T]                `json:"multiple-of,omitempty"`
 	Ranges     optioner.Option[[]NumberRange[T]] `json:"ranges,omitempty"`
 	NoneOf     optioner.Option[[]T]              `json:"one-of,omitempty"`
@@ -260,7 +260,7 @@ var (
 )
 
 func (t number[T]) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -282,7 +282,7 @@ func (t number[T]) Validate() error {
 }
 
 func (t number[T]) HasValidation() bool {
-	return t.codeGenCommon.HasValidation() || t.MultipleOf.Defined() || t.Ranges.Defined()
+	return t.CodeGenCommon.HasValidation() || t.MultipleOf.Defined() || t.Ranges.Defined()
 }
 
 ///////////////////////////////////////////////////////////////////

@@ -20,13 +20,13 @@ func Test_Marshal_Project(t *testing.T) {
 			input: model.BuildProject().
 				Name("A_PROJECT").
 				Operations(
-					model.BuildOperation().WithInputs(
+					model.BuildOperation().Inputs(
 						model.BuildRef().Ref("label").Name("A_LABEL").Build(),
 					).Build(),
 				).
 				Types(
 					model.BuildObject().
-						Name("label").
+						Id("label").
 						Description("A simple label").
 						Properties(
 							model.BuildString().

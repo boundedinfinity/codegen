@@ -12,7 +12,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenString struct {
-	codeGenCommon
+	CodeGenCommon
 	Min      optioner.Option[int]      `json:"min,omitempty"`
 	Max      optioner.Option[int]      `json:"max,omitempty"`
 	Regex    optioner.Option[string]   `json:"regex,omitempty"`
@@ -35,7 +35,7 @@ func (t CodeGenString) GetType() string {
 //----------------------------------------------------------------
 
 func (t CodeGenString) HasValidation() bool {
-	return t.codeGenCommon.HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined() ||
+	return t.CodeGenCommon.HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined() ||
 		t.Includes.Defined() || t.Excludes.Defined() || t.OneOf.Defined() || t.NoneOf.Defined()
 }
 
@@ -46,7 +46,7 @@ var (
 )
 
 func (t CodeGenString) Validate() error {
-	if err := t.codeGenCommon.Validate(); err != nil {
+	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
@@ -161,9 +161,9 @@ func (t *codeGenStringBuilder) Package(v string) StringBuilder {
 	return setO(t, &t.obj.Package, v)
 }
 
-// QName implements StringBuilder.
-func (t *codeGenStringBuilder) QName(v string) StringBuilder {
-	panic("unimplemented")
+// Id implements StringBuilder.
+func (t *codeGenStringBuilder) Id(v string) StringBuilder {
+	return setO(t, &t.obj.Id, v)
 }
 
 // Ref implements StringBuilder.

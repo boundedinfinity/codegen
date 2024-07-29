@@ -13,6 +13,7 @@ require (
 	github.com/boundedinfinity/go-jsonschema v1.0.10 // indirect
 	github.com/boundedinfinity/go-mimetyper v1.0.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

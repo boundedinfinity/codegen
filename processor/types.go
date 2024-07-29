@@ -10,11 +10,11 @@ import (
 func (t *Processor) processTypes() error {
 	for _, project := range t.projects {
 		for _, typ := range project.Types {
-			if _, ok := t.typeIdMap[typ.GetQName().Get()]; ok {
+			if _, ok := t.typeIdMap[typ.Common().Id.Get()]; ok {
 				return ErrCodeGenTypeSchemaIdDuplicateFn(typ)
 			}
 
-			t.typeIdMap[typ.GetQName().Get()] = typ
+			t.typeIdMap[typ.Common().Id.Get()] = typ
 			t.combined.Types = append(t.combined.Types, typ)
 		}
 	}
@@ -39,14 +39,14 @@ func (t *Processor) processTypes() error {
 func (t *Processor) processTypePackageAndQualifiedName(typ model.CodeGenType, translations map[string]string) error {
 	var qualifedName string
 
-	if typ.GetPackage().Defined() {
-		qualifedName = typ.GetPackage().Get()
+	if typ.Common().Package.Defined() {
+		qualifedName = typ.Common().Package.Get()
 	} else {
 		if t.combined.Package.Defined() {
 			qualifedName = t.combined.Package.Get()
 		}
 
-		qualifedName = pather.Paths.Join(qualifedName, typ.GetQName().Get())
+		qualifedName = pather.Paths.Join(qualifedName, typ.Common().Id.Get())
 	}
 
 	for from, to := range translations {
@@ -94,7 +94,7 @@ func (t *Processor) checkType(typ model.CodeGenType) error {
 	switch obj := typ.(type) {
 	case *model.CodeGenRef:
 		found, err = t.resolveType(typ)
-		obj.Found = found
+		obj.Resolved = found
 	case *model.CodeGenArray:
 		_, err = t.resolveType(obj.Items.Get())
 	case *model.CodeGenObject:

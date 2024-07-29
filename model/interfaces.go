@@ -1,19 +1,15 @@
 package model
 
-import "github.com/boundedinfinity/go-commoner/functional/optioner"
-
 type CodeGenType interface {
+	Common() *CodeGenCommon
 	GetType() string
-	GetQName() optioner.Option[string]
-	GetName() optioner.Option[string]
-	GetPackage() optioner.Option[string]
 	Validate() error
 	HasValidation() bool
 }
 
 type ArrayBuilder interface {
 	Build() *CodeGenArray
-	QName(string) ArrayBuilder
+	Id(string) ArrayBuilder
 	Name(string) ArrayBuilder
 	Package(string) ArrayBuilder
 	Description(string) ArrayBuilder
@@ -25,7 +21,7 @@ type ArrayBuilder interface {
 
 type BooleanBuilder interface {
 	Build() *CodeGenBoolean
-	QName(string) BooleanBuilder
+	Id(string) BooleanBuilder
 	Name(string) BooleanBuilder
 	Package(string) BooleanBuilder
 	Description(string) BooleanBuilder
@@ -35,7 +31,7 @@ type BooleanBuilder interface {
 type EnumBuilder interface {
 	Ref() RefBuilder
 	Build() *CodeGenEnum
-	QName(string) EnumBuilder
+	Id(string) EnumBuilder
 	Name(string) EnumBuilder
 	Package(string) EnumBuilder
 	Description(string) EnumBuilder
@@ -46,7 +42,7 @@ type EnumBuilder interface {
 type FloatBuilder interface {
 	Ref() RefBuilder
 	Build() *CodeGenFloat
-	QName(string) FloatBuilder
+	Id(string) FloatBuilder
 	Name(string) FloatBuilder
 	Package(string) FloatBuilder
 	Description(string) FloatBuilder
@@ -64,7 +60,7 @@ type FloatBuilder interface {
 type IntBuilder interface {
 	Ref() RefBuilder
 	Build() *CodeGenInteger
-	QName(string) IntBuilder
+	Id(string) IntBuilder
 	Name(string) IntBuilder
 	Package(string) IntBuilder
 	Description(string) IntBuilder
@@ -79,7 +75,7 @@ type IntBuilder interface {
 
 type ObjectBuilder interface {
 	Build() *CodeGenObject
-	QName(string) ObjectBuilder
+	Id(string) ObjectBuilder
 	Name(string) ObjectBuilder
 	Package(string) ObjectBuilder
 	Description(string) ObjectBuilder
@@ -88,8 +84,8 @@ type ObjectBuilder interface {
 }
 
 type RefBuilder interface {
-	Build() CodeGenRef
-	QName(string) RefBuilder
+	Build() *CodeGenRef
+	Resolved(CodeGenType) RefBuilder
 	Ref(string) RefBuilder
 	Name(string) RefBuilder
 	Package(string) RefBuilder
@@ -98,9 +94,9 @@ type RefBuilder interface {
 }
 
 type StringBuilder interface {
-	Ref() RefBuilder
 	Build() *CodeGenString
-	QName(string) StringBuilder
+	Ref() RefBuilder
+	Id(string) StringBuilder
 	Name(string) StringBuilder
 	Package(string) StringBuilder
 	Description(string) StringBuilder
@@ -113,4 +109,13 @@ type StringBuilder interface {
 	Excludes(...string) StringBuilder
 	OneOf(...string) StringBuilder
 	NoneOf(...string) StringBuilder
+}
+
+type CodeGenOperationBuilder interface {
+	Build() *CodeGenOperation
+	Id(string) CodeGenOperationBuilder
+	Name(string) CodeGenOperationBuilder
+	Description(string) CodeGenOperationBuilder
+	Inputs(...CodeGenType) CodeGenOperationBuilder
+	Outputs(...CodeGenType) CodeGenOperationBuilder
 }

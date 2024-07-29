@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	ErrGeneratorQNameEmpty          = errorer.New("q-name empty")
+	ErrGeneratorIDEmpty             = errorer.New("id empty")
 	ErrGeneratorLangNotSupported    = errorer.New("language not supported")
 	ErrGeneratorPackageEmpty        = errorer.New("package empty")
 	ErrGeneratorLangTypeUnsupported = errorer.New("unsupported lang")
@@ -50,11 +50,11 @@ func (t *Generator) typeName(typ model.CodeGenType) (string, error) {
 	var result string
 	var err error
 
-	if typ.GetQName().Empty() {
-		return result, ErrGeneratorQNameEmpty
+	if typ.Common().Id.Empty() {
+		return result, ErrGeneratorIDEmpty
 	}
 
-	result = typ.GetQName().Get()
+	result = typ.Common().Id.Get()
 	result = pather.Paths.Base(result)
 	result, err = langer.Go.WithCaserConversion(t.caserConversion).Identifier(result)
 
@@ -65,11 +65,11 @@ func (t *Generator) typePackage(typ model.CodeGenType) (string, error) {
 	var result string
 	var err error
 
-	if typ.GetQName().Empty() {
+	if typ.Common().Id.Empty() {
 		return result, ErrGeneratorPackageEmpty
 	}
 
-	result = typ.GetQName().Get()
+	result = typ.Common().Id.Get()
 	result = pather.Paths.Dir(result)
 	result = pather.Paths.Base(result)
 

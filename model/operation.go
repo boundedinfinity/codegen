@@ -14,6 +14,7 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type CodeGenOperation struct {
+	Id          optioner.Option[string] `json:"id,omitempty"`
 	Name        optioner.Option[string] `json:"name,omitempty"`
 	Description optioner.Option[string] `json:"description,omitempty"`
 	Inputs      []CodeGenType           `json:"inputs,omitempty"`
@@ -116,7 +117,7 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 // Builders
 //----------------------------------------------------------------
 
-func BuildOperation() *codeGenOperationBuilder {
+func BuildOperation() CodeGenOperationBuilder {
 	return &codeGenOperationBuilder{}
 }
 
@@ -128,20 +129,24 @@ func (t *codeGenOperationBuilder) Build() *CodeGenOperation {
 	return &t.obj
 }
 
-func (t *codeGenOperationBuilder) Name(v string) *codeGenOperationBuilder {
+func (t *codeGenOperationBuilder) Id(v string) CodeGenOperationBuilder {
+	return setO(t, &t.obj.Id, v)
+}
+
+func (t *codeGenOperationBuilder) Name(v string) CodeGenOperationBuilder {
 	return setO(t, &t.obj.Name, v)
 }
 
-func (t *codeGenOperationBuilder) Description(v string) *codeGenOperationBuilder {
+func (t *codeGenOperationBuilder) Description(v string) CodeGenOperationBuilder {
 	return setO(t, &t.obj.Description, v)
 }
 
-func (t *codeGenOperationBuilder) WithInputs(v ...CodeGenType) *codeGenOperationBuilder {
+func (t *codeGenOperationBuilder) Inputs(v ...CodeGenType) CodeGenOperationBuilder {
 	t.obj.Inputs = append(t.obj.Inputs, v...)
 	return t
 }
 
-func (t *codeGenOperationBuilder) WithOutputs(v ...CodeGenType) *codeGenOperationBuilder {
+func (t *codeGenOperationBuilder) Outputs(v ...CodeGenType) CodeGenOperationBuilder {
 	t.obj.Outputs = append(t.obj.Outputs, v...)
 	return t
 }
