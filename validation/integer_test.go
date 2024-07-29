@@ -7,28 +7,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_String(t *testing.T) {
-	type CustomString string
+func Test_Integer(t *testing.T) {
+	type CustomInteger int
 
 	tcs := []struct {
 		name    string
-		input   CustomString
-		fn      func(CustomString) error
+		input   CustomInteger
+		fn      func(CustomInteger) error
 		err     error
 		message string
 	}{
 		{
 			name:  "case 1",
-			input: "something",
-			fn:    validation.StringMin[CustomString]("case 1", 4),
+			input: 5,
+			fn:    validation.IntegerMin[CustomInteger]("case 1", 4),
 			err:   nil,
 		},
 		{
 			name:    "case 2",
-			input:   "so",
-			fn:      validation.StringMin[CustomString]("case 2", 4),
-			err:     validation.ErrStringLessThanMin,
-			message: "case 2 value so less than min value of 4",
+			input:   3,
+			fn:      validation.IntegerMin[CustomInteger]("case 2", 4),
+			err:     validation.ErrIntegerLessThanMin,
+			message: "case 2 value 3 is less than min value of 4",
 		},
 	}
 

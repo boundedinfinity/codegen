@@ -10,6 +10,7 @@ import (
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/langer"
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
 var (
@@ -27,6 +28,7 @@ func (t *Generator) getHelpers(lang string) template.FuncMap {
 			"typePackage": t.typePackage,
 			"langType":    t.langType,
 			"sjoin":       strings.Join,
+			"lowerFirst":  stringer.LowercaseFirst[string],
 		},
 	}
 

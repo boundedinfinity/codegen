@@ -39,7 +39,7 @@ func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 // Builder
 //----------------------------------------------------------------
 
-func BuildInteger() IntBuilder {
+func BuildInteger() IntegerBuilder {
 	return &codeGenIntBuilder{}
 }
 
@@ -47,7 +47,7 @@ type codeGenIntBuilder struct {
 	obj CodeGenInteger
 }
 
-var _ IntBuilder = &codeGenIntBuilder{}
+var _ IntegerBuilder = &codeGenIntBuilder{}
 
 // Build implements IntBuilder.
 func (t *codeGenIntBuilder) Build() *CodeGenInteger {
@@ -55,52 +55,62 @@ func (t *codeGenIntBuilder) Build() *CodeGenInteger {
 }
 
 // Description implements IntBuilder.
-func (t *codeGenIntBuilder) Description(v string) IntBuilder {
+func (t *codeGenIntBuilder) Description(v string) IntegerBuilder {
 	return setO(t, &t.obj.Description, v)
 }
 
 // MultipleOf implements IntBuilder.
-func (t *codeGenIntBuilder) MultipleOf(v int) IntBuilder {
+func (t *codeGenIntBuilder) MultipleOf(v int) IntegerBuilder {
 	return setO(t, &t.obj.MultipleOf, v)
 }
 
+// Min implements IntBuilder.
+func (t *codeGenIntBuilder) Min(v int) IntegerBuilder {
+	return setO(t, &t.obj.Min, v)
+}
+
+// Max implements IntBuilder.
+func (t *codeGenIntBuilder) Max(v int) IntegerBuilder {
+	return setO(t, &t.obj.Max, v)
+}
+
 // Name implements IntBuilder.
-func (t *codeGenIntBuilder) Name(v string) IntBuilder {
+func (t *codeGenIntBuilder) Name(v string) IntegerBuilder {
 	return setO(t, &t.obj.Name, v)
 }
 
 // Negative implements IntBuilder.
-func (t *codeGenIntBuilder) Negative() IntBuilder {
+func (t *codeGenIntBuilder) Negative() IntegerBuilder {
 	return setO(t, &t.obj.Negative, true)
 }
 
 // NoneOf implements IntBuilder.
-func (t *codeGenIntBuilder) NoneOf(v ...int) IntBuilder {
+func (t *codeGenIntBuilder) NoneOf(v ...int) IntegerBuilder {
 	return setO(t, &t.obj.NoneOf, v)
 }
 
 // OneOf implements IntBuilder.
-func (t *codeGenIntBuilder) OneOf(v ...int) IntBuilder {
+func (t *codeGenIntBuilder) OneOf(v ...int) IntegerBuilder {
 	return setO(t, &t.obj.OneOf, v)
 }
 
 // Package implements IntBuilder.
-func (t *codeGenIntBuilder) Package(v string) IntBuilder {
+func (t *codeGenIntBuilder) Package(v string) IntegerBuilder {
 	return setO(t, &t.obj.Package, v)
 }
 
 // Positive implements IntBuilder.
-func (t *codeGenIntBuilder) Positive() IntBuilder {
+func (t *codeGenIntBuilder) Positive() IntegerBuilder {
 	return setO(t, &t.obj.Positive, true)
 }
 
 // Id implements IntBuilder.
-func (t *codeGenIntBuilder) Id(v string) IntBuilder {
+func (t *codeGenIntBuilder) Id(v string) IntegerBuilder {
 	return setO(t, &t.obj.Id, v)
 }
 
 // Ranges implements IntBuilder.
-func (t *codeGenIntBuilder) Ranges(v ...NumberRange[int]) IntBuilder {
+func (t *codeGenIntBuilder) Ranges(v ...NumberRange[int]) IntegerBuilder {
 	return setO(t, &t.obj.Ranges, v)
 }
 
@@ -110,7 +120,7 @@ func (t *codeGenIntBuilder) Ref() RefBuilder {
 }
 
 // Required implements IntBuilder.
-func (t *codeGenIntBuilder) Required(v bool) IntBuilder {
+func (t *codeGenIntBuilder) Required(v bool) IntegerBuilder {
 	return setO(t, &t.obj.Required, v)
 }
 
@@ -168,6 +178,16 @@ func (t *codeGenFloatBuilder) Build() *CodeGenFloat {
 // Description implements FloatBuilder.
 func (t *codeGenFloatBuilder) Description(v string) FloatBuilder {
 	return setO(t, &t.obj.Description, v)
+}
+
+// Min implements IntBuilder.
+func (t *codeGenFloatBuilder) Min(v float64) FloatBuilder {
+	return setO(t, &t.obj.Min, v)
+}
+
+// Max implements IntBuilder.
+func (t *codeGenFloatBuilder) Max(v float64) FloatBuilder {
+	return setO(t, &t.obj.Max, v)
 }
 
 // MultipleOf implements FloatBuilder.
@@ -239,8 +259,10 @@ func (t *codeGenFloatBuilder) Tolerance(v float64) FloatBuilder {
 // number
 ///////////////////////////////////////////////////////////////////
 
-type number[T int | float64] struct {
+type number[T ~int | ~float64] struct {
 	CodeGenCommon
+	Min        optioner.Option[T]                `json:"min,omitempty"`
+	Max        optioner.Option[T]                `json:"max,omitempty"`
 	MultipleOf optioner.Option[T]                `json:"multiple-of,omitempty"`
 	Ranges     optioner.Option[[]NumberRange[T]] `json:"ranges,omitempty"`
 	NoneOf     optioner.Option[[]T]              `json:"one-of,omitempty"`
@@ -289,22 +311,22 @@ func (t number[T]) HasValidation() bool {
 // NumberRange
 ///////////////////////////////////////////////////////////////////
 
-func NewRange[T int | float64]() *NumberRange[T] {
+func NewRange[T ~int | ~float64]() *NumberRange[T] {
 	return &NumberRange[T]{}
 }
 
-type NumberRange[T int | float64] struct {
+type NumberRange[T ~int | ~float64] struct {
 	Min          optioner.Option[T] `json:"min,omitempty"`
 	ExclusiveMin optioner.Option[T] `json:"exclusive-min,omitempty"`
 	Max          optioner.Option[T] `json:"max,omitempty"`
 	ExclusiveMax optioner.Option[T] `json:"exclusive-max,omitempty"`
 }
 
-type NumberRangeBuilder[T int | float64] struct {
+type NumberRangeBuilder[T ~int | ~float64] struct {
 	obj NumberRange[T]
 }
 
-func BuildRange[T int | float64]() *NumberRangeBuilder[T] {
+func BuildRange[T ~int | ~float64]() *NumberRangeBuilder[T] {
 	return &NumberRangeBuilder[T]{}
 }
 

@@ -47,6 +47,8 @@ type FloatBuilder interface {
 	Package(string) FloatBuilder
 	Description(string) FloatBuilder
 	Required(bool) FloatBuilder
+	Min(float64) FloatBuilder
+	Max(float64) FloatBuilder
 	Ranges(...NumberRange[float64]) FloatBuilder
 	MultipleOf(float64) FloatBuilder
 	Negative() FloatBuilder
@@ -57,20 +59,22 @@ type FloatBuilder interface {
 	Precision(int) FloatBuilder
 }
 
-type IntBuilder interface {
+type IntegerBuilder interface {
 	Ref() RefBuilder
 	Build() *CodeGenInteger
-	Id(string) IntBuilder
-	Name(string) IntBuilder
-	Package(string) IntBuilder
-	Description(string) IntBuilder
-	Required(bool) IntBuilder
-	Ranges(...NumberRange[int]) IntBuilder
-	MultipleOf(int) IntBuilder
-	Negative() IntBuilder
-	Positive() IntBuilder
-	OneOf(...int) IntBuilder
-	NoneOf(...int) IntBuilder
+	Id(string) IntegerBuilder
+	Name(string) IntegerBuilder
+	Package(string) IntegerBuilder
+	Description(string) IntegerBuilder
+	Required(bool) IntegerBuilder
+	Ranges(...NumberRange[int]) IntegerBuilder
+	Min(int) IntegerBuilder
+	Max(int) IntegerBuilder
+	MultipleOf(int) IntegerBuilder
+	Negative() IntegerBuilder
+	Positive() IntegerBuilder
+	OneOf(...int) IntegerBuilder
+	NoneOf(...int) IntegerBuilder
 }
 
 type ObjectBuilder interface {
