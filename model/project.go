@@ -146,11 +146,11 @@ func (t *codeGenProjectBuilder) Build() *CodeGenProject {
 }
 
 func (t *codeGenProjectBuilder) Name(v string) *codeGenProjectBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 func (t *codeGenProjectBuilder) Description(v string) *codeGenProjectBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 func (t *codeGenProjectBuilder) Operations(v ...*CodeGenOperation) *codeGenProjectBuilder {

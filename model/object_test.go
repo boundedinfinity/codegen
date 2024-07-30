@@ -20,7 +20,7 @@ func Test_Marshal_Object(t *testing.T) {
 			input: model.BuildObject().Build(),
 			err:   nil,
 			expected: `{
-		        "base-type": "object",
+		        "type": "object",
                 "properties": []
 		    }`,
 		},
@@ -32,7 +32,7 @@ func Test_Marshal_Object(t *testing.T) {
 				Build(),
 			err: nil,
 			expected: `{
-		        "base-type": "object",
+		        "type": "object",
                 "name": "AN_OBJECT",
                 "description": "an object description",
                 "properties": []
@@ -48,12 +48,12 @@ func Test_Marshal_Object(t *testing.T) {
 					model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
 				).Build(),
 			expected: `{
-		        "base-type": "object",
+		        "type": "object",
                 "name": "AN_OBJECT",
                 "description": "an object description",
                 "properties": [
                     {
-                        "base-type": "boolean",
+                        "type": "boolean",
                         "name": "A_BOOLEAN",
                         "description": "a bool description"
                     }

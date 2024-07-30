@@ -32,7 +32,7 @@ func (t CodeGenBoolean) Validate() error {
 
 func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId         string `json:"base-type"`
+		TypeId         string `json:"type"`
 		CodeGenBoolean `json:",inline"`
 	}{
 		TypeId:         t.GetType(),
@@ -63,25 +63,25 @@ func (t *codeGenBooleanBuilder) Build() *CodeGenBoolean {
 
 // Description implements BooleanBuilder.
 func (t *codeGenBooleanBuilder) Description(v string) BooleanBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Name implements BooleanBuilder.
 func (t *codeGenBooleanBuilder) Name(v string) BooleanBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Package implements BooleanBuilder.
 func (t *codeGenBooleanBuilder) Package(v string) BooleanBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Id implements BooleanBuilder.
 func (t *codeGenBooleanBuilder) Id(v string) BooleanBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Required implements BooleanBuilder.
 func (t *codeGenBooleanBuilder) Required(v bool) BooleanBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }

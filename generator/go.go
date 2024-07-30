@@ -18,10 +18,10 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
-func New(lang string, caserConversion string) (*Generator, error) {
+func New(lang string) (*Generator, error) {
 	gen := &Generator{
 		lang:                lang,
-		caserConversion:     caserConversion,
+		caserConversion:     "kebab-to-pascal",
 		templ:               template.New(""),
 		templateDescriptors: []templateDescriptor{},
 		formatSource:        true,
@@ -36,6 +36,10 @@ type Generator struct {
 	caserConversion     string
 	formatSource        bool
 	templateDescriptors []templateDescriptor
+}
+
+func (t *Generator) CasserConvertion(v string) *Generator {
+	return model.SetV(t, &t.caserConversion, v)
 }
 
 func (t *Generator) GenerateProject(project *model.CodeGenProject) (map[string]string, error) {

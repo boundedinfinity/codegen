@@ -15,15 +15,15 @@ import (
 
 func New() *Processor {
 	return &Processor{
-		projects:  []*model.CodeGenProject{},
-		typeIdMap: map[string]model.CodeGenType{},
+		projects: []*model.CodeGenProject{},
+		TypeMap:  map[string]model.CodeGenType{},
 	}
 }
 
 type Processor struct {
-	combined  model.CodeGenProject
-	projects  []*model.CodeGenProject
-	typeIdMap map[string]model.CodeGenType
+	Combined model.CodeGenProject
+	TypeMap  map[string]model.CodeGenType
+	projects []*model.CodeGenProject
 }
 
 func (t *Processor) ProcessFiles(paths ...string) error {
@@ -95,14 +95,14 @@ func (t *Processor) ProcessProjects(projects ...model.CodeGenProject) error {
 }
 
 func (t *Processor) validate() error {
-	if t.combined.OutputRoot.Empty() {
-		t.combined.OutputRoot = optioner.Some(".")
+	if t.Combined.OutputRoot.Empty() {
+		t.Combined.OutputRoot = optioner.Some(".")
 	}
 
 	if abs, err := pather.Paths.AbsErr("."); err != nil {
 		return err
 	} else {
-		t.combined.OutputRoot = optioner.Some(abs)
+		t.Combined.OutputRoot = optioner.Some(abs)
 	}
 
 	return nil

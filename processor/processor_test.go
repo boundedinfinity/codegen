@@ -23,9 +23,15 @@ func Test_Process_Files(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
-			err := processor.New().ProcessFiles(tc.inputs...)
+			proc := processor.New()
 
+			err := proc.ProcessFiles(tc.inputs...)
 			assert.ErrorIs(tt, err, tc.err)
+
+			fullName, fullNameOk := proc.TypeMap["codegen/schema/person/full-name"]
+			assert.True(t, fullNameOk)
+			assert.Equal(t, "codegen/schema/person/full-name", fullName.Common().Id.Get())
+			assert.Equal(t, "FullName", fullName.Common().Name.Get())
 		})
 	}
 }

@@ -69,7 +69,7 @@ func (t *CodeGenOperation) Merge(obj CodeGenOperation) error {
 
 func (t *CodeGenOperation) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId           string `json:"base-type"`
+		TypeId           string `json:"type"`
 		CodeGenOperation `json:",inline"`
 	}{
 		TypeId:           t.TypeId(),
@@ -130,15 +130,15 @@ func (t *codeGenOperationBuilder) Build() *CodeGenOperation {
 }
 
 func (t *codeGenOperationBuilder) Id(v string) CodeGenOperationBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 func (t *codeGenOperationBuilder) Name(v string) CodeGenOperationBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 func (t *codeGenOperationBuilder) Description(v string) CodeGenOperationBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 func (t *codeGenOperationBuilder) Inputs(v ...CodeGenType) CodeGenOperationBuilder {

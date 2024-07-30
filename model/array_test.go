@@ -20,7 +20,7 @@ func Test_Marshal_Array(t *testing.T) {
 			input: model.BuildArray().Build(),
 			err:   nil,
 			expected: `{
-		        "base-type": "array"
+		        "type": "array"
 		    }`,
 		},
 		{
@@ -31,7 +31,7 @@ func Test_Marshal_Array(t *testing.T) {
 				Build(),
 			err: nil,
 			expected: `{
-		        "base-type": "array",
+		        "type": "array",
                 "name": "AN_ARRAY",
                 "description": "an array description"
 		    }`,
@@ -48,11 +48,11 @@ func Test_Marshal_Array(t *testing.T) {
 					Build()).
 				Build(),
 			expected: `{
-		        "base-type": "array",
+		        "type": "array",
                 "name": "AN_ARRAY",
                 "description": "an array description",
                 "items": {
-                    "base-type": "boolean",
+                    "type": "boolean",
                     "name": "A_BOOLEAN",
                     "description": "a bool description"
                 }

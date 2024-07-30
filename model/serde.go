@@ -10,8 +10,8 @@ import (
 
 var (
 	ErrInvalidMarshalCodeGenObject   = errorer.New("invalid code gen object")
-	ErrCodeGenTypeTypeIdMissing      = errorer.New("base-type missing")
-	ErrCodeGenTypeTypeIdNotSupported = errorer.New("base-type not supported")
+	ErrCodeGenTypeTypeIdMissing      = errorer.New("type missing")
+	ErrCodeGenTypeTypeIdNotSupported = errorer.New("type not supported")
 	ErrCodeGenTypeUnmarshal          = errorer.New("unmarshal error")
 
 	errCodeGenTypeUnmarshalFn = func(err error) error {
@@ -42,7 +42,7 @@ func marshalCodeGenType(v any) ([]byte, error) {
 }
 
 type descriminator struct {
-	CodeGenId string `json:"base-type"`
+	Type string `json:"type"`
 }
 
 func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
@@ -53,13 +53,13 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		return nil, err
 	}
 
-	if descrim.CodeGenId == "" {
+	if descrim.Type == "" {
 		return nil, ErrCodeGenTypeTypeIdMissing
 	}
 
 	var err error
 
-	switch descrim.CodeGenId {
+	switch descrim.Type {
 	case CodeGenString{}.GetType():
 		var obj CodeGenString
 
@@ -117,7 +117,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 			v = &obj
 		}
 	default:
-		err = fmt.Errorf("%v : %w", descrim.CodeGenId, ErrCodeGenTypeTypeIdNotSupported)
+		err = fmt.Errorf("%v : %w", descrim.Type, ErrCodeGenTypeTypeIdNotSupported)
 	}
 
 	return v, err

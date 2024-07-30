@@ -51,7 +51,7 @@ func (t CodeGenObject) Validate() error {
 
 func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId        string `json:"base-type"`
+		TypeId        string `json:"type"`
 		CodeGenObject `json:",inline"`
 	}{
 		TypeId:        t.GetType(),
@@ -107,30 +107,30 @@ func (t *codeGenObjectBuilder) Build() *CodeGenObject {
 
 // Description implements ObjectBuilder.
 func (t *codeGenObjectBuilder) Description(v string) ObjectBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Name implements ObjectBuilder.
 func (t *codeGenObjectBuilder) Name(v string) ObjectBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Package implements ObjectBuilder.
 func (t *codeGenObjectBuilder) Package(v string) ObjectBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Property implements ObjectBuilder.
 func (t *codeGenObjectBuilder) Properties(v ...CodeGenType) ObjectBuilder {
-	return setO(t, &t.obj.Properties, v)
+	return SetO(t, &t.obj.Properties, v)
 }
 
 // Id implements ObjectBuilder.
 func (t *codeGenObjectBuilder) Id(v string) ObjectBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Required implements ObjectBuilder.
 func (t *codeGenObjectBuilder) Required(v bool) ObjectBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }

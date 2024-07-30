@@ -20,7 +20,7 @@ func Test_Marshal_Integer(t *testing.T) {
 			input: model.BuildInteger().Build(),
 			err:   nil,
 			expected: `{
-		        "base-type": "integer"
+		        "type": "integer"
 		    }`,
 		},
 		{
@@ -31,7 +31,7 @@ func Test_Marshal_Integer(t *testing.T) {
 				Build(),
 			err: nil,
 			expected: `{
-		        "base-type": "integer",
+		        "type": "integer",
 		        "name": "AN_INTEGER",
 		        "description": "an integer description"
 		    }`,
@@ -45,7 +45,7 @@ func Test_Marshal_Integer(t *testing.T) {
 				Build(),
 			err: nil,
 			expected: `{
-		        "base-type": "integer",
+		        "type": "integer",
 		        "name": "AN_INTEGER",
 		        "description": "an integer description",
                 "multiple-of": 5
@@ -62,7 +62,7 @@ func Test_Marshal_Integer(t *testing.T) {
 				).Build(),
 			err: nil,
 			expected: `{
-                "base-type": "integer",
+                "type": "integer",
                 "description": "an integer description",
                 "multiple-of": 5,
                 "name": "AN_INTEGER",

@@ -77,7 +77,7 @@ func (t CodeGenEnum) Validate() error {
 
 func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId      string `json:"base-type"`
+		TypeId      string `json:"type"`
 		CodeGenEnum `json:",inline"`
 	}{
 		TypeId:      t.GetType(),
@@ -113,30 +113,30 @@ func (t *codeGenEnumBuilder) Build() *CodeGenEnum {
 
 // Description implements EnumBuilder.
 func (t *codeGenEnumBuilder) Description(v string) EnumBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Items implements EnumBuilder.
 func (t *codeGenEnumBuilder) Values(v ...CodeGenEnumItem) EnumBuilder {
-	return setO(t, &t.obj.Values, v)
+	return SetO(t, &t.obj.Values, v)
 }
 
 // Name implements EnumBuilder.
 func (t *codeGenEnumBuilder) Name(v string) EnumBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Package implements EnumBuilder.
 func (t *codeGenEnumBuilder) Package(v string) EnumBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Id implements EnumBuilder.
 func (t *codeGenEnumBuilder) Id(v string) EnumBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Required implements EnumBuilder.
 func (t *codeGenEnumBuilder) Required(v bool) EnumBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }

@@ -23,7 +23,7 @@ func (t *Processor) processProjectPackage(projects ...*model.CodeGenProject) err
 	case 0:
 		return ErrCodeGenPackageEmpty
 	case 1:
-		t.combined.Package = filtered[0].Package
+		t.Combined.Package = filtered[0].Package
 	default:
 		pkgs := slicer.Map(
 			func(_ int, p *model.CodeGenProject) string { return p.Package.Get() },
@@ -47,9 +47,9 @@ func (t *Processor) processProjectOutputRoot(projects ...*model.CodeGenProject) 
 
 	switch len(filtered) {
 	case 0:
-		t.combined.OutputRoot = optioner.Some(".")
+		t.Combined.OutputRoot = optioner.Some(".")
 	case 1:
-		t.combined.OutputRoot = filtered[0].OutputRoot
+		t.Combined.OutputRoot = filtered[0].OutputRoot
 	default:
 		pkgs := slicer.Map(
 			func(_ int, p *model.CodeGenProject) string { return p.Package.Get() },

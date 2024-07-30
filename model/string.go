@@ -113,57 +113,57 @@ func (t *codeGenStringBuilder) Build() *CodeGenString {
 
 // Abnf implements StringBuilder.
 func (t *codeGenStringBuilder) Abnf(v string) StringBuilder {
-	return setO(t, &t.obj.Abnf, v)
+	return SetO(t, &t.obj.Abnf, v)
 }
 
 // Description implements StringBuilder.
 func (t *codeGenStringBuilder) Description(v string) StringBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Excludes implements StringBuilder.
 func (t *codeGenStringBuilder) Excludes(v ...string) StringBuilder {
-	return setO(t, &t.obj.Excludes, v)
+	return SetO(t, &t.obj.Excludes, v)
 }
 
 // Includes implements StringBuilder.
 func (t *codeGenStringBuilder) Includes(v ...string) StringBuilder {
-	return setO(t, &t.obj.Includes, v)
+	return SetO(t, &t.obj.Includes, v)
 }
 
 // Max implements StringBuilder.
 func (t *codeGenStringBuilder) Max(v int) StringBuilder {
-	return setO(t, &t.obj.Max, v)
+	return SetO(t, &t.obj.Max, v)
 }
 
 // Min implements StringBuilder.
 func (t *codeGenStringBuilder) Min(v int) StringBuilder {
-	return setO(t, &t.obj.Min, v)
+	return SetO(t, &t.obj.Min, v)
 }
 
 // Name implements StringBuilder.
 func (t *codeGenStringBuilder) Name(v string) StringBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // NoneOf implements StringBuilder.
 func (t *codeGenStringBuilder) NoneOf(v ...string) StringBuilder {
-	return setO(t, &t.obj.NoneOf, v)
+	return SetO(t, &t.obj.NoneOf, v)
 }
 
 // OneOf implements StringBuilder.
 func (t *codeGenStringBuilder) OneOf(v ...string) StringBuilder {
-	return setO(t, &t.obj.OneOf, v)
+	return SetO(t, &t.obj.OneOf, v)
 }
 
 // Package implements StringBuilder.
 func (t *codeGenStringBuilder) Package(v string) StringBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Id implements StringBuilder.
 func (t *codeGenStringBuilder) Id(v string) StringBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Ref implements StringBuilder.
@@ -173,10 +173,10 @@ func (t *codeGenStringBuilder) Ref() RefBuilder {
 
 // Regex implements StringBuilder.
 func (t *codeGenStringBuilder) Regex(v string) StringBuilder {
-	return setO(t, &t.obj.Regex, v)
+	return SetO(t, &t.obj.Regex, v)
 }
 
 // Required implements StringBuilder.
 func (t *codeGenStringBuilder) Required(v bool) StringBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }

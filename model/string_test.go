@@ -20,7 +20,7 @@ func Test_Marshal_String(t *testing.T) {
 			input: model.BuildString().Build(),
 			err:   nil,
 			expected: `{
-		        "base-type": "string"
+		        "type": "string"
 		    }`,
 		},
 		{
@@ -31,7 +31,7 @@ func Test_Marshal_String(t *testing.T) {
 				Build(),
 			err: nil,
 			expected: `{
-		        "base-type": "string",
+		        "type": "string",
                 "name": "A_STRING",
                 "description": "an object description"
 		    }`,

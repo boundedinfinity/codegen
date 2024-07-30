@@ -82,35 +82,35 @@ func (t *codeGenRefBuilder) Build() *CodeGenRef {
 }
 
 func (t *codeGenRefBuilder) Resolved(typ CodeGenType) RefBuilder {
-	return setV(t, &t.obj.Resolved, typ)
+	return SetV(t, &t.obj.Resolved, typ)
 }
 
 // Ref implements RefBuilder.
 func (t *codeGenRefBuilder) Ref(v string) RefBuilder {
-	return setO(t, &t.obj.Ref, v)
+	return SetO(t, &t.obj.Ref, v)
 }
 
 // Description implements RefBuilder.
 func (t *codeGenRefBuilder) Description(v string) RefBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Name implements RefBuilder.
 func (t *codeGenRefBuilder) Name(v string) RefBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Package implements RefBuilder.
 func (t *codeGenRefBuilder) Package(v string) RefBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Id implements RefBuilder.
 func (t *codeGenRefBuilder) Id(v string) RefBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Required implements RefBuilder.
 func (t *codeGenRefBuilder) Required(v bool) RefBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }

@@ -10,18 +10,16 @@ import (
 
 func Test_Generate(t *testing.T) {
 	tcs := []struct {
-		name            string
-		lang            string
-		input           model.CodeGenType
-		caserConversion string
-		expected        map[string]string
-		err             error
-		newErr          error
+		name     string
+		lang     string
+		input    model.CodeGenType
+		expected map[string]string
+		err      error
+		newErr   error
 	}{
 		{
-			name:            "string 01",
-			lang:            "go",
-			caserConversion: "kebab-to-pascal",
+			name: "string 01",
+			lang: "go",
 			input: model.BuildString().
 				Id("test-output/codegen/schema/util/string-01").
 				Max(50).
@@ -31,9 +29,8 @@ func Test_Generate(t *testing.T) {
 			expected: map[string]string{},
 		},
 		{
-			name:            "integer 01",
-			lang:            "go",
-			caserConversion: "kebab-to-pascal",
+			name: "integer 01",
+			lang: "go",
 			input: model.BuildInteger().
 				Id("test-output/codegen/schema/util/integer-01").
 				Min(2).
@@ -47,7 +44,7 @@ func Test_Generate(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
-			gen, err := generator.New(tc.lang, tc.caserConversion)
+			gen, err := generator.New(tc.lang)
 			assert.ErrorIs(tt, err, tc.newErr)
 
 			// actual, err := gen.GenerateType(tc.input)

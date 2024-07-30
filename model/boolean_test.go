@@ -20,7 +20,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 			input: model.BuildBoolean().Build(),
 			err:   nil,
 			expected: ` {
-                "base-type": "boolean"
+                "type": "boolean"
             }`,
 		},
 		{
@@ -28,7 +28,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 			input: model.BuildBoolean().Name("A_BOOLEAN").Build(),
 			err:   nil,
 			expected: `{
-		        "base-type": "boolean",
+		        "type": "boolean",
 		        "name": "A_BOOLEAN"
 		    }`,
 		},
@@ -37,7 +37,7 @@ func Test_Marshal_Boolean(t *testing.T) {
 			input: model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
 			err:   nil,
 			expected: `{
-		        "base-type": "boolean",
+		        "type": "boolean",
 		        "name": "A_BOOLEAN",
 		        "required": true
 		    }`,

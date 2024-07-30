@@ -59,7 +59,7 @@ func (t CodeGenArray) Validate() error {
 
 func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId       string `json:"base-type"`
+		TypeId       string `json:"type"`
 		CodeGenArray `json:",inline"`
 	}{
 		TypeId:       t.GetType(),
@@ -117,40 +117,40 @@ func (t *codeGenArrayBuilder) Build() *CodeGenArray {
 
 // Description implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Description(v string) ArrayBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Items implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Items(v CodeGenType) ArrayBuilder {
-	return setO(t, &t.obj.Items, v)
+	return SetO(t, &t.obj.Items, v)
 }
 
 // Max implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Max(v int) ArrayBuilder {
-	return setO(t, &t.obj.Max, v)
+	return SetO(t, &t.obj.Max, v)
 }
 
 // Min implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Min(v int) ArrayBuilder {
-	return setO(t, &t.obj.Min, v)
+	return SetO(t, &t.obj.Min, v)
 }
 
 // Name implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Name(v string) ArrayBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Package implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Package(v string) ArrayBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Id implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Id(v string) ArrayBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Required implements ArrayBuilder.
 func (t *codeGenArrayBuilder) Required(v bool) ArrayBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }

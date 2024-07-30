@@ -22,3 +22,13 @@ func mergeDescription(d1, d2 optioner.Option[string]) optioner.Option[string] {
 
 	return optioner.None[string]()
 }
+
+func SetV[T any, V any](t T, c *V, n V) T {
+	*c = n
+	return t
+}
+
+func SetO[T any, V any](t T, c *optioner.Option[V], n V) T {
+	*c = optioner.Some(n)
+	return t
+}

@@ -39,7 +39,7 @@ func Test_Marshal_Project(t *testing.T) {
 				).Build(),
 			err: nil,
 			expected: `{
-		        "base-type": "boolean",
+		        "type": "boolean",
                 "name": null,
                 "description": null,
                 "required": null,

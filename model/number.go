@@ -25,7 +25,7 @@ func (t CodeGenInteger) GetType() string {
 
 func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId         string `json:"base-type"`
+		TypeId         string `json:"type"`
 		CodeGenInteger `json:",inline"`
 	}{
 		TypeId:         t.GetType(),
@@ -56,62 +56,62 @@ func (t *codeGenIntBuilder) Build() *CodeGenInteger {
 
 // Description implements IntBuilder.
 func (t *codeGenIntBuilder) Description(v string) IntegerBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // MultipleOf implements IntBuilder.
 func (t *codeGenIntBuilder) MultipleOf(v int) IntegerBuilder {
-	return setO(t, &t.obj.MultipleOf, v)
+	return SetO(t, &t.obj.MultipleOf, v)
 }
 
 // Min implements IntBuilder.
 func (t *codeGenIntBuilder) Min(v int) IntegerBuilder {
-	return setO(t, &t.obj.Min, v)
+	return SetO(t, &t.obj.Min, v)
 }
 
 // Max implements IntBuilder.
 func (t *codeGenIntBuilder) Max(v int) IntegerBuilder {
-	return setO(t, &t.obj.Max, v)
+	return SetO(t, &t.obj.Max, v)
 }
 
 // Name implements IntBuilder.
 func (t *codeGenIntBuilder) Name(v string) IntegerBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Negative implements IntBuilder.
 func (t *codeGenIntBuilder) Negative() IntegerBuilder {
-	return setO(t, &t.obj.Negative, true)
+	return SetO(t, &t.obj.Negative, true)
 }
 
 // NoneOf implements IntBuilder.
 func (t *codeGenIntBuilder) NoneOf(v ...int) IntegerBuilder {
-	return setO(t, &t.obj.NoneOf, v)
+	return SetO(t, &t.obj.NoneOf, v)
 }
 
 // OneOf implements IntBuilder.
 func (t *codeGenIntBuilder) OneOf(v ...int) IntegerBuilder {
-	return setO(t, &t.obj.OneOf, v)
+	return SetO(t, &t.obj.OneOf, v)
 }
 
 // Package implements IntBuilder.
 func (t *codeGenIntBuilder) Package(v string) IntegerBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Positive implements IntBuilder.
 func (t *codeGenIntBuilder) Positive() IntegerBuilder {
-	return setO(t, &t.obj.Positive, true)
+	return SetO(t, &t.obj.Positive, true)
 }
 
 // Id implements IntBuilder.
 func (t *codeGenIntBuilder) Id(v string) IntegerBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Ranges implements IntBuilder.
 func (t *codeGenIntBuilder) Ranges(v ...NumberRange[int]) IntegerBuilder {
-	return setO(t, &t.obj.Ranges, v)
+	return SetO(t, &t.obj.Ranges, v)
 }
 
 // Ref implements IntBuilder.
@@ -121,7 +121,7 @@ func (t *codeGenIntBuilder) Ref() RefBuilder {
 
 // Required implements IntBuilder.
 func (t *codeGenIntBuilder) Required(v bool) IntegerBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ func (t CodeGenFloat) GetType() string {
 
 func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 	dto := struct {
-		TypeId       string `json:"base-type"`
+		TypeId       string `json:"type"`
 		CodeGenFloat `json:",inline"`
 	}{
 		TypeId:       t.GetType(),
@@ -177,67 +177,67 @@ func (t *codeGenFloatBuilder) Build() *CodeGenFloat {
 
 // Description implements FloatBuilder.
 func (t *codeGenFloatBuilder) Description(v string) FloatBuilder {
-	return setO(t, &t.obj.Description, v)
+	return SetO(t, &t.obj.Description, v)
 }
 
 // Min implements IntBuilder.
 func (t *codeGenFloatBuilder) Min(v float64) FloatBuilder {
-	return setO(t, &t.obj.Min, v)
+	return SetO(t, &t.obj.Min, v)
 }
 
 // Max implements IntBuilder.
 func (t *codeGenFloatBuilder) Max(v float64) FloatBuilder {
-	return setO(t, &t.obj.Max, v)
+	return SetO(t, &t.obj.Max, v)
 }
 
 // MultipleOf implements FloatBuilder.
 func (t *codeGenFloatBuilder) MultipleOf(v float64) FloatBuilder {
-	return setO(t, &t.obj.MultipleOf, v)
+	return SetO(t, &t.obj.MultipleOf, v)
 }
 
 // Name implements FloatBuilder.
 func (t *codeGenFloatBuilder) Name(v string) FloatBuilder {
-	return setO(t, &t.obj.Name, v)
+	return SetO(t, &t.obj.Name, v)
 }
 
 // Negative implements FloatBuilder.
 func (t *codeGenFloatBuilder) Negative() FloatBuilder {
-	return setO(t, &t.obj.Negative, true)
+	return SetO(t, &t.obj.Negative, true)
 }
 
 // NoneOf implements FloatBuilder.
 func (t *codeGenFloatBuilder) NoneOf(v ...float64) FloatBuilder {
-	return setO(t, &t.obj.NoneOf, v)
+	return SetO(t, &t.obj.NoneOf, v)
 }
 
 // OneOf implements FloatBuilder.
 func (t *codeGenFloatBuilder) OneOf(v ...float64) FloatBuilder {
-	return setO(t, &t.obj.OneOf, v)
+	return SetO(t, &t.obj.OneOf, v)
 }
 
 // Package implements FloatBuilder.
 func (t *codeGenFloatBuilder) Package(v string) FloatBuilder {
-	return setO(t, &t.obj.Package, v)
+	return SetO(t, &t.obj.Package, v)
 }
 
 // Positive implements FloatBuilder.
 func (t *codeGenFloatBuilder) Positive() FloatBuilder {
-	return setO(t, &t.obj.Positive, true)
+	return SetO(t, &t.obj.Positive, true)
 }
 
 // Precision implements FloatBuilder.
 func (t *codeGenFloatBuilder) Precision(v int) FloatBuilder {
-	return setO(t, &t.obj.Precision, v)
+	return SetO(t, &t.obj.Precision, v)
 }
 
 // Id implements FloatBuilder.
 func (t *codeGenFloatBuilder) Id(v string) FloatBuilder {
-	return setO(t, &t.obj.Id, v)
+	return SetO(t, &t.obj.Id, v)
 }
 
 // Ranges implements FloatBuilder.
 func (t *codeGenFloatBuilder) Ranges(v ...NumberRange[float64]) FloatBuilder {
-	return setO(t, &t.obj.Ranges, v)
+	return SetO(t, &t.obj.Ranges, v)
 }
 
 // Ref implements FloatBuilder.
@@ -247,12 +247,12 @@ func (t *codeGenFloatBuilder) Ref() RefBuilder {
 
 // Required implements FloatBuilder.
 func (t *codeGenFloatBuilder) Required(v bool) FloatBuilder {
-	return setO(t, &t.obj.Required, v)
+	return SetO(t, &t.obj.Required, v)
 }
 
 // Tolerance implements FloatBuilder.
 func (t *codeGenFloatBuilder) Tolerance(v float64) FloatBuilder {
-	return setO(t, &t.obj.Tolerance, v)
+	return SetO(t, &t.obj.Tolerance, v)
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -335,19 +335,19 @@ func (t *NumberRangeBuilder[T]) Build() NumberRange[T] {
 }
 
 func (t *NumberRangeBuilder[T]) Min(v T) *NumberRangeBuilder[T] {
-	return setO(t, &t.obj.Min, v)
+	return SetO(t, &t.obj.Min, v)
 }
 
 func (t *NumberRangeBuilder[T]) Max(v T) *NumberRangeBuilder[T] {
-	return setO(t, &t.obj.Max, v)
+	return SetO(t, &t.obj.Max, v)
 }
 
 func (t *NumberRangeBuilder[T]) ExclusiveMin(v T) *NumberRangeBuilder[T] {
-	return setO(t, &t.obj.ExclusiveMin, v)
+	return SetO(t, &t.obj.ExclusiveMin, v)
 }
 
 func (t *NumberRangeBuilder[T]) ExclusiveMax(v T) *NumberRangeBuilder[T] {
-	return setO(t, &t.obj.ExclusiveMax, v)
+	return SetO(t, &t.obj.ExclusiveMax, v)
 }
 
 //----------------------------------------------------------------
