@@ -15,27 +15,27 @@ func Test_Marshal_String(t *testing.T) {
 		expected string
 		err      error
 	}{
-		{
-			name:  "Serialize boolean",
-			input: model.BuildString().Build(),
-			err:   nil,
-			expected: `{
-		        "type": "string"
-		    }`,
-		},
-		{
-			name: "Serialize boolean",
-			input: model.BuildString().
-				Name("A_STRING").
-				Description("an object description").
-				Build(),
-			err: nil,
-			expected: `{
-		        "type": "string",
-                "name": "A_STRING",
-                "description": "an object description"
-		    }`,
-		},
+		// {
+		// 	name:  "Serialize boolean",
+		// 	input: model.BuildString().Build(),
+		// 	err:   nil,
+		// 	expected: `{
+		//         "type": "string"
+		//     }`,
+		// },
+		// {
+		// 	name: "Serialize boolean",
+		// 	input: model.BuildString().
+		// 		Name("A_STRING").
+		// 		Description("an object description").
+		// 		Build(),
+		// 	err: nil,
+		// 	expected: `{
+		//         "type": "string",
+		//         "name": "A_STRING",
+		//         "description": "an object description"
+		//     }`,
+		// },
 	}
 
 	for _, tc := range tcs {

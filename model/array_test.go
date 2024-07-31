@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	o "github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +18,7 @@ func Test_Marshal_Array(t *testing.T) {
 	}{
 		{
 			name:  "Serialize boolean",
-			input: model.BuildArray().Build(),
+			input: &model.CodeGenArray{},
 			err:   nil,
 			expected: `{
 		        "type": "array"
@@ -25,37 +26,43 @@ func Test_Marshal_Array(t *testing.T) {
 		},
 		{
 			name: "Serialize boolean",
-			input: model.BuildArray().
-				Name("AN_ARRAY").
-				Description("an array description").
-				Build(),
+			input: &model.CodeGenArray{
+				CodeGenCommon: model.CodeGenCommon{
+					Name:        o.Some("AN_ARRAY"),
+					Description: o.Some("an array description"),
+				},
+			},
 			err: nil,
 			expected: `{
 		        "type": "array",
-                "name": "AN_ARRAY",
-                "description": "an array description"
+		        "name": "AN_ARRAY",
+		        "description": "an array description"
 		    }`,
 		},
 		{
 			name: "Serialize array with boolean",
 			err:  nil,
-			input: model.BuildArray().
-				Name("AN_ARRAY").
-				Description("an array description").
-				Items(model.BuildBoolean().
-					Name("A_BOOLEAN").
-					Description("a bool description").
-					Build()).
-				Build(),
+			input: &model.CodeGenArray{
+				CodeGenCommon: model.CodeGenCommon{
+					Name:        o.Some("AN_ARRAY"),
+					Description: o.Some("an array description"),
+				},
+				Items: o.Some(model.CodeGenType(&model.CodeGenBoolean{
+					CodeGenCommon: model.CodeGenCommon{
+						Name:        o.Some("A_BOOLEAN"),
+						Description: o.Some("a bool description"),
+					},
+				})),
+			},
 			expected: `{
 		        "type": "array",
-                "name": "AN_ARRAY",
-                "description": "an array description",
-                "items": {
-                    "type": "boolean",
-                    "name": "A_BOOLEAN",
-                    "description": "a bool description"
-                }
+		        "name": "AN_ARRAY",
+		        "description": "an array description",
+		        "items": {
+		            "type": "boolean",
+		            "name": "A_BOOLEAN",
+		            "description": "a bool description"
+		        }
 		    }`,
 		},
 	}
@@ -79,14 +86,18 @@ func Test_Unmarshal_Array(t *testing.T) {
 	}{
 		{
 			name: "Unmarshal array and boolean item",
-			obj: model.BuildArray().
-				Name("AN_ARRAY").
-				Description("an array description").
-				Items(model.BuildBoolean().
-					Name("A_BOOLEAN").
-					Description("a bool description").
-					Build()).
-				Build(),
+			obj: &model.CodeGenArray{
+				CodeGenCommon: model.CodeGenCommon{
+					Name:        o.Some("AN_ARRAY"),
+					Description: o.Some("an array description"),
+				},
+				Items: o.Some(model.CodeGenType(&model.CodeGenBoolean{
+					CodeGenCommon: model.CodeGenCommon{
+						Name:        o.Some("A_BOOLEAN"),
+						Description: o.Some("a bool description"),
+					},
+				})),
+			},
 			err: nil,
 		},
 	}

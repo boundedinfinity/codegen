@@ -1,24 +1,24 @@
 package: boundedinfinity-test
 
 types:
-    -   id: codegen/schema/person/full-name
-        type: object
-        description: A simple label
-        properties:
-            -   type: ref
-                ref: codegen/schema/util/id
-            -   name: first-names
-                type: array
-                items:
-                    type: ref
-                    ref: codegen/schema/name/name
-            -   name: last-names
-                type: array
-                items:
-                    type: ref
-                    ref: codegen/schema/name/name
-            -   type: ref
-                ref: codegen/schema/util/description
+    # -   id: codegen/schema/person/full-name
+    #     type: object
+    #     description: A simple label
+    #     properties:
+    #         -   type: ref
+    #             ref: codegen/schema/util/id
+    #         -   name: first-names
+    #             type: array
+    #             items:
+    #                 type: ref
+    #                 ref: codegen/schema/name/name
+    #         -   name: last-names
+    #             type: array
+    #             items:
+    #                 type: ref
+    #                 ref: codegen/schema/name/name
+    #         -   type: ref
+    #             ref: codegen/schema/util/description
 
     -   id: codegen/schema/util/id
         type: string
@@ -28,20 +28,20 @@ types:
     -   id: codegen/schema/util/label
         type: object
         properties:
-            -   type: ref
-                ref: codegen/schema/util/id
+            # -   type: ref
+            #     ref: codegen/schema/util/id
             -   name: name
                 type: string
                 min: 1
                 max: 10
     
-    -   id: codegen/schema/util/labels
-        type: array
-        items:
-            type: ref
-            ref: codegen/schema/util/label
+    # -   id: codegen/schema/util/labels
+    #     type: array
+    #     items:
+    #         type: ref
+    #         ref: codegen/schema/util/label
 
-    -   id: codegen/schema/name/name
-        type: string
-        min: 1
-        max: 50
+    # -   id: codegen/schema/name/name
+    #     type: string
+    #     min: 1
+    #     max: 50

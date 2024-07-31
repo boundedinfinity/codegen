@@ -2,10 +2,6 @@ package processor
 
 import (
 	"boundedinfinity/codegen/model"
-
-	"github.com/boundedinfinity/go-commoner/functional/optioner"
-	"github.com/boundedinfinity/go-commoner/idiomatic/caser"
-	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
 )
 
 func (t *Processor) processTypes() error {
@@ -60,51 +56,32 @@ func (t *Processor) processTypes() error {
 func processType(project model.CodeGenProject, typ model.CodeGenType) {
 	switch rtyp := typ.(type) {
 	case *model.CodeGenObject:
+		model.EnsureName(typ)
+		model.EnsurePackage(typ)
+		model.EnsureImportPath(project, typ)
+		model.EnsureJsonName(typ)
+		model.EnsureYamlName(typ)
+		model.EnsureSqlName(typ)
+
 		for _, prop := range rtyp.Properties.Get() {
 			processType(project, prop)
 		}
 	case *model.CodeGenArray:
 		processType(project, rtyp.Items.Get())
+
+		model.EnsureName(typ)
+		model.EnsurePackage(typ)
+		model.EnsureImportPath(project, typ)
+		model.EnsureJsonName(typ)
+		model.EnsureYamlName(typ)
+		model.EnsureSqlName(typ)
 	default:
-		if typ.Common().Name.Empty() {
-			name := typ.Common().Id.Get()
-			name = pather.Paths.Base(name)
-			name = caser.KebabToPascal(name)
-			typ.Common().Name = optioner.Some(name)
-		}
-
-		if typ.Common().Package.Empty() {
-			pkg := typ.Common().Id.Get()
-			pkg = pather.Paths.Dir(pkg)
-			pkg = pather.Paths.Base(pkg)
-			typ.Common().Package = optioner.Some(pkg)
-		}
-
-		if typ.Common().ImportPath.Empty() {
-			pkg := typ.Common().Id.Get()
-			pkg = pather.Paths.Dir(pkg)
-			pkg = pather.Paths.Join(project.Package.Get(), pkg)
-			typ.Common().ImportPath = optioner.Some(pkg)
-		}
-
-		if typ.Common().JsonName.Empty() {
-			name := typ.Common().Id.Get()
-			name = pather.Paths.Base(name)
-			typ.Common().JsonName = optioner.Some(name)
-		}
-
-		if typ.Common().YamlName.Empty() {
-			name := typ.Common().Id.Get()
-			name = pather.Paths.Base(name)
-			typ.Common().YamlName = optioner.Some(name)
-		}
-
-		if typ.Common().SqlName.Empty() {
-			name := typ.Common().Id.Get()
-			name = pather.Paths.Base(name)
-			name = caser.KebabToSnake(name)
-			typ.Common().SqlName = optioner.Some(name)
-		}
+		model.EnsureName(typ)
+		model.EnsurePackage(typ)
+		model.EnsureImportPath(project, typ)
+		model.EnsureJsonName(typ)
+		model.EnsureYamlName(typ)
+		model.EnsureSqlName(typ)
 	}
 }
 

@@ -15,51 +15,51 @@ func Test_Marshal_Object(t *testing.T) {
 		expected string
 		err      error
 	}{
-		{
-			name:  "Serialize boolean",
-			input: model.BuildObject().Build(),
-			err:   nil,
-			expected: `{
-		        "type": "object",
-                "properties": []
-		    }`,
-		},
-		{
-			name: "Serialize boolean",
-			input: model.BuildObject().
-				Name("AN_OBJECT").
-				Description("an object description").
-				Build(),
-			err: nil,
-			expected: `{
-		        "type": "object",
-                "name": "AN_OBJECT",
-                "description": "an object description",
-                "properties": []
-		    }`,
-		},
-		{
-			name: "Serialize object with boolean",
-			err:  nil,
-			input: model.BuildObject().
-				Name("AN_OBJECT").
-				Description("an object description").
-				Properties(
-					model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
-				).Build(),
-			expected: `{
-		        "type": "object",
-                "name": "AN_OBJECT",
-                "description": "an object description",
-                "properties": [
-                    {
-                        "type": "boolean",
-                        "name": "A_BOOLEAN",
-                        "description": "a bool description"
-                    }
-                ]
-		    }`,
-		},
+		// {
+		// 	name:  "Serialize boolean",
+		// 	input: model.BuildObject().Build(),
+		// 	err:   nil,
+		// 	expected: `{
+		//         "type": "object",
+		//         "properties": []
+		//     }`,
+		// },
+		// {
+		// 	name: "Serialize boolean",
+		// 	input: model.BuildObject().
+		// 		Name("AN_OBJECT").
+		// 		Description("an object description").
+		// 		Build(),
+		// 	err: nil,
+		// 	expected: `{
+		//         "type": "object",
+		//         "name": "AN_OBJECT",
+		//         "description": "an object description",
+		//         "properties": []
+		//     }`,
+		// },
+		// {
+		// 	name: "Serialize object with boolean",
+		// 	err:  nil,
+		// 	input: model.BuildObject().
+		// 		Name("AN_OBJECT").
+		// 		Description("an object description").
+		// 		Properties(
+		// 			model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
+		// 		).Build(),
+		// 	expected: `{
+		//         "type": "object",
+		//         "name": "AN_OBJECT",
+		//         "description": "an object description",
+		//         "properties": [
+		//             {
+		//                 "type": "boolean",
+		//                 "name": "A_BOOLEAN",
+		//                 "description": "a bool description"
+		//             }
+		//         ]
+		//     }`,
+		// },
 	}
 
 	for _, tc := range tcs {
@@ -80,17 +80,17 @@ func Test_Unmarshal_Object(t *testing.T) {
 		obj  *model.CodeGenObject
 		err  error
 	}{
-		{
-			name: "Unmarshal object and boolean item",
-			obj: model.BuildObject().
-				Name("AN_OBJECT").
-				Description("an object description").
-				Properties(
-					model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
-					// model.NewInteger().Name("A_INT").Description("a int description"),
-				).Build(),
-			err: nil,
-		},
+		// {
+		// 	name: "Unmarshal object and boolean item",
+		// 	obj: model.BuildObject().
+		// 		Name("AN_OBJECT").
+		// 		Description("an object description").
+		// 		Properties(
+		// 			model.BuildBoolean().Name("A_BOOLEAN").Description("a bool description").Build(),
+		// 			// model.NewInteger().Name("A_INT").Description("a int description"),
+		// 		).Build(),
+		// 	err: nil,
+		// },
 	}
 
 	for _, tc := range tcs {

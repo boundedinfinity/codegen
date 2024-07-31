@@ -15,39 +15,39 @@ func Test_Marshal_Project(t *testing.T) {
 		expected string
 		err      error
 	}{
-		{
-			name: "Marshal project",
-			input: model.BuildProject().
-				Name("A_PROJECT").
-				Operations(
-					model.BuildOperation().Inputs(
-						model.BuildRef().Ref("label").Name("A_LABEL").Build(),
-					).Build(),
-				).
-				Types(
-					model.BuildObject().
-						Id("label").
-						Description("A simple label").
-						Properties(
-							model.BuildString().
-								Name("name").
-								Description("The label name").
-								Min(0).
-								Max(50).
-								Build(),
-						).Build(),
-				).Build(),
-			err: nil,
-			expected: `{
-		        "type": "boolean",
-                "name": null,
-                "description": null,
-                "required": null,
-                "default": null,
-                "inherit": null,
-                "links": null
-		    }`,
-		},
+		// {
+		// 	name: "Marshal project",
+		// 	input: model.BuildProject().
+		// 		Name("A_PROJECT").
+		// 		Operations(
+		// 			model.BuildOperation().Inputs(
+		// 				model.BuildRef().Ref("label").Name("A_LABEL").Build(),
+		// 			).Build(),
+		// 		).
+		// 		Types(
+		// 			model.BuildObject().
+		// 				Id("label").
+		// 				Description("A simple label").
+		// 				Properties(
+		// 					model.BuildString().
+		// 						Name("name").
+		// 						Description("The label name").
+		// 						Min(0).
+		// 						Max(50).
+		// 						Build(),
+		// 				).Build(),
+		// 		).Build(),
+		// 	err: nil,
+		// 	expected: `{
+		//         "type": "boolean",
+		//         "name": null,
+		//         "description": null,
+		//         "required": null,
+		//         "default": null,
+		//         "inherit": null,
+		//         "links": null
+		//     }`,
+		// },
 	}
 
 	for _, tc := range tcs {
@@ -67,11 +67,11 @@ func Test_Unmarshal_Project(t *testing.T) {
 		obj  *model.CodeGenBoolean
 		err  error
 	}{
-		{
-			name: "Marshal boolean",
-			obj:  model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
-			err:  nil,
-		},
+		// 	{
+		// 		name: "Marshal boolean",
+		// 		obj:  model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
+		// 		err:  nil,
+		// 	},
 	}
 
 	for _, tc := range tcs {

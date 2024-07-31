@@ -73,64 +73,19 @@ func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 		t.CodeGenCommon = dto.CodeGenCommon
 	}
 
-	for i, rawProp := range dto.Properties {
-		if prop, err := UnmarshalCodeGenType(rawProp); err != nil {
-			return errors.Join(fmt.Errorf("property[%v]", i), err)
-		} else {
-			if t.Properties.Defined() {
-				t.Properties = optioner.Some(append(t.Properties.Get(), prop))
+	if len(dto.Properties) > 0 {
+		t.Properties = optioner.Some([]CodeGenType{})
+
+		for i, rawProp := range dto.Properties {
+			if prop, err := UnmarshalCodeGenType(rawProp); err != nil {
+				return errors.Join(fmt.Errorf("property[%v]", i), err)
+			} else {
+				if t.Properties.Defined() {
+					t.Properties = optioner.Some(append(t.Properties.Get(), prop))
+				}
 			}
 		}
 	}
 
 	return nil
-}
-
-//----------------------------------------------------------------
-// Builders
-//----------------------------------------------------------------
-
-func BuildObject() ObjectBuilder {
-	return &codeGenObjectBuilder{}
-}
-
-type codeGenObjectBuilder struct {
-	obj CodeGenObject
-}
-
-var _ ObjectBuilder = &codeGenObjectBuilder{}
-
-// Build implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Build() *CodeGenObject {
-	return &t.obj
-}
-
-// Description implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Description(v string) ObjectBuilder {
-	return SetO(t, &t.obj.Description, v)
-}
-
-// Name implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Name(v string) ObjectBuilder {
-	return SetO(t, &t.obj.Name, v)
-}
-
-// Package implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Package(v string) ObjectBuilder {
-	return SetO(t, &t.obj.Package, v)
-}
-
-// Property implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Properties(v ...CodeGenType) ObjectBuilder {
-	return SetO(t, &t.obj.Properties, v)
-}
-
-// Id implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Id(v string) ObjectBuilder {
-	return SetO(t, &t.obj.Id, v)
-}
-
-// Required implements ObjectBuilder.
-func (t *codeGenObjectBuilder) Required(v bool) ObjectBuilder {
-	return SetO(t, &t.obj.Required, v)
 }

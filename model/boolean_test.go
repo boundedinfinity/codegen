@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	o "github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,25 +18,34 @@ func Test_Marshal_Boolean(t *testing.T) {
 	}{
 		{
 			name:  "Marshal boolean",
-			input: model.BuildBoolean().Build(),
+			input: &model.CodeGenBoolean{},
 			err:   nil,
 			expected: ` {
                 "type": "boolean"
             }`,
 		},
 		{
-			name:  "Marshal boolean with name",
-			input: model.BuildBoolean().Name("A_BOOLEAN").Build(),
-			err:   nil,
+			name: "Marshal boolean with name",
+			input: &model.CodeGenBoolean{
+				CodeGenCommon: model.CodeGenCommon{
+					Name: o.Some("A_BOOLEAN"),
+				},
+			},
+			err: nil,
 			expected: `{
 		        "type": "boolean",
 		        "name": "A_BOOLEAN"
 		    }`,
 		},
 		{
-			name:  "Marshal boolean with name and required",
-			input: model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
-			err:   nil,
+			name: "Marshal boolean with name and required",
+			input: &model.CodeGenBoolean{
+				CodeGenCommon: model.CodeGenCommon{
+					Name:     o.Some("A_BOOLEAN"),
+					Required: o.Some(true),
+				},
+			},
+			err: nil,
 			expected: `{
 		        "type": "boolean",
 		        "name": "A_BOOLEAN",
@@ -63,18 +73,27 @@ func Test_Unmarshal_Boolean(t *testing.T) {
 	}{
 		{
 			name: "Marshal boolean",
-			obj:  model.BuildBoolean().Build(),
+			obj:  &model.CodeGenBoolean{},
 			err:  nil,
 		},
 		{
 			name: "Marshal boolean",
-			obj:  model.BuildBoolean().Name("A_BOOLEAN").Build(),
-			err:  nil,
+			obj: &model.CodeGenBoolean{
+				CodeGenCommon: model.CodeGenCommon{
+					Name: o.Some("A_BOOLEAN"),
+				},
+			},
+			err: nil,
 		},
 		{
 			name: "Marshal boolean",
-			obj:  model.BuildBoolean().Name("A_BOOLEAN").Required(true).Build(),
-			err:  nil,
+			obj: &model.CodeGenBoolean{
+				CodeGenCommon: model.CodeGenCommon{
+					Name:     o.Some("A_BOOLEAN"),
+					Required: o.Some(true),
+				},
+			},
+			err: nil,
 		},
 	}
 
