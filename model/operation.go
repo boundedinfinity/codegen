@@ -17,8 +17,8 @@ type CodeGenOperation struct {
 	Id          optioner.Option[string] `json:"id,omitempty"`
 	Name        optioner.Option[string] `json:"name,omitempty"`
 	Description optioner.Option[string] `json:"description,omitempty"`
-	Inputs      []CodeGenType           `json:"inputs,omitempty"`
-	Outputs     []CodeGenType           `json:"outputs,omitempty"`
+	Inputs      []CodeGenSchema         `json:"inputs,omitempty"`
+	Outputs     []CodeGenSchema         `json:"outputs,omitempty"`
 }
 
 func (t CodeGenOperation) TypeId() string {

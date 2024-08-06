@@ -11,7 +11,7 @@ func Test_Unmarshal_CodeGenType(t *testing.T) {
 	tcs := []struct {
 		name     string
 		input    string
-		expected model.CodeGenType
+		expected model.CodeGenSchema
 		err      error
 	}{
 		{

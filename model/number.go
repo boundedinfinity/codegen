@@ -14,12 +14,12 @@ func NewInteger() *CodeGenInteger {
 }
 
 type CodeGenInteger struct {
-	number[int]
+	Number[int]
 }
 
-var _ CodeGenType = &CodeGenInteger{}
+var _ CodeGenSchema = &CodeGenInteger{}
 
-func (t CodeGenInteger) GetType() string {
+func (t CodeGenInteger) Schema() string {
 	return "integer"
 }
 
@@ -28,7 +28,7 @@ func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
 		TypeId         string `json:"type"`
 		CodeGenInteger `json:",inline"`
 	}{
-		TypeId:         t.GetType(),
+		TypeId:         t.Schema(),
 		CodeGenInteger: *t,
 	}
 
@@ -44,14 +44,14 @@ func NewFloat() *CodeGenFloat {
 }
 
 type CodeGenFloat struct {
-	number[float64]
+	Number[float64]
 	Precision optioner.Option[int]     `json:"precision,omitempty"`
 	Tolerance optioner.Option[float64] `json:"tolerance,omitempty"`
 }
 
-var _ CodeGenType = &CodeGenFloat{}
+var _ CodeGenSchema = &CodeGenFloat{}
 
-func (t CodeGenFloat) GetType() string {
+func (t CodeGenFloat) Schema() string {
 	return "float"
 }
 
@@ -60,7 +60,7 @@ func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 		TypeId       string `json:"type"`
 		CodeGenFloat `json:",inline"`
 	}{
-		TypeId:       t.GetType(),
+		TypeId:       t.Schema(),
 		CodeGenFloat: *t,
 	}
 
@@ -71,7 +71,7 @@ func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
 // number
 ///////////////////////////////////////////////////////////////////
 
-type number[T ~int | ~float64] struct {
+type Number[T ~int | ~float64] struct {
 	CodeGenCommon
 	Min        optioner.Option[T]                `json:"min,omitempty"`
 	Max        optioner.Option[T]                `json:"max,omitempty"`
@@ -93,7 +93,7 @@ var (
 	ErrNumberRangePositiveAndNegativeMutuallyExclusive = errorer.New("positive and negative are multually exclusive")
 )
 
-func (t number[T]) Validate() error {
+func (t Number[T]) Validate() error {
 	if err := t.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func (t number[T]) Validate() error {
 	return nil
 }
 
-func (t number[T]) HasValidation() bool {
+func (t Number[T]) HasValidation() bool {
 	return t.CodeGenCommon.HasValidation() || t.MultipleOf.Defined() || t.Ranges.Defined()
 }
 

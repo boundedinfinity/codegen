@@ -1,5 +1,8 @@
 package model
 
+//lint:file-ignore ST1006
+// https://staticcheck.dev/docs/checks#ST1006
+
 import (
 	"encoding/json"
 	"errors"
@@ -14,12 +17,12 @@ import (
 
 type CodeGenObject struct {
 	CodeGenCommon
-	Properties optioner.Option[[]CodeGenType] `json:"properties"`
+	Properties optioner.Option[[]CodeGenSchema] `json:"properties"`
 }
 
-var _ CodeGenType = &CodeGenObject{}
+var _ CodeGenSchema = &CodeGenObject{}
 
-func (t CodeGenObject) GetType() string {
+func (t CodeGenObject) Schema() string {
 	return "object"
 }
 
@@ -27,16 +30,27 @@ func (t CodeGenObject) GetType() string {
 // Validation
 //----------------------------------------------------------------
 
-func (t CodeGenObject) HasValidation() bool {
-	return t.CodeGenCommon.HasValidation()
+func (this CodeGenObject) HasValidation() bool {
+	hasValidation := this.CodeGenCommon.HasValidation()
+
+	if !hasValidation {
+		for _, property := range this.Properties.Get() {
+			if property.HasValidation() {
+				hasValidation = true
+				break
+			}
+		}
+	}
+
+	return hasValidation
 }
 
-func (t CodeGenObject) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+func (this CodeGenObject) Validate() error {
+	if err := this.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
-	for i, prop := range t.Properties.Get() {
+	for i, prop := range this.Properties.Get() {
 		if err := prop.Validate(); err != nil {
 			return errors.Join(fmt.Errorf("prop[%v]", i))
 		}
@@ -49,19 +63,19 @@ func (t CodeGenObject) Validate() error {
 // Marshal
 //----------------------------------------------------------------
 
-func (t *CodeGenObject) MarshalJSON() ([]byte, error) {
+func (this *CodeGenObject) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId        string `json:"type"`
 		CodeGenObject `json:",inline"`
 	}{
-		TypeId:        t.GetType(),
-		CodeGenObject: *t,
+		TypeId:        this.Schema(),
+		CodeGenObject: *this,
 	}
 
 	return marshalCodeGenType(dto)
 }
 
-func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
+func (this *CodeGenObject) UnmarshalJSON(data []byte) error {
 	dto := struct {
 		CodeGenCommon
 		Properties []json.RawMessage `json:"properties"`
@@ -70,18 +84,18 @@ func (t *CodeGenObject) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.CodeGenCommon = dto.CodeGenCommon
+		this.CodeGenCommon = dto.CodeGenCommon
 	}
 
 	if len(dto.Properties) > 0 {
-		t.Properties = optioner.Some([]CodeGenType{})
+		this.Properties = optioner.Some([]CodeGenSchema{})
 
 		for i, rawProp := range dto.Properties {
 			if prop, err := UnmarshalCodeGenType(rawProp); err != nil {
 				return errors.Join(fmt.Errorf("property[%v]", i), err)
 			} else {
-				if t.Properties.Defined() {
-					t.Properties = optioner.Some(append(t.Properties.Get(), prop))
+				if this.Properties.Defined() {
+					this.Properties = optioner.Some(append(this.Properties.Get(), prop))
 				}
 			}
 		}

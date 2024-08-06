@@ -20,10 +20,10 @@ types:
     #         -   type: ref
     #             ref: codegen/schema/util/description
 
-    -   id: codegen/schema/util/id
-        type: string
-        min: 36
-        max: 36
+    # -   id: codegen/schema/util/id
+    #     type: string
+    #     min: 36
+    #     max: 36
 
     -   id: codegen/schema/util/label
         type: object

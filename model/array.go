@@ -1,5 +1,8 @@
 package model
 
+//lint:file-ignore ST1006
+// https://staticcheck.dev/docs/checks#ST1006
+
 import (
 	"encoding/json"
 
@@ -13,14 +16,14 @@ import (
 
 type CodeGenArray struct {
 	CodeGenCommon `json:",inline,omitempty"`
-	Min           optioner.Option[int]         `json:"min,omitempty"`
-	Max           optioner.Option[int]         `json:"max,omitempty"`
-	Items         optioner.Option[CodeGenType] `json:"items,omitempty"`
+	Min           optioner.Option[int]           `json:"min,omitempty"`
+	Max           optioner.Option[int]           `json:"max,omitempty"`
+	Items         optioner.Option[CodeGenSchema] `json:"items,omitempty"`
 }
 
-var _ CodeGenType = &CodeGenArray{}
+var _ CodeGenSchema = &CodeGenArray{}
 
-func (t CodeGenArray) GetType() string {
+func (t CodeGenArray) Schema() string {
 	return "array"
 }
 
@@ -33,8 +36,9 @@ var (
 )
 
 func (t CodeGenArray) HasValidation() bool {
-	return t.CodeGenCommon.HasValidation() || t.Min.Defined() || t.Min.Defined() || t.Max.Defined() ||
-		t.Max.Defined() || t.Items.Defined() && t.Items.Get().HasValidation()
+	return t.CodeGenCommon.HasValidation() ||
+		t.Items.Defined() && t.Items.Get().HasValidation() ||
+		t.Min.Defined() || t.Max.Defined()
 }
 
 func (t CodeGenArray) Validate() error {
@@ -46,7 +50,7 @@ func (t CodeGenArray) Validate() error {
 		return err
 	}
 
-	if t.Min.Defined() && t.Min.Defined() && t.Min.Get() > t.Max.Get() {
+	if t.Min.Defined() && t.Max.Defined() && t.Min.Get() > t.Max.Get() {
 		return errCodeGenArrayMinGreaterThanMax.FormatFn("min: %v, max: %v")(t.Min.Get(), t.Max.Get())
 	}
 
@@ -62,7 +66,7 @@ func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
 		TypeId       string `json:"type"`
 		CodeGenArray `json:",inline"`
 	}{
-		TypeId:       t.GetType(),
+		TypeId:       t.Schema(),
 		CodeGenArray: *t,
 	}
 

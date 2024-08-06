@@ -1,5 +1,6 @@
 makefile_dir		:= $(abspath $(shell pwd))
 template_dir		:= $(makefile_dir)/generator/templates
+m					?= "updates"
 
 .PHONY: list purge build install generate test commit tag publish
 
@@ -24,7 +25,7 @@ install: generate
 test: generate
 	go test ./...
 
-commit:
+push:
 	git add . || true
 	git commit -m "$(m)" || true
 	git push origin master

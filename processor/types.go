@@ -53,12 +53,11 @@ func (t *Processor) processTypes() error {
 	return nil
 }
 
-func processType(project model.CodeGenProject, typ model.CodeGenType) {
+func processType(project model.CodeGenProject, typ model.CodeGenSchema) {
 	switch rtyp := typ.(type) {
 	case *model.CodeGenObject:
 		model.EnsureName(typ)
 		model.EnsurePackage(typ)
-		model.EnsureImportPath(project, typ)
 		model.EnsureJsonName(typ)
 		model.EnsureYamlName(typ)
 		model.EnsureSqlName(typ)
@@ -71,22 +70,20 @@ func processType(project model.CodeGenProject, typ model.CodeGenType) {
 
 		model.EnsureName(typ)
 		model.EnsurePackage(typ)
-		model.EnsureImportPath(project, typ)
 		model.EnsureJsonName(typ)
 		model.EnsureYamlName(typ)
 		model.EnsureSqlName(typ)
 	default:
 		model.EnsureName(typ)
 		model.EnsurePackage(typ)
-		model.EnsureImportPath(project, typ)
 		model.EnsureJsonName(typ)
 		model.EnsureYamlName(typ)
 		model.EnsureSqlName(typ)
 	}
 }
 
-func (t *Processor) resolveType(typ model.CodeGenType) (model.CodeGenType, error) {
-	var found model.CodeGenType
+func (t *Processor) resolveType(typ model.CodeGenSchema) (model.CodeGenSchema, error) {
+	var found model.CodeGenSchema
 	var err error
 
 	switch obj := typ.(type) {
@@ -112,9 +109,9 @@ func (t *Processor) resolveType(typ model.CodeGenType) (model.CodeGenType, error
 	return found, err
 }
 
-func (t *Processor) checkType(typ model.CodeGenType) error {
+func (t *Processor) checkType(typ model.CodeGenSchema) error {
 	var err error
-	var found model.CodeGenType
+	var found model.CodeGenSchema
 
 	switch obj := typ.(type) {
 	case *model.CodeGenRef:

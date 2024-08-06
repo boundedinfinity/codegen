@@ -47,7 +47,7 @@ func Test_Marshal_Array(t *testing.T) {
 					Name:        o.Some("AN_ARRAY"),
 					Description: o.Some("an array description"),
 				},
-				Items: o.Some(model.CodeGenType(&model.CodeGenBoolean{
+				Items: o.Some(model.CodeGenSchema(&model.CodeGenBoolean{
 					CodeGenCommon: model.CodeGenCommon{
 						Name:        o.Some("A_BOOLEAN"),
 						Description: o.Some("a bool description"),
@@ -91,7 +91,7 @@ func Test_Unmarshal_Array(t *testing.T) {
 					Name:        o.Some("AN_ARRAY"),
 					Description: o.Some("an array description"),
 				},
-				Items: o.Some(model.CodeGenType(&model.CodeGenBoolean{
+				Items: o.Some(model.CodeGenSchema(&model.CodeGenBoolean{
 					CodeGenCommon: model.CodeGenCommon{
 						Name:        o.Some("A_BOOLEAN"),
 						Description: o.Some("a bool description"),

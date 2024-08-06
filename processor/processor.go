@@ -16,13 +16,13 @@ import (
 func New() *Processor {
 	return &Processor{
 		projects: []*model.CodeGenProject{},
-		TypeMap:  map[string]model.CodeGenType{},
+		TypeMap:  map[string]model.CodeGenSchema{},
 	}
 }
 
 type Processor struct {
 	Combined model.CodeGenProject
-	TypeMap  map[string]model.CodeGenType
+	TypeMap  map[string]model.CodeGenSchema
 	projects []*model.CodeGenProject
 }
 

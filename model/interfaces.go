@@ -1,8 +1,8 @@
 package model
 
-type CodeGenType interface {
+type CodeGenSchema interface {
 	Common() *CodeGenCommon
-	GetType() string
+	Schema() string
 	Validate() error
 	HasValidation() bool
 }

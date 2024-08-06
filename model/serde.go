@@ -45,9 +45,9 @@ type descriminator struct {
 	Type string `json:"type"`
 }
 
-func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
+func UnmarshalCodeGenType(data []byte) (CodeGenSchema, error) {
 	descrim := descriminator{}
-	var v CodeGenType
+	var v CodeGenSchema
 
 	if err := json.Unmarshal(data, &descrim); err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 	var err error
 
 	switch descrim.Type {
-	case CodeGenString{}.GetType():
+	case CodeGenString{}.Schema():
 		var obj CodeGenString
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -68,7 +68,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenInteger{}.GetType():
+	case CodeGenInteger{}.Schema():
 		var obj CodeGenInteger
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -76,7 +76,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenFloat{}.GetType():
+	case CodeGenFloat{}.Schema():
 		var obj CodeGenFloat
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -84,7 +84,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenBoolean{}.GetType():
+	case CodeGenBoolean{}.Schema():
 		var obj CodeGenBoolean
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -92,7 +92,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenArray{}.GetType():
+	case CodeGenArray{}.Schema():
 		var obj CodeGenArray
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -100,7 +100,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenObject{}.GetType():
+	case CodeGenObject{}.Schema():
 		var obj CodeGenObject
 
 		if err = json.Unmarshal(data, &obj); err != nil {
@@ -108,7 +108,7 @@ func UnmarshalCodeGenType(data []byte) (CodeGenType, error) {
 		} else {
 			v = &obj
 		}
-	case CodeGenRef{}.GetType():
+	case CodeGenRef{}.Schema():
 		var obj CodeGenRef
 
 		if err = json.Unmarshal(data, &obj); err != nil {

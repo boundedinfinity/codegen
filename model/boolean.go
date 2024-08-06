@@ -8,9 +8,9 @@ type CodeGenBoolean struct {
 	CodeGenCommon
 }
 
-var _ CodeGenType = &CodeGenBoolean{}
+var _ CodeGenSchema = &CodeGenBoolean{}
 
-func (t CodeGenBoolean) GetType() string {
+func (t CodeGenBoolean) Schema() string {
 	return "boolean"
 }
 
@@ -35,7 +35,7 @@ func (t *CodeGenBoolean) MarshalJSON() ([]byte, error) {
 		TypeId         string `json:"type"`
 		CodeGenBoolean `json:",inline"`
 	}{
-		TypeId:         t.GetType(),
+		TypeId:         t.Schema(),
 		CodeGenBoolean: *t,
 	}
 

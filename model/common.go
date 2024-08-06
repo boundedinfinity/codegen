@@ -15,10 +15,6 @@ type CodeGenCommon struct {
 	//Name The unqualified (or base) name for this type
 	Name optioner.Option[string] `json:"name,omitempty"`
 
-	Package optioner.Option[string] `json:"-"`
-
-	ImportPath optioner.Option[string] `json:"-"`
-
 	// Description description of the type
 	Description optioner.Option[string] `json:"description,omitempty"`
 
@@ -34,12 +30,15 @@ type CodeGenCommon struct {
 	// SqlName name used for serialization
 	SqlName optioner.Option[string] `json:"sql-name,omitempty"`
 
-	Imports optioner.Option[[]CodeGenImport]
+	Lang CodeGenLangData
 }
 
-type CodeGenImport struct {
-	Name    string `json:"name,omitempty"`
-	Package string `json:"package,omitempty"`
+type CodeGenLangData struct {
+	Imports optioner.Option[[]string]
+	Import  optioner.Option[string]
+	Package optioner.Option[string]
+	Name    optioner.Option[string]
+	Type    optioner.Option[string]
 }
 
 //----------------------------------------------------------------

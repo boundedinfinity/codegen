@@ -32,12 +32,12 @@ func (t integerValidations[T]) Validate(v T) error {
 }
 
 func (t *integerValidations[T]) Min(n T) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerMin(t.name, n))
+	t.validations = append(t.validations, IntegerMinFn(t.name, n))
 	return t
 }
 
 func (t *integerValidations[T]) Max(n T) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerMax(t.name, n))
+	t.validations = append(t.validations, IntegerMaxFn(t.name, n))
 	return t
 }
 

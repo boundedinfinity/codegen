@@ -27,27 +27,27 @@ func (t stringValidations[T]) Validate(v T) error {
 }
 
 func (t *stringValidations[T]) Min(n int) *stringValidations[T] {
-	t.validations = append(t.validations, StringMin[T](t.name, n))
+	t.validations = append(t.validations, StringMinFn[T](t.name, n))
 	return t
 }
 
 func (t *stringValidations[T]) Max(n int) *stringValidations[T] {
-	t.validations = append(t.validations, StringMax[T](t.name, n))
+	t.validations = append(t.validations, StringMaxFn[T](t.name, n))
 	return t
 }
 
 func (t *stringValidations[T]) Regex(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringRegex[T](t.name, pattern))
+	t.validations = append(t.validations, StringRegexFn[T](t.name, pattern))
 	return t
 }
 
 func (t *stringValidations[T]) NotEmpty(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringNotEmpty[T](t.name))
+	t.validations = append(t.validations, StringNotEmptyFn[T](t.name))
 	return t
 }
 
 func (t *stringValidations[T]) UpperCase(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringUpperCase[T](t.name))
+	t.validations = append(t.validations, StringUpperCaseFn[T](t.name))
 	return t
 }
 
@@ -57,6 +57,6 @@ func (t *stringValidations[T]) LowerCase(pattern string) *stringValidations[T] {
 }
 
 func (t *stringValidations[T]) Required() *stringValidations[T] {
-	t.validations = append(t.validations, StringRequired[T](t.name))
+	t.validations = append(t.validations, StringRequiredFn[T](t.name))
 	return t
 }

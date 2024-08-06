@@ -35,34 +35,32 @@ func SetO[T any, V any](t T, c *optioner.Option[V], n V) T {
 	return t
 }
 
-func EnsureName(typ CodeGenType) {
-	if typ.Common().Name.Empty() {
-		name := typ.Common().Id.Get()
-		name = pather.Paths.Base(name)
-		name = caser.KebabToPascal(name)
-		typ.Common().Name = optioner.Some(name)
+func EnsureName(typ CodeGenSchema) {
+	if typ.Common().Lang.Name.Empty() {
+		var name string
+
+		if typ.Common().Name.Defined() {
+			name = typ.Common().Name.Get()
+		} else {
+			name = typ.Common().Id.Get()
+			name = pather.Paths.Base(name)
+			name = caser.KebabToPascal(name)
+		}
+
+		typ.Common().Lang.Name = optioner.Some(name)
 	}
 }
 
-func EnsurePackage(typ CodeGenType) {
-	if typ.Common().Package.Empty() {
+func EnsurePackage(typ CodeGenSchema) {
+	if typ.Common().Lang.Import.Empty() {
 		pkg := typ.Common().Id.Get()
 		pkg = pather.Paths.Dir(pkg)
 		pkg = pather.Paths.Base(pkg)
-		typ.Common().Package = optioner.Some(pkg)
+		typ.Common().Lang.Import = optioner.Some(pkg)
 	}
 }
 
-func EnsureImportPath(project CodeGenProject, typ CodeGenType) {
-	if typ.Common().ImportPath.Empty() {
-		pkg := typ.Common().Id.Get()
-		pkg = pather.Paths.Dir(pkg)
-		pkg = pather.Paths.Join(project.Package.Get(), pkg)
-		typ.Common().ImportPath = optioner.Some(pkg)
-	}
-}
-
-func EnsureJsonName(typ CodeGenType) {
+func EnsureJsonName(typ CodeGenSchema) {
 	if typ.Common().JsonName.Empty() {
 		name := typ.Common().Id.Get()
 		name = pather.Paths.Base(name)
@@ -70,7 +68,7 @@ func EnsureJsonName(typ CodeGenType) {
 	}
 }
 
-func EnsureYamlName(typ CodeGenType) {
+func EnsureYamlName(typ CodeGenSchema) {
 	if typ.Common().YamlName.Empty() {
 		name := typ.Common().Id.Get()
 		name = pather.Paths.Base(name)
@@ -78,7 +76,7 @@ func EnsureYamlName(typ CodeGenType) {
 	}
 }
 
-func EnsureSqlName(typ CodeGenType) {
+func EnsureSqlName(typ CodeGenSchema) {
 	if typ.Common().SqlName.Empty() {
 		name := typ.Common().Id.Get()
 		name = pather.Paths.Base(name)

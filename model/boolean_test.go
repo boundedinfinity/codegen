@@ -12,7 +12,7 @@ import (
 func Test_Marshal_Boolean(t *testing.T) {
 	tcs := []struct {
 		name     string
-		input    model.CodeGenType
+		input    model.CodeGenSchema
 		expected string
 		err      error
 	}{

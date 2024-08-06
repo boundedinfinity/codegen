@@ -29,14 +29,16 @@ func (e *errIntegerLessThanMin[T]) Unwrap() error {
 	return ErrIntegerLessThanMin
 }
 
-func IntegerMin[T ~int](name string, min T) func(v T) error {
-	return func(v T) error {
-		if v < min {
-			return &errIntegerLessThanMin[T]{name, min}
-		}
-
-		return nil
+func IntegerMin[T ~int](name string, min T, value T) error {
+	if value < min {
+		return &errIntegerLessThanMin[T]{name, min}
 	}
+
+	return nil
+}
+
+func IntegerMinFn[T ~int](name string, min T) func(T) error {
+	return func(value T) error { return IntegerMin(name, min, value) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -58,14 +60,16 @@ func (e *errIntegerGreaterThanMax[T]) Unwrap() error {
 	return ErrIntegerGreaterThanMax
 }
 
-func IntegerMax[T ~int](name string, n T) func(v T) error {
-	return func(v T) error {
-		if v < n {
-			return &errIntegerGreaterThanMax[T]{Name: name, Max: n}
-		}
-
-		return nil
+func IntegerMax[T ~int](name string, max T, value T) error {
+	if value < max {
+		return &errIntegerGreaterThanMax[T]{Name: name, Max: max}
 	}
+
+	return nil
+}
+
+func IntegerMaxFn[T ~int](name string, max T) func(T) error {
+	return func(value T) error { return IntegerMax(name, max, value) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -157,14 +161,16 @@ func (e *errIntegerNotMultipleOf[T]) Unwrap() error {
 	return ErrIntegerNotMultipleOf
 }
 
-func IntegerMultipleOf[T ~int](name string, multipleOf T) func(v T) error {
-	return func(v T) error {
-		if v%multipleOf != 0 {
-			return &errIntegerNotMultipleOf[T]{Name: name, MultipleOf: multipleOf, Value: v}
-		}
-
-		return nil
+func IntegerMultipleOf[T ~int](name string, multipleOf T, value T) error {
+	if value%multipleOf != 0 {
+		return &errIntegerNotMultipleOf[T]{Name: name, MultipleOf: multipleOf, Value: value}
 	}
+
+	return nil
+}
+
+func IntegerMultipleOfFn[T ~int](name string, multipleOf T) func(T) error {
+	return func(value T) error { return IntegerMultipleOf(name, multipleOf, value) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -173,14 +179,16 @@ func IntegerMultipleOf[T ~int](name string, multipleOf T) func(v T) error {
 
 var ErrIntegerZero = errors.New("is zero")
 
-func IntegerNotZero[T ~int](name string) func(v T) error {
-	return func(v T) error {
-		if v == 0 {
-			return fmt.Errorf("%s %w", name, ErrIntegerZero)
-		}
-
-		return nil
+func IntegerNotZero[T ~int](name string, value T) error {
+	if value == 0 {
+		return fmt.Errorf("%s %w", name, ErrIntegerZero)
 	}
+
+	return nil
+}
+
+func IntegerNotZeroFn[T ~int](name string) func(T) error {
+	return func(value T) error { return IntegerNotZero(name, value) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -201,14 +209,17 @@ func (e *errIntegerNotPositive[T]) Unwrap() error {
 	return ErrIntegerNotPositive
 }
 
-func IntegerPositive[T ~int](name string) func(v T) error {
-	return func(v T) error {
-		if v < 0 {
-			return &errIntegerNotPositive[T]{Value: v}
-		}
-
-		return nil
+func IntegerPositive[T ~int](name string, value T) error {
+	if value < 0 {
+		return &errIntegerNotPositive[T]{Value: value}
 	}
+
+	return nil
+
+}
+
+func IntegerPositiveFn[T ~int](name string) func(T) error {
+	return func(value T) error { return IntegerPositive(name, value) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -229,14 +240,17 @@ func (e *errIntegerNotNegative[T]) Unwrap() error {
 	return ErrIntegerNotNegative
 }
 
-func IntegerNegative[T ~int](name string) func(v T) error {
-	return func(v T) error {
-		if v > 0 {
-			return &errIntegerNotNegative[T]{Value: v}
-		}
-
-		return nil
+func IntegerNegative[T ~int](name string, value T) error {
+	if value > 0 {
+		return &errIntegerNotNegative[T]{Value: value}
 	}
+
+	return nil
+
+}
+
+func IntegerNegativeFn[T ~int](name string) func(T) error {
+	return func(value T) error { return IntegerNegative(name, value) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -263,14 +277,16 @@ func (e *errIntegerNotAnyOf[T]) Unwrap() error {
 	return ErrIntegerNotNegative
 }
 
-func IntegerAnyOf[T ~int](name string, elems ...T) func(v T) error {
-	return func(v T) error {
-		if !slicer.AnyOf(v, elems...) {
-			return &errIntegerNotAnyOf[T]{Name: name, Value: v, OneOf: elems}
-		}
-
-		return nil
+func IntegerAnyOf[T ~int](name string, value T, elems ...T) error {
+	if !slicer.AnyOf(value, elems...) {
+		return &errIntegerNotAnyOf[T]{Name: name, Value: value, OneOf: elems}
 	}
+
+	return nil
+}
+
+func IntegerAnyOfFn[T ~int](name string, elems ...T) func(T) error {
+	return func(value T) error { return IntegerAnyOf(name, value, elems...) }
 }
 
 //////////////////////////////////////////////////////////////
@@ -297,12 +313,14 @@ func (e *errIntegerNotNoneOf[T]) Unwrap() error {
 	return ErrIntegerNotNegative
 }
 
-func IntegerNoneOf[T ~int](name string, elems ...T) func(v T) error {
-	return func(v T) error {
-		if !slicer.NoneOf(v, elems...) {
-			return &errIntegerNotNoneOf[T]{Name: name, Value: v, OneOf: elems}
-		}
-
-		return nil
+func IntegerNoneOf[T ~int](name string, value T, elems ...T) error {
+	if !slicer.NoneOf(value, elems...) {
+		return &errIntegerNotNoneOf[T]{Name: name, Value: value, OneOf: elems}
 	}
+
+	return nil
+}
+
+func IntegerNoneOfFn[T ~int](name string, elems ...T) func(T) error {
+	return func(value T) error { return IntegerNoneOf(name, value, elems...) }
 }

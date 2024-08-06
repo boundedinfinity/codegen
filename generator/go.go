@@ -3,6 +3,9 @@ package generator
 // https://www.digitalocean.com/community/tutorials/how-to-use-templates-in-go
 // https://gobyexample.com/embed-directive
 
+//lint:file-ignore ST1006
+// https://staticcheck.dev/docs/checks#ST1006
+
 import (
 	"boundedinfinity/codegen/model"
 	"bytes"
@@ -38,11 +41,11 @@ type Generator struct {
 	templateDescriptors []templateDescriptor
 }
 
-func (t *Generator) CasserConvertion(v string) *Generator {
-	return model.SetV(t, &t.caserConversion, v)
+func (this *Generator) CasserConvertion(v string) *Generator {
+	return model.SetV(this, &this.caserConversion, v)
 }
 
-func (t *Generator) GenerateProject(project *model.CodeGenProject) (map[string]string, error) {
+func (this *Generator) GenerateProject(project *model.CodeGenProject) (map[string]string, error) {
 	results := map[string]string{}
 
 	if project == nil {
@@ -50,7 +53,7 @@ func (t *Generator) GenerateProject(project *model.CodeGenProject) (map[string]s
 	}
 
 	for _, typ := range project.Types {
-		typeResults, err := t.GenerateType(typ)
+		typeResults, err := this.GenerateType(typ)
 		if err != nil {
 			return results, err
 		}
@@ -61,44 +64,44 @@ func (t *Generator) GenerateProject(project *model.CodeGenProject) (map[string]s
 	return results, nil
 }
 
-func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, error) {
+func (this *Generator) GenerateType(typ model.CodeGenSchema) (map[string]string, error) {
 	results := map[string]string{}
-	params := templateDescriptor{lang: "go", baseType: typ.GetType()}
+	params := templateDescriptor{lang: "go", baseType: typ.Schema()}
 
-	if err := t.loadTemplates(params); err != nil {
+	if err := this.loadTemplates(params); err != nil {
 		return results, err
 	}
 
 	var templateDescriptors []templateDescriptor
 
 	switch i := typ.(type) {
-	case *model.CodeGenString, *model.CodeGenInteger, *model.CodeGenFloat:
+	case *model.CodeGenString, *model.CodeGenInteger, *model.CodeGenFloat, *model.CodeGenObject:
 		templateDescriptors = slicer.Filter(
 			func(_ int, td templateDescriptor) bool { return includeTemplate(params, td) },
-			t.templateDescriptors...,
+			this.templateDescriptors...,
 		)
 	default:
-		fmt.Printf("unsupported %v", i.GetType())
+		fmt.Printf("unsupported type %v", i.Schema())
 	}
 
 	for _, td := range templateDescriptors {
 		var buffer bytes.Buffer
 
-		err := t.templ.ExecuteTemplate(&buffer, td.name, typ)
+		err := this.templ.ExecuteTemplate(&buffer, td.name, typ)
 		if err != nil {
 			return results, err
 		}
 
-		if t.formatSource {
+		if this.formatSource {
 			formatted, err := format.Source(buffer.Bytes())
 			if err != nil {
-				return results, err
-			}
-
-			buffer.Reset()
-			_, err = buffer.Write(formatted)
-			if err != nil {
-				return results, err
+				content := buffer.String()
+				buffer.Reset()
+				buffer.WriteString("// FORMAT ERROR: " + err.Error() + "\n\n")
+				buffer.WriteString(content)
+			} else {
+				buffer.Reset()
+				buffer.Write(formatted)
 			}
 		}
 
@@ -109,7 +112,7 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 		var filename string
 		filename = td.path
 		filename = pather.Paths.Base(filename)
-		filename = stringer.Replace(filename, typ.Common().Id.Get(), typ.GetType())
+		filename = stringer.Replace(filename, typ.Common().Id.Get(), typ.Schema())
 		filename = extentioner.Strip(filename)
 
 		path := pather.Paths.Join(dir, filename)
@@ -119,8 +122,8 @@ func (t *Generator) GenerateType(typ model.CodeGenType) (map[string]string, erro
 	return results, nil
 }
 
-func (t *Generator) WriteType(typ model.CodeGenType) (map[string]string, error) {
-	results, err := t.GenerateType(typ)
+func (this *Generator) WriteType(typ model.CodeGenSchema) (map[string]string, error) {
+	results, err := this.GenerateType(typ)
 	if err != nil {
 		return results, err
 	}

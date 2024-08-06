@@ -20,13 +20,13 @@ func Test_Integer(t *testing.T) {
 		{
 			name:  "case 1",
 			input: 5,
-			fn:    validation.IntegerMin[CustomInteger]("case 1", 4),
+			fn:    validation.IntegerMinFn[CustomInteger]("case 1", 4),
 			err:   nil,
 		},
 		{
 			name:    "case 2",
 			input:   3,
-			fn:      validation.IntegerMin[CustomInteger]("case 2", 4),
+			fn:      validation.IntegerMinFn[CustomInteger]("case 2", 4),
 			err:     validation.ErrIntegerLessThanMin,
 			message: "case 2 value 3 is less than min value of 4",
 		},

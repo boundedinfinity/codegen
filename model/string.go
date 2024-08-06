@@ -1,6 +1,10 @@
 package model
 
+//lint:file-ignore ST1006
+// https://staticcheck.dev/docs/checks#ST1006
+
 import (
+	"errors"
 	"regexp"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -24,9 +28,9 @@ type CodeGenString struct {
 	// upper case, lower case, snake case, kebab case, etc...
 }
 
-var _ CodeGenType = &CodeGenString{}
+var _ CodeGenSchema = &CodeGenString{}
 
-func (t CodeGenString) GetType() string {
+func (this CodeGenString) Schema() string {
 	return "string"
 }
 
@@ -34,9 +38,12 @@ func (t CodeGenString) GetType() string {
 // Validation
 //----------------------------------------------------------------
 
-func (t CodeGenString) HasValidation() bool {
-	return t.CodeGenCommon.HasValidation() || t.Min.Defined() || t.Max.Defined() || t.Regex.Defined() ||
-		t.Includes.Defined() || t.Excludes.Defined() || t.OneOf.Defined() || t.NoneOf.Defined()
+func (this CodeGenString) HasValidation() bool {
+	return this.CodeGenCommon.HasValidation() ||
+		this.Min.Defined() || this.Max.Defined() ||
+		this.Regex.Defined() ||
+		this.Includes.Defined() || this.Excludes.Defined() ||
+		this.OneOf.Defined() || this.NoneOf.Defined()
 }
 
 var (
@@ -45,48 +52,45 @@ var (
 	ErrStringInvalidRegex = errorer.New("invalid regex")
 )
 
-func (t CodeGenString) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
-		return err
+func (this CodeGenString) Validate() error {
+	var errs []error
+
+	errs = append(errs, this.CodeGenCommon.Validate())
+	errs = append(errs, ErrStringMinBelow1.WithValue(this.Min.Get()))
+
+	if this.Min.Defined() && this.Max.Defined() && this.Max.Get() < this.Min.Get() {
+		errs = append(errs,
+			ErrStringMaxBelowMin.FormatFn("max %v, min %v")(this.Max.Get(), this.Min.Get()),
+		)
 	}
 
-	if t.Min.Defined() && t.Min.Get() < 1 {
-		return ErrStringMinBelow1.WithValue(t.Min.Get())
-	}
-
-	if t.Min.Defined() && t.Max.Defined() {
-		if t.Max.Get() < t.Min.Get() {
-			return ErrStringMaxBelowMin.FormatFn("max %v, min %v")(t.Max.Get(), t.Min.Get())
-		}
-	}
-
-	if t.Regex.Defined() {
-		_, err := regexp.Compile(t.Regex.Get())
+	if this.Regex.Defined() {
+		_, err := regexp.Compile(this.Regex.Get())
 		if err != nil {
 			return ErrStringInvalidRegex.WithValue(err.Error())
 		}
 	}
 
-	if t.Regex.Defined() {
-		if _, err := regexp.Compile(t.Regex.Get()); err != nil {
+	if this.Regex.Defined() {
+		if _, err := regexp.Compile(this.Regex.Get()); err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 // ----------------------------------------------------------------
 // Marshal
 // ----------------------------------------------------------------
 
-func (t *CodeGenString) MarshalJSON() ([]byte, error) {
+func (this *CodeGenString) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId        string `json:"type"`
 		CodeGenString `json:",inline"`
 	}{
-		TypeId:        t.GetType(),
-		CodeGenString: *t,
+		TypeId:        this.Schema(),
+		CodeGenString: *this,
 	}
 
 	return marshalCodeGenType(dto)

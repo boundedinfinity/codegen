@@ -8,62 +8,80 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
+var ErrStringEmpty = errors.New("is empty")
+
+func StringNotEmtpy[T ~string](name string, value T) error {
+	if value == "" {
+		return fmt.Errorf("%s %w", name, ErrStringEmpty)
+	}
+
+	return nil
+}
+
+func StringNotEmptyFn[T ~string](name string) func(T) error {
+	return func(value T) error { return StringNotEmtpy(name, value) }
+}
+
 var ErrStringRequired = errors.New("is required")
 
-func StringRequired[T ~string](name string) func(v T) error {
-	return func(v T) error {
-		if v == "" {
-			return fmt.Errorf("%s %w", name, ErrStringRequired)
-		}
-
-		return nil
+func StringRequired[T ~string](name string, value T) error {
+	if value == "" {
+		return fmt.Errorf("%s %w", name, ErrStringRequired)
 	}
+
+	return nil
+}
+
+func StringRequiredFn[T ~string](name string) func(v T) error {
+	return func(value T) error { return StringRequired(name, value) }
 }
 
 var ErrStringLessThanMin = errors.New("length is less than min value")
 
-func StringMin[T ~string](name string, n int) func(v T) error {
-	return func(v T) error {
-		if len(v) < n {
-			return fmt.Errorf("%s value %s %w of %d", name, v, ErrStringLessThanMin, n)
-		}
-
-		return nil
+func StringMin[T ~string](name string, min int, value T) error {
+	if len(value) < min {
+		return fmt.Errorf("%s value %s %w of %d", name, value, ErrStringLessThanMin, min)
 	}
+
+	return nil
+}
+
+func StringMinFn[T ~string](name string, min int) func(T) error {
+	return func(value T) error { return StringMin(name, min, value) }
 }
 
 var ErrStringGreaterThanMax = errors.New("length is greater than max value")
 
-func StringMax[T ~string](name string, n int) func(v T) error {
-	return func(v T) error {
-		if len(v) < n {
-			return fmt.Errorf("%s value %s %w of %d", name, v, ErrStringGreaterThanMax, n)
-		}
-
-		return nil
+func StringMax[T ~string](name string, max int, value T) error {
+	if len(value) > max {
+		return fmt.Errorf("%s value %s %w of %d", name, value, ErrStringGreaterThanMax, max)
 	}
+
+	return nil
+}
+
+func StringMaxFn[T ~string](name string, max int) func(T) error {
+	return func(value T) error { return StringMin(name, max, value) }
 }
 
 var ErrStringDoesNotMatchPattern = errors.New("does not match pattern")
 
-func StringRegex[T ~string](name string, pattern string) func(v T) error {
+func StringRegex[T ~string](name string, pattern string, value T) error {
 	regex := regexp.MustCompile(pattern)
 
-	return func(v T) error {
-		if !regex.MatchString(string(v)) {
-			return fmt.Errorf("%s value %s %w of %s", name, v, ErrStringDoesNotMatchPattern, pattern)
-		}
-
-		return nil
+	if !regex.MatchString(string(value)) {
+		return fmt.Errorf("%s value %s %w of %s", name, value, ErrStringDoesNotMatchPattern, pattern)
 	}
+
+	return nil
 }
 
-var ErrStringEmpty = errors.New("is empty")
+func StringRegexFn[T ~string](name string, pattern string) func(T) error {
+	regex := regexp.MustCompile(pattern)
 
-func StringNotEmpty[T ~string](name string) func(v T) error {
-	return func(v T) error {
-		if v == "" {
-			return fmt.Errorf("%s %w", name, ErrStringEmpty)
+	return func(value T) error {
+		if !regex.MatchString(string(value)) {
+			return fmt.Errorf("%s value %s %w of %s", name, value, ErrStringDoesNotMatchPattern, pattern)
 		}
 
 		return nil
@@ -72,7 +90,7 @@ func StringNotEmpty[T ~string](name string) func(v T) error {
 
 var ErrStringNotUpperCase = errors.New("is not upper cased")
 
-func StringUpperCase[T ~string](name string) func(v T) error {
+func StringUpperCaseFn[T ~string](name string) func(v T) error {
 	return func(v T) error {
 		if stringer.Capitalize(v) != string(v) {
 			return fmt.Errorf("%s value %w", name, ErrStringNotUpperCase)
@@ -96,7 +114,7 @@ func StringLowerCase[T ~string](name string) func(v T) error {
 
 var ErrStringDoesNotContainAny = errors.New("does not contain given value")
 
-func StringContainsAny[T ~string](name string, elems ...T) func(v T) error {
+func StringContainsAnyFn[T ~string](name string, elems ...T) func(v T) error {
 	return func(v T) error {
 		if !stringer.ContainsAny(v, elems...) {
 			return fmt.Errorf("%s value %s %w from %s",
@@ -111,7 +129,7 @@ func StringContainsAny[T ~string](name string, elems ...T) func(v T) error {
 
 var ErrStringContainSome = errors.New("does contain given value")
 
-func StringContainsNone[T ~string](name string, elems ...T) func(v T) error {
+func StringContainsNoneFn[T ~string](name string, elems ...T) func(v T) error {
 	return func(v T) error {
 		if !stringer.ContainsNone(v, elems...) {
 			return fmt.Errorf("%s value %s %w from %s",
@@ -126,7 +144,7 @@ func StringContainsNone[T ~string](name string, elems ...T) func(v T) error {
 
 var ErrStringNotOneOf = errors.New("is not one of given value")
 
-func StringOneOf[T ~string](name string, elems ...T) func(v T) error {
+func StringOneOfFn[T ~string](name string, elems ...T) func(v T) error {
 	return func(v T) error {
 		if !stringer.ContainsAny(v, elems...) {
 			return fmt.Errorf("%s value %s %w from %s",

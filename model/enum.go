@@ -43,11 +43,11 @@ type CodeGenEnum struct {
 	Values optioner.Option[[]CodeGenEnumItem] `json:"values,omitempty"`
 }
 
-func (t CodeGenEnum) GetType() string {
+func (t CodeGenEnum) Schema() string {
 	return "enum"
 }
 
-var _ CodeGenType = &CodeGenEnum{}
+var _ CodeGenSchema = &CodeGenEnum{}
 
 //----------------------------------------------------------------
 // Validation
@@ -80,7 +80,7 @@ func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 		TypeId      string `json:"type"`
 		CodeGenEnum `json:",inline"`
 	}{
-		TypeId:      t.GetType(),
+		TypeId:      t.Schema(),
 		CodeGenEnum: *t,
 	}
 

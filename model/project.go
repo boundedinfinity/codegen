@@ -20,7 +20,7 @@ type CodeGenProject struct {
 	Mappings    mapper.Mapper[string, string] `json:"mappings,omitempty"`
 	Operations  []CodeGenOperation            `json:"operations,omitempty"`
 	Templates   CodeGenProjectTemplates       `json:"templates,omitempty"`
-	Types       []CodeGenType                 `json:"types,omitempty"`
+	Types       []CodeGenSchema               `json:"types,omitempty"`
 	Package     optioner.Option[string]       `json:"package,omitempty"`
 	OutputRoot  optioner.Option[string]       `json:"output-root,omitempty"`
 }
@@ -161,7 +161,7 @@ func (t *codeGenProjectBuilder) Operations(v ...*CodeGenOperation) *codeGenProje
 	return t
 }
 
-func (t *codeGenProjectBuilder) Types(v ...CodeGenType) *codeGenProjectBuilder {
+func (t *codeGenProjectBuilder) Types(v ...CodeGenSchema) *codeGenProjectBuilder {
 	t.obj.Types = append(t.obj.Types, v...)
 	return t
 }

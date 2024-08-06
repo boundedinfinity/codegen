@@ -20,13 +20,13 @@ func Test_String(t *testing.T) {
 		{
 			name:  "case 1",
 			input: "something",
-			fn:    validation.StringMin[CustomString]("case 1", 4),
+			fn:    validation.StringMinFn[CustomString]("case 1", 4),
 			err:   nil,
 		},
 		{
 			name:    "case 2",
 			input:   "so",
-			fn:      validation.StringMin[CustomString]("case 2", 4),
+			fn:      validation.StringMinFn[CustomString]("case 2", 4),
 			err:     validation.ErrStringLessThanMin,
 			message: "case 2 value so less than min value of 4",
 		},
