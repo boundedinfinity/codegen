@@ -52,21 +52,21 @@ func (t *integerValidations[T]) Range(rng model.NumberRange[T]) *integerValidati
 }
 
 func (t *integerValidations[T]) MultipleOf(n T) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerMultipleOf(t.name, n))
+	t.validations = append(t.validations, IntegerMultipleOfFn(t.name, n))
 	return t
 }
 
 func (t *integerValidations[T]) NotZero() *integerValidations[T] {
-	t.validations = append(t.validations, IntegerNotZero[T](t.name))
+	t.validations = append(t.validations, IntegerNotZeroFn[T](t.name))
 	return t
 }
 
 func (t *integerValidations[T]) Positive() *integerValidations[T] {
-	t.validations = append(t.validations, IntegerPositive[T](t.name))
+	t.validations = append(t.validations, IntegerPositiveFn[T](t.name))
 	return t
 }
 
 func (t *integerValidations[T]) Negative() *integerValidations[T] {
-	t.validations = append(t.validations, IntegerNegative[T](t.name))
+	t.validations = append(t.validations, IntegerNegativeFn[T](t.name))
 	return t
 }

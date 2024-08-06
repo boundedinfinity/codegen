@@ -16,7 +16,7 @@ func (t *Generator) loadTemplates(params templateDescriptor) error {
 		return err
 	}
 
-	t.templ.Funcs(t.getHelpers(t.lang))
+	t.templ.Funcs(getHelpers(t.lang))
 
 	for _, tname := range tnames {
 		if t.templateAlreadyLoaded(tname) || !includeTemplate(params, tname) {

@@ -5,6 +5,7 @@ package generator
 
 import (
 	"boundedinfinity/codegen/model"
+	"errors"
 	"strings"
 	"text/template"
 
@@ -19,11 +20,12 @@ var (
 	ErrGeneratorLangTypeUnsupported = errorer.New("unsupported lang")
 )
 
-func (this *Generator) getHelpers(lang string) template.FuncMap {
+func getHelpers(lang string) template.FuncMap {
 	helpers := map[string]template.FuncMap{
 		"go": {
 			"sjoin":      strings.Join,
 			"lowerFirst": stringer.LowercaseFirst[string],
+			"dict":       dict,
 		},
 	}
 
@@ -42,4 +44,19 @@ func (this *Generator) resolve(typ model.CodeGenSchema) model.CodeGenSchema {
 		resolved = typ
 	}
 	return resolved
+}
+
+func dict(values ...interface{}) (map[string]interface{}, error) {
+	if len(values)%2 != 0 {
+		return nil, errors.New("invalid dict call")
+	}
+	dict := make(map[string]interface{}, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		key, ok := values[i].(string)
+		if !ok {
+			return nil, errors.New("dict keys must be strings")
+		}
+		dict[key] = values[i+1]
+	}
+	return dict, nil
 }

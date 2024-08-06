@@ -248,3 +248,5 @@ following additions:
 - https://typeschema.org/
 - https://github.com/Masterminds/sprig
 - https://developers.google.com/protocol-buffers
+- https://go-ozzo.github.io/ozzo-validation/
+- https://www.jsonrpc.org/
