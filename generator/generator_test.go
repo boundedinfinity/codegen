@@ -3,11 +3,45 @@ package generator_test
 import (
 	"boundedinfinity/codegen/generator"
 	"boundedinfinity/codegen/model"
+	"context"
+	"database/sql"
+	"fmt"
+	"os"
 	"testing"
 
 	o "github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/tursodatabase/go-libsql"
 )
+
+func Test_Db(t *testing.T) {
+	file := "./test-output/test-0.db"
+	db, err := sql.Open("libsql", fmt.Sprintf("file:%s", file))
+	assert.Nil(t, err)
+
+	defer func() {
+		db.Close()
+		os.Remove(file)
+	}()
+
+	ctx := context.Background()
+
+	_, err = db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS test_0 ( column_1 TEXT );`)
+	assert.Nil(t, err)
+
+	_, err = db.ExecContext(ctx, `INSERT INTO test_0 ( column_1 ) VALUES ('something');`)
+	assert.Nil(t, err)
+
+	rows, err := db.QueryContext(ctx, `SELECT column_1 FROM test_0;`)
+	assert.Nil(t, err)
+
+	var column_1 string
+	for rows.Next() {
+		assert.Nil(t, rows.Scan(&column_1))
+		fmt.Printf("column_1: %s\n", column_1)
+	}
+}
 
 func Test_Generate(t *testing.T) {
 	tcs := []struct {

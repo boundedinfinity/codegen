@@ -8,15 +8,6 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
-// Indexed Name
-func in(name string, length, index int) string {
-	if length > 0 {
-		return fmt.Sprintf("%s[%d]", name, index)
-	}
-
-	return name
-}
-
 // ================================================================================================
 // String Empty
 // ================================================================================================
@@ -243,12 +234,12 @@ func (e ErrStringNotUpperCaseDetails[T]) Error() string {
 }
 
 func (e ErrStringNotUpperCaseDetails[T]) Unwrap() error {
-	return ErrStringRegex
+	return ErrStringNotUpperCase
 }
 
 func StringUpperCase[T ~string](name string, values ...T) error {
 	for i, value := range values {
-		if stringer.Capitalize(value) != string(value) {
+		if stringer.Uppercase(value) != string(value) {
 			return &ErrStringNotUpperCaseDetails[T]{
 				Name:   name,
 				Length: len(values),
@@ -272,56 +263,131 @@ func StringUpperCaseFn[T ~string](name string) func(values ...T) error {
 
 var ErrStringNotLowerCase = errors.New("is not lower cased")
 
-func StringLowerCaseFn[T ~string](name string) func(...T) error {
-	return func(values ...T) error {
-		for _, value := range values {
-			if stringer.Capitalize(value) != string(value) {
-				return fmt.Errorf("%s value %w", name, ErrStringNotLowerCase)
+type ErrStringNotLowerCaseDetails[T ~string] struct {
+	Name   string
+	Length int
+	Index  int
+	Value  T
+}
+
+func (e ErrStringNotLowerCaseDetails[T]) Error() string {
+	return fmt.Sprintf("%s(%s) %s",
+		in(e.Name, e.Length, e.Index), e.Value, ErrStringMax.Error(),
+	)
+}
+
+func (e ErrStringNotLowerCaseDetails[T]) Unwrap() error {
+	return ErrStringNotLowerCase
+}
+
+func StringLowerCase[T ~string](name string, values ...T) error {
+	for i, value := range values {
+		if stringer.Lowercase(value) != string(value) {
+			return &ErrStringNotLowerCaseDetails[T]{
+				Name:   name,
+				Length: len(values),
+				Index:  i,
+				Value:  value,
 			}
 		}
-
-		return nil
 	}
+
+	return nil
+}
+
+func StringLowerCaseFn[T ~string](name string) func(...T) error {
+	return func(values ...T) error { return StringLowerCase(name, values...) }
 }
 
 // ================================================================================================
 // String ContainsAny
 // ================================================================================================
 
-var ErrStringDoesNotContainAny = errors.New("does not contain given value")
+var ErrStringContainsAny = errors.New("string does any of the required values")
 
-func StringContainsAnyFn[T ~string](name string, elems ...T) func(...T) error {
-	return func(values ...T) error {
-		for _, value := range values {
-			if !stringer.ContainsAny(value, elems...) {
-				return fmt.Errorf("%s value %s %w from %s",
-					name, value, ErrStringDoesNotContainAny,
-					stringer.Join(", ", elems...),
-				)
+type ErrStringContainsAnyDetails[T ~string, U ~string] struct {
+	Name   string
+	Length int
+	Index  int
+	AnyOf  []T
+	Value  U
+}
+
+func (e ErrStringContainsAnyDetails[T, U]) Error() string {
+	return fmt.Sprintf("%s(%s) %s from %s",
+		in(e.Name, e.Length, e.Index), e.Value,
+		ErrStringMax.Error(), stringer.Join(", ", e.AnyOf...),
+	)
+}
+
+func (e ErrStringContainsAnyDetails[T, U]) Unwrap() error {
+	return ErrStringContainsAny
+}
+
+func StringContainsAny[T ~string, U ~string](name string, elems []T, values ...U) error {
+	for i, value := range values {
+		if !stringer.ContainsAny(value, elems...) {
+			return &ErrStringContainsAnyDetails[T, U]{
+				Name:   name,
+				Length: len(values),
+				Index:  i,
+				AnyOf:  elems,
+				Value:  value,
 			}
 		}
-
-		return nil
 	}
+
+	return nil
+}
+
+func StringContainsAnyFn[T ~string, U ~string](name string, elems ...T) func(...U) error {
+	return func(values ...U) error { return StringContainsAny(name, elems, values...) }
 }
 
 // ================================================================================================
 // String ContainsNone
 // ================================================================================================
 
-var ErrStringContainSome = errors.New("does contain given value")
+var ErrStringContainsNone = errors.New("string contains at least one of invalid values")
 
-func StringContainsNoneFn[T ~string](name string, elems ...T) func(v T) error {
-	return func(v T) error {
-		if !stringer.ContainsNone(v, elems...) {
-			return fmt.Errorf("%s value %s %w from %s",
-				name, v, ErrStringContainSome,
-				stringer.Join(", ", elems...),
-			)
+type ErrStringContainsNoneDetails[T ~string, U ~string] struct {
+	Name   string
+	Length int
+	Index  int
+	NoneOf []T
+	Value  U
+}
+
+func (e ErrStringContainsNoneDetails[T, U]) Error() string {
+	return fmt.Sprintf("%s(%s) %s from %s",
+		in(e.Name, e.Length, e.Index), e.Value,
+		ErrStringMax.Error(), stringer.Join(", ", e.NoneOf...),
+	)
+}
+
+func (e ErrStringContainsNoneDetails[T, U]) Unwrap() error {
+	return ErrStringContainsNone
+}
+
+func StringContainsNone[T ~string, U ~string](name string, elems []T, values ...U) error {
+	for i, value := range values {
+		if !stringer.ContainsNone(value, elems...) {
+			return &ErrStringContainsNoneDetails[T, U]{
+				Name:   name,
+				Length: len(values),
+				Index:  i,
+				NoneOf: elems,
+				Value:  value,
+			}
 		}
-
-		return nil
 	}
+
+	return nil
+
+}
+
+func StringContainsNoneFn[T ~string, U ~string](name string, elems ...T) func(...U) error {
+	return func(values ...U) error { return StringContainsNone(name, elems, values...) }
 }
 
 // ================================================================================================
@@ -334,7 +400,7 @@ func StringOneOfFn[T ~string](name string, elems ...T) func(v T) error {
 	return func(v T) error {
 		if !stringer.ContainsAny(v, elems...) {
 			return fmt.Errorf("%s value %s %w from %s",
-				name, v, ErrStringDoesNotContainAny,
+				name, v, ErrStringNotOneOf,
 				stringer.Join(", ", elems...),
 			)
 		}

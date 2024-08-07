@@ -250,3 +250,6 @@ following additions:
 - https://developers.google.com/protocol-buffers
 - https://go-ozzo.github.io/ozzo-validation/
 - https://www.jsonrpc.org/
+- https://docs.turso.tech/local-development#sqlite
+- https://www.sqlite.org
+- https://www.w3schools.com/sql

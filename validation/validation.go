@@ -1,6 +1,9 @@
 package validation
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var ValidationError = errors.New("validation error")
 
@@ -26,4 +29,13 @@ func (t validations[T]) Validate(v T) error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// Indexed Name
+func in(name string, length, index int) string {
+	if length > 0 {
+		return fmt.Sprintf("%s[%d]", name, index)
+	}
+
+	return name
 }
