@@ -31,6 +31,7 @@ func Test_Generate(t *testing.T) {
 							"boundedinfinity/codegen/validation",
 							"errors",
 							"boundedinfinity/codegen/schema/util",
+							"fmt",
 						}),
 					},
 				},
@@ -82,6 +83,7 @@ func Test_Generate(t *testing.T) {
 										"errors",
 										"database/sql/driver",
 										"boundedinfinity/codegen/validation",
+										"fmt",
 									}),
 								},
 							},
@@ -91,26 +93,28 @@ func Test_Generate(t *testing.T) {
 							Positive:   o.Some(true),
 						},
 					},
-
-					// &model.CodeGenArray{
-					// 	CodeGenCommon: model.CodeGenCommon{
-					// 		Name: o.Some("description"),
-					// 		Lang: model.CodeGenLangData{
-					// 			Name: o.Some("Description"),
-					// 			Type: o.Some("[]string"),
-					// 		},
-					// 	},
-					// 	Items: o.Some(model.CodeGenSchema(&model.CodeGenString{
-					// 		CodeGenCommon: model.CodeGenCommon{
-					// 			Lang: model.CodeGenLangData{
-					// 				Type: o.Some("string"),
-					// 			},
-					// 		},
-					// 		Min:   o.Some(2),
-					// 		Max:   o.Some(10),
-					// 		Regex: o.Some(`.*`),
-					// 	})),
-					// },
+					&model.CodeGenArray{
+						CodeGenCommon: model.CodeGenCommon{
+							Name: o.Some("description"),
+							Lang: model.CodeGenLangData{
+								Name: o.Some("Description"),
+								Type: o.Some("[]string"),
+								Imports: o.Some([]string{
+									"fmt",
+								}),
+							},
+						},
+						Items: o.Some(model.CodeGenSchema(&model.CodeGenString{
+							CodeGenCommon: model.CodeGenCommon{
+								Lang: model.CodeGenLangData{
+									Type: o.Some("string"),
+								},
+							},
+							Min:   o.Some(2),
+							Max:   o.Some(10),
+							Regex: o.Some(`.*`),
+						})),
+					},
 				}),
 			},
 			expected: map[string]string{},

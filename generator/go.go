@@ -17,6 +17,7 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/extentioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/mapper"
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
 func New(lang string) (*Generator, error) {
@@ -37,7 +38,7 @@ func New(lang string) (*Generator, error) {
 	}
 
 	gen.templ = templ
-	gen._dumpTemplates()
+	// gen._dumpTemplates()
 
 	return gen, nil
 }
@@ -52,7 +53,12 @@ type Generator struct {
 }
 
 func (this *Generator) _dumpTemplates() {
-	fmt.Println(this.templ.DefinedTemplates())
+	message := this.templ.DefinedTemplates()
+	message = stringer.Replace(message, "", "; defined templates are: ")
+	message = stringer.Replace(message, "\n", ",")
+
+	fmt.Println("====================================================================")
+	fmt.Println(message)
 }
 
 func (this *Generator) CasserConvertion(v string) *Generator {
@@ -91,6 +97,10 @@ func (this *Generator) GenerateType(typ model.CodeGenSchema) (map[string]string,
 		err = this.templ.ExecuteTemplate(&buffer, "object_type", typ)
 	case *model.CodeGenInteger:
 		err = this.templ.ExecuteTemplate(&buffer, "integer_type", typ)
+	case *model.CodeGenFloat:
+		err = this.templ.ExecuteTemplate(&buffer, "float_type", typ)
+	// case *model.CodeGenArray:
+	// 	err = this.templ.ExecuteTemplate(&buffer, "array_type", typ)
 	default:
 		fmt.Printf("unsupported type %v", i.Schema())
 	}

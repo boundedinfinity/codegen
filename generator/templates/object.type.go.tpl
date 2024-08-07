@@ -6,10 +6,10 @@
 
     {{ if .Lang.Imports.Defined }}
         import (
-        {{ range .Lang.Imports.Get}}
-            "{{ . }}"
-        {{ end }}
-    )
+            {{ range .Lang.Imports.Get}}
+                "{{ . }}"
+            {{ end }}
+        )
     {{ end }}
 
     type {{ $tname }} struct {
@@ -37,6 +37,8 @@
                 {{ template "ref_validation" dict "Name" $pname "Path" $path "Instance" . }}
                 {{ template "string_validation" dict "Name" $pname "Path" $path "Instance" . }}
                 {{ template "integer_validation" dict "Name" $pname "Path" $path "Instance" . }}
+                {{ template "float_validation" dict "Name" $pname "Path" $path "Instance" . }}
+                {{ template "array_validation" dict "Name" $pname "Path" $path "Instance" . }}
             {{ end }}
 
             for _, validator := range {{ $validators }} {
@@ -50,6 +52,6 @@
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////
     // SQL
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
 
 {{ end }}

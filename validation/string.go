@@ -8,6 +8,10 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
+// ================================================================================================
+// String Empty
+// ================================================================================================
+
 var ErrStringEmpty = errors.New("is empty")
 
 func StringNotEmtpy[T ~string](name string, value T) error {
@@ -21,6 +25,10 @@ func StringNotEmtpy[T ~string](name string, value T) error {
 func StringNotEmptyFn[T ~string](name string) func(T) error {
 	return func(value T) error { return StringNotEmtpy(name, value) }
 }
+
+// ================================================================================================
+// String Required
+// ================================================================================================
 
 var ErrStringRequired = errors.New("is required")
 
@@ -36,6 +44,10 @@ func StringRequiredFn[T ~string](name string) func(v T) error {
 	return func(value T) error { return StringRequired(name, value) }
 }
 
+// ================================================================================================
+// String Min
+// ================================================================================================
+
 var ErrStringLessThanMin = errors.New("length is less than min value")
 
 func StringMin[T ~string](name string, min int, value T) error {
@@ -50,6 +62,10 @@ func StringMinFn[T ~string](name string, min int) func(T) error {
 	return func(value T) error { return StringMin(name, min, value) }
 }
 
+// ================================================================================================
+// String Max
+// ================================================================================================
+
 var ErrStringGreaterThanMax = errors.New("length is greater than max value")
 
 func StringMax[T ~string](name string, max int, value T) error {
@@ -63,6 +79,10 @@ func StringMax[T ~string](name string, max int, value T) error {
 func StringMaxFn[T ~string](name string, max int) func(T) error {
 	return func(value T) error { return StringMin(name, max, value) }
 }
+
+// ================================================================================================
+// String Regex
+// ================================================================================================
 
 var ErrStringDoesNotMatchPattern = errors.New("does not match pattern")
 
@@ -88,6 +108,10 @@ func StringRegexFn[T ~string](name string, pattern string) func(T) error {
 	}
 }
 
+// ================================================================================================
+// String UpperCase
+// ================================================================================================
+
 var ErrStringNotUpperCase = errors.New("is not upper cased")
 
 func StringUpperCaseFn[T ~string](name string) func(v T) error {
@@ -100,6 +124,10 @@ func StringUpperCaseFn[T ~string](name string) func(v T) error {
 	}
 }
 
+// ================================================================================================
+// String LowerCase
+// ================================================================================================
+
 var ErrStringNotLowerCase = errors.New("is not lower cased")
 
 func StringLowerCase[T ~string](name string) func(v T) error {
@@ -111,6 +139,10 @@ func StringLowerCase[T ~string](name string) func(v T) error {
 		return nil
 	}
 }
+
+// ================================================================================================
+// String ContainsAny
+// ================================================================================================
 
 var ErrStringDoesNotContainAny = errors.New("does not contain given value")
 
@@ -127,6 +159,10 @@ func StringContainsAnyFn[T ~string](name string, elems ...T) func(v T) error {
 	}
 }
 
+// ================================================================================================
+// String ContainsNone
+// ================================================================================================
+
 var ErrStringContainSome = errors.New("does contain given value")
 
 func StringContainsNoneFn[T ~string](name string, elems ...T) func(v T) error {
@@ -141,6 +177,10 @@ func StringContainsNoneFn[T ~string](name string, elems ...T) func(v T) error {
 		return nil
 	}
 }
+
+// ================================================================================================
+// String OneOf
+// ================================================================================================
 
 var ErrStringNotOneOf = errors.New("is not one of given value")
 
