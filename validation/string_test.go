@@ -13,7 +13,7 @@ func Test_String(t *testing.T) {
 	tcs := []struct {
 		name    string
 		input   CustomString
-		fn      func(CustomString) error
+		fn      func(...CustomString) error
 		err     error
 		message string
 	}{
@@ -27,7 +27,7 @@ func Test_String(t *testing.T) {
 			name:    "case 2",
 			input:   "so",
 			fn:      validation.StringMinFn[CustomString]("case 2", 4),
-			err:     validation.ErrStringLessThanMin,
+			err:     validation.ErrStringMin,
 			message: "case 2 value so less than min value of 4",
 		},
 	}
@@ -42,4 +42,16 @@ func Test_String(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_String_Error(t *testing.T) {
+	err := validation.StringNotEmtpy("something", "a", "b", "", "d", "e")
+	assert.ErrorIs(t, err, validation.ErrStringEmpty)
+
+	details, ok := err.(*validation.ErrStringEmtpyDetails)
+	assert.True(t, ok)
+	assert.Equal(t, 2, details.Index)
+	assert.Equal(t, 5, details.Length)
+	assert.Equal(t, "something[2] string is empty", details.Error())
+
 }

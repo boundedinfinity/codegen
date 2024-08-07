@@ -31,7 +31,6 @@ func Test_Generate(t *testing.T) {
 							"boundedinfinity/codegen/validation",
 							"errors",
 							"boundedinfinity/codegen/schema/util",
-							"fmt",
 						}),
 					},
 				},
@@ -83,7 +82,6 @@ func Test_Generate(t *testing.T) {
 										"errors",
 										"database/sql/driver",
 										"boundedinfinity/codegen/validation",
-										"fmt",
 									}),
 								},
 							},
@@ -99,9 +97,6 @@ func Test_Generate(t *testing.T) {
 							Lang: model.CodeGenLangData{
 								Name: o.Some("Description"),
 								Type: o.Some("[]string"),
-								Imports: o.Some([]string{
-									"fmt",
-								}),
 							},
 						},
 						Items: o.Some(model.CodeGenSchema(&model.CodeGenString{

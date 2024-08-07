@@ -5,13 +5,13 @@ import "errors"
 func String[T ~string](name string) *stringValidations[T] {
 	return &stringValidations[T]{
 		name:        name,
-		validations: []func(v T) error{},
+		validations: []func(...T) error{},
 	}
 }
 
 type stringValidations[T ~string] struct {
 	name        string
-	validations []func(v T) error
+	validations []func(...T) error
 }
 
 func (t stringValidations[T]) Validate(v T) error {
@@ -52,7 +52,7 @@ func (t *stringValidations[T]) UpperCase(pattern string) *stringValidations[T] {
 }
 
 func (t *stringValidations[T]) LowerCase(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringLowerCase[T](t.name))
+	t.validations = append(t.validations, StringLowerCaseFn[T](t.name))
 	return t
 }
 
