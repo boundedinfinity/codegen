@@ -1,3 +1,4 @@
+// Package model contains schema typing information
 package model
 
 type CodeGenSchema interface {

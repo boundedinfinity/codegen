@@ -466,3 +466,57 @@ func (this *arrayBilder) SqlName(sqlName string) *arrayBilder {
 func (this *arrayBilder) Items(property SchemaBuilder) *arrayBilder {
 	return setAndReturn(this, &this.typ.Items, property.Schema())
 }
+
+///////////////////////////////////////////////////////////////////
+// Ref
+//////////////////////////////////////////////////////////////////
+
+func (this build) Ref() *refBilder {
+	return &refBilder{}
+}
+
+type refBilder struct {
+	typ CodeGenRef
+}
+
+var _ SchemaBuilder = &refBilder{}
+
+func (this *refBilder) Schema() CodeGenSchema {
+	return &this.typ
+}
+
+func (this *refBilder) Id(id string) *refBilder {
+	return setAndReturn(this, &this.typ.Id, id)
+}
+
+func (this *refBilder) Name(name string) *refBilder {
+	return setAndReturn(this, &this.typ.Name, name)
+}
+
+func (this *refBilder) Description(description string) *refBilder {
+	return setAndReturn(this, &this.typ.Description, description)
+}
+
+func (this *refBilder) Required(required bool) *refBilder {
+	return setAndReturn(this, &this.typ.Required, required)
+}
+
+func (this *refBilder) JsonName(jsonName string) *refBilder {
+	return setAndReturn(this, &this.typ.JsonName, jsonName)
+}
+
+func (this *refBilder) YamlName(yamlName string) *refBilder {
+	return setAndReturn(this, &this.typ.YamlName, yamlName)
+}
+
+func (this *refBilder) SqlName(sqlName string) *refBilder {
+	return setAndReturn(this, &this.typ.SqlName, sqlName)
+}
+
+func (this *refBilder) Ref(id string) *refBilder {
+	return setAndReturn(this, &this.typ.Ref, id)
+}
+
+func (this *refBilder) RefSchema(ref SchemaBuilder) *refBilder {
+	return this.Ref(ref.Schema().Common().Id.Get())
+}

@@ -1,8 +1,5 @@
 package model
 
-//lint:file-ignore ST1006
-// https://staticcheck.dev/docs/checks#ST1006
-
 import (
 	"boundedinfinity/codegen/utils"
 	"errors"
