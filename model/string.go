@@ -1,8 +1,5 @@
 package model
 
-//lint:file-ignore ST1006
-// https://staticcheck.dev/docs/checks#ST1006
-
 import (
 	"errors"
 	"regexp"
@@ -17,14 +14,15 @@ import (
 
 type CodeGenString struct {
 	CodeGenCommon
-	Min      optioner.Option[int]      `json:"min,omitempty"`
-	Max      optioner.Option[int]      `json:"max,omitempty"`
-	Regex    optioner.Option[string]   `json:"regex,omitempty"`
-	Abnf     optioner.Option[string]   `json:"abnf,omitempty"`
-	Includes optioner.Option[[]string] `json:"includes,omitempty"`
-	Excludes optioner.Option[[]string] `json:"excludes,omitempty"`
-	OneOf    optioner.Option[[]string] `json:"one-of,omitempty"`
-	NoneOf   optioner.Option[[]string] `json:"none-of,omitempty"`
+	Min      optioner.Option[int]        `json:"min,omitempty"`
+	Max      optioner.Option[int]        `json:"max,omitempty"`
+	Range    optioner.Option[Range[int]] `json:"range,omitempty"`
+	Regex    optioner.Option[string]     `json:"regex,omitempty"`
+	Abnf     optioner.Option[string]     `json:"abnf,omitempty"`
+	Includes optioner.Option[[]string]   `json:"includes,omitempty"`
+	Excludes optioner.Option[[]string]   `json:"excludes,omitempty"`
+	OneOf    optioner.Option[[]string]   `json:"one-of,omitempty"`
+	NoneOf   optioner.Option[[]string]   `json:"none-of,omitempty"`
 	// upper case, lower case, snake case, kebab case, etc...
 }
 

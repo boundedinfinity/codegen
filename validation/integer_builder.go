@@ -42,11 +42,11 @@ func (t *integerValidations[T]) Max(n T) *integerValidations[T] {
 }
 
 func (t *integerValidations[T]) MinMax(min, max T) *integerValidations[T] {
-	t.Range(model.NumberRange[T]{Min: optioner.Some(min), Max: optioner.Some(max)})
+	t.Range(model.Range[T]{Min: optioner.Some(min), Max: optioner.Some(max)})
 	return t
 }
 
-func (t *integerValidations[T]) Range(rng model.NumberRange[T]) *integerValidations[T] {
+func (t *integerValidations[T]) Range(rng model.Range[T]) *integerValidations[T] {
 	t.validations = append(t.validations, IntegerRange(t.name, rng))
 	return t
 }

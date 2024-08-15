@@ -80,7 +80,7 @@ var ErrIntegerOutOfRange = errors.New("out of range")
 
 type errIntegerNotInRange[T ~int] struct {
 	Name  string
-	Range model.NumberRange[T]
+	Range model.Range[T]
 	Value T
 }
 
@@ -116,7 +116,7 @@ func (e *errIntegerNotInRange[T]) Unwrap() error {
 	return ErrIntegerOutOfRange
 }
 
-func IntegerRange[T ~int](name string, rng model.NumberRange[T]) func(v T) error {
+func IntegerRange[T ~int](name string, rng model.Range[T]) func(v T) error {
 	return func(v T) error {
 		if rng.Min.Defined() && v < rng.Min.Get() {
 			return &errIntegerNotInRange[T]{Name: name, Range: rng, Value: v}

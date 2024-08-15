@@ -9,32 +9,6 @@ import (
 )
 
 ///////////////////////////////////////////////////////////////////
-// EnumValue
-//////////////////////////////////////////////////////////////////
-
-type CodeGenEnumItem struct {
-	Name        optioner.Option[string]   `json:"name,omitempty"`
-	Items       optioner.Option[[]string] `json:"items,omitempty"`
-	Description optioner.Option[string]   `json:"description,omitempty"`
-}
-
-//----------------------------------------------------------------
-// Validation
-//----------------------------------------------------------------
-
-var (
-	errCodeGenEnumValueMustBeDefined = errorer.New("name or value must be defined")
-)
-
-func (t CodeGenEnumItem) Validate() error {
-	if t.Name.Empty() || t.Items.Empty() || len(t.Items.Get()) < 1 {
-		return errCodeGenEnumValueMustBeDefined
-	}
-
-	return nil
-}
-
-///////////////////////////////////////////////////////////////////
 // Enum
 //////////////////////////////////////////////////////////////////
 
@@ -85,4 +59,30 @@ func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
 	}
 
 	return marshalCodeGenType(dto)
+}
+
+///////////////////////////////////////////////////////////////////
+// EnumValue
+//////////////////////////////////////////////////////////////////
+
+type CodeGenEnumItem struct {
+	Name        optioner.Option[string]   `json:"name,omitempty"`
+	Items       optioner.Option[[]string] `json:"items,omitempty"`
+	Description optioner.Option[string]   `json:"description,omitempty"`
+}
+
+//----------------------------------------------------------------
+// Validation
+//----------------------------------------------------------------
+
+var (
+	errCodeGenEnumValueMustBeDefined = errorer.New("name or value must be defined")
+)
+
+func (t CodeGenEnumItem) Validate() error {
+	if t.Name.Empty() || t.Items.Empty() || len(t.Items.Get()) < 1 {
+		return errCodeGenEnumValueMustBeDefined
+	}
+
+	return nil
 }

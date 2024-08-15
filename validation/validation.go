@@ -19,10 +19,10 @@ type validations[T any] struct {
 	validations []func(v T) error
 }
 
-func (t validations[T]) Validate(v T) error {
+func (this validations[T]) Validate(v T) error {
 	errs := []error{}
 
-	for _, validation := range t.validations {
+	for _, validation := range this.validations {
 		if err := validation(v); err != nil {
 			errs = append(errs, err)
 		}
