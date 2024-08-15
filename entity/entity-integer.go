@@ -35,50 +35,50 @@ var (
 	ErrIntegerEntityPosAndNegMutEx = errorer.New("positive and negative are mutually exclusive")
 )
 
-func (t integerEntity) Validate() error {
-	if err := t.entityBase.Validate(); err != nil {
+func (this integerEntity) Validate() error {
+	if err := this.entityBase.Validate(); err != nil {
 		return err
 	}
 
-	if t.positive && t.negative {
+	if this.positive && this.negative {
 		return ErrIntegerEntityPosAndNegMutEx
 	}
 
-	if t.min > t.max {
-		return ErrIntegerEntityMinAboveMax.FormatFn("min: %v, max: v")(t.min, t.max)
+	if this.min > this.max {
+		return ErrIntegerEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
 	}
 
-	if t.multipleOf < 1 {
-		return ErrIntegerEntityLessThan1.WithValue(t.multipleOf)
+	if this.multipleOf < 1 {
+		return ErrIntegerEntityLessThan1.WithValue(this.multipleOf)
 	}
 
-	for i, rng := range t.ranges {
+	for i, rng := range this.ranges {
 		return ErrIntegerEntityMinAboveMax.FormatFn("ranges[%v] min: %v, max: v")(i, rng.Min, rng.Max)
 	}
 
 	return nil
 }
 
-func (t integerEntity) ToMap() (map[string]any, error) {
-	data, err := t.entityBase.ToMap()
+func (this integerEntity) ToMap() (map[string]any, error) {
+	data, err := this.entityBase.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
-	iparam(data, "min", t.min)
-	iparam(data, "min", t.max)
-	iparam(data, "multiple-of", t.multipleOf)
-	bparam(data, "positive", t.positive)
-	bparam(data, "negative", t.negative)
+	iparam(data, "min", this.min)
+	iparam(data, "min", this.max)
+	iparam(data, "multiple-of", this.multipleOf)
+	bparam(data, "positive", this.positive)
+	bparam(data, "negative", this.negative)
 
-	if len(t.oneOf) > 0 {
-		data["one-of"] = t.oneOf
+	if len(this.oneOf) > 0 {
+		data["one-of"] = this.oneOf
 	}
 
-	if len(t.ranges) > 0 {
+	if len(this.ranges) > 0 {
 		ranges := []map[string]any{}
-		for _, irange := range t.ranges {
+		for _, irange := range this.ranges {
 			ranges = append(ranges, map[string]any{
 				"min": irange.Min,
 				"max": irange.Max,
@@ -87,62 +87,71 @@ func (t integerEntity) ToMap() (map[string]any, error) {
 		data["ranges"] = ranges
 	}
 
-	if t.positive {
+	if this.positive {
 		data["positive"] = true
 	}
 
-	if t.negative {
+	if this.negative {
 		data["negative"] = true
 	}
 
 	return data, nil
 }
 
-func (t integerEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this integerEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaInteger{
 		JsonSchemaCore: json_schema.JsonSchemaCore{
 			Schema:      json_schema.SCHEMA_VERSION_2020_12,
-			Id:          t.qname,
-			Comment:     t.comments,
-			Title:       t.shortDescription,
-			Description: t.longDescription,
+			Id:          this.qname,
+			Comment:     this.comments,
+			Title:       this.shortDescription,
+			Description: this.longDescription,
 		},
 	}
 	return schema, nil
 }
 
-func (t integerEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t integerEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t integerEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t integerEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t integerEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this integerEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this integerEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this integerEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this integerEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this integerEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *integerEntity) QName(s string) *integerEntity           { t.qname = s; return t }
-func (t *integerEntity) License(s License) *integerEntity        { t.license = s; return t }
-func (t *integerEntity) Copyright(s string) *integerEntity       { t.copyright = s; return t }
-func (t *integerEntity) Comments(s string) *integerEntity        { t.comments = s; return t }
-func (t *integerEntity) LongDescription(s string) *integerEntity { t.longDescription = s; return t }
-func (t *integerEntity) Serde(s string) *integerEntity           { t.serde = s; return t }
-func (t *integerEntity) Json(s string) *integerEntity            { t.json = s; return t }
-func (t *integerEntity) Yaml(s string) *integerEntity            { t.yaml = s; return t }
-func (t *integerEntity) Sql(s string) *integerEntity             { t.sql = s; return t }
+func (this *integerEntity) QName(s string) *integerEntity     { this.qname = s; return this }
+func (this *integerEntity) License(s License) *integerEntity  { this.license = s; return this }
+func (this *integerEntity) Copyright(s string) *integerEntity { this.copyright = s; return this }
+func (this *integerEntity) Comments(s string) *integerEntity  { this.comments = s; return this }
+func (this *integerEntity) LongDescription(s string) *integerEntity {
+	this.longDescription = s
+	return this
+}
+func (this *integerEntity) Serde(s string) *integerEntity { this.serde = s; return this }
+func (this *integerEntity) Json(s string) *integerEntity  { this.json = s; return this }
+func (this *integerEntity) Yaml(s string) *integerEntity  { this.yaml = s; return this }
+func (this *integerEntity) Sql(s string) *integerEntity   { this.sql = s; return this }
 
-func (t *integerEntity) Required(b bool) *integerEntity          { t.required = b; return t }
-func (t *integerEntity) Default(m map[string]any) *integerEntity { t.defaultValue = m; return t }
-func (t *integerEntity) AdditionalValidation(b bool) *integerEntity {
-	t.additionalValidation = b
-	return t
+func (this *integerEntity) Required(b bool) *integerEntity { this.required = b; return this }
+func (this *integerEntity) Default(m map[string]any) *integerEntity {
+	this.defaultValue = m
+	return this
+}
+func (this *integerEntity) AdditionalValidation(b bool) *integerEntity {
+	this.additionalValidation = b
+	return this
 }
 
-func (t *integerEntity) Positive() *integerEntity                    { t.positive = true; return t }
-func (t *integerEntity) Negative() *integerEntity                    { t.negative = true; return t }
-func (t *integerEntity) Min(n int) *integerEntity                    { t.min = n; return t }
-func (t *integerEntity) Max(n int) *integerEntity                    { t.max = n; return t }
-func (t *integerEntity) OneOf(n ...int) *integerEntity               { t.oneOf = n; return t }
-func (t *integerEntity) Range(ranges ...IntegerRange) *integerEntity { t.ranges = ranges; return t }
+func (this *integerEntity) Positive() *integerEntity      { this.positive = true; return this }
+func (this *integerEntity) Negative() *integerEntity      { this.negative = true; return this }
+func (this *integerEntity) Min(n int) *integerEntity      { this.min = n; return this }
+func (this *integerEntity) Max(n int) *integerEntity      { this.max = n; return this }
+func (this *integerEntity) OneOf(n ...int) *integerEntity { this.oneOf = n; return this }
+func (this *integerEntity) Range(ranges ...IntegerRange) *integerEntity {
+	this.ranges = ranges
+	return this
+}
 
-func (t *integerEntity) MultipleOf(n int) *integerEntity {
-	t.multipleOf = n
-	t.multipleOf = n
-	return t
+func (this *integerEntity) MultipleOf(n int) *integerEntity {
+	this.multipleOf = n
+	this.multipleOf = n
+	return this
 }

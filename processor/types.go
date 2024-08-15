@@ -4,48 +4,48 @@ import (
 	"boundedinfinity/codegen/model"
 )
 
-func (t *Processor) processTypes() error {
-	for _, project := range t.projects {
+func (this *Processor) processTypes() error {
+	for _, project := range this.projects {
 		for _, typ := range project.Types {
-			if _, ok := t.TypeMap[typ.Common().Id.Get()]; ok {
+			if _, ok := this.TypeMap[typ.Common().Id.Get()]; ok {
 				return ErrCodeGenTypeSchemaIdDuplicateFn(typ)
 			}
 
-			t.TypeMap[typ.Common().Id.Get()] = typ
-			t.Combined.Types = append(t.Combined.Types, typ)
+			this.TypeMap[typ.Common().Id.Get()] = typ
+			this.Combined.Types = append(this.Combined.Types, typ)
 		}
 	}
 
-	for _, typ := range t.Combined.Types {
-		if err := t.checkType(typ); err != nil {
+	for _, typ := range this.Combined.Types {
+		if err := this.checkType(typ); err != nil {
 			return err
 		}
 	}
 
-	for _, typ := range t.Combined.Types {
+	for _, typ := range this.Combined.Types {
 		switch typ.(type) {
 		case *model.CodeGenRef:
 		case *model.CodeGenArray:
 		case *model.CodeGenObject:
 		default:
-			processType(t.Combined, typ)
+			processType(this.Combined, typ)
 		}
 	}
 
-	for _, typ := range t.Combined.Types {
+	for _, typ := range this.Combined.Types {
 		switch typ.(type) {
 		case *model.CodeGenRef:
-			processType(t.Combined, typ)
+			processType(this.Combined, typ)
 		default:
 		}
 	}
 
-	for _, typ := range t.Combined.Types {
+	for _, typ := range this.Combined.Types {
 		switch typ.(type) {
 		case *model.CodeGenArray:
-			processType(t.Combined, typ)
+			processType(this.Combined, typ)
 		case *model.CodeGenObject:
-			processType(t.Combined, typ)
+			processType(this.Combined, typ)
 		default:
 		}
 	}
@@ -82,7 +82,7 @@ func processType(project model.CodeGenProject, typ model.CodeGenSchema) {
 	}
 }
 
-func (t *Processor) resolveType(typ model.CodeGenSchema) (model.CodeGenSchema, error) {
+func (this *Processor) resolveType(typ model.CodeGenSchema) (model.CodeGenSchema, error) {
 	var found model.CodeGenSchema
 	var err error
 
@@ -93,7 +93,7 @@ func (t *Processor) resolveType(typ model.CodeGenSchema) (model.CodeGenSchema, e
 			break
 		}
 
-		if target, ok := t.TypeMap[obj.Ref.Get()]; !ok {
+		if target, ok := this.TypeMap[obj.Ref.Get()]; !ok {
 			err = model.ErrRefNotFound.WithValue(obj.Ref.Get())
 		} else {
 			found = target
@@ -109,19 +109,19 @@ func (t *Processor) resolveType(typ model.CodeGenSchema) (model.CodeGenSchema, e
 	return found, err
 }
 
-func (t *Processor) checkType(typ model.CodeGenSchema) error {
+func (this *Processor) checkType(typ model.CodeGenSchema) error {
 	var err error
 	var found model.CodeGenSchema
 
 	switch obj := typ.(type) {
 	case *model.CodeGenRef:
-		found, err = t.resolveType(typ)
+		found, err = this.resolveType(typ)
 		obj.Resolved = found
 	case *model.CodeGenArray:
-		_, err = t.resolveType(obj.Items.Get())
+		_, err = this.resolveType(obj.Items.Get())
 	case *model.CodeGenObject:
 		for _, prop := range obj.Properties.Get() {
-			err = t.checkType(prop)
+			err = this.checkType(prop)
 
 			if err != nil {
 				break

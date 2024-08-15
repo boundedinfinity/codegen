@@ -24,16 +24,16 @@ var (
 	ErrUnionEntityInvalidProps = errorer.New("invalid properties")
 )
 
-func (t unionEntity) Validate() error {
-	if err := t.entityBase.Validate(); err != nil {
+func (this unionEntity) Validate() error {
+	if err := this.entityBase.Validate(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (t unionEntity) ToMap() (map[string]any, error) {
-	data, err := t.entityBase.ToMap()
+func (this unionEntity) ToMap() (map[string]any, error) {
+	data, err := this.entityBase.ToMap()
 
 	if err != nil {
 		return data, err
@@ -41,7 +41,7 @@ func (t unionEntity) ToMap() (map[string]any, error) {
 
 	entities := []map[string]any{}
 
-	for _, entity := range t.entities {
+	for _, entity := range this.entities {
 		if edata, err := entity.ToMap(); err != nil {
 			return data, err
 		} else {
@@ -54,32 +54,38 @@ func (t unionEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (t unionEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this unionEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaArray{}
 	return schema, nil
 }
 
-func (t unionEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t unionEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t unionEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t unionEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t unionEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this unionEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this unionEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this unionEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this unionEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this unionEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *unionEntity) QName(s string) *unionEntity           { t.qname = s; return t }
-func (t *unionEntity) License(s License) *unionEntity        { t.license = s; return t }
-func (t *unionEntity) Copyright(s string) *unionEntity       { t.copyright = s; return t }
-func (t *unionEntity) Comments(s string) *unionEntity        { t.comments = s; return t }
-func (t *unionEntity) LongDescription(s string) *unionEntity { t.longDescription = s; return t }
-func (t *unionEntity) Serde(s string) *unionEntity           { t.serde = s; return t }
-func (t *unionEntity) Json(s string) *unionEntity            { t.json = s; return t }
-func (t *unionEntity) Yaml(s string) *unionEntity            { t.yaml = s; return t }
-func (t *unionEntity) Sql(s string) *unionEntity             { t.sql = s; return t }
+func (this *unionEntity) QName(s string) *unionEntity     { this.qname = s; return this }
+func (this *unionEntity) License(s License) *unionEntity  { this.license = s; return this }
+func (this *unionEntity) Copyright(s string) *unionEntity { this.copyright = s; return this }
+func (this *unionEntity) Comments(s string) *unionEntity  { this.comments = s; return this }
+func (this *unionEntity) LongDescription(s string) *unionEntity {
+	this.longDescription = s
+	return this
+}
+func (this *unionEntity) Serde(s string) *unionEntity { this.serde = s; return this }
+func (this *unionEntity) Json(s string) *unionEntity  { this.json = s; return this }
+func (this *unionEntity) Yaml(s string) *unionEntity  { this.yaml = s; return this }
+func (this *unionEntity) Sql(s string) *unionEntity   { this.sql = s; return this }
 
-func (t *unionEntity) Required(b bool) *unionEntity             { t.required = b; return t }
-func (t *unionEntity) Default(m map[string]any) *unionEntity    { t.defaultValue = m; return t }
-func (t *unionEntity) AdditionalValidation(b bool) *unionEntity { t.additionalValidation = b; return t }
+func (this *unionEntity) Required(b bool) *unionEntity          { this.required = b; return this }
+func (this *unionEntity) Default(m map[string]any) *unionEntity { this.defaultValue = m; return this }
+func (this *unionEntity) AdditionalValidation(b bool) *unionEntity {
+	this.additionalValidation = b
+	return this
+}
 
-func (t *unionEntity) Entity(elems ...Entity) *unionEntity {
-	t.entities = append(t.entities, elems...)
-	return t
+func (this *unionEntity) Entity(elems ...Entity) *unionEntity {
+	this.entities = append(this.entities, elems...)
+	return this
 }

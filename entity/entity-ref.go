@@ -23,53 +23,56 @@ var (
 	ErrRefEntityInvalidRef = errorer.New("invalid ref")
 )
 
-func (t refEntity) Validate() error {
-	if err := t.entityBase.Validate(); err != nil {
+func (this refEntity) Validate() error {
+	if err := this.entityBase.Validate(); err != nil {
 		return err
 	}
 
-	if t.qname == "" {
+	if this.qname == "" {
 		return ErrRefEntityMissingRef
 	}
 
 	return nil
 }
 
-func (t refEntity) ToMap() (map[string]any, error) {
-	data, err := t.entityBase.ToMap()
+func (this refEntity) ToMap() (map[string]any, error) {
+	data, err := this.entityBase.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
-	sparam(data, "ref", t.ref)
+	sparam(data, "ref", this.ref)
 
 	return data, nil
 }
 
-func (t refEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this refEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaArray{}
 	return schema, nil
 }
 
-func (t refEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t refEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t refEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t refEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t refEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this refEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this refEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this refEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this refEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this refEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *refEntity) License(s License) *refEntity        { t.license = s; return t }
-func (t *refEntity) Copyright(s string) *refEntity       { t.copyright = s; return t }
-func (t *refEntity) Comments(s string) *refEntity        { t.comments = s; return t }
-func (t *refEntity) LongDescription(s string) *refEntity { t.longDescription = s; return t }
-func (t *refEntity) Serde(s string) *refEntity           { t.serde = s; return t }
-func (t *refEntity) Json(s string) *refEntity            { t.json = s; return t }
-func (t *refEntity) Yaml(s string) *refEntity            { t.yaml = s; return t }
-func (t *refEntity) Sql(s string) *refEntity             { t.sql = s; return t }
+func (this *refEntity) License(s License) *refEntity        { this.license = s; return this }
+func (this *refEntity) Copyright(s string) *refEntity       { this.copyright = s; return this }
+func (this *refEntity) Comments(s string) *refEntity        { this.comments = s; return this }
+func (this *refEntity) LongDescription(s string) *refEntity { this.longDescription = s; return this }
+func (this *refEntity) Serde(s string) *refEntity           { this.serde = s; return this }
+func (this *refEntity) Json(s string) *refEntity            { this.json = s; return this }
+func (this *refEntity) Yaml(s string) *refEntity            { this.yaml = s; return this }
+func (this *refEntity) Sql(s string) *refEntity             { this.sql = s; return this }
 
-func (t *refEntity) Required(b bool) *refEntity             { t.required = b; return t }
-func (t *refEntity) Default(m map[string]any) *refEntity    { t.defaultValue = m; return t }
-func (t *refEntity) AdditionalValidation(b bool) *refEntity { t.additionalValidation = b; return t }
+func (this *refEntity) Required(b bool) *refEntity          { this.required = b; return this }
+func (this *refEntity) Default(m map[string]any) *refEntity { this.defaultValue = m; return this }
+func (this *refEntity) AdditionalValidation(b bool) *refEntity {
+	this.additionalValidation = b
+	return this
+}
 
-func (t *refEntity) Ref(s string) *refEntity    { t.ref = s; return t }
-func (t *refEntity) Entity(s Entity) *refEntity { return t.Ref(s.GetQName()) }
+func (this *refEntity) Ref(s string) *refEntity    { this.ref = s; return this }
+func (this *refEntity) Entity(s Entity) *refEntity { return this.Ref(s.GetQName()) }

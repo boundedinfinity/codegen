@@ -14,10 +14,10 @@ type floatValidations[T ~float32 | ~float64] struct {
 	validations []func(v T) error
 }
 
-func (t floatValidations[T]) Validate(v T) error {
+func (this floatValidations[T]) Validate(v T) error {
 	errs := []error{}
 
-	for _, validation := range t.validations {
+	for _, validation := range this.validations {
 		if err := validation(v); err != nil {
 			errs = append(errs, err)
 		}
@@ -26,32 +26,32 @@ func (t floatValidations[T]) Validate(v T) error {
 	return errors.Join(errs...)
 }
 
-func (t *floatValidations[T]) Min(n T) *floatValidations[T] {
-	t.validations = append(t.validations, FloatMin[T](t.name, n))
-	return t
+func (this *floatValidations[T]) Min(n T) *floatValidations[T] {
+	this.validations = append(this.validations, FloatMin[T](this.name, n))
+	return this
 }
 
-func (t *floatValidations[T]) Max(n T) *floatValidations[T] {
-	t.validations = append(t.validations, FloatMax[T](t.name, n))
-	return t
+func (this *floatValidations[T]) Max(n T) *floatValidations[T] {
+	this.validations = append(this.validations, FloatMax[T](this.name, n))
+	return this
 }
 
-// func (t *floatValidations[T]) MultipleOf(n T) *floatValidations[T] {
-// 	t.validations = append(t.validations, FloatMultipleOf[T](t.name, n))
-// 	return t
+// func (this *floatValidations[T]) MultipleOf(n T) *floatValidations[T] {
+// 	this.validations = append(this.validations, FloatMultipleOf[T](this.name, n))
+// 	return this
 // }
 
-func (t *floatValidations[T]) NotZero() *floatValidations[T] {
-	t.validations = append(t.validations, FloatNotZero[T](t.name))
-	return t
+func (this *floatValidations[T]) NotZero() *floatValidations[T] {
+	this.validations = append(this.validations, FloatNotZero[T](this.name))
+	return this
 }
 
-func (t *floatValidations[T]) Positive() *floatValidations[T] {
-	t.validations = append(t.validations, FloatPositive[T](t.name))
-	return t
+func (this *floatValidations[T]) Positive() *floatValidations[T] {
+	this.validations = append(this.validations, FloatPositive[T](this.name))
+	return this
 }
 
-func (t *floatValidations[T]) Negative() *floatValidations[T] {
-	t.validations = append(t.validations, FloatNegative[T](t.name))
-	return t
+func (this *floatValidations[T]) Negative() *floatValidations[T] {
+	this.validations = append(this.validations, FloatNegative[T](this.name))
+	return this
 }

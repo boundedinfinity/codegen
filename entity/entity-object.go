@@ -23,29 +23,29 @@ var (
 	ErrObjectEntityInvalidProps = errorer.New("invalid properties")
 )
 
-func (t objectEntity) Validate() error {
-	if err := t.entityBase.Validate(); err != nil {
+func (this objectEntity) Validate() error {
+	if err := this.entityBase.Validate(); err != nil {
 		return err
 	}
 
-	if t.props == nil {
+	if this.props == nil {
 		return ErrObjectEntityMissingProps
 	}
 
 	return nil
 }
 
-func (t objectEntity) ToMap() (map[string]any, error) {
-	data, err := t.entityBase.ToMap()
+func (this objectEntity) ToMap() (map[string]any, error) {
+	data, err := this.entityBase.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
-	if t.props != nil {
+	if this.props != nil {
 		props := []map[string]any{}
 
-		for _, prop := range t.props {
+		for _, prop := range this.props {
 			pdata, err := prop.ToMap()
 			if err != nil {
 				return data, err
@@ -60,32 +60,35 @@ func (t objectEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (t objectEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this objectEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaArray{}
 	return schema, nil
 }
 
-func (t objectEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t objectEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t objectEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t objectEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t objectEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this objectEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this objectEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this objectEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this objectEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this objectEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *objectEntity) QName(s string) *objectEntity           { t.qname = s; return t }
-func (t *objectEntity) License(s License) *objectEntity        { t.license = s; return t }
-func (t *objectEntity) Copyright(s string) *objectEntity       { t.copyright = s; return t }
-func (t *objectEntity) Comments(s string) *objectEntity        { t.comments = s; return t }
-func (t *objectEntity) LongDescription(s string) *objectEntity { t.longDescription = s; return t }
-func (t *objectEntity) Serde(s string) *objectEntity           { t.serde = s; return t }
-func (t *objectEntity) Json(s string) *objectEntity            { t.json = s; return t }
-func (t *objectEntity) Yaml(s string) *objectEntity            { t.yaml = s; return t }
-func (t *objectEntity) Sql(s string) *objectEntity             { t.sql = s; return t }
+func (this *objectEntity) QName(s string) *objectEntity     { this.qname = s; return this }
+func (this *objectEntity) License(s License) *objectEntity  { this.license = s; return this }
+func (this *objectEntity) Copyright(s string) *objectEntity { this.copyright = s; return this }
+func (this *objectEntity) Comments(s string) *objectEntity  { this.comments = s; return this }
+func (this *objectEntity) LongDescription(s string) *objectEntity {
+	this.longDescription = s
+	return this
+}
+func (this *objectEntity) Serde(s string) *objectEntity { this.serde = s; return this }
+func (this *objectEntity) Json(s string) *objectEntity  { this.json = s; return this }
+func (this *objectEntity) Yaml(s string) *objectEntity  { this.yaml = s; return this }
+func (this *objectEntity) Sql(s string) *objectEntity   { this.sql = s; return this }
 
-func (t *objectEntity) Required(b bool) *objectEntity          { t.required = b; return t }
-func (t *objectEntity) Default(m map[string]any) *objectEntity { t.defaultValue = m; return t }
-func (t *objectEntity) AdditionalValidation(b bool) *objectEntity {
-	t.additionalValidation = b
-	return t
+func (this *objectEntity) Required(b bool) *objectEntity          { this.required = b; return this }
+func (this *objectEntity) Default(m map[string]any) *objectEntity { this.defaultValue = m; return this }
+func (this *objectEntity) AdditionalValidation(b bool) *objectEntity {
+	this.additionalValidation = b
+	return this
 }
 
-func (t *objectEntity) Properties(elems ...Entity) *objectEntity { t.props = elems; return t }
+func (this *objectEntity) Properties(elems ...Entity) *objectEntity { this.props = elems; return this }

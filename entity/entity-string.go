@@ -32,21 +32,21 @@ var (
 	ErrStringEntityInvalidRegex = errorer.New("invalid regex")
 )
 
-func (t stringEntity) Validate() error {
-	if err := t.entityBase.Validate(); err != nil {
+func (this stringEntity) Validate() error {
+	if err := this.entityBase.Validate(); err != nil {
 		return err
 	}
 
-	if t.min > t.max {
-		return ErrStringEntityMinAboveMax.FormatFn("min: %v, max: v")(t.min, t.max)
+	if this.min > this.max {
+		return ErrStringEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
 	}
 
-	if t.min < 0 {
-		return ErrStringEntityMinNegative.WithValue(t.min)
+	if this.min < 0 {
+		return ErrStringEntityMinNegative.WithValue(this.min)
 	}
 
-	if t.regex != "" {
-		_, err := regexp.Compile(t.regex)
+	if this.regex != "" {
+		_, err := regexp.Compile(this.regex)
 
 		if err != nil {
 			return ErrStringEntityInvalidRegex.Sub(err)
@@ -56,56 +56,59 @@ func (t stringEntity) Validate() error {
 	return nil
 }
 
-func (t stringEntity) ToMap() (map[string]any, error) {
-	data, err := t.entityBase.ToMap()
+func (this stringEntity) ToMap() (map[string]any, error) {
+	data, err := this.entityBase.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
-	iparam(data, "min", t.min)
-	iparam(data, "min", t.max)
-	iparam(data, "length", t.length)
-	sparam(data, "regex", t.regex)
-	sparam(data, "includes", t.includes)
-	sparam(data, "starts-with", t.startsWith)
-	sparam(data, "ends-with", t.endsWith)
+	iparam(data, "min", this.min)
+	iparam(data, "min", this.max)
+	iparam(data, "length", this.length)
+	sparam(data, "regex", this.regex)
+	sparam(data, "includes", this.includes)
+	sparam(data, "starts-with", this.startsWith)
+	sparam(data, "ends-with", this.endsWith)
 
 	return data, nil
 }
 
-func (t stringEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this stringEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaArray{}
 	return schema, nil
 }
 
-func (t stringEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t stringEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t stringEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t stringEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t stringEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this stringEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this stringEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this stringEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this stringEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this stringEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *stringEntity) QName(s string) *stringEntity           { t.qname = s; return t }
-func (t *stringEntity) License(s License) *stringEntity        { t.license = s; return t }
-func (t *stringEntity) Copyright(s string) *stringEntity       { t.copyright = s; return t }
-func (t *stringEntity) Comments(s string) *stringEntity        { t.comments = s; return t }
-func (t *stringEntity) LongDescription(s string) *stringEntity { t.longDescription = s; return t }
-func (t *stringEntity) Serde(s string) *stringEntity           { t.serde = s; return t }
-func (t *stringEntity) Json(s string) *stringEntity            { t.json = s; return t }
-func (t *stringEntity) Yaml(s string) *stringEntity            { t.yaml = s; return t }
-func (t *stringEntity) Sql(s string) *stringEntity             { t.sql = s; return t }
+func (this *stringEntity) QName(s string) *stringEntity     { this.qname = s; return this }
+func (this *stringEntity) License(s License) *stringEntity  { this.license = s; return this }
+func (this *stringEntity) Copyright(s string) *stringEntity { this.copyright = s; return this }
+func (this *stringEntity) Comments(s string) *stringEntity  { this.comments = s; return this }
+func (this *stringEntity) LongDescription(s string) *stringEntity {
+	this.longDescription = s
+	return this
+}
+func (this *stringEntity) Serde(s string) *stringEntity { this.serde = s; return this }
+func (this *stringEntity) Json(s string) *stringEntity  { this.json = s; return this }
+func (this *stringEntity) Yaml(s string) *stringEntity  { this.yaml = s; return this }
+func (this *stringEntity) Sql(s string) *stringEntity   { this.sql = s; return this }
 
-func (t *stringEntity) Required(b bool) *stringEntity          { t.required = b; return t }
-func (t *stringEntity) Default(m map[string]any) *stringEntity { t.defaultValue = m; return t }
-func (t *stringEntity) AdditionalValidation(b bool) *stringEntity {
-	t.additionalValidation = b
-	return t
+func (this *stringEntity) Required(b bool) *stringEntity          { this.required = b; return this }
+func (this *stringEntity) Default(m map[string]any) *stringEntity { this.defaultValue = m; return this }
+func (this *stringEntity) AdditionalValidation(b bool) *stringEntity {
+	this.additionalValidation = b
+	return this
 }
 
-func (t *stringEntity) Min(n int) *stringEntity           { t.min = n; return t }
-func (t *stringEntity) Max(n int) *stringEntity           { t.max = n; return t }
-func (t *stringEntity) Length(n int) *stringEntity        { t.length = n; return t }
-func (t *stringEntity) Regex(s string) *stringEntity      { t.regex = s; return t }
-func (t *stringEntity) Includes(s string) *stringEntity   { t.includes = s; return t }
-func (t *stringEntity) StartsWith(r string) *stringEntity { t.startsWith = r; return t }
-func (t *stringEntity) EndsWith(r string) *stringEntity   { t.endsWith = r; return t }
+func (this *stringEntity) Min(n int) *stringEntity           { this.min = n; return this }
+func (this *stringEntity) Max(n int) *stringEntity           { this.max = n; return this }
+func (this *stringEntity) Length(n int) *stringEntity        { this.length = n; return this }
+func (this *stringEntity) Regex(s string) *stringEntity      { this.regex = s; return this }
+func (this *stringEntity) Includes(s string) *stringEntity   { this.includes = s; return this }
+func (this *stringEntity) StartsWith(r string) *stringEntity { this.startsWith = r; return this }
+func (this *stringEntity) EndsWith(r string) *stringEntity   { this.endsWith = r; return this }

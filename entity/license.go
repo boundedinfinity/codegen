@@ -27,11 +27,11 @@ type License struct {
 	Text string
 }
 
-func (t License) ToMap() (map[string]any, error) {
+func (this License) ToMap() (map[string]any, error) {
 	data := map[string]any{}
 
-	sparam(data, "text", t.Text)
-	sparam(data, "type", t.Type.String())
+	sparam(data, "text", this.Text)
+	sparam(data, "type", this.Type.String())
 
 	return data, nil
 }

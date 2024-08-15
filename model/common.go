@@ -45,14 +45,14 @@ type CodeGenLangData struct {
 // Validation
 //----------------------------------------------------------------
 
-func (t *CodeGenCommon) Common() *CodeGenCommon {
-	return t
+func (this *CodeGenCommon) Common() *CodeGenCommon {
+	return this
 }
 
-func (t CodeGenCommon) Validate() error {
+func (this CodeGenCommon) Validate() error {
 	return nil
 }
 
-func (t CodeGenCommon) HasValidation() bool {
+func (this CodeGenCommon) HasValidation() bool {
 	return false
 }

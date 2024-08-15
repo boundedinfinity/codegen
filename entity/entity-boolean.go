@@ -16,31 +16,40 @@ type booleanEntity struct {
 	entityBase
 }
 
-func (t booleanEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this booleanEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaArray{}
 	return schema, nil
 }
 
-func (t booleanEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t booleanEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t booleanEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t booleanEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t booleanEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this booleanEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this booleanEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this booleanEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this booleanEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this booleanEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *booleanEntity) QName(s string) *booleanEntity            { t.qname = s; return t }
-func (t *booleanEntity) License(s License) *booleanEntity         { t.license = s; return t }
-func (t *booleanEntity) Copyright(s string) *booleanEntity        { t.copyright = s; return t }
-func (t *booleanEntity) Comments(s string) *booleanEntity         { t.comments = s; return t }
-func (t *booleanEntity) LongDescription(s string) *booleanEntity  { t.longDescription = s; return t }
-func (t *booleanEntity) ShortDescription(s string) *booleanEntity { t.shortDescription = s; return t }
-func (t *booleanEntity) Serde(s string) *booleanEntity            { t.serde = s; return t }
-func (t *booleanEntity) Json(s string) *booleanEntity             { t.json = s; return t }
-func (t *booleanEntity) Yaml(s string) *booleanEntity             { t.yaml = s; return t }
-func (t *booleanEntity) Sql(s string) *booleanEntity              { t.sql = s; return t }
-
-func (t *booleanEntity) Required(b bool) *booleanEntity { t.required = b; return t }
-func (t *booleanEntity) AdditionalValidation(b bool) *booleanEntity {
-	t.additionalValidation = b
-	return t
+func (this *booleanEntity) QName(s string) *booleanEntity     { this.qname = s; return this }
+func (this *booleanEntity) License(s License) *booleanEntity  { this.license = s; return this }
+func (this *booleanEntity) Copyright(s string) *booleanEntity { this.copyright = s; return this }
+func (this *booleanEntity) Comments(s string) *booleanEntity  { this.comments = s; return this }
+func (this *booleanEntity) LongDescription(s string) *booleanEntity {
+	this.longDescription = s
+	return this
 }
-func (t *booleanEntity) Default(m map[string]any) *booleanEntity { t.defaultValue = m; return t }
+func (this *booleanEntity) ShortDescription(s string) *booleanEntity {
+	this.shortDescription = s
+	return this
+}
+func (this *booleanEntity) Serde(s string) *booleanEntity { this.serde = s; return this }
+func (this *booleanEntity) Json(s string) *booleanEntity  { this.json = s; return this }
+func (this *booleanEntity) Yaml(s string) *booleanEntity  { this.yaml = s; return this }
+func (this *booleanEntity) Sql(s string) *booleanEntity   { this.sql = s; return this }
+
+func (this *booleanEntity) Required(b bool) *booleanEntity { this.required = b; return this }
+func (this *booleanEntity) AdditionalValidation(b bool) *booleanEntity {
+	this.additionalValidation = b
+	return this
+}
+func (this *booleanEntity) Default(m map[string]any) *booleanEntity {
+	this.defaultValue = m
+	return this
+}

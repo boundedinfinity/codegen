@@ -26,7 +26,7 @@ type Processor struct {
 	projects []*model.CodeGenProject
 }
 
-func (t *Processor) ProcessFiles(paths ...string) error {
+func (this *Processor) ProcessFiles(paths ...string) error {
 	var projects []model.CodeGenProject
 	wd, err := os.Getwd()
 
@@ -67,42 +67,42 @@ func (t *Processor) ProcessFiles(paths ...string) error {
 		projects = append(projects, project)
 	}
 
-	return t.ProcessProjects(projects...)
+	return this.ProcessProjects(projects...)
 }
 
-func (t *Processor) ProcessProjects(projects ...model.CodeGenProject) error {
+func (this *Processor) ProcessProjects(projects ...model.CodeGenProject) error {
 	for _, project := range projects {
-		t.projects = append(t.projects, &project)
+		this.projects = append(this.projects, &project)
 	}
 
-	if err := t.processProjectOutputRoot(t.projects...); err != nil {
+	if err := this.processProjectOutputRoot(this.projects...); err != nil {
 		return err
 	}
 
-	if err := t.processProjectPackage(t.projects...); err != nil {
+	if err := this.processProjectPackage(this.projects...); err != nil {
 		return err
 	}
 
-	if err := t.processTypes(); err != nil {
+	if err := this.processTypes(); err != nil {
 		return err
 	}
 
-	if err := t.validate(); err != nil {
+	if err := this.validate(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (t *Processor) validate() error {
-	if t.Combined.OutputRoot.Empty() {
-		t.Combined.OutputRoot = optioner.Some(".")
+func (this *Processor) validate() error {
+	if this.Combined.OutputRoot.Empty() {
+		this.Combined.OutputRoot = optioner.Some(".")
 	}
 
 	if abs, err := pather.Paths.AbsErr("."); err != nil {
 		return err
 	} else {
-		t.Combined.OutputRoot = optioner.Some(abs)
+		this.Combined.OutputRoot = optioner.Some(abs)
 	}
 
 	return nil

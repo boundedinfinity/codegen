@@ -13,7 +13,7 @@ var (
 	ErrCodeGenPackageMoreThanOne = errorer.New("more than one package found")
 )
 
-func (t *Processor) processProjectPackage(projects ...*model.CodeGenProject) error {
+func (this *Processor) processProjectPackage(projects ...*model.CodeGenProject) error {
 	filtered := slicer.Filter(
 		func(_ int, p *model.CodeGenProject) bool { return p.Package.Defined() },
 		projects...,
@@ -23,7 +23,7 @@ func (t *Processor) processProjectPackage(projects ...*model.CodeGenProject) err
 	case 0:
 		return ErrCodeGenPackageEmpty
 	case 1:
-		t.Combined.Package = filtered[0].Package
+		this.Combined.Package = filtered[0].Package
 	default:
 		pkgs := slicer.Map(
 			func(_ int, p *model.CodeGenProject) string { return p.Package.Get() },
@@ -39,7 +39,7 @@ var (
 	ErrCodeGenOutputRootMoreThanOne = errorer.New("more than one output root found")
 )
 
-func (t *Processor) processProjectOutputRoot(projects ...*model.CodeGenProject) error {
+func (this *Processor) processProjectOutputRoot(projects ...*model.CodeGenProject) error {
 	filtered := slicer.Filter(
 		func(_ int, p *model.CodeGenProject) bool { return p.OutputRoot.Defined() },
 		projects...,
@@ -47,9 +47,9 @@ func (t *Processor) processProjectOutputRoot(projects ...*model.CodeGenProject) 
 
 	switch len(filtered) {
 	case 0:
-		t.Combined.OutputRoot = optioner.Some(".")
+		this.Combined.OutputRoot = optioner.Some(".")
 	case 1:
-		t.Combined.OutputRoot = filtered[0].OutputRoot
+		this.Combined.OutputRoot = filtered[0].OutputRoot
 	default:
 		pkgs := slicer.Map(
 			func(_ int, p *model.CodeGenProject) string { return p.Package.Get() },

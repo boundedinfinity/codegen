@@ -21,7 +21,7 @@ type CodeGenOperation struct {
 	Outputs     []CodeGenSchema         `json:"outputs,omitempty"`
 }
 
-func (t CodeGenOperation) TypeId() string {
+func (_ CodeGenOperation) TypeId() string {
 	return "operation"
 }
 
@@ -35,18 +35,18 @@ var (
 	ErrCodeGenOperationInvalidOutput = errorer.New("invalid output")
 )
 
-func (t *CodeGenOperation) Validate() error {
-	if t.Name.Empty() {
+func (this *CodeGenOperation) Validate() error {
+	if this.Name.Empty() {
 		return ErrCodeGenOperationEmptyName
 	}
 
-	for i, input := range t.Inputs {
+	for i, input := range this.Inputs {
 		if err := input.Validate(); err != nil {
 			return fmt.Errorf("inputs[%v]: %w", i, ErrCodeGenOperationInvalidInput)
 		}
 	}
 
-	for i, output := range t.Outputs {
+	for i, output := range this.Outputs {
 		if err := output.Validate(); err != nil {
 			return fmt.Errorf("outputs[%v]: %w", i, ErrCodeGenOperationInvalidOutput)
 		}
@@ -59,7 +59,7 @@ func (t *CodeGenOperation) Validate() error {
 // Merge
 //----------------------------------------------------------------
 
-func (t *CodeGenOperation) Merge(obj CodeGenOperation) error {
+func (this *CodeGenOperation) Merge(obj CodeGenOperation) error {
 	return nil
 }
 
@@ -67,19 +67,19 @@ func (t *CodeGenOperation) Merge(obj CodeGenOperation) error {
 // Marshal
 //----------------------------------------------------------------
 
-func (t *CodeGenOperation) MarshalJSON() ([]byte, error) {
+func (this *CodeGenOperation) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId           string `json:"type"`
 		CodeGenOperation `json:",inline"`
 	}{
-		TypeId:           t.TypeId(),
-		CodeGenOperation: *t,
+		TypeId:           this.TypeId(),
+		CodeGenOperation: *this,
 	}
 
 	return json.Marshal(dto)
 }
 
-func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
+func (this *CodeGenOperation) UnmarshalJSON(data []byte) error {
 	dto := struct {
 		Name        optioner.Option[string] `json:"name,omitempty"`
 		Description optioner.Option[string] `json:"description,omitempty"`
@@ -90,15 +90,15 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.Name = dto.Name
-		t.Description = dto.Description
+		this.Name = dto.Name
+		this.Description = dto.Description
 	}
 
 	for i, rawInput := range dto.Inputs {
 		if input, err := UnmarshalCodeGenType(rawInput); err != nil {
 			return errors.Join(fmt.Errorf("input[%v]", i), err)
 		} else {
-			t.Inputs = append(t.Inputs, input)
+			this.Inputs = append(this.Inputs, input)
 		}
 	}
 
@@ -106,7 +106,7 @@ func (t *CodeGenOperation) UnmarshalJSON(data []byte) error {
 		if output, err := UnmarshalCodeGenType(rawOutput); err != nil {
 			return errors.Join(fmt.Errorf("input[%v]", i), err)
 		} else {
-			t.Outputs = append(t.Outputs, output)
+			this.Outputs = append(this.Outputs, output)
 		}
 	}
 

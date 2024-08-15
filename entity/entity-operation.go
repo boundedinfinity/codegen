@@ -14,15 +14,15 @@ type operationEntity struct {
 	outputs []Entity
 }
 
-func (f operationEntity) ToMap() (map[string]any, error) {
-	data, err := f.common.ToMap()
+func (this operationEntity) ToMap() (map[string]any, error) {
+	data, err := this.common.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
 	var inputs []map[string]any
-	for _, input := range f.inputs {
+	for _, input := range this.inputs {
 		idata, err := input.ToMap()
 		if err != nil {
 			return data, err
@@ -33,7 +33,7 @@ func (f operationEntity) ToMap() (map[string]any, error) {
 	aparam(data, "inputs", inputs)
 
 	var outputs []map[string]any
-	for _, output := range f.outputs {
+	for _, output := range this.outputs {
 		odata, err := output.ToMap()
 		if err != nil {
 			return data, err
@@ -46,38 +46,41 @@ func (f operationEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (t operationEntity) ToJson() ([]byte, error)       { return ToJson(t) }
-func (t operationEntity) ToJsonIndent() ([]byte, error) { return ToJsonIndent(t) }
-func (t operationEntity) ToYaml() ([]byte, error)       { return ToYaml(t) }
+func (this operationEntity) ToJson() ([]byte, error)       { return ToJson(this) }
+func (this operationEntity) ToJsonIndent() ([]byte, error) { return ToJsonIndent(this) }
+func (this operationEntity) ToYaml() ([]byte, error)       { return ToYaml(this) }
 
-func (t operationEntity) Validate() error {
-	if err := t.common.Validate(); err != nil {
+func (this operationEntity) Validate() error {
+	if err := this.common.Validate(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (t operationEntity) HasValidation() bool {
-	return t.common.HasValidation()
+func (this operationEntity) HasValidation() bool {
+	return this.common.HasValidation()
 }
 
-func (t *operationEntity) QName(s string) *operationEntity           { t.qname = s; return t }
-func (t *operationEntity) License(s License) *operationEntity        { t.license = s; return t }
-func (t *operationEntity) Copyright(s string) *operationEntity       { t.copyright = s; return t }
-func (t *operationEntity) Comments(s string) *operationEntity        { t.comments = s; return t }
-func (t *operationEntity) LongDescription(s string) *operationEntity { t.longDescription = s; return t }
-func (t *operationEntity) Serde(s string) *operationEntity           { t.serde = s; return t }
-func (t *operationEntity) Json(s string) *operationEntity            { t.json = s; return t }
-func (t *operationEntity) Yaml(s string) *operationEntity            { t.yaml = s; return t }
-func (t *operationEntity) Sql(s string) *operationEntity             { t.sql = s; return t }
+func (this *operationEntity) QName(s string) *operationEntity     { this.qname = s; return this }
+func (this *operationEntity) License(s License) *operationEntity  { this.license = s; return this }
+func (this *operationEntity) Copyright(s string) *operationEntity { this.copyright = s; return this }
+func (this *operationEntity) Comments(s string) *operationEntity  { this.comments = s; return this }
+func (this *operationEntity) LongDescription(s string) *operationEntity {
+	this.longDescription = s
+	return this
+}
+func (this *operationEntity) Serde(s string) *operationEntity { this.serde = s; return this }
+func (this *operationEntity) Json(s string) *operationEntity  { this.json = s; return this }
+func (this *operationEntity) Yaml(s string) *operationEntity  { this.yaml = s; return this }
+func (this *operationEntity) Sql(s string) *operationEntity   { this.sql = s; return this }
 
-func (t *operationEntity) Input(v ...Entity) *operationEntity {
-	t.inputs = append(t.inputs, v...)
-	return t
+func (this *operationEntity) Input(v ...Entity) *operationEntity {
+	this.inputs = append(this.inputs, v...)
+	return this
 }
-func (t *operationEntity) Outputs(v ...Entity) *operationEntity {
-	t.outputs = append(t.outputs, v...)
-	return t
+func (this *operationEntity) Outputs(v ...Entity) *operationEntity {
+	this.outputs = append(this.outputs, v...)
+	return this
 }
-func (t *operationEntity) Entity(v Entity) *operationEntity { t.entity = v; return t }
+func (this *operationEntity) Entity(v Entity) *operationEntity { this.entity = v; return this }

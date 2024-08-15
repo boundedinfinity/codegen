@@ -32,45 +32,45 @@ var (
 	ErrEntityMissingQName = errorer.New("missing q-name")
 )
 
-func (t entityBase) Validate() error {
-	if err := t.common.Validate(); err != nil {
+func (this entityBase) Validate() error {
+	if err := this.common.Validate(); err != nil {
 		return err
 	}
 
-	if _, ok := type2StringMap[t.entityType]; !ok {
-		return ErrEntityInvalidType.WithValue(t.entityType)
+	if _, ok := type2StringMap[this.entityType]; !ok {
+		return ErrEntityInvalidType.WithValue(this.entityType)
 	}
 
-	if t.qname == "" {
+	if this.qname == "" {
 		return ErrEntityMissingQName
 	}
 
 	return nil
 }
 
-func (t entityBase) HasValidation() bool {
-	return t.common.HasValidation() && t.required && t.additionalValidation
+func (this entityBase) HasValidation() bool {
+	return this.common.HasValidation() && this.required && this.additionalValidation
 }
 
-func (t entityBase) ToMap() (map[string]any, error) {
-	data, err := t.common.ToMap()
+func (this entityBase) ToMap() (map[string]any, error) {
+	data, err := this.common.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
-	if t.entityType != noEntityType {
-		data["entity-type"] = type2StringMap[t.entityType]
+	if this.entityType != noEntityType {
+		data["entity-type"] = type2StringMap[this.entityType]
 	}
 
-	bparam(data, "additional-validation", t.additionalValidation)
-	bparam(data, "required", t.required)
+	bparam(data, "additional-validation", this.additionalValidation)
+	bparam(data, "required", this.required)
 
-	if t.defaultValue != nil && len(t.defaultValue) > 0 {
-		data["default"] = t.defaultValue
+	if this.defaultValue != nil && len(this.defaultValue) > 0 {
+		data["default"] = this.defaultValue
 	}
 
 	return data, nil
 }
 
-func (t entityBase) Type() EntityType { return t.entityType }
+func (this entityBase) Type() EntityType { return this.entityType }

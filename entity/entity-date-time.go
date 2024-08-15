@@ -28,40 +28,40 @@ var (
 	ErrDateTimeEntityLessThan1   = errorer.New("less than one")
 )
 
-func (t dateTimeEntity) Validate() error {
+func (this dateTimeEntity) Validate() error {
 
-	if err := t.entityBase.Validate(); err != nil {
+	if err := this.entityBase.Validate(); err != nil {
 		return err
 	}
 
 	var zero time.Time
 
-	if t.min != zero && t.max != zero && t.min.After(t.max) {
-		return ErrDateTimeEntityMinAboveMax.FormatFn("min: %v, max: v")(t.min, t.max)
+	if this.min != zero && this.max != zero && this.min.After(this.max) {
+		return ErrDateTimeEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
 	}
 
-	for i, rng := range t.ranges {
+	for i, rng := range this.ranges {
 		return ErrDateTimeEntityMinAboveMax.FormatFn("ranges[%v] min: %v, max: v")(i, rng.Min, rng.Max)
 	}
 
 	return nil
 }
 
-func (t dateTimeEntity) ToMap() (map[string]any, error) {
-	data, err := t.entityBase.ToMap()
+func (this dateTimeEntity) ToMap() (map[string]any, error) {
+	data, err := this.entityBase.ToMap()
 
 	if err != nil {
 		return data, err
 	}
 
-	tparam(data, "min", t.min)
-	tparam(data, "max", t.max)
-	tparams(data, "one-of", t.oneOf...)
+	tparam(data, "min", this.min)
+	tparam(data, "max", this.max)
+	tparams(data, "one-of", this.oneOf...)
 
-	if len(t.ranges) > 0 {
+	if len(this.ranges) > 0 {
 		ranges := []map[string]any{}
 
-		for _, rng := range t.ranges {
+		for _, rng := range this.ranges {
 			rm := map[string]any{}
 			tparam(rm, "min", rng.Min)
 			tparam(rm, "max", rng.Max)
@@ -76,40 +76,49 @@ func (t dateTimeEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (t dateTimeEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
+func (this dateTimeEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
 	schema := &json_schema.JsonSchemaArray{}
 	return schema, nil
 }
 
-func (t dateTimeEntity) ToJson() ([]byte, error)             { return ToJson(t) }
-func (t dateTimeEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(t) }
-func (t dateTimeEntity) ToYaml() ([]byte, error)             { return ToYaml(t) }
-func (t dateTimeEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(t) }
-func (t dateTimeEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(t) }
+func (this dateTimeEntity) ToJson() ([]byte, error)             { return ToJson(this) }
+func (this dateTimeEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
+func (this dateTimeEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
+func (this dateTimeEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
+func (this dateTimeEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
 
-func (t *dateTimeEntity) License(s License) *dateTimeEntity         { t.license = s; return t }
-func (t *dateTimeEntity) Copyright(s string) *dateTimeEntity        { t.copyright = s; return t }
-func (t *dateTimeEntity) Comments(s string) *dateTimeEntity         { t.comments = s; return t }
-func (t *dateTimeEntity) LongDescription(s string) *dateTimeEntity  { t.longDescription = s; return t }
-func (t *dateTimeEntity) ShortDescription(s string) *dateTimeEntity { t.shortDescription = s; return t }
-func (t *dateTimeEntity) Serde(s string) *dateTimeEntity            { t.serde = s; return t }
-func (t *dateTimeEntity) Json(s string) *dateTimeEntity             { t.json = s; return t }
-func (t *dateTimeEntity) Yaml(s string) *dateTimeEntity             { t.yaml = s; return t }
-func (t *dateTimeEntity) Sql(s string) *dateTimeEntity              { t.sql = s; return t }
+func (this *dateTimeEntity) License(s License) *dateTimeEntity  { this.license = s; return this }
+func (this *dateTimeEntity) Copyright(s string) *dateTimeEntity { this.copyright = s; return this }
+func (this *dateTimeEntity) Comments(s string) *dateTimeEntity  { this.comments = s; return this }
+func (this *dateTimeEntity) LongDescription(s string) *dateTimeEntity {
+	this.longDescription = s
+	return this
+}
+func (this *dateTimeEntity) ShortDescription(s string) *dateTimeEntity {
+	this.shortDescription = s
+	return this
+}
+func (this *dateTimeEntity) Serde(s string) *dateTimeEntity { this.serde = s; return this }
+func (this *dateTimeEntity) Json(s string) *dateTimeEntity  { this.json = s; return this }
+func (this *dateTimeEntity) Yaml(s string) *dateTimeEntity  { this.yaml = s; return this }
+func (this *dateTimeEntity) Sql(s string) *dateTimeEntity   { this.sql = s; return this }
 
-func (t *dateTimeEntity) Required(b bool) *dateTimeEntity          { t.required = b; return t }
-func (t *dateTimeEntity) Default(m map[string]any) *dateTimeEntity { t.defaultValue = m; return t }
-func (t *dateTimeEntity) AdditionalValidation(b bool) *dateTimeEntity {
-	t.additionalValidation = b
-	return t
+func (this *dateTimeEntity) Required(b bool) *dateTimeEntity { this.required = b; return this }
+func (this *dateTimeEntity) Default(m map[string]any) *dateTimeEntity {
+	this.defaultValue = m
+	return this
+}
+func (this *dateTimeEntity) AdditionalValidation(b bool) *dateTimeEntity {
+	this.additionalValidation = b
+	return this
 }
 
-func (t *dateTimeEntity) Min(n time.Time) *dateTimeEntity      { t.min = n; return t }
-func (t *dateTimeEntity) Max(n time.Time) *dateTimeEntity      { t.max = n; return t }
-func (t *dateTimeEntity) OneOf(n ...time.Time) *dateTimeEntity { t.oneOf = n; return t }
-func (t *dateTimeEntity) Range(ranges ...DateTimeRange) *dateTimeEntity {
-	t.ranges = append(t.ranges, ranges...)
-	return t
+func (this *dateTimeEntity) Min(n time.Time) *dateTimeEntity      { this.min = n; return this }
+func (this *dateTimeEntity) Max(n time.Time) *dateTimeEntity      { this.max = n; return this }
+func (this *dateTimeEntity) OneOf(n ...time.Time) *dateTimeEntity { this.oneOf = n; return this }
+func (this *dateTimeEntity) Range(ranges ...DateTimeRange) *dateTimeEntity {
+	this.ranges = append(this.ranges, ranges...)
+	return this
 }
 
 // ========================================================================================
@@ -124,24 +133,24 @@ var DateTimeRanges = dateTimeRanges{}
 type dateTimeRanges struct {
 }
 
-func (t dateTimeRanges) NextWeekFrom(d time.Time) DateTimeRange {
+func (this dateTimeRanges) NextWeekFrom(d time.Time) DateTimeRange {
 	return DateTimeRange{
 		Min: d,
 		Max: d.Add(7 * 24 * time.Hour),
 	}
 }
 
-func (t dateTimeRanges) NextWeekFromNow() DateTimeRange {
-	return t.NextWeekFrom(time.Now())
+func (this dateTimeRanges) NextWeekFromNow() DateTimeRange {
+	return this.NextWeekFrom(time.Now())
 }
 
-func (t dateTimeRanges) PrevWeekFrom(d time.Time) DateTimeRange {
+func (this dateTimeRanges) PrevWeekFrom(d time.Time) DateTimeRange {
 	return DateTimeRange{
 		Min: d,
 		Max: d.Add(-7 * 24 * time.Hour),
 	}
 }
 
-func (t dateTimeRanges) PrevWeekFromNow() DateTimeRange {
-	return t.PrevWeekFrom(time.Now())
+func (this dateTimeRanges) PrevWeekFromNow() DateTimeRange {
+	return this.PrevWeekFrom(time.Now())
 }

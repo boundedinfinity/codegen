@@ -31,20 +31,20 @@ var (
 	ErrNumberRangePositiveAndNegativeMutuallyExclusive = errorer.New("positive and negative are multually exclusive")
 )
 
-func (t Number[T]) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+func (this Number[T]) Validate() error {
+	if err := this.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
-	if t.MultipleOf.Defined() && t.MultipleOf.Get() < 1 {
-		return ErrNumberMultipleOfBelow1.WithValue(t.MultipleOf.Get())
+	if this.MultipleOf.Defined() && this.MultipleOf.Get() < 1 {
+		return ErrNumberMultipleOfBelow1.WithValue(this.MultipleOf.Get())
 	}
 
-	if t.Positive.Defined() && t.Negative.Defined() {
+	if this.Positive.Defined() && this.Negative.Defined() {
 		return ErrNumberRangePositiveAndNegativeMutuallyExclusive
 	}
 
-	for _, rng := range t.Ranges.Get() {
+	for _, rng := range this.Ranges.Get() {
 		if err := rng.Validate(); err != nil {
 			return err
 		}
@@ -53,8 +53,8 @@ func (t Number[T]) Validate() error {
 	return nil
 }
 
-func (t Number[T]) HasValidation() bool {
-	return t.CodeGenCommon.HasValidation() || t.MultipleOf.Defined() || t.Ranges.Defined()
+func (this Number[T]) HasValidation() bool {
+	return this.CodeGenCommon.HasValidation() || this.MultipleOf.Defined() || this.Ranges.Defined()
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -71,17 +71,17 @@ type CodeGenInteger struct {
 
 var _ CodeGenSchema = &CodeGenInteger{}
 
-func (t CodeGenInteger) Schema() string {
+func (_ CodeGenInteger) Schema() string {
 	return "integer"
 }
 
-func (t *CodeGenInteger) MarshalJSON() ([]byte, error) {
+func (this *CodeGenInteger) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId         string `json:"type"`
 		CodeGenInteger `json:",inline"`
 	}{
-		TypeId:         t.Schema(),
-		CodeGenInteger: *t,
+		TypeId:         this.Schema(),
+		CodeGenInteger: *this,
 	}
 
 	return marshalCodeGenType(dto)
@@ -103,17 +103,17 @@ type CodeGenFloat struct {
 
 var _ CodeGenSchema = &CodeGenFloat{}
 
-func (t CodeGenFloat) Schema() string {
+func (_ CodeGenFloat) Schema() string {
 	return "float"
 }
 
-func (t *CodeGenFloat) MarshalJSON() ([]byte, error) {
+func (this *CodeGenFloat) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId       string `json:"type"`
 		CodeGenFloat `json:",inline"`
 	}{
-		TypeId:       t.Schema(),
-		CodeGenFloat: *t,
+		TypeId:       this.Schema(),
+		CodeGenFloat: *this,
 	}
 
 	return marshalCodeGenType(dto)

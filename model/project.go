@@ -35,28 +35,28 @@ var (
 	ErrCodeGenProjectInvalidMappingFn = ErrCodeGenProjectInvalidMapping.FormatFn("key: %v, val: %v, %w")
 )
 
-func (t *CodeGenProject) Validate() error {
-	if t.Name.Empty() {
+func (this *CodeGenProject) Validate() error {
+	if this.Name.Empty() {
 		return ErrCodeGenProjectEmptyName
 	}
 
-	for k, v := range t.Mappings {
+	for k, v := range this.Mappings {
 		if k == "" || v == "" {
 			return ErrCodeGenProjectInvalidMappingFn(k, v)
 		}
 	}
 
-	for i, operation := range t.Operations {
+	for i, operation := range this.Operations {
 		if err := operation.Validate(); err != nil {
 			return fmt.Errorf("operation[%v] %w", i, err)
 		}
 	}
 
-	if err := t.Templates.Validate(); err != nil {
+	if err := this.Templates.Validate(); err != nil {
 		return err
 	}
 
-	for i, typ := range t.Types {
+	for i, typ := range this.Types {
 		if err := typ.Validate(); err != nil {
 			return fmt.Errorf("type[%v] %w", i, err)
 		}
@@ -69,10 +69,10 @@ func (t *CodeGenProject) Validate() error {
 // Merge
 //----------------------------------------------------------------
 
-func (t *CodeGenProject) Merge(obj CodeGenProject) error {
-	t.Name = obj.Name
-	t.Description = mergeDescription(t.Description, obj.Description)
-	mapper.MergeInto(t.Mappings, obj.Mappings)
+func (this *CodeGenProject) Merge(obj CodeGenProject) error {
+	this.Name = obj.Name
+	this.Description = mergeDescription(this.Description, obj.Description)
+	mapper.MergeInto(this.Mappings, obj.Mappings)
 
 	// operationG := slicer.Group(func(_ int, operation CodeGenOperation) string {
 	// 	return operation.Name.Get()
@@ -96,7 +96,7 @@ func (t *CodeGenProject) Merge(obj CodeGenProject) error {
 // Marshal
 //----------------------------------------------------------------
 
-func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
+func (this *CodeGenProject) UnmarshalJSON(data []byte) error {
 	dto := struct {
 		Name        optioner.Option[string]       `json:"name,omitempty"`
 		Description optioner.Option[string]       `json:"description,omitempty"`
@@ -110,19 +110,19 @@ func (t *CodeGenProject) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.Name = dto.Name
-		t.Description = dto.Description
-		t.Mappings = dto.Mappings
-		t.Operations = dto.Operations
-		t.Templates = dto.Templates
-		t.Package = dto.Package
+		this.Name = dto.Name
+		this.Description = dto.Description
+		this.Mappings = dto.Mappings
+		this.Operations = dto.Operations
+		this.Templates = dto.Templates
+		this.Package = dto.Package
 	}
 
 	for i, raw := range dto.Types {
 		if typ, err := UnmarshalCodeGenType(raw); err != nil {
 			return errors.Join(fmt.Errorf("type[%v]", i), err)
 		} else {
-			t.Types = append(t.Types, typ)
+			this.Types = append(this.Types, typ)
 		}
 	}
 
@@ -141,27 +141,27 @@ type codeGenProjectBuilder struct {
 	obj CodeGenProject
 }
 
-func (t *codeGenProjectBuilder) Build() *CodeGenProject {
-	return &t.obj
+func (this *codeGenProjectBuilder) Build() *CodeGenProject {
+	return &this.obj
 }
 
-func (t *codeGenProjectBuilder) Name(v string) *codeGenProjectBuilder {
-	return SetO(t, &t.obj.Name, v)
+func (this *codeGenProjectBuilder) Name(v string) *codeGenProjectBuilder {
+	return SetO(this, &this.obj.Name, v)
 }
 
-func (t *codeGenProjectBuilder) Description(v string) *codeGenProjectBuilder {
-	return SetO(t, &t.obj.Description, v)
+func (this *codeGenProjectBuilder) Description(v string) *codeGenProjectBuilder {
+	return SetO(this, &this.obj.Description, v)
 }
 
-func (t *codeGenProjectBuilder) Operations(v ...*CodeGenOperation) *codeGenProjectBuilder {
+func (this *codeGenProjectBuilder) Operations(v ...*CodeGenOperation) *codeGenProjectBuilder {
 	for _, operation := range v {
-		t.obj.Operations = append(t.obj.Operations, *operation)
+		this.obj.Operations = append(this.obj.Operations, *operation)
 	}
 
-	return t
+	return this
 }
 
-func (t *codeGenProjectBuilder) Types(v ...CodeGenSchema) *codeGenProjectBuilder {
-	t.obj.Types = append(t.obj.Types, v...)
-	return t
+func (this *codeGenProjectBuilder) Types(v ...CodeGenSchema) *codeGenProjectBuilder {
+	this.obj.Types = append(this.obj.Types, v...)
+	return this
 }

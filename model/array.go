@@ -1,8 +1,5 @@
 package model
 
-//lint:file-ignore ST1006
-// https://staticcheck.dev/docs/checks#ST1006
-
 import (
 	"encoding/json"
 
@@ -23,7 +20,7 @@ type CodeGenArray struct {
 
 var _ CodeGenSchema = &CodeGenArray{}
 
-func (t CodeGenArray) Schema() string {
+func (this CodeGenArray) Schema() string {
 	return "array"
 }
 
@@ -35,23 +32,23 @@ var (
 	errCodeGenArrayMinGreaterThanMax = errorer.New("min greater than max")
 )
 
-func (t CodeGenArray) HasValidation() bool {
-	return t.CodeGenCommon.HasValidation() ||
-		t.Items.Defined() && t.Items.Get().HasValidation() ||
-		t.Min.Defined() || t.Max.Defined()
+func (this CodeGenArray) HasValidation() bool {
+	return this.CodeGenCommon.HasValidation() ||
+		this.Items.Defined() && this.Items.Get().HasValidation() ||
+		this.Min.Defined() || this.Max.Defined()
 }
 
-func (t CodeGenArray) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+func (this CodeGenArray) Validate() error {
+	if err := this.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
-	if err := t.Items.Get().Validate(); err != nil {
+	if err := this.Items.Get().Validate(); err != nil {
 		return err
 	}
 
-	if t.Min.Defined() && t.Max.Defined() && t.Min.Get() > t.Max.Get() {
-		return errCodeGenArrayMinGreaterThanMax.FormatFn("min: %v, max: %v")(t.Min.Get(), t.Max.Get())
+	if this.Min.Defined() && this.Max.Defined() && this.Min.Get() > this.Max.Get() {
+		return errCodeGenArrayMinGreaterThanMax.FormatFn("min: %v, max: %v")(this.Min.Get(), this.Max.Get())
 	}
 
 	return nil
@@ -61,19 +58,19 @@ func (t CodeGenArray) Validate() error {
 // Marshal
 //----------------------------------------------------------------
 
-func (t *CodeGenArray) MarshalJSON() ([]byte, error) {
+func (this *CodeGenArray) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId       string `json:"type"`
 		CodeGenArray `json:",inline"`
 	}{
-		TypeId:       t.Schema(),
-		CodeGenArray: *t,
+		TypeId:       this.Schema(),
+		CodeGenArray: *this,
 	}
 
 	return marshalCodeGenType(dto)
 }
 
-func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
+func (this *CodeGenArray) UnmarshalJSON(data []byte) error {
 	dto := struct {
 		CodeGenCommon
 		Min          optioner.Option[int] `json:"min,omitempty"`
@@ -86,15 +83,15 @@ func (t *CodeGenArray) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &dto); err != nil {
 		return err
 	} else {
-		t.CodeGenCommon = dto.CodeGenCommon
-		t.Min = dto.Min
-		t.Max = dto.Max
+		this.CodeGenCommon = dto.CodeGenCommon
+		this.Min = dto.Min
+		this.Max = dto.Max
 	}
 
 	if items, err := UnmarshalCodeGenType(dto.Items); err != nil {
 		return err
 	} else {
-		t.Items = optioner.Some(items)
+		this.Items = optioner.Some(items)
 	}
 
 	return nil

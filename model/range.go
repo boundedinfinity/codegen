@@ -30,33 +30,33 @@ func BuildRange[T ~int | ~float64]() *RangeBuilder[T] {
 	return &RangeBuilder[T]{}
 }
 
-func (t *RangeBuilder[T]) Build() Range[T] {
-	return t.obj
+func (this *RangeBuilder[T]) Build() Range[T] {
+	return this.obj
 }
 
-func (t *RangeBuilder[T]) Min(v T) *RangeBuilder[T] {
-	return SetO(t, &t.obj.Min, v)
+func (this *RangeBuilder[T]) Min(v T) *RangeBuilder[T] {
+	return SetO(this, &this.obj.Min, v)
 }
 
-func (t *RangeBuilder[T]) Max(v T) *RangeBuilder[T] {
-	return SetO(t, &t.obj.Max, v)
+func (this *RangeBuilder[T]) Max(v T) *RangeBuilder[T] {
+	return SetO(this, &this.obj.Max, v)
 }
 
-func (t *RangeBuilder[T]) ExclusiveMin(v T) *RangeBuilder[T] {
-	return SetO(t, &t.obj.ExclusiveMin, v)
+func (this *RangeBuilder[T]) ExclusiveMin(v T) *RangeBuilder[T] {
+	return SetO(this, &this.obj.ExclusiveMin, v)
 }
 
-func (t *RangeBuilder[T]) ExclusiveMax(v T) *RangeBuilder[T] {
-	return SetO(t, &t.obj.ExclusiveMax, v)
+func (this *RangeBuilder[T]) ExclusiveMax(v T) *RangeBuilder[T] {
+	return SetO(this, &this.obj.ExclusiveMax, v)
 }
 
 //----------------------------------------------------------------
 // Marshal
 //----------------------------------------------------------------
 
-func (t *Range[T]) MarshalJSON() ([]byte, error) {
+func (this *Range[T]) MarshalJSON() ([]byte, error) {
 	type internal Range[T]
-	return marshalCodeGenType(internal(*t))
+	return marshalCodeGenType(internal(*this))
 }
 
 //----------------------------------------------------------------
@@ -111,41 +111,41 @@ func (e errRangeMinMax[T]) Unwrap() error {
 	return e.parent
 }
 
-func (t Range[T]) Validate() error {
+func (this Range[T]) Validate() error {
 	switch {
-	case t.Min.Defined() && t.ExclusiveMin.Defined():
-		return &errErrRangeMinAndExclusiveMinMutuallyExclusive[T]{t.Min.Get(), t.ExclusiveMin.Get()}
-	case t.Min.Empty() && t.ExclusiveMin.Empty():
+	case this.Min.Defined() && this.ExclusiveMin.Defined():
+		return &errErrRangeMinAndExclusiveMinMutuallyExclusive[T]{this.Min.Get(), this.ExclusiveMin.Get()}
+	case this.Min.Empty() && this.ExclusiveMin.Empty():
 		return ErrNumberRangeMinOrExclusiveMinRequired
-	case t.Max.Defined() && t.ExclusiveMax.Defined():
-		return &errErrRangeMaxAndExclusiveMaxMutuallyExclusive[T]{t.Max.Get(), t.ExclusiveMax.Get()}
-	case t.Max.Empty() && t.ExclusiveMax.Empty():
+	case this.Max.Defined() && this.ExclusiveMax.Defined():
+		return &errErrRangeMaxAndExclusiveMaxMutuallyExclusive[T]{this.Max.Get(), this.ExclusiveMax.Get()}
+	case this.Max.Empty() && this.ExclusiveMax.Empty():
 		return ErrNumberRangeMaxOrExclusiveMaxRequired
 	}
 
 	switch {
-	case t.Max.Defined(), t.Min.Defined():
-		if t.Min.Get() > t.Max.Get() {
-			return &errRangeMinMax[T]{t.Min.Get(), t.Max.Get(), ErrRangeMaxLessThanMin}
+	case this.Max.Defined(), this.Min.Defined():
+		if this.Min.Get() > this.Max.Get() {
+			return &errRangeMinMax[T]{this.Min.Get(), this.Max.Get(), ErrRangeMaxLessThanMin}
 		}
-	case t.Max.Defined(), t.ExclusiveMin.Defined():
-		if t.Min.Get() >= t.ExclusiveMax.Get() {
-			return &errRangeMinMax[T]{t.ExclusiveMin.Get(), t.Max.Get(), ErrRangeMaxLessThanMin}
+	case this.Max.Defined(), this.ExclusiveMin.Defined():
+		if this.Min.Get() >= this.ExclusiveMax.Get() {
+			return &errRangeMinMax[T]{this.ExclusiveMin.Get(), this.Max.Get(), ErrRangeMaxLessThanMin}
 		}
-	case t.ExclusiveMax.Defined(), t.Min.Defined():
-		if t.ExclusiveMin.Get() > t.ExclusiveMax.Get() {
-			return &errRangeMinMax[T]{t.Min.Get(), t.ExclusiveMax.Get(), ErrRangeMaxLessThanMin}
+	case this.ExclusiveMax.Defined(), this.Min.Defined():
+		if this.ExclusiveMin.Get() > this.ExclusiveMax.Get() {
+			return &errRangeMinMax[T]{this.Min.Get(), this.ExclusiveMax.Get(), ErrRangeMaxLessThanMin}
 		}
-	case t.ExclusiveMax.Defined(), t.ExclusiveMin.Defined():
-		if t.ExclusiveMin.Get() < t.ExclusiveMax.Get() {
-			return &errRangeMinMax[T]{t.ExclusiveMin.Get(), t.ExclusiveMax.Get(), ErrRangeMaxLessThanMin}
+	case this.ExclusiveMax.Defined(), this.ExclusiveMin.Defined():
+		if this.ExclusiveMin.Get() < this.ExclusiveMax.Get() {
+			return &errRangeMinMax[T]{this.ExclusiveMin.Get(), this.ExclusiveMax.Get(), ErrRangeMaxLessThanMin}
 		}
 	}
 
 	return nil
 }
 
-func (t Range[T]) HasValidation() bool {
-	return t.Max.Defined() || t.ExclusiveMax.Defined() ||
-		t.Min.Defined() || t.ExclusiveMin.Defined()
+func (this Range[T]) HasValidation() bool {
+	return this.Max.Defined() || this.ExclusiveMax.Defined() ||
+		this.Min.Defined() || this.ExclusiveMin.Defined()
 }

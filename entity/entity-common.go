@@ -13,27 +13,27 @@ type common struct {
 	sql              string
 }
 
-func (t common) Validate() error {
+func (this common) Validate() error {
 	return nil
 }
 
-func (t common) HasValidation() bool {
+func (this common) HasValidation() bool {
 	return false
 }
 
-func (t common) ToMap() (map[string]any, error) {
+func (this common) ToMap() (map[string]any, error) {
 	data := map[string]any{}
 
-	sparam(data, "q-name", t.qname)
-	sparam(data, "long-description", t.longDescription)
-	sparam(data, "short-description", t.shortDescription)
-	sparam(data, "serde", t.serde)
-	sparam(data, "json", t.json)
-	sparam(data, "yaml", t.yaml)
-	sparam(data, "comments", t.comments)
-	sparam(data, "copyright", t.copyright)
+	sparam(data, "q-name", this.qname)
+	sparam(data, "long-description", this.longDescription)
+	sparam(data, "short-description", this.shortDescription)
+	sparam(data, "serde", this.serde)
+	sparam(data, "json", this.json)
+	sparam(data, "yaml", this.yaml)
+	sparam(data, "comments", this.comments)
+	sparam(data, "copyright", this.copyright)
 
-	if licenseData, err := t.license.ToMap(); err != nil {
+	if licenseData, err := this.license.ToMap(); err != nil {
 		return data, err
 	} else {
 		mparam(data, "license", licenseData)
@@ -42,4 +42,4 @@ func (t common) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (t common) GetQName() string { return t.qname }
+func (this common) GetQName() string { return this.qname }

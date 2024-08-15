@@ -22,7 +22,7 @@ type CodeGenObject struct {
 
 var _ CodeGenSchema = &CodeGenObject{}
 
-func (t CodeGenObject) Schema() string {
+func (_ CodeGenObject) Schema() string {
 	return "object"
 }
 

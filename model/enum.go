@@ -17,7 +17,7 @@ type CodeGenEnum struct {
 	Values optioner.Option[[]CodeGenEnumItem] `json:"values,omitempty"`
 }
 
-func (t CodeGenEnum) Schema() string {
+func (this CodeGenEnum) Schema() string {
 	return "enum"
 }
 
@@ -27,16 +27,16 @@ var _ CodeGenSchema = &CodeGenEnum{}
 // Validation
 //----------------------------------------------------------------
 
-func (t CodeGenEnum) HasValidation() bool {
-	return t.CodeGenCommon.HasValidation()
+func (this CodeGenEnum) HasValidation() bool {
+	return this.CodeGenCommon.HasValidation()
 }
 
-func (t CodeGenEnum) Validate() error {
-	if err := t.CodeGenCommon.Validate(); err != nil {
+func (this CodeGenEnum) Validate() error {
+	if err := this.CodeGenCommon.Validate(); err != nil {
 		return err
 	}
 
-	for i, value := range t.Values.Get() {
+	for i, value := range this.Values.Get() {
 		if err := value.Validate(); err != nil {
 			return errors.Join(fmt.Errorf("value[%v]", i))
 		}
@@ -49,13 +49,13 @@ func (t CodeGenEnum) Validate() error {
 // Marshal
 //----------------------------------------------------------------
 
-func (t *CodeGenEnum) MarshalJSON() ([]byte, error) {
+func (this *CodeGenEnum) MarshalJSON() ([]byte, error) {
 	dto := struct {
 		TypeId      string `json:"type"`
 		CodeGenEnum `json:",inline"`
 	}{
-		TypeId:      t.Schema(),
-		CodeGenEnum: *t,
+		TypeId:      this.Schema(),
+		CodeGenEnum: *this,
 	}
 
 	return marshalCodeGenType(dto)
@@ -79,8 +79,8 @@ var (
 	errCodeGenEnumValueMustBeDefined = errorer.New("name or value must be defined")
 )
 
-func (t CodeGenEnumItem) Validate() error {
-	if t.Name.Empty() || t.Items.Empty() || len(t.Items.Get()) < 1 {
+func (this CodeGenEnumItem) Validate() error {
+	if this.Name.Empty() || this.Items.Empty() || len(this.Items.Get()) < 1 {
 		return errCodeGenEnumValueMustBeDefined
 	}
 

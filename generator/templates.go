@@ -10,34 +10,34 @@ import (
 //go:embed templates/*
 var embeddedTemplates embed.FS
 
-func (t *Generator) loadTemplates(params templateDescriptor) error {
+func (this *Generator) loadTemplates(params templateDescriptor) error {
 	tnames, err := getTemplateDescriptors()
 	if err != nil {
 		return err
 	}
 
-	t.templ.Funcs(getHelpers(t.lang))
+	this.templ.Funcs(getHelpers(this.lang))
 
 	for _, tname := range tnames {
-		if t.templateAlreadyLoaded(tname) || !includeTemplate(params, tname) {
+		if this.templateAlreadyLoaded(tname) || !includeTemplate(params, tname) {
 			continue
 		}
 
-		_, err := t.templ.ParseFS(embeddedTemplates, tname.path)
+		_, err := this.templ.ParseFS(embeddedTemplates, tname.path)
 		if err != nil {
 			return err
 		}
 
-		t.templateDescriptors = append(t.templateDescriptors, tname)
+		this.templateDescriptors = append(this.templateDescriptors, tname)
 	}
 
 	return nil
 }
 
-func (t *Generator) loadedTemplates() []string {
+func (this *Generator) loadedTemplates() []string {
 	var names []string
 
-	for _, templ := range t.templ.Templates() {
+	for _, templ := range this.templ.Templates() {
 		names = append(names, templ.Name())
 	}
 
@@ -76,10 +76,10 @@ func getTemplateDescriptors() ([]templateDescriptor, error) {
 	return results, nil
 }
 
-func (t *Generator) templateAlreadyLoaded(tname templateDescriptor) bool {
+func (this *Generator) templateAlreadyLoaded(tname templateDescriptor) bool {
 	var ok bool
 
-	for _, name := range t.loadedTemplates() {
+	for _, name := range this.loadedTemplates() {
 		if name == tname.name {
 			ok = true
 			continue

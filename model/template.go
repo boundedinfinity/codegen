@@ -34,7 +34,7 @@ type CodeGenProjectTemplates struct {
 // Validate
 //----------------------------------------------------------------
 
-func (t CodeGenProjectTemplates) Validate() error {
+func (this CodeGenProjectTemplates) Validate() error {
 
 	return nil
 }

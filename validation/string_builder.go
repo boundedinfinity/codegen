@@ -14,10 +14,10 @@ type stringValidations[T ~string] struct {
 	validations []func(...T) error
 }
 
-func (t stringValidations[T]) Validate(v T) error {
+func (this stringValidations[T]) Validate(v T) error {
 	errs := []error{}
 
-	for _, validation := range t.validations {
+	for _, validation := range this.validations {
 		if err := validation(v); err != nil {
 			errs = append(errs, err)
 		}
@@ -26,37 +26,37 @@ func (t stringValidations[T]) Validate(v T) error {
 	return errors.Join(errs...)
 }
 
-func (t *stringValidations[T]) Min(n int) *stringValidations[T] {
-	t.validations = append(t.validations, StringMinFn[T](t.name, n))
-	return t
+func (this *stringValidations[T]) Min(n int) *stringValidations[T] {
+	this.validations = append(this.validations, StringMinFn[T](this.name, n))
+	return this
 }
 
-func (t *stringValidations[T]) Max(n int) *stringValidations[T] {
-	t.validations = append(t.validations, StringMaxFn[T](t.name, n))
-	return t
+func (this *stringValidations[T]) Max(n int) *stringValidations[T] {
+	this.validations = append(this.validations, StringMaxFn[T](this.name, n))
+	return this
 }
 
-func (t *stringValidations[T]) Regex(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringRegexFn[T](t.name, pattern))
-	return t
+func (this *stringValidations[T]) Regex(pattern string) *stringValidations[T] {
+	this.validations = append(this.validations, StringRegexFn[T](this.name, pattern))
+	return this
 }
 
-func (t *stringValidations[T]) NotEmpty(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringNotEmptyFn[T](t.name))
-	return t
+func (this *stringValidations[T]) NotEmpty(pattern string) *stringValidations[T] {
+	this.validations = append(this.validations, StringNotEmptyFn[T](this.name))
+	return this
 }
 
-func (t *stringValidations[T]) UpperCase(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringUpperCaseFn[T](t.name))
-	return t
+func (this *stringValidations[T]) UpperCase(pattern string) *stringValidations[T] {
+	this.validations = append(this.validations, StringUpperCaseFn[T](this.name))
+	return this
 }
 
-func (t *stringValidations[T]) LowerCase(pattern string) *stringValidations[T] {
-	t.validations = append(t.validations, StringLowerCaseFn[T](t.name))
-	return t
+func (this *stringValidations[T]) LowerCase(pattern string) *stringValidations[T] {
+	this.validations = append(this.validations, StringLowerCaseFn[T](this.name))
+	return this
 }
 
-func (t *stringValidations[T]) Required() *stringValidations[T] {
-	t.validations = append(t.validations, StringRequiredFn[T](t.name))
-	return t
+func (this *stringValidations[T]) Required() *stringValidations[T] {
+	this.validations = append(this.validations, StringRequiredFn[T](this.name))
+	return this
 }

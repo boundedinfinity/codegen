@@ -19,10 +19,10 @@ type integerValidations[T ~int] struct {
 	validations []func(v T) error
 }
 
-func (t integerValidations[T]) Validate(v T) error {
+func (this integerValidations[T]) Validate(v T) error {
 	errs := []error{}
 
-	for _, validation := range t.validations {
+	for _, validation := range this.validations {
 		if err := validation(v); err != nil {
 			errs = append(errs, err)
 		}
@@ -31,42 +31,42 @@ func (t integerValidations[T]) Validate(v T) error {
 	return errors.Join(errs...)
 }
 
-func (t *integerValidations[T]) Min(n T) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerMinFn(t.name, n))
-	return t
+func (this *integerValidations[T]) Min(n T) *integerValidations[T] {
+	this.validations = append(this.validations, IntegerMinFn(this.name, n))
+	return this
 }
 
-func (t *integerValidations[T]) Max(n T) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerMaxFn(t.name, n))
-	return t
+func (this *integerValidations[T]) Max(n T) *integerValidations[T] {
+	this.validations = append(this.validations, IntegerMaxFn(this.name, n))
+	return this
 }
 
-func (t *integerValidations[T]) MinMax(min, max T) *integerValidations[T] {
-	t.Range(model.Range[T]{Min: optioner.Some(min), Max: optioner.Some(max)})
-	return t
+func (this *integerValidations[T]) MinMax(min, max T) *integerValidations[T] {
+	this.Range(model.Range[T]{Min: optioner.Some(min), Max: optioner.Some(max)})
+	return this
 }
 
-func (t *integerValidations[T]) Range(rng model.Range[T]) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerRange(t.name, rng))
-	return t
+func (this *integerValidations[T]) Range(rng model.Range[T]) *integerValidations[T] {
+	this.validations = append(this.validations, IntegerRange(this.name, rng))
+	return this
 }
 
-func (t *integerValidations[T]) MultipleOf(n T) *integerValidations[T] {
-	t.validations = append(t.validations, IntegerMultipleOfFn(t.name, n))
-	return t
+func (this *integerValidations[T]) MultipleOf(n T) *integerValidations[T] {
+	this.validations = append(this.validations, IntegerMultipleOfFn(this.name, n))
+	return this
 }
 
-func (t *integerValidations[T]) NotZero() *integerValidations[T] {
-	t.validations = append(t.validations, IntegerNotZeroFn[T](t.name))
-	return t
+func (this *integerValidations[T]) NotZero() *integerValidations[T] {
+	this.validations = append(this.validations, IntegerNotZeroFn[T](this.name))
+	return this
 }
 
-func (t *integerValidations[T]) Positive() *integerValidations[T] {
-	t.validations = append(t.validations, IntegerPositiveFn[T](t.name))
-	return t
+func (this *integerValidations[T]) Positive() *integerValidations[T] {
+	this.validations = append(this.validations, IntegerPositiveFn[T](this.name))
+	return this
 }
 
-func (t *integerValidations[T]) Negative() *integerValidations[T] {
-	t.validations = append(t.validations, IntegerNegativeFn[T](t.name))
-	return t
+func (this *integerValidations[T]) Negative() *integerValidations[T] {
+	this.validations = append(this.validations, IntegerNegativeFn[T](this.name))
+	return this
 }
