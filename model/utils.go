@@ -8,6 +8,19 @@ import (
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
 )
 
+func setOptionAndReturn[B any, V comparable](builder B, opt *optioner.Option[V], value V) B {
+	*opt = optioner.OfZero(value)
+	return builder
+}
+
+func appendOptionAndReturn[B any, V comparable](builder B, opt *optioner.Option[[]V], value []V) B {
+	var new []V
+	new = append(new, opt.Get()...)
+	new = append(new, value...)
+	*opt = optioner.OfSlice(new)
+	return builder
+}
+
 func mergeDescription(d1, d2 optioner.Option[string]) optioner.Option[string] {
 	if d1.Defined() && d2.Empty() {
 		return d1
