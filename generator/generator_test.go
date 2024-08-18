@@ -15,14 +15,41 @@ import (
 	_ "github.com/tursodatabase/go-libsql"
 )
 
+var cleanupDb bool = false
+
+func storeNfixTypes(nfixTypes map[string]NfixType) error {
+
+	return nil
+}
+
+func storePrefixes(nfixTypes map[string]Prefix) error {
+
+	return nil
+}
+
+func storeSuffixes(nfixTypes map[string]Suffix) error {
+
+	return nil
+}
+
+func storePeople(nfixTypes map[string]Suffix) error {
+
+	return nil
+}
+
 func Test_Db(t *testing.T) {
+	nfixTypes := createNfixTypes()
+	assert.Nil(t, storeNfixTypes(nfixTypes))
+
 	file := "./test-output/test-0.db"
 	db, err := sql.Open("libsql", fmt.Sprintf("file:%s", file))
 	assert.Nil(t, err)
 
 	defer func() {
 		db.Close()
-		os.Remove(file)
+		if cleanupDb {
+			os.Remove(file)
+		}
 	}()
 
 	ctx := context.Background()

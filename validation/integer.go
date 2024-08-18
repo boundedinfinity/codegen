@@ -269,7 +269,7 @@ func (e errIntegerNotAnyOf[T]) Error() string {
 	return fmt.Sprintf(
 		"%s value of %d %s the following %s",
 		e.Name, e.Value, ErrIntegerNotAnyOf.Error(),
-		stringer.Join(", ", e.OneOf...),
+		stringer.Join(", ", stringer.AsStrings(e.OneOf...)...),
 	)
 }
 
@@ -293,29 +293,29 @@ func IntegerAnyOfFn[T ~int](name string, elems ...T) func(T) error {
 // NoneOf
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerNotNoneOf = errors.New("is one of")
+var ErrIntegerNoneOf = errors.New("is one of")
 
-type errIntegerNotNoneOf[T ~int] struct {
-	Name  string
-	OneOf []T
-	Value T
+type errIntegerNoneOf[T ~int] struct {
+	Name   string
+	NoneOf []T
+	Value  T
 }
 
-func (e errIntegerNotNoneOf[T]) Error() string {
+func (e errIntegerNoneOf[T]) Error() string {
 	return fmt.Sprintf(
 		"%s value of %d %s the following %s",
-		e.Name, e.Value, ErrIntegerNotNoneOf.Error(),
-		stringer.Join(", ", e.OneOf...),
+		e.Name, e.Value, ErrIntegerNoneOf.Error(),
+		stringer.Join(", ", stringer.AsStrings(e.NoneOf...)...),
 	)
 }
 
-func (e *errIntegerNotNoneOf[T]) Unwrap() error {
+func (e *errIntegerNoneOf[T]) Unwrap() error {
 	return ErrIntegerNotNegative
 }
 
 func IntegerNoneOf[T ~int](name string, value T, elems ...T) error {
 	if !slicer.NoneOf(value, elems...) {
-		return &errIntegerNotNoneOf[T]{Name: name, Value: value, OneOf: elems}
+		return &errIntegerNoneOf[T]{Name: name, Value: value, NoneOf: elems}
 	}
 
 	return nil
