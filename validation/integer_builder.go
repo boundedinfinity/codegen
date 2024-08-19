@@ -2,42 +2,32 @@ package validation
 
 import (
 	"boundedinfinity/codegen/model"
-	"errors"
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"golang.org/x/exp/constraints"
 )
 
-func Integer[T ~int](name string) *integerValidations[T] {
-	return &integerValidations[T]{
-		name:        name,
-		validations: []func(v T) error{},
-	}
+type integerValidations[T constraints.Integer] struct {
+	validator *validator[T]
 }
 
-type integerValidations[T ~int] struct {
-	name        string
-	validations []func(v T) error
+var _ Validater[int] = &integerValidations[int]{}
+
+func Integer[T constraints.Integer](name string) *integerValidations[T] {
+	return &integerValidations[T]{validator: &validator[T]{name: name}}
 }
 
-func (this integerValidations[T]) Validate(v T) error {
-	errs := []error{}
-
-	for _, validation := range this.validations {
-		if err := validation(v); err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	return errors.Join(errs...)
+func (this *integerValidations[T]) Validate(value T) error {
+	return this.validator.Validate(value)
 }
 
 func (this *integerValidations[T]) Min(n T) *integerValidations[T] {
-	this.validations = append(this.validations, IntegerMinFn(this.name, n))
+	this.validator.append(IntegerMinFn[T](this.validator.name, n))
 	return this
 }
 
 func (this *integerValidations[T]) Max(n T) *integerValidations[T] {
-	this.validations = append(this.validations, IntegerMaxFn(this.name, n))
+	this.validator.append(IntegerMaxFn[T](this.validator.name, n))
 	return this
 }
 
@@ -47,26 +37,26 @@ func (this *integerValidations[T]) MinMax(min, max T) *integerValidations[T] {
 }
 
 func (this *integerValidations[T]) Range(rng model.Range[T]) *integerValidations[T] {
-	this.validations = append(this.validations, IntegerRange(this.name, rng))
+	this.validator.append(IntegerRange[T](this.validator.name, rng))
 	return this
 }
 
 func (this *integerValidations[T]) MultipleOf(n T) *integerValidations[T] {
-	this.validations = append(this.validations, IntegerMultipleOfFn(this.name, n))
+	this.validator.append(IntegerMultipleOfFn[T](this.validator.name, n))
 	return this
 }
 
 func (this *integerValidations[T]) NotZero() *integerValidations[T] {
-	this.validations = append(this.validations, IntegerNotZeroFn[T](this.name))
+	this.validator.append(IntegerNotZeroFn[T](this.validator.name))
 	return this
 }
 
 func (this *integerValidations[T]) Positive() *integerValidations[T] {
-	this.validations = append(this.validations, IntegerPositiveFn[T](this.name))
+	this.validator.append(IntegerPositiveFn[T](this.validator.name))
 	return this
 }
 
 func (this *integerValidations[T]) Negative() *integerValidations[T] {
-	this.validations = append(this.validations, IntegerNegativeFn[T](this.name))
+	this.validator.append(IntegerNegativeFn[T](this.validator.name))
 	return this
 }

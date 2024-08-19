@@ -20,13 +20,13 @@ func Test_String(t *testing.T) {
 		{
 			name:  "case 1",
 			input: "something",
-			fn:    validation.StringMinFn[CustomString]("case 1", 4),
+			fn:    validation.StringsMinFn[CustomString]("case 1", 4),
 			err:   nil,
 		},
 		{
 			name:    "case 2",
 			input:   "so",
-			fn:      validation.StringMinFn[CustomString]("case 2", 4),
+			fn:      validation.StringsMinFn[CustomString]("case 2", 4),
 			err:     validation.ErrStringMin,
 			message: "case 2 value so less than min value of 4",
 		},
@@ -45,7 +45,7 @@ func Test_String(t *testing.T) {
 }
 
 func Test_String_Error(t *testing.T) {
-	err := validation.StringNotEmtpy("something", "a", "b", "", "d", "e")
+	err := validation.StringsNotEmtpy("something", "a", "b", "", "d", "e")
 	assert.ErrorIs(t, err, validation.ErrStringEmpty)
 
 	details, ok := err.(*validation.ErrStringEmtpyDetails)

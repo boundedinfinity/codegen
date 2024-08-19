@@ -1,3 +1,4 @@
+// Package validation stuff goes here
 package validation
 
 import (
@@ -5,30 +6,50 @@ import (
 	"fmt"
 )
 
-var ValidationError = errors.New("validation error")
-
-func newValidations[T any](name string) *validations[T] {
-	return &validations[T]{
-		name:        name,
-		validations: []func(v T) error{},
-	}
+type Validater[T any] interface {
+	Validate(T) error
 }
 
-type validations[T any] struct {
+type Validation[T any] func(T) error
+
+var ErrValidatorIncorrectType = errors.New("incorrect type")
+
+type ErrValidatorIncorrectTypeDetails struct {
+	name  string
+	value any
+}
+
+func (this ErrValidatorIncorrectTypeDetails) Error() string {
+	return fmt.Sprintf("%s for %s: %v", ErrValidatorIncorrectType, this.name, this.value)
+}
+
+func (this ErrValidatorIncorrectTypeDetails) Unwrap() error {
+	return ErrValidatorIncorrectType
+}
+
+type validator[T any] struct {
 	name        string
-	validations []func(v T) error
+	validations []Validation[T]
 }
 
-func (this validations[T]) Validate(v T) error {
-	errs := []error{}
+func (this *validator[T]) append(validation Validation[T]) {
+	this.validations = append(this.validations, validation)
+}
+
+func (this validator[T]) Validate(value any) error {
+	tvalue, ok := value.(T)
+
+	if !ok {
+		return &ErrValidatorIncorrectTypeDetails{name: this.name, value: value}
+	}
 
 	for _, validation := range this.validations {
-		if err := validation(v); err != nil {
-			errs = append(errs, err)
+		if err := validation(tvalue); err != nil {
+			return err
 		}
 	}
 
-	return errors.Join(errs...)
+	return nil
 }
 
 // Indexed Name

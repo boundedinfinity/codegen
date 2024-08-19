@@ -11,18 +11,18 @@ import (
 // NumberRange
 ///////////////////////////////////////////////////////////////////
 
-func NewRange[T ~int | ~float64]() *Range[T] {
+func NewRange[T NumberType]() *Range[T] {
 	return &Range[T]{}
 }
 
-type Range[T ~int | ~float64] struct {
+type Range[T NumberType] struct {
 	Min          optioner.Option[T] `json:"min,omitempty"`
 	ExclusiveMin optioner.Option[T] `json:"exclusive-min,omitempty"`
 	Max          optioner.Option[T] `json:"max,omitempty"`
 	ExclusiveMax optioner.Option[T] `json:"exclusive-max,omitempty"`
 }
 
-type RangeBuilder[T ~int | ~float64] struct {
+type RangeBuilder[T NumberType] struct {
 	obj Range[T]
 }
 
@@ -71,33 +71,35 @@ var (
 	ErrRangeMaxLessThanMin                            = errors.New("max less than min")
 )
 
-type errErrRangeMinAndExclusiveMinMutuallyExclusive[T ~int | ~float64] struct {
+type errErrRangeMinAndExclusiveMinMutuallyExclusive[T NumberType] struct {
 	Min          T
 	ExclusiveMin T
 }
 
 func (e errErrRangeMinAndExclusiveMinMutuallyExclusive[T]) Error() string {
-	return fmt.Sprintf("min: %v, exclusive-min: %v : %s", e.Min, e.ExclusiveMin, ErrNumberRangeMinAndExclusiveMinMutuallyExclusive.Error())
+	return fmt.Sprintf("min: %v, exclusive-min: %v : %s", e.Min, e.ExclusiveMin,
+		ErrNumberRangeMinAndExclusiveMinMutuallyExclusive.Error())
 }
 
 func (e errErrRangeMinAndExclusiveMinMutuallyExclusive[T]) Unwrap() error {
 	return ErrNumberRangeMinAndExclusiveMinMutuallyExclusive
 }
 
-type errErrRangeMaxAndExclusiveMaxMutuallyExclusive[T ~int | ~float64] struct {
+type errErrRangeMaxAndExclusiveMaxMutuallyExclusive[T NumberType] struct {
 	Max          T
 	ExclusiveMax T
 }
 
 func (e errErrRangeMaxAndExclusiveMaxMutuallyExclusive[T]) Error() string {
-	return fmt.Sprintf("max: %v, exclusive-max: %v : %s", e.Max, e.ExclusiveMax, ErrNumberRangeMaxAndExclusiveMaxMutuallyExclusive.Error())
+	return fmt.Sprintf("max: %v, exclusive-max: %v : %s", e.Max, e.ExclusiveMax,
+		ErrNumberRangeMaxAndExclusiveMaxMutuallyExclusive.Error())
 }
 
 func (e errErrRangeMaxAndExclusiveMaxMutuallyExclusive[T]) Unwrap() error {
 	return ErrNumberRangeMinAndExclusiveMinMutuallyExclusive
 }
 
-type errRangeMinMax[T ~int | ~float64] struct {
+type errRangeMinMax[T NumberType] struct {
 	Min    T
 	Max    T
 	parent error

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/boundedinfinity/go-commoner/idiomatic/slicer"
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
@@ -28,6 +29,10 @@ func quote(s string) string {
 	}
 
 	return s
+}
+
+func quotes(s []string) []string {
+	return slicer.Map(func(_ int, s string) string { return quote(s) }, s...)
 }
 
 // https://sqlite.org/lang_keywords.html

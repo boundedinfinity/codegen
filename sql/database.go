@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -179,6 +180,10 @@ func (this *DatabaseSchema) Generate() string {
 func (this DatabaseSchema) WriteSqlFile(path string) error {
 	content := this.Generate()
 	return os.WriteFile(path, []byte(content), os.FileMode(0755))
+}
+
+func (this DatabaseSchema) CreateTables(db sql.DB) error {
+	return nil
 }
 
 func (this *DatabaseSchema) AddTable(table *TableSchema) *DatabaseSchema {

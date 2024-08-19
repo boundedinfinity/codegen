@@ -98,8 +98,6 @@ type DateLabelRepository struct {
 func (this *DateLabelRepository) EnsureTable(ctx context.Context) error {
 	query := `CREATE TABLE IF NOT EXISTS label (id TEXT, name TEXT);`
 	return createTable(this.db, ctx, query)
-
-	return nil
 }
 
 func (this *DateLabelRepository) Save(ctx context.Context, label DateLabel) error {

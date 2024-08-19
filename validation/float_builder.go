@@ -1,15 +1,21 @@
 package validation
 
-import "errors"
+import (
+	"errors"
 
-func Float[T ~float32 | ~float64](name string) *floatValidations[T] {
+	"golang.org/x/exp/constraints"
+)
+
+func Float[T constraints.Float](name string) *floatValidations[T] {
 	return &floatValidations[T]{
 		name:        name,
 		validations: []func(v T) error{},
 	}
 }
 
-type floatValidations[T ~float32 | ~float64] struct {
+// var _ ValidationManager[float64] = &floatValidations[float64]{}
+
+type floatValidations[T constraints.Float] struct {
 	name        string
 	validations []func(v T) error
 }

@@ -8,36 +8,37 @@ import (
 
 	"github.com/boundedinfinity/go-commoner/idiomatic/slicer"
 	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
+	"golang.org/x/exp/constraints"
 )
 
 //////////////////////////////////////////////////////////////
 // Less than
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerLessThanMin = errors.New("less than minimum")
+var ErrIntegerMin = errors.New("less than minimum")
 
-type errIntegerLessThanMin[T ~int] struct {
+type ErrIntegerMinDetails[T constraints.Integer] struct {
 	Name string
 	Min  T
 }
 
-func (e *errIntegerLessThanMin[T]) Error() string {
-	return fmt.Sprintf("%s value of %d is %s", e.Name, e.Min, ErrIntegerLessThanMin.Error())
+func (e *ErrIntegerMinDetails[T]) Error() string {
+	return fmt.Sprintf("%s value of %d is %s", e.Name, e.Min, ErrIntegerMin.Error())
 }
 
-func (e *errIntegerLessThanMin[T]) Unwrap() error {
-	return ErrIntegerLessThanMin
+func (e *ErrIntegerMinDetails[T]) Unwrap() error {
+	return ErrIntegerMin
 }
 
-func IntegerMin[T ~int](name string, min T, value T) error {
+func IntegerMin[T constraints.Integer](name string, min T, value T) error {
 	if value < min {
-		return &errIntegerLessThanMin[T]{name, min}
+		return &ErrIntegerMinDetails[T]{name, min}
 	}
 
 	return nil
 }
 
-func IntegerMinFn[T ~int](name string, min T) func(T) error {
+func IntegerMinFn[T constraints.Integer](name string, min T) func(T) error {
 	return func(value T) error { return IntegerMin(name, min, value) }
 }
 
@@ -45,30 +46,30 @@ func IntegerMinFn[T ~int](name string, min T) func(T) error {
 // Greater than
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerGreaterThanMax = errors.New("is greater than maxium")
+var ErrIntegerMax = errors.New("is greater than maxium")
 
-type errIntegerGreaterThanMax[T ~int] struct {
+type ErrIntegerMaxDetails[T constraints.Integer] struct {
 	Name string
 	Max  T
 }
 
-func (e *errIntegerGreaterThanMax[T]) Error() string {
-	return fmt.Sprintf("%s value of %d is %s", e.Name, e.Max, ErrIntegerGreaterThanMax.Error())
+func (e *ErrIntegerMaxDetails[T]) Error() string {
+	return fmt.Sprintf("%s value of %d is %s", e.Name, e.Max, ErrIntegerMax.Error())
 }
 
-func (e *errIntegerGreaterThanMax[T]) Unwrap() error {
-	return ErrIntegerGreaterThanMax
+func (e *ErrIntegerMaxDetails[T]) Unwrap() error {
+	return ErrIntegerMax
 }
 
-func IntegerMax[T ~int](name string, max T, value T) error {
-	if value < max {
-		return &errIntegerGreaterThanMax[T]{Name: name, Max: max}
+func IntegerMax[T constraints.Integer](name string, max T, value T) error {
+	if value > max {
+		return &ErrIntegerMaxDetails[T]{Name: name, Max: max}
 	}
 
 	return nil
 }
 
-func IntegerMaxFn[T ~int](name string, max T) func(T) error {
+func IntegerMaxFn[T constraints.Integer](name string, max T) func(T) error {
 	return func(value T) error { return IntegerMax(name, max, value) }
 }
 
@@ -76,15 +77,15 @@ func IntegerMaxFn[T ~int](name string, max T) func(T) error {
 // Greater than
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerOutOfRange = errors.New("out of range")
+var ErrIntegerRange = errors.New("out of range")
 
-type errIntegerNotInRange[T ~int] struct {
+type ErrIntegerRangeDetails[T constraints.Integer] struct {
 	Name  string
 	Range model.Range[T]
 	Value T
 }
 
-func (e errIntegerNotInRange[T]) Error() string {
+func (e ErrIntegerRangeDetails[T]) Error() string {
 	var sb strings.Builder
 
 	sb.WriteString(e.Name + " is out of range of ")
@@ -112,26 +113,26 @@ func (e errIntegerNotInRange[T]) Error() string {
 	return sb.String()
 }
 
-func (e *errIntegerNotInRange[T]) Unwrap() error {
-	return ErrIntegerOutOfRange
+func (e *ErrIntegerRangeDetails[T]) Unwrap() error {
+	return ErrIntegerRange
 }
 
-func IntegerRange[T ~int](name string, rng model.Range[T]) func(v T) error {
+func IntegerRange[T constraints.Integer](name string, rng model.Range[T]) func(v T) error {
 	return func(v T) error {
 		if rng.Min.Defined() && v < rng.Min.Get() {
-			return &errIntegerNotInRange[T]{Name: name, Range: rng, Value: v}
+			return &ErrIntegerRangeDetails[T]{Name: name, Range: rng, Value: v}
 		}
 
 		if rng.ExclusiveMin.Defined() && v <= rng.ExclusiveMin.Get() {
-			return &errIntegerNotInRange[T]{Name: name, Range: rng, Value: v}
+			return &ErrIntegerRangeDetails[T]{Name: name, Range: rng, Value: v}
 		}
 
 		if rng.Max.Defined() && v < rng.Max.Get() {
-			return &errIntegerNotInRange[T]{Name: name, Range: rng, Value: v}
+			return &ErrIntegerRangeDetails[T]{Name: name, Range: rng, Value: v}
 		}
 
 		if rng.ExclusiveMax.Defined() && v <= rng.ExclusiveMax.Get() {
-			return &errIntegerNotInRange[T]{Name: name, Range: rng, Value: v}
+			return &ErrIntegerRangeDetails[T]{Name: name, Range: rng, Value: v}
 		}
 
 		return nil
@@ -142,34 +143,34 @@ func IntegerRange[T ~int](name string, rng model.Range[T]) func(v T) error {
 // Greater than
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerNotMultipleOf = errors.New("is not a multiple")
+var ErrIntegerMultipleOf = errors.New("is not a multiple")
 
-type errIntegerNotMultipleOf[T ~int] struct {
+type ErrIntegerMultipleOfDetails[T constraints.Integer] struct {
 	Name       string
 	MultipleOf T
 	Value      T
 }
 
-func (e errIntegerNotMultipleOf[T]) Error() string {
+func (e ErrIntegerMultipleOfDetails[T]) Error() string {
 	return fmt.Sprintf(
 		"%s value of %d is %s of %d",
-		e.Name, e.Value, ErrIntegerNotMultipleOf.Error(), e.MultipleOf,
+		e.Name, e.Value, ErrIntegerMultipleOf.Error(), e.MultipleOf,
 	)
 }
 
-func (e *errIntegerNotMultipleOf[T]) Unwrap() error {
-	return ErrIntegerNotMultipleOf
+func (e *ErrIntegerMultipleOfDetails[T]) Unwrap() error {
+	return ErrIntegerMultipleOf
 }
 
-func IntegerMultipleOf[T ~int](name string, multipleOf T, value T) error {
+func IntegerMultipleOf[T constraints.Integer](name string, multipleOf T, value T) error {
 	if value%multipleOf != 0 {
-		return &errIntegerNotMultipleOf[T]{Name: name, MultipleOf: multipleOf, Value: value}
+		return &ErrIntegerMultipleOfDetails[T]{Name: name, MultipleOf: multipleOf, Value: value}
 	}
 
 	return nil
 }
 
-func IntegerMultipleOfFn[T ~int](name string, multipleOf T) func(T) error {
+func IntegerMultipleOfFn[T constraints.Integer](name string, multipleOf T) func(T) error {
 	return func(value T) error { return IntegerMultipleOf(name, multipleOf, value) }
 }
 
@@ -179,7 +180,7 @@ func IntegerMultipleOfFn[T ~int](name string, multipleOf T) func(T) error {
 
 var ErrIntegerZero = errors.New("is zero")
 
-func IntegerNotZero[T ~int](name string, value T) error {
+func IntegerNotZero[T constraints.Integer](name string, value T) error {
 	if value == 0 {
 		return fmt.Errorf("%s %w", name, ErrIntegerZero)
 	}
@@ -187,7 +188,7 @@ func IntegerNotZero[T ~int](name string, value T) error {
 	return nil
 }
 
-func IntegerNotZeroFn[T ~int](name string) func(T) error {
+func IntegerNotZeroFn[T constraints.Integer](name string) func(T) error {
 	return func(value T) error { return IntegerNotZero(name, value) }
 }
 
@@ -195,30 +196,30 @@ func IntegerNotZeroFn[T ~int](name string) func(T) error {
 // Not Positive
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerNotPositive = errors.New("is not positive")
+var ErrIntegerPositive = errors.New("is not positive")
 
-type errIntegerNotPositive[T ~int] struct {
+type ErrIntegerPositiveDetails[T constraints.Integer] struct {
 	Value T
 }
 
-func (e errIntegerNotPositive[T]) Error() string {
-	return fmt.Sprintf("%d %s", e.Value, ErrIntegerNotPositive.Error())
+func (e ErrIntegerPositiveDetails[T]) Error() string {
+	return fmt.Sprintf("%d %s", e.Value, ErrIntegerPositive.Error())
 }
 
-func (e *errIntegerNotPositive[T]) Unwrap() error {
-	return ErrIntegerNotPositive
+func (e *ErrIntegerPositiveDetails[T]) Unwrap() error {
+	return ErrIntegerPositive
 }
 
-func IntegerPositive[T ~int](name string, value T) error {
+func IntegerPositive[T constraints.Integer](name string, value T) error {
 	if value < 0 {
-		return &errIntegerNotPositive[T]{Value: value}
+		return &ErrIntegerPositiveDetails[T]{Value: value}
 	}
 
 	return nil
 
 }
 
-func IntegerPositiveFn[T ~int](name string) func(T) error {
+func IntegerPositiveFn[T constraints.Integer](name string) func(T) error {
 	return func(value T) error { return IntegerPositive(name, value) }
 }
 
@@ -226,30 +227,30 @@ func IntegerPositiveFn[T ~int](name string) func(T) error {
 // Not Negative
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerNotNegative = errors.New("is not negative")
+var ErrIntegerNegative = errors.New("is not negative")
 
-type errIntegerNotNegative[T ~int] struct {
+type ErrIntegerNegativeDetails[T constraints.Integer] struct {
 	Value T
 }
 
-func (e errIntegerNotNegative[T]) Error() string {
-	return fmt.Sprintf("%d %s", e.Value, ErrIntegerNotNegative.Error())
+func (e ErrIntegerNegativeDetails[T]) Error() string {
+	return fmt.Sprintf("%d %s", e.Value, ErrIntegerNegative.Error())
 }
 
-func (e *errIntegerNotNegative[T]) Unwrap() error {
-	return ErrIntegerNotNegative
+func (e *ErrIntegerNegativeDetails[T]) Unwrap() error {
+	return ErrIntegerNegative
 }
 
-func IntegerNegative[T ~int](name string, value T) error {
+func IntegerNegative[T constraints.Integer](name string, value T) error {
 	if value > 0 {
-		return &errIntegerNotNegative[T]{Value: value}
+		return &ErrIntegerNegativeDetails[T]{Value: value}
 	}
 
 	return nil
 
 }
 
-func IntegerNegativeFn[T ~int](name string) func(T) error {
+func IntegerNegativeFn[T constraints.Integer](name string) func(T) error {
 	return func(value T) error { return IntegerNegative(name, value) }
 }
 
@@ -257,35 +258,35 @@ func IntegerNegativeFn[T ~int](name string) func(T) error {
 // AnyOf
 //////////////////////////////////////////////////////////////
 
-var ErrIntegerNotAnyOf = errors.New("is not any of")
+var ErrIntegerAnyOf = errors.New("is not any of")
 
-type errIntegerNotAnyOf[T ~int] struct {
+type ErrIntegerAnyOfDetails[T constraints.Integer] struct {
 	Name  string
 	OneOf []T
 	Value T
 }
 
-func (e errIntegerNotAnyOf[T]) Error() string {
+func (e ErrIntegerAnyOfDetails[T]) Error() string {
 	return fmt.Sprintf(
 		"%s value of %d %s the following %s",
-		e.Name, e.Value, ErrIntegerNotAnyOf.Error(),
+		e.Name, e.Value, ErrIntegerAnyOf.Error(),
 		stringer.Join(", ", stringer.AsStrings(e.OneOf...)...),
 	)
 }
 
-func (e *errIntegerNotAnyOf[T]) Unwrap() error {
-	return ErrIntegerNotNegative
+func (e *ErrIntegerAnyOfDetails[T]) Unwrap() error {
+	return ErrIntegerNegative
 }
 
-func IntegerAnyOf[T ~int](name string, value T, elems ...T) error {
+func IntegerAnyOf[T constraints.Integer](name string, value T, elems ...T) error {
 	if !slicer.AnyOf(value, elems...) {
-		return &errIntegerNotAnyOf[T]{Name: name, Value: value, OneOf: elems}
+		return &ErrIntegerAnyOfDetails[T]{Name: name, Value: value, OneOf: elems}
 	}
 
 	return nil
 }
 
-func IntegerAnyOfFn[T ~int](name string, elems ...T) func(T) error {
+func IntegerAnyOfFn[T constraints.Integer](name string, elems ...T) func(T) error {
 	return func(value T) error { return IntegerAnyOf(name, value, elems...) }
 }
 
@@ -295,13 +296,13 @@ func IntegerAnyOfFn[T ~int](name string, elems ...T) func(T) error {
 
 var ErrIntegerNoneOf = errors.New("is one of")
 
-type errIntegerNoneOf[T ~int] struct {
+type ErrIntegerNoneOfDetails[T constraints.Integer] struct {
 	Name   string
 	NoneOf []T
 	Value  T
 }
 
-func (e errIntegerNoneOf[T]) Error() string {
+func (e ErrIntegerNoneOfDetails[T]) Error() string {
 	return fmt.Sprintf(
 		"%s value of %d %s the following %s",
 		e.Name, e.Value, ErrIntegerNoneOf.Error(),
@@ -309,18 +310,18 @@ func (e errIntegerNoneOf[T]) Error() string {
 	)
 }
 
-func (e *errIntegerNoneOf[T]) Unwrap() error {
-	return ErrIntegerNotNegative
+func (e *ErrIntegerNoneOfDetails[T]) Unwrap() error {
+	return ErrIntegerNegative
 }
 
-func IntegerNoneOf[T ~int](name string, value T, elems ...T) error {
+func IntegerNoneOf[T constraints.Integer](name string, value T, elems ...T) error {
 	if !slicer.NoneOf(value, elems...) {
-		return &errIntegerNoneOf[T]{Name: name, Value: value, NoneOf: elems}
+		return &ErrIntegerNoneOfDetails[T]{Name: name, Value: value, NoneOf: elems}
 	}
 
 	return nil
 }
 
-func IntegerNoneOfFn[T ~int](name string, elems ...T) func(T) error {
+func IntegerNoneOfFn[T constraints.Integer](name string, elems ...T) func(T) error {
 	return func(value T) error { return IntegerNoneOf(name, value, elems...) }
 }

@@ -2,6 +2,7 @@ package sql_test
 
 import (
 	"boundedinfinity/codegen/sql"
+	"context"
 	"testing"
 
 	"github.com/boundedinfinity/go-commoner/idiomatic/extentioner"
@@ -9,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Unmarshal_Object(t *testing.T) {
+func Test_Generate(t *testing.T) {
 	database := sql.Database().SetForeignKeys(true).SetFormatted(true)
 
 	person_table := sql.Table().
@@ -79,12 +80,55 @@ func Test_Unmarshal_Object(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(tt *testing.T) {
 			actual := tc.input.Generate()
-			_, err := pather.Dirs.EnsureErr("./test-output")
-			assert.ErrorIs(tt, err, nil)
-			filename := extentioner.Join(tc.name, ".sql")
-			path := pather.Paths.Join("./test-output", filename)
+			path := testOutputPath(tc.name, "sql")
 			assert.ErrorIs(tt, tc.input.WriteSqlFile(path), nil)
 			assert.Equal(tt, tc.expected, actual)
+		})
+	}
+}
+
+func testOutputPath(name, ext string) string {
+	_, err := pather.Dirs.EnsureErr("./test-output")
+	if err != nil {
+		panic(err)
+	}
+	filename := extentioner.Join(name, ext)
+	path := pather.Paths.Join("./test-output", filename)
+	return path
+}
+
+func Test_Database(t *testing.T) {
+	database := sql.Database().SetForeignKeys(true).SetFormatted(true)
+
+	person_table := sql.Table().
+		SetIsNotExists(true).SetName("person").
+		AddColumn(&sql.ColumnSchema{Name: "id", Type: sql.ColumnTypes.TEXT, PrimaryKey: true})
+
+	database.
+		AddTable(person_table)
+
+	tcs := []struct {
+		name     string
+		input    *sql.DatabaseSchema
+		expected string
+	}{
+		{
+			name:     "case 1",
+			input:    database,
+			expected: ``,
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(tt *testing.T) {
+			path := testOutputPath(tc.name, "db")
+
+			manager, err := sql.NewManager(path, context.Background())
+			assert.ErrorIs(tt, err, nil)
+			defer manager.Cleanup()
+
+			err = manager.EnsureTables(*tc.input)
+			assert.ErrorIs(tt, err, nil)
 		})
 	}
 }

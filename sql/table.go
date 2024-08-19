@@ -124,13 +124,9 @@ func (this *TableSchema) AddForeignKey(fk *ForeignKeySchema) *TableSchema {
 }
 
 func (this TableSchema) primaryKeyColumns() []*ColumnSchema {
-	var columns []*ColumnSchema
-	for _, column := range this.Columns {
-		if column.PrimaryKey {
-			columns = append(columns, column)
-		}
-	}
-	return columns
+	return slicer.Filter(
+		func(_ int, column *ColumnSchema) bool { return column.PrimaryKey },
+		this.Columns...)
 }
 
 func (this TableSchema) primaryKeyNames() []string {
@@ -138,25 +134,9 @@ func (this TableSchema) primaryKeyNames() []string {
 }
 
 func (this TableSchema) indexedColumns() []*ColumnSchema {
-	var columns []*ColumnSchema
-	for _, column := range this.Columns {
-		if column.Indexed {
-			columns = append(columns, column)
-		}
-	}
-	return columns
-}
-
-// func (this TableSchema) indexedNames() []string {
-// 	return columnNames(this.indexedColumns())
-// }
-
-func columnNames(columns []*ColumnSchema) []string {
-	var names []string
-	for _, column := range columns {
-		names = append(names, column.Name)
-	}
-	return names
+	return slicer.Filter(
+		func(_ int, column *ColumnSchema) bool { return column.Indexed },
+		this.Columns...)
 }
 
 func (this *TableSchema) SetName(name string) *TableSchema {
@@ -165,6 +145,10 @@ func (this *TableSchema) SetName(name string) *TableSchema {
 
 func (this *TableSchema) SetWithoutRowId(enabed bool) *TableSchema {
 	return setAndReturn(this, &this.WithoutRowId, enabed)
+}
+
+func (this *TableSchema) SetIsNotExists(enabed bool) *TableSchema {
+	return setAndReturn(this, &this.IfNotExists, enabed)
 }
 
 func (this *TableSchema) AddColumn(column *ColumnSchema) *TableSchema {

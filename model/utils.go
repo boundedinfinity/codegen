@@ -6,7 +6,12 @@ import (
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
 	"github.com/boundedinfinity/go-commoner/idiomatic/caser"
 	"github.com/boundedinfinity/go-commoner/idiomatic/pather"
+	"golang.org/x/exp/constraints"
 )
+
+type NumberType interface {
+	constraints.Integer | constraints.Float
+}
 
 func setOptionAndReturn[B any, V comparable](builder B, opt *optioner.Option[V], value V) B {
 	*opt = optioner.OfZero(value)

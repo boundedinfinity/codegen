@@ -27,7 +27,7 @@ func Test_Integer(t *testing.T) {
 			name:    "case 2",
 			input:   3,
 			fn:      validation.IntegerMinFn[CustomInteger]("case 2", 4),
-			err:     validation.ErrIntegerLessThanMin,
+			err:     validation.ErrIntegerMin,
 			message: "case 2 value 3 is less than min value of 4",
 		},
 	}
