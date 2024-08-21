@@ -10,54 +10,62 @@ func Select() *SelectSchema {
 }
 
 type SelectSchema struct {
-	table     *TableSchema
 	columns   []*ColumnSchema
-	clauses   [][]*WhereClauseSchema
+	clauses   []*WhereClauseSchema
 	formatted bool
 }
 
-func (this *SelectSchema) Generate() string {
+func (this *SelectSchema) Generate() (string, error) {
 	var sb stringBuiler
+	var tables []*TableSchema
 
-	create := func(whereColumns []*WhereClauseSchema) {
-		columnNames := columnNames(this.table.Columns)
-		columnNames = quotes(columnNames)
-
-		sb.Writef("SELECT %s FROM %s", stringer.Join(", ", columnNames...), this.table.Name)
-
-		if len(whereColumns) > 0 {
-			sb.Writef(" WHERE ")
-
-			for _, whereClauses := range this.clauses {
-				whereClauses := slicer.Map(
-					func(_ int, clause *WhereClauseSchema) string { return clause.Generate() },
-					whereClauses...)
-				sb.Writef(stringer.Join(" ", whereClauses...))
-			}
-		}
-
-		sb.Writef(";")
-
-		if this.formatted {
-			sb.Writef("\n")
-		}
+	if len(this.columns) <= 0 {
+		return sb.String(), ErrSelectNoColumns
 	}
 
-	create([]*WhereClauseSchema{})
+	tables = slicer.Map(func(_ int, column *ColumnSchema) *TableSchema {
+		return column.Table
+	}, this.columns...)
 
-	for _, wheres := range this.clauses {
-		create(wheres)
+	tables = slicer.UniqFn(func(_ int, table *TableSchema) string {
+		return table.Name
+	}, tables...)
+
+	sb.Writef("SELECT ")
+
+	if len(tables) > 1 {
+		sb.Writef(stringer.Join(", ", getQualifiedColumnNames(this.columns)...))
+	} else {
+		sb.Writef(stringer.Join(", ", getColumnNames(this.columns)...))
 	}
 
-	return sb.String()
+	sb.Writef(" FROM %s", stringer.Join(", ", getTableNames(tables)...))
+
+	if len(this.clauses) > 0 {
+		clauses := slicer.Map(func(_ int, clause *WhereClauseSchema) string {
+			return clause.Generate()
+		}, this.clauses...)
+
+		sb.Writef(" %s", stringer.Join(" ", clauses...))
+	}
+
+	sb.Writef(";")
+
+	if this.formatted {
+		sb.Writef("\n")
+	}
+
+	return sb.String(), nil
 }
 
-func (this *SelectSchema) Table(table *TableSchema) *SelectSchema {
-	return setAndReturn(this, &this.table, table)
-}
+func (this *SelectSchema) All(tables ...*TableSchema) *SelectSchema {
+	var columns []*ColumnSchema
 
-func (this *SelectSchema) Formatted(enabed bool) *SelectSchema {
-	return setAndReturn(this, &this.formatted, enabed)
+	for _, table := range tables {
+		columns = append(columns, table.Columns...)
+	}
+
+	return appendAndReturn(this, &this.columns, columns...)
 }
 
 func (this *SelectSchema) Column(columns ...*ColumnSchema) *SelectSchema {
@@ -65,5 +73,9 @@ func (this *SelectSchema) Column(columns ...*ColumnSchema) *SelectSchema {
 }
 
 func (this *SelectSchema) Where(clauses ...*WhereClauseSchema) *SelectSchema {
-	return appendAndReturn(this, &this.clauses, clauses)
+	return appendAndReturn(this, &this.clauses, clauses...)
+}
+
+func (this *SelectSchema) Formatted(enabed bool) *SelectSchema {
+	return setAndReturn(this, &this.formatted, enabed)
 }

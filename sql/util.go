@@ -12,8 +12,21 @@ func appendAndReturn[B any, V any](builder B, field *[]V, values ...V) B {
 	return builder
 }
 
-func columnNames(columns []*ColumnSchema) []string {
+func getTableNames(tables []*TableSchema) []string {
+	return slicer.Map(
+		func(_ int, table *TableSchema) string { return table.Name },
+		tables...)
+}
+
+func getColumnNames(columns []*ColumnSchema) []string {
 	return slicer.Map(
 		func(_ int, column *ColumnSchema) string { return column.Name },
 		columns...)
+}
+
+func getQualifiedColumnNames(columns []*ColumnSchema) []string {
+	return slicer.Map(
+		func(_ int, column *ColumnSchema) string {
+			return column.Table.Name + "." + column.Name
+		}, columns...)
 }

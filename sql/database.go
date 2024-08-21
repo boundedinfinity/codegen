@@ -10,30 +10,26 @@ import (
 )
 
 func Database() *DatabaseSchema {
-	return &DatabaseSchema{}
+	return &DatabaseSchema{
+		Tables: map[string]*TableSchema{},
+	}
 }
 
 type DatabaseSchema struct {
-	Tables      []*TableSchema
+	Tables      map[string]*TableSchema
 	ForeignKeys bool
 	Formatted   bool
+	errs        []error
 }
 
-func (this *DatabaseSchema) Table(name string) *TableSchema {
-	var found *TableSchema
+func (this *DatabaseSchema) Error() error {
+	return errors.Join(this.errs...)
+}
 
-	for _, table := range this.Tables {
-		if table.Name == name {
-			found = table
-			break
-		}
+func (this *DatabaseSchema) checkError() {
+	if this.Error() != nil {
+		panic(this.Error())
 	}
-
-	if found == nil {
-		panic(&errDatabaseTableNotFound{TableName: name})
-	}
-
-	return found
 }
 
 func (this *DatabaseSchema) ManyToMany(domestic, foreign *TableSchema) *DatabaseSchema {
@@ -41,7 +37,7 @@ func (this *DatabaseSchema) ManyToMany(domestic, foreign *TableSchema) *Database
 		Name:         fmt.Sprintf("%s_%s", domestic.Name, foreign.Name),
 		WithoutRowId: true,
 	}
-	this.AddTable(link_table)
+	this.Table(link_table)
 	this.ReferencedTo(link_table, domestic)
 	this.ReferencedTo(link_table, foreign)
 
@@ -73,7 +69,7 @@ func (this *DatabaseSchema) OneToMany(domestic, foreign *TableSchema) *DatabaseS
 	}
 
 	for _, foreignKey := range domesticForeignKeys {
-		foreign.AddColumn(foreignKey.Foreign)
+		foreign.Column(foreignKey.Foreign)
 		domestic.AddForeignKey(foreignKey)
 	}
 
@@ -110,7 +106,7 @@ func (this *DatabaseSchema) OneToOne(domestic, foreign *TableSchema) *DatabaseSc
 	}
 
 	for _, foreignKey := range domesticForeignKeys {
-		foreign.AddColumn(foreignKey.Foreign)
+		foreign.Column(foreignKey.Foreign)
 		domestic.AddForeignKey(foreignKey)
 	}
 
@@ -140,7 +136,7 @@ func (this *DatabaseSchema) ReferencedTo(domestic, foreign *TableSchema) *Databa
 	}
 
 	for _, foreignKey := range foreignKeys {
-		domestic.AddColumn(foreignKey.Domestic)
+		domestic.Column(foreignKey.Domestic)
 		domestic.AddForeignKey(foreignKey)
 	}
 
@@ -148,6 +144,8 @@ func (this *DatabaseSchema) ReferencedTo(domestic, foreign *TableSchema) *Databa
 }
 
 func (this *DatabaseSchema) Generate() string {
+	this.checkError()
+
 	var sb stringBuiler
 
 	var tableTexts []string
@@ -183,32 +181,37 @@ func (this DatabaseSchema) WriteSqlFile(path string) error {
 }
 
 func (this DatabaseSchema) CreateTables(db sql.DB) error {
+	if this.Error() != nil {
+		return this.Error()
+	}
+
 	return nil
 }
 
-func (this *DatabaseSchema) AddTable(table *TableSchema) *DatabaseSchema {
+func (this *DatabaseSchema) GetTable(name string) *TableSchema {
+	var found *TableSchema
+
+	for _, table := range this.Tables {
+		if table.Name == name {
+			found = table
+			break
+		}
+	}
+
+	if found == nil {
+		panic(&ErrDatabaseTableNotFoundDetails{TableName: name})
+	}
+
+	return found
+}
+
+func (this *DatabaseSchema) Table(table *TableSchema) *DatabaseSchema {
 	if this.Formatted {
 		table.Formatted = this.Formatted
 	}
 
-	this.Tables = append(this.Tables, table)
+	this.Tables[table.Name] = table
 	return this
-}
-
-var (
-	ErrDatabaseTableNotFound = errors.New("table not found")
-)
-
-type errDatabaseTableNotFound struct {
-	TableName string
-}
-
-func (e errDatabaseTableNotFound) Error() string {
-	return fmt.Sprintf("%s : %s", ErrDatabaseTableNotFound.Error(), e.TableName)
-}
-
-func (e errDatabaseTableNotFound) Unwrap() error {
-	return ErrDatabaseTableNotFound
 }
 
 func (this *DatabaseSchema) SetForeignKeys(enabled bool) *DatabaseSchema {

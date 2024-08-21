@@ -1,87 +1,149 @@
 package sql
 
 import (
-	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"fmt"
+
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
 func Where() *WhereClauseSchema {
-	return &WhereClauseSchema{}
+	return &WhereClauseSchema{
+		clauses: []whereFragment{
+			&joinFragment{operator: "WHERE"},
+		},
+	}
 }
 
 type WhereClauseSchema struct {
-	column     *ColumnSchema
-	comparison optioner.Option[WhereComparisonOperator]
-	logical    optioner.Option[WhereLogicalOperator]
+	clauses []whereFragment
 }
 
 func (this *WhereClauseSchema) Generate() string {
 	var sb stringBuiler
+	var clauses []string
 
-	comparison := this.comparison.OrElse(WhereComparisonOperators.EqualTo)
-
-	if this.logical.Defined() {
-		sb.Writef("%s ", this.logical.Get())
+	for _, clause := range this.clauses {
+		clauses = append(clauses, clause.Generate())
 	}
 
-	sb.Writef("%s %s ?", quote(this.column.Name), comparison)
+	sb.Writef(stringer.Join(" ", clauses...))
 
 	return sb.String()
 }
 
-func (this *WhereClauseSchema) Table(column *ColumnSchema) *WhereClauseSchema {
-	return setAndReturn(this, &this.column, column)
+func (this *WhereClauseSchema) And() *WhereClauseSchema {
+	return appendAndReturn(this, &this.clauses, whereFragment(&joinFragment{operator: "AND"}))
 }
 
-func (this *WhereClauseSchema) Compare(operator WhereComparisonOperator) *WhereClauseSchema {
-	return setAndReturn(this, &this.comparison, optioner.Some(operator))
+func (this *WhereClauseSchema) Or() *WhereClauseSchema {
+	return appendAndReturn(this, &this.clauses, whereFragment(&joinFragment{operator: "OR"}))
 }
 
-func (this *WhereClauseSchema) Logical(operator WhereLogicalOperator) *WhereClauseSchema {
-	return setAndReturn(this, &this.logical, optioner.Some(operator))
+func (this *WhereClauseSchema) Not() *WhereClauseSchema {
+	return appendAndReturn(this, &this.clauses, whereFragment(&joinFragment{operator: "NOT"}))
 }
 
-type WhereComparisonOperator string
-
-var WhereComparisonOperators = whereComparisonOperators{
-	EqualTo:              "=",
-	NotEqualTo:           "!=",
-	LessThan:             "<",
-	GreaterThan:          ">",
-	LessThanOrEqualTo:    "<=",
-	GreaterThanOrEqualTo: ">=",
+func (this *WhereClauseSchema) Equal(column *ColumnSchema) *WhereClauseSchema {
+	return appendAndReturn(this, &this.clauses, whereFragment(&comparisonFragment{
+		operator: "=",
+		column:   column,
+	}))
 }
 
-type whereComparisonOperators struct {
-	EqualTo              WhereComparisonOperator
-	NotEqualTo           WhereComparisonOperator
-	LessThan             WhereComparisonOperator
-	GreaterThan          WhereComparisonOperator
-	LessThanOrEqualTo    WhereComparisonOperator
-	GreaterThanOrEqualTo WhereComparisonOperator
+func (this *WhereClauseSchema) NotEqual(column *ColumnSchema) *WhereClauseSchema {
+	return appendAndReturn(this, &this.clauses, whereFragment(&comparisonFragment{
+		operator: "!=",
+		column:   column,
+	}))
 }
 
-type WhereLogicalOperator string
-
-var WhereLogicalOperators = whereLogicalOperators{
-	All:     "ALL",
-	And:     "AND",
-	Any:     "ANY",
-	Between: "BETWEEN",
-	Exists:  "EXISTS",
-	In:      "IN",
-	Like:    "LIKE",
-	Not:     "NOT",
-	Or:      "OR",
+func (this *WhereClauseSchema) Like(column *ColumnSchema, pattern, escape string) *WhereClauseSchema {
+	return appendAndReturn(this, &this.clauses, whereFragment(&likeFragment{
+		pattern: pattern,
+		escape:  escape,
+		column:  column,
+	}))
 }
 
-type whereLogicalOperators struct {
-	All     WhereComparisonOperator
-	And     WhereComparisonOperator
-	Any     WhereComparisonOperator
-	Between WhereComparisonOperator
-	Exists  WhereComparisonOperator
-	In      WhereComparisonOperator
-	Like    WhereComparisonOperator
-	Not     WhereComparisonOperator
-	Or      WhereComparisonOperator
+type whereFragment interface {
+	Generate() string
 }
+
+var _ whereFragment = &comparisonFragment{}
+
+type comparisonFragment struct {
+	operator string
+	column   *ColumnSchema
+}
+
+func (this *comparisonFragment) Generate() string {
+	return fmt.Sprintf("%s %s ?", this.column.Name, this.operator)
+}
+
+var _ whereFragment = &joinFragment{}
+
+type joinFragment struct {
+	operator string
+}
+
+func (this *joinFragment) Generate() string {
+	return this.operator
+}
+
+var _ whereFragment = &likeFragment{}
+
+// https://www.sqlitetutorial.net/sqlite-like/
+
+type likeFragment struct {
+	pattern string
+	escape  string
+	column  *ColumnSchema
+}
+
+func (this *likeFragment) Generate() string {
+	if this.escape == "" {
+		return fmt.Sprintf("%s LIKE '%s'", this.column.Name, this.pattern)
+	}
+
+	return fmt.Sprintf("%s LIKE '%s' ESCAPE '%s'", this.column.Name, this.pattern, this.escape)
+}
+
+// type whereKeyword string
+
+// var whereKeywords = whereLogicalOperators{
+// 	where:                "WHERE",
+// 	All:                  "ALL",
+// 	And:                  "AND",
+// 	Any:                  "ANY",
+// 	Between:              "BETWEEN",
+// 	Exists:               "EXISTS",
+// 	In:                   "IN",
+// 	Like:                 "LIKE",
+// 	Not:                  "NOT",
+// 	Or:                   "OR",
+// 	EqualTo:              "=",
+// 	NotEqualTo:           "!=",
+// 	LessThan:             "<",
+// 	GreaterThan:          ">",
+// 	LessThanOrEqualTo:    "<=",
+// 	GreaterThanOrEqualTo: ">=",
+// }
+
+// type whereLogicalOperators struct {
+// 	where                whereKeyword
+// 	All                  whereKeyword
+// 	And                  whereKeyword
+// 	Any                  whereKeyword
+// 	Between              whereKeyword
+// 	Exists               whereKeyword
+// 	In                   whereKeyword
+// 	Like                 whereKeyword
+// 	Not                  whereKeyword
+// 	Or                   whereKeyword
+// 	EqualTo              whereKeyword
+// 	NotEqualTo           whereKeyword
+// 	LessThan             whereKeyword
+// 	GreaterThan          whereKeyword
+// 	LessThanOrEqualTo    whereKeyword
+// 	GreaterThanOrEqualTo whereKeyword
+// }

@@ -1,7 +1,6 @@
 package sql
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/boundedinfinity/go-commoner/functional/optioner"
@@ -21,23 +20,6 @@ type TableSchema struct {
 	Columns      []*ColumnSchema
 	ForeignKeys  []*ForeignKeySchema
 	Formatted    bool
-}
-
-func (this *TableSchema) GetColumn(name string) *ColumnSchema {
-	var found *ColumnSchema
-
-	for _, column := range this.Columns {
-		if column.Name == name {
-			found = column
-			break
-		}
-	}
-
-	if found == nil {
-		panic(&errTableColumnNotFound{TableName: this.Name, ColumnName: name})
-	}
-
-	return found
 }
 
 func (this *TableSchema) Generate() string {
@@ -81,7 +63,8 @@ func (this *TableSchema) Generate() string {
 	}
 
 	if len(primaryKeys) > 1 {
-		columnTexts = append(columnTexts, fmt.Sprintf("PRIMARY KEY (%s)", stringer.Join(", ", this.primaryKeyNames()...)))
+		names := stringer.Join(", ", getColumnNames(this.primaryKeyColumns())...)
+		columnTexts = append(columnTexts, fmt.Sprintf("PRIMARY KEY (%s)", names))
 	}
 
 	for _, foreignKey := range this.ForeignKeys {
@@ -115,7 +98,7 @@ func (this TableSchema) ensureId() {
 		}
 	}
 
-	this.AddColumn(&ColumnSchema{Name: "id", Type: ColumnTypes.TEXT, PrimaryKey: true})
+	this.Column(&ColumnSchema{Name: "id", Type: ColumnTypes.TEXT, PrimaryKey: true})
 }
 
 func (this *TableSchema) AddForeignKey(fk *ForeignKeySchema) *TableSchema {
@@ -127,10 +110,6 @@ func (this TableSchema) primaryKeyColumns() []*ColumnSchema {
 	return slicer.Filter(
 		func(_ int, column *ColumnSchema) bool { return column.PrimaryKey },
 		this.Columns...)
-}
-
-func (this TableSchema) primaryKeyNames() []string {
-	return columnNames(this.primaryKeyColumns())
 }
 
 func (this TableSchema) indexedColumns() []*ColumnSchema {
@@ -151,25 +130,31 @@ func (this *TableSchema) SetIsNotExists(enabed bool) *TableSchema {
 	return setAndReturn(this, &this.IfNotExists, enabed)
 }
 
-func (this *TableSchema) AddColumn(column *ColumnSchema) *TableSchema {
+func (this *TableSchema) GetColumn(name string) *ColumnSchema {
+	var found *ColumnSchema
+
+	for _, column := range this.Columns {
+		if column.Name == name {
+			found = column
+			break
+		}
+	}
+
+	if found == nil {
+		panic(&ErrTableColumnNotFoundDetails{TableName: this.Name, ColumnName: name})
+	}
+
+	return found
+}
+
+func (this *TableSchema) Column(column *ColumnSchema) *TableSchema {
 	column.Table = this
 	this.Columns = append(this.Columns, column)
 	return this
 }
 
-var (
-	ErrTableColumnNotFound = errors.New("column not found")
-)
-
-type errTableColumnNotFound struct {
-	TableName  string
-	ColumnName string
-}
-
-func (e errTableColumnNotFound) Error() string {
-	return fmt.Sprintf("%s : %s.%s", ErrTableColumnNotFound.Error(), e.TableName, e.ColumnName)
-}
-
-func (e errTableColumnNotFound) Unwrap() error {
-	return ErrTableColumnNotFound
+func (this *TableSchema) qualifiedNames() []string {
+	return slicer.Map(func(_ int, column *ColumnSchema) string {
+		return column.qualifiedName()
+	}, this.Columns...)
 }

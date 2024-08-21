@@ -1,5 +1,7 @@
 package sql
 
+import "fmt"
+
 func Column() *ColumnSchema {
 	return &ColumnSchema{}
 }
@@ -16,6 +18,10 @@ type ColumnSchema struct {
 	AutoIncrement     bool
 	Indexed           bool
 	UniqueIndexed     bool
+}
+
+func (this *ColumnSchema) qualifiedName() string {
+	return fmt.Sprintf("%s.%s", this.Table.Name, this.Name)
 }
 
 func (this ColumnSchema) Generate() string {

@@ -15,15 +15,15 @@ func Test_Generate(t *testing.T) {
 
 	person_table := sql.Table().
 		SetName("person").
-		AddColumn(&sql.ColumnSchema{Name: "id", Type: sql.ColumnTypes.TEXT, PrimaryKey: true})
+		Column(&sql.ColumnSchema{Name: "id", Type: sql.ColumnTypes.TEXT, PrimaryKey: true})
 
 	name_sub_table := func(name string) *sql.TableSchema {
 		table := sql.Table().
 			SetName(name).
 			SetWithoutRowId(true).
-			AddColumn(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true)).
-			AddColumn(sql.Column().SetName("name").SetType(sql.ColumnTypes.TEXT).SetIndexed(true)).
-			AddColumn(sql.Column().SetName("index").SetType(sql.ColumnTypes.INTEGER))
+			Column(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true)).
+			Column(sql.Column().SetName("name").SetType(sql.ColumnTypes.TEXT).SetIndexed(true)).
+			Column(sql.Column().SetName("index").SetType(sql.ColumnTypes.INTEGER))
 
 		return table
 	}
@@ -35,29 +35,29 @@ func Test_Generate(t *testing.T) {
 	name_table := sql.Table().
 		SetName("name").
 		SetWithoutRowId(true).
-		AddColumn(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true))
+		Column(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true))
 
 	name_type := sql.Table().
 		SetName("name_type").
 		SetWithoutRowId(true).
-		AddColumn(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true)).
-		AddColumn(sql.Column().SetName("name").SetType(sql.ColumnTypes.TEXT).SetIndexed(true)).
-		AddColumn(sql.Column().SetName("description").SetType(sql.ColumnTypes.TEXT))
+		Column(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true)).
+		Column(sql.Column().SetName("name").SetType(sql.ColumnTypes.TEXT).SetIndexed(true)).
+		Column(sql.Column().SetName("description").SetType(sql.ColumnTypes.TEXT))
 
 	label_table := sql.Table().
 		SetName("label").
-		AddColumn(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true)).
-		AddColumn(sql.Column().SetName("name").SetType(sql.ColumnTypes.TEXT).SetIndexed(true)).
-		AddColumn(sql.Column().SetName("description").SetType(sql.ColumnTypes.TEXT))
+		Column(sql.Column().SetName("id").SetType(sql.ColumnTypes.TEXT).SetPrimaryKey(true)).
+		Column(sql.Column().SetName("name").SetType(sql.ColumnTypes.TEXT).SetIndexed(true)).
+		Column(sql.Column().SetName("description").SetType(sql.ColumnTypes.TEXT))
 
 	database.
-		AddTable(name_table).
-		AddTable(name_first_table).
-		AddTable(name_middle_table).
-		AddTable(name_last_table).
-		AddTable(name_type).
-		AddTable(person_table).
-		AddTable(label_table).
+		Table(name_table).
+		Table(name_first_table).
+		Table(name_middle_table).
+		Table(name_last_table).
+		Table(name_type).
+		Table(person_table).
+		Table(label_table).
 		OneToMany(name_table, name_first_table).
 		OneToMany(name_table, name_middle_table).
 		OneToMany(name_table, name_last_table).
@@ -102,10 +102,10 @@ func Test_Database(t *testing.T) {
 
 	person_table := sql.Table().
 		SetIsNotExists(true).SetName("person").
-		AddColumn(&sql.ColumnSchema{Name: "id", Type: sql.ColumnTypes.TEXT, PrimaryKey: true})
+		Column(&sql.ColumnSchema{Name: "id", Type: sql.ColumnTypes.TEXT, PrimaryKey: true})
 
 	database.
-		AddTable(person_table)
+		Table(person_table)
 
 	tcs := []struct {
 		name     string
