@@ -18,15 +18,15 @@ func getTableNames(tables []*TableSchema) []string {
 		tables...)
 }
 
-func getColumnNames(columns []*ColumnSchema) []string {
-	return slicer.Map(
-		func(_ int, column *ColumnSchema) string { return column.Name },
-		columns...)
+func getColumnName(qualified bool, column *ColumnSchema) string {
+	if qualified {
+		return column.Table.Name + "." + column.Name
+	}
+	return column.Name
 }
 
-func getQualifiedColumnNames(columns []*ColumnSchema) []string {
+func getColumnNames(qualified bool, columns []*ColumnSchema) []string {
 	return slicer.Map(
-		func(_ int, column *ColumnSchema) string {
-			return column.Table.Name + "." + column.Name
-		}, columns...)
+		func(_ int, column *ColumnSchema) string { return getColumnName(qualified, column) },
+		columns...)
 }

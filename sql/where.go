@@ -8,65 +8,86 @@ import (
 
 func Where() *WhereClauseSchema {
 	return &WhereClauseSchema{
-		clauses: []whereFragment{
+		fragments: []whereFragment{
 			&joinFragment{operator: "WHERE"},
 		},
 	}
 }
 
 type WhereClauseSchema struct {
-	clauses []whereFragment
+	fragments []whereFragment
 }
 
 func (this *WhereClauseSchema) Generate() string {
 	var sb stringBuiler
-	var clauses []string
+	var fragments []string
 
-	for _, clause := range this.clauses {
-		clauses = append(clauses, clause.Generate())
+	for _, fragment := range this.fragments {
+		fragments = append(fragments, fragment.Generate())
 	}
 
-	sb.Writef(stringer.Join(" ", clauses...))
+	sb.Writef(stringer.Join(" ", fragments...))
 
 	return sb.String()
 }
 
 func (this *WhereClauseSchema) And() *WhereClauseSchema {
-	return appendAndReturn(this, &this.clauses, whereFragment(&joinFragment{operator: "AND"}))
+	return appendAndReturn(this, &this.fragments, whereFragment(&joinFragment{operator: "AND"}))
 }
 
 func (this *WhereClauseSchema) Or() *WhereClauseSchema {
-	return appendAndReturn(this, &this.clauses, whereFragment(&joinFragment{operator: "OR"}))
+	return appendAndReturn(this, &this.fragments, whereFragment(&joinFragment{operator: "OR"}))
 }
 
 func (this *WhereClauseSchema) Not() *WhereClauseSchema {
-	return appendAndReturn(this, &this.clauses, whereFragment(&joinFragment{operator: "NOT"}))
+	return appendAndReturn(this, &this.fragments, whereFragment(&joinFragment{operator: "NOT"}))
 }
 
 func (this *WhereClauseSchema) Equal(column *ColumnSchema) *WhereClauseSchema {
-	return appendAndReturn(this, &this.clauses, whereFragment(&comparisonFragment{
+	return appendAndReturn(this, &this.fragments, whereFragment(&comparisonFragment{
 		operator: "=",
 		column:   column,
 	}))
 }
 
 func (this *WhereClauseSchema) NotEqual(column *ColumnSchema) *WhereClauseSchema {
-	return appendAndReturn(this, &this.clauses, whereFragment(&comparisonFragment{
+	return appendAndReturn(this, &this.fragments, whereFragment(&comparisonFragment{
 		operator: "!=",
 		column:   column,
 	}))
 }
 
 func (this *WhereClauseSchema) Like(column *ColumnSchema, pattern, escape string) *WhereClauseSchema {
-	return appendAndReturn(this, &this.clauses, whereFragment(&likeFragment{
+	return appendAndReturn(this, &this.fragments, whereFragment(&likeFragment{
 		pattern: pattern,
 		escape:  escape,
 		column:  column,
 	}))
 }
 
+func (this *WhereClauseSchema) InList(column *ColumnSchema, items ...any) *WhereClauseSchema {
+	return appendAndReturn(this, &this.fragments, whereFragment(&inListFragment{
+		items:  items,
+		column: column,
+	}))
+}
+
 type whereFragment interface {
 	Generate() string
+}
+
+var _ whereFragment = &inListFragment{}
+
+type inListFragment struct {
+	items  []any
+	column *ColumnSchema
+}
+
+func (this *inListFragment) Generate() string {
+	return fmt.Sprintf("%s IN (%s)",
+		getColumnName(true, this.column),
+		stringer.Join(", ", stringer.AsStrings(this.items...)...),
+	)
 }
 
 var _ whereFragment = &comparisonFragment{}
@@ -77,7 +98,7 @@ type comparisonFragment struct {
 }
 
 func (this *comparisonFragment) Generate() string {
-	return fmt.Sprintf("%s %s ?", this.column.Name, this.operator)
+	return fmt.Sprintf("%s %s ?", getColumnName(true, this.column), this.operator)
 }
 
 var _ whereFragment = &joinFragment{}
@@ -101,11 +122,13 @@ type likeFragment struct {
 }
 
 func (this *likeFragment) Generate() string {
+	name := getColumnName(true, this.column)
+
 	if this.escape == "" {
-		return fmt.Sprintf("%s LIKE '%s'", this.column.Name, this.pattern)
+		return fmt.Sprintf("%s LIKE '%s'", name, this.pattern)
 	}
 
-	return fmt.Sprintf("%s LIKE '%s' ESCAPE '%s'", this.column.Name, this.pattern, this.escape)
+	return fmt.Sprintf("%s LIKE '%s' ESCAPE '%s'", name, this.pattern, this.escape)
 }
 
 // type whereKeyword string

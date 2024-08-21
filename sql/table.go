@@ -63,7 +63,7 @@ func (this *TableSchema) Generate() string {
 	}
 
 	if len(primaryKeys) > 1 {
-		names := stringer.Join(", ", getColumnNames(this.primaryKeyColumns())...)
+		names := stringer.Join(", ", getColumnNames(false, this.primaryKeyColumns())...)
 		columnTexts = append(columnTexts, fmt.Sprintf("PRIMARY KEY (%s)", names))
 	}
 

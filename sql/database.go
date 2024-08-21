@@ -17,6 +17,7 @@ func Database() *DatabaseSchema {
 
 type DatabaseSchema struct {
 	Tables      map[string]*TableSchema
+	Selects     []*SelectSchema
 	ForeignKeys bool
 	Formatted   bool
 	errs        []error

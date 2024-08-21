@@ -1,7 +1,5 @@
 package sql
 
-import "fmt"
-
 func Column() *ColumnSchema {
 	return &ColumnSchema{}
 }
@@ -21,7 +19,7 @@ type ColumnSchema struct {
 }
 
 func (this *ColumnSchema) qualifiedName() string {
-	return fmt.Sprintf("%s.%s", this.Table.Name, this.Name)
+	return getColumnName(true, this)
 }
 
 func (this ColumnSchema) Generate() string {
