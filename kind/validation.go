@@ -1,4 +1,4 @@
-package entity
+package kind
 
 type Validatable interface {
 	Validate() error

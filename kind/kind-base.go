@@ -1,14 +1,12 @@
-package entity
+// Package kind contains the enumeration of kind names
+package kind
 
 import (
-	"strings"
-
 	"github.com/boundedinfinity/go-commoner/errorer"
 	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
-type Entity interface {
-	Type() EntityType
+type Kind interface {
 	GetQName() string
 	Marshalable
 	Validatable
@@ -16,7 +14,6 @@ type Entity interface {
 }
 
 type entityBase struct {
-	entityType           EntityType
 	required             bool
 	additionalValidation bool
 	defaultValue         map[string]any
@@ -24,12 +21,7 @@ type entityBase struct {
 }
 
 var (
-	ErrEntityInvalidType = errorer.Errorf(
-		"invalid entity type, must be one of %v",
-		strings.Join(asString(validTypes...), ", "),
-	)
-
-	ErrEntityMissingQName = errorer.New("missing q-name")
+	ErrKindMissingQName = errorer.New("missing q-name")
 )
 
 func (this entityBase) Validate() error {
@@ -37,12 +29,8 @@ func (this entityBase) Validate() error {
 		return err
 	}
 
-	if _, ok := type2StringMap[this.entityType]; !ok {
-		return ErrEntityInvalidType.WithValue(this.entityType)
-	}
-
 	if this.qname == "" {
-		return ErrEntityMissingQName
+		return ErrKindMissingQName
 	}
 
 	return nil
@@ -59,10 +47,6 @@ func (this entityBase) ToMap() (map[string]any, error) {
 		return data, err
 	}
 
-	if this.entityType != noEntityType {
-		data["entity-type"] = type2StringMap[this.entityType]
-	}
-
 	bparam(data, "additional-validation", this.additionalValidation)
 	bparam(data, "required", this.required)
 
@@ -72,5 +56,3 @@ func (this entityBase) ToMap() (map[string]any, error) {
 
 	return data, nil
 }
-
-func (this entityBase) Type() EntityType { return this.entityType }

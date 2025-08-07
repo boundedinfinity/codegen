@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -11,7 +11,7 @@ func Ref() *refEntity {
 	}
 }
 
-var _ Entity = &refEntity{}
+var _ Kind = &refEntity{}
 
 type refEntity struct {
 	entityBase
@@ -74,5 +74,5 @@ func (this *refEntity) AdditionalValidation(b bool) *refEntity {
 	return this
 }
 
-func (this *refEntity) Ref(s string) *refEntity    { this.ref = s; return this }
-func (this *refEntity) Entity(s Entity) *refEntity { return this.Ref(s.GetQName()) }
+func (this *refEntity) Ref(s string) *refEntity  { this.ref = s; return this }
+func (this *refEntity) Entity(s Kind) *refEntity { return this.Ref(s.GetQName()) }

@@ -1,10 +1,25 @@
-package entity
+package kind
 
 import (
 	"encoding/json"
 
 	"gopkg.in/yaml.v3"
 )
+
+type JsonMarshaller struct {
+}
+
+func (this JsonMarshaller) Marshal(kind Kind) ([]byte, error) {
+	var data []byte
+	var err error
+
+	switch kind.(type) {
+	case stringEntity:
+
+	}
+
+	return data, err
+}
 
 type Marshalable interface {
 	ToMap() (map[string]any, error)
@@ -37,7 +52,7 @@ func ToYaml(e Marshalable) ([]byte, error) {
 	return marshal(e, yaml.Marshal)
 }
 
-func ToJsonSchema(e Entity) ([]byte, error) {
+func ToJsonSchema(e Kind) ([]byte, error) {
 	data, err := e.AsJsonSchema()
 
 	if err != nil {
@@ -47,7 +62,7 @@ func ToJsonSchema(e Entity) ([]byte, error) {
 	return json.Marshal(data)
 }
 
-func ToJsonSchemaIndent(e Entity) ([]byte, error) {
+func ToJsonSchemaIndent(e Kind) ([]byte, error) {
 	data, err := e.AsJsonSchema()
 
 	if err != nil {
@@ -56,3 +71,12 @@ func ToJsonSchemaIndent(e Entity) ([]byte, error) {
 
 	return json.MarshalIndent(data, "", "    ")
 }
+
+// ErrEntityInvalidType = errorer.Errorf(
+// 		"invalid entity type, must be one of %v",
+// 		strings.Join(asString(validTypes...), ", "),
+// 	)
+
+// if this.entityType != noEntityType {
+// 		data["entity-type"] = type2StringMap[this.entityType]
+// 	}

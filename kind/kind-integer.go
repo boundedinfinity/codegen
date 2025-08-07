@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -11,7 +11,7 @@ func Integer() *integerEntity {
 	}
 }
 
-var _ Entity = &integerEntity{}
+var _ Kind = &integerEntity{}
 
 type integerEntity struct {
 	entityBase

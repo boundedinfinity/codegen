@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"time"
@@ -13,7 +13,7 @@ func DateTime() *dateTimeEntity {
 	}
 }
 
-var _ Entity = &dateTimeEntity{}
+var _ Kind = &dateTimeEntity{}
 
 type dateTimeEntity struct {
 	entityBase

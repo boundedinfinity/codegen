@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -11,11 +11,11 @@ func Object() *objectEntity {
 	}
 }
 
-var _ Entity = &objectEntity{}
+var _ Kind = &objectEntity{}
 
 type objectEntity struct {
 	entityBase
-	props []Entity
+	props []Kind
 }
 
 var (
@@ -91,4 +91,4 @@ func (this *objectEntity) AdditionalValidation(b bool) *objectEntity {
 	return this
 }
 
-func (this *objectEntity) Properties(elems ...Entity) *objectEntity { this.props = elems; return this }
+func (this *objectEntity) Properties(elems ...Kind) *objectEntity { this.props = elems; return this }

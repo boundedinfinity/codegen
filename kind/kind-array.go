@@ -1,8 +1,7 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func Array() *arrayEntity {
@@ -11,11 +10,11 @@ func Array() *arrayEntity {
 	}
 }
 
-var _ Entity = &arrayEntity{}
+var _ Kind = &arrayEntity{}
 
 type arrayEntity struct {
 	entityBase
-	items    Entity
+	items    Kind
 	min      int
 	max      int
 	length   int
@@ -81,11 +80,6 @@ func (this arrayEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (this arrayEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaArray{}
-	return schema, nil
-}
-
 func (this arrayEntity) ToJson() ([]byte, error)             { return ToJson(this) }
 func (this arrayEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
 func (this arrayEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
@@ -112,7 +106,7 @@ func (this *arrayEntity) AdditionalValidation(b bool) *arrayEntity {
 }
 func (this *arrayEntity) Default(m map[string]any) *arrayEntity { this.defaultValue = m; return this }
 
-func (this *arrayEntity) Items(s Entity) *arrayEntity  { this.items = s; return this }
+func (this *arrayEntity) Items(s Kind) *arrayEntity    { this.items = s; return this }
 func (this *arrayEntity) NotEmpty(b bool) *arrayEntity { this.notEmpty = b; return this }
 func (this *arrayEntity) Min(n int) *arrayEntity       { this.min = n; return this }
 func (this *arrayEntity) Max(n int) *arrayEntity       { this.max = n; return this }

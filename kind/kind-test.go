@@ -1,4 +1,4 @@
-package entity_test
+package kind_test
 
 import (
 	"boundedinfinity/codegen/entity"

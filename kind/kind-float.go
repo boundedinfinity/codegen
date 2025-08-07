@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -11,7 +11,7 @@ func Float() *floatEntity {
 	}
 }
 
-var _ Entity = &floatEntity{}
+var _ Kind = &floatEntity{}
 
 type floatEntity struct {
 	entityBase

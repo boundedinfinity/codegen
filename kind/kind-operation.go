@@ -1,4 +1,4 @@
-package entity
+package kind
 
 func Operation() *operationEntity {
 	return &operationEntity{}
@@ -9,9 +9,9 @@ var _ Validatable = &operationEntity{}
 
 type operationEntity struct {
 	common
-	entity  Entity
-	inputs  []Entity
-	outputs []Entity
+	entity  Kind
+	inputs  []Kind
+	outputs []Kind
 }
 
 func (this operationEntity) ToMap() (map[string]any, error) {
@@ -75,12 +75,12 @@ func (this *operationEntity) Json(s string) *operationEntity  { this.json = s; r
 func (this *operationEntity) Yaml(s string) *operationEntity  { this.yaml = s; return this }
 func (this *operationEntity) Sql(s string) *operationEntity   { this.sql = s; return this }
 
-func (this *operationEntity) Input(v ...Entity) *operationEntity {
+func (this *operationEntity) Input(v ...Kind) *operationEntity {
 	this.inputs = append(this.inputs, v...)
 	return this
 }
-func (this *operationEntity) Outputs(v ...Entity) *operationEntity {
+func (this *operationEntity) Outputs(v ...Kind) *operationEntity {
 	this.outputs = append(this.outputs, v...)
 	return this
 }
-func (this *operationEntity) Entity(v Entity) *operationEntity { this.entity = v; return this }
+func (this *operationEntity) Entity(v Kind) *operationEntity { this.entity = v; return this }

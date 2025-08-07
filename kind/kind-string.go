@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"regexp"
@@ -7,19 +7,33 @@ import (
 	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
+type StringKindConfiguration struct {
+	Name       string
+	Min        int
+	Max        int
+	Regex      string
+	StartsWith string
+	EndsWith   string
+}
+
+type StringKind struct {
+	Config StringKindConfiguration
+	Source string
+	QName  string
+}
+
 func String() *stringEntity {
 	return &stringEntity{
 		entityBase: entityBase{entityType: StringType},
 	}
 }
 
-var _ Entity = &stringEntity{}
+var _ Kind = &stringEntity{}
 
 type stringEntity struct {
 	entityBase
 	min        int
 	max        int
-	length     int
 	regex      string
 	includes   string
 	startsWith string

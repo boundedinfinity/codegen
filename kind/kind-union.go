@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
@@ -16,7 +16,7 @@ var _ Validatable = &unionEntity{}
 
 type unionEntity struct {
 	entityBase
-	entities []Entity
+	entities []Kind
 }
 
 var (
@@ -85,7 +85,7 @@ func (this *unionEntity) AdditionalValidation(b bool) *unionEntity {
 	return this
 }
 
-func (this *unionEntity) Entity(elems ...Entity) *unionEntity {
+func (this *unionEntity) Entity(elems ...Kind) *unionEntity {
 	this.entities = append(this.entities, elems...)
 	return this
 }

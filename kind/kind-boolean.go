@@ -1,4 +1,4 @@
-package entity
+package kind
 
 import (
 	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
@@ -10,7 +10,7 @@ func Boolean() *booleanEntity {
 	}
 }
 
-var _ Entity = &booleanEntity{}
+var _ Kind = &booleanEntity{}
 
 type booleanEntity struct {
 	entityBase

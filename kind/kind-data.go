@@ -1,4 +1,4 @@
-package entity
+package kind
 
 func Data() *dataEntity {
 	return &dataEntity{}
@@ -9,7 +9,7 @@ var _ Validatable = &dataEntity{}
 
 type dataEntity struct {
 	common
-	entity Entity
+	entity Kind
 	items  []map[string]any
 }
 
@@ -67,4 +67,4 @@ func (this *dataEntity) Item(v ...map[string]any) *dataEntity {
 	return this
 }
 
-func (this *dataEntity) Entity(v Entity) *dataEntity { this.entity = v; return this }
+func (this *dataEntity) Entity(v Kind) *dataEntity { this.entity = v; return this }

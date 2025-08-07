@@ -1,4 +1,4 @@
-package entity
+package kind
 
 type common struct {
 	qname            string
@@ -7,10 +7,10 @@ type common struct {
 	comments         string
 	copyright        string
 	license          License
-	serde            string
-	json             string
-	yaml             string
-	sql              string
+	serde            KindSerializationConfig
+	json             KindSerializationConfig
+	yaml             KindSerializationConfig
+	sql              KindSerializationConfig
 }
 
 func (this common) Validate() error {
