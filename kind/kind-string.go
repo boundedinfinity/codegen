@@ -1,128 +1,121 @@
 package kind
 
 import (
+	"boundedinfinity/codegen/errorer"
+	"boundedinfinity/codegen/kind/name"
+	"errors"
 	"regexp"
 
-	"github.com/boundedinfinity/go-commoner/errorer"
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
-type StringKindConfiguration struct {
-	Name       string
-	Min        int
-	Max        int
-	Regex      string
-	StartsWith string
-	EndsWith   string
-}
+// //////////////////////////////////////////////////////////////////////////
+// String Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &StringKind{}
 
 type StringKind struct {
-	Config StringKindConfiguration
-	Source string
-	QName  string
+	KindCommon
+	Min        optioner.Option[int]
+	Max        optioner.Option[int]
+	Regex      optioner.Option[string]
+	StartsWith optioner.Option[string]
+	EndsWith   optioner.Option[string]
+	Contains   optioner.Option[string]
 }
 
-func String() *stringEntity {
-	return &stringEntity{
-		entityBase: entityBase{entityType: StringType},
-	}
-}
-
-var _ Kind = &stringEntity{}
-
-type stringEntity struct {
-	entityBase
-	min        int
-	max        int
-	regex      string
-	includes   string
-	startsWith string
-	endsWith   string
+func (this StringKind) KindName() name.KindName {
+	return name.String
 }
 
 var (
-	ErrStringEntityMinAboveMax  = errorer.New("min above max")
-	ErrStringEntityMinNegative  = errorer.New("min negative")
-	ErrStringEntityInvalidRegex = errorer.New("invalid regex")
+	ErrStringKindMinGreaterThanMax   = errorer.New("min is greater than max")
+	errStringKindMinGreaterThanMaxFn = errorer.ValueFnf(ErrStringKindMinGreaterThanMax, "%v max, %v min")
+	ErrStringKindMinNegative         = errorer.New("min is negative number")
+	errStringKindMinNegativeFn       = errorer.ValueFn(ErrStringKindMinNegative)
+	ErrStringKindMaxNegative         = errorer.New("max is negative number")
+	errStringKindMaxNegativeFn       = errorer.ValueFn(ErrStringKindMaxNegative)
+	ErrStringKindInvalidRegex        = errorer.New("invalid regex")
+	errStringKindInvalidRegexFn      = errorer.ValueFnf(ErrStringKindInvalidRegex, "%v : %w")
 )
 
-func (this stringEntity) Validate() error {
-	if err := this.entityBase.Validate(); err != nil {
-		return err
+func (this StringKind) Validate(config ValidatorConfig) error {
+	var errs []error
+
+	if this.Min.Defined() && this.Min.Get() < 0 {
+		errs = append(errs, errStringKindMinNegativeFn(this.Min.Get()))
 	}
 
-	if this.min > this.max {
-		return ErrStringEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
+	if this.Max.Defined() && this.Max.Get() < 0 {
+		errs = append(errs, errStringKindMaxNegativeFn(this.Max.Get()))
 	}
 
-	if this.min < 0 {
-		return ErrStringEntityMinNegative.WithValue(this.min)
+	if this.Max.Defined() && this.Min.Defined() && this.Min.Get() > this.Max.Get() {
+		errs = append(errs, errStringKindMinGreaterThanMaxFn(this.Max.Get(), this.Min.Get()))
 	}
 
-	if this.regex != "" {
-		_, err := regexp.Compile(this.regex)
+	if this.Regex.Defined() {
+		_, err := regexp.Compile(this.Regex.Get())
 
 		if err != nil {
-			return ErrStringEntityInvalidRegex.Sub(err)
+			errs = append(errs, errStringKindInvalidRegexFn(this.Regex.Get(), err))
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
-func (this stringEntity) ToMap() (map[string]any, error) {
-	data, err := this.entityBase.ToMap()
+// //////////////////////////////////////////////////////////////////////////
+// String Kind Builder
+// //////////////////////////////////////////////////////////////////////////
 
-	if err != nil {
-		return data, err
-	}
+var _ kindBuilder[stringKindBuilder] = &stringKindBuilder{}
 
-	iparam(data, "min", this.min)
-	iparam(data, "min", this.max)
-	iparam(data, "length", this.length)
-	sparam(data, "regex", this.regex)
-	sparam(data, "includes", this.includes)
-	sparam(data, "starts-with", this.startsWith)
-	sparam(data, "ends-with", this.endsWith)
-
-	return data, nil
+type stringKindBuilder struct {
+	kind *StringKind
 }
 
-func (this stringEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaArray{}
-	return schema, nil
+func (this *stringKindBuilder) Done() Kind {
+	return *this.kind
 }
 
-func (this stringEntity) ToJson() ([]byte, error)             { return ToJson(this) }
-func (this stringEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
-func (this stringEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
-func (this stringEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
-func (this stringEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
-
-func (this *stringEntity) QName(s string) *stringEntity     { this.qname = s; return this }
-func (this *stringEntity) License(s License) *stringEntity  { this.license = s; return this }
-func (this *stringEntity) Copyright(s string) *stringEntity { this.copyright = s; return this }
-func (this *stringEntity) Comments(s string) *stringEntity  { this.comments = s; return this }
-func (this *stringEntity) LongDescription(s string) *stringEntity {
-	this.longDescription = s
-	return this
-}
-func (this *stringEntity) Serde(s string) *stringEntity { this.serde = s; return this }
-func (this *stringEntity) Json(s string) *stringEntity  { this.json = s; return this }
-func (this *stringEntity) Yaml(s string) *stringEntity  { this.yaml = s; return this }
-func (this *stringEntity) Sql(s string) *stringEntity   { this.sql = s; return this }
-
-func (this *stringEntity) Required(b bool) *stringEntity          { this.required = b; return this }
-func (this *stringEntity) Default(m map[string]any) *stringEntity { this.defaultValue = m; return this }
-func (this *stringEntity) AdditionalValidation(b bool) *stringEntity {
-	this.additionalValidation = b
+func (this *stringKindBuilder) Name(v string) *stringKindBuilder {
+	this.kind.KindCommon.Name = optioner.OfZero(v)
 	return this
 }
 
-func (this *stringEntity) Min(n int) *stringEntity           { this.min = n; return this }
-func (this *stringEntity) Max(n int) *stringEntity           { this.max = n; return this }
-func (this *stringEntity) Length(n int) *stringEntity        { this.length = n; return this }
-func (this *stringEntity) Regex(s string) *stringEntity      { this.regex = s; return this }
-func (this *stringEntity) Includes(s string) *stringEntity   { this.includes = s; return this }
-func (this *stringEntity) StartsWith(r string) *stringEntity { this.startsWith = r; return this }
-func (this *stringEntity) EndsWith(r string) *stringEntity   { this.endsWith = r; return this }
+func (this *stringKindBuilder) Type(v string) *stringKindBuilder {
+	this.kind.KindCommon.Type = optioner.OfZero(v)
+	return this
+}
+
+func (this *stringKindBuilder) Min(v int) *stringKindBuilder {
+	this.kind.Min = optioner.Some(v)
+	return this
+}
+
+func (this *stringKindBuilder) Max(v int) *stringKindBuilder {
+	this.kind.Max = optioner.Some(v)
+	return this
+}
+
+func (this *stringKindBuilder) Regex(v string) *stringKindBuilder {
+	this.kind.Regex = optioner.OfZero(v)
+	return this
+}
+
+func (this *stringKindBuilder) StartsWith(v string) *stringKindBuilder {
+	this.kind.StartsWith = optioner.OfZero(v)
+	return this
+}
+
+func (this *stringKindBuilder) EndsWith(v string) *stringKindBuilder {
+	this.kind.EndsWith = optioner.OfZero(v)
+	return this
+}
+
+func (this *stringKindBuilder) Contains(v string) *stringKindBuilder {
+	this.kind.Contains = optioner.OfZero(v)
+	return this
+}

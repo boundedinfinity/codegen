@@ -1,55 +1,49 @@
 package kind
 
 import (
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
+	"boundedinfinity/codegen/kind/name"
+
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
 )
 
-func Boolean() *booleanEntity {
-	return &booleanEntity{
-		entityBase: entityBase{entityType: BooleanType},
-	}
+// //////////////////////////////////////////////////////////////////////////
+// Boolean Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &BooleanKind{}
+
+type BooleanKind struct {
+	KindCommon
 }
 
-var _ Kind = &booleanEntity{}
-
-type booleanEntity struct {
-	entityBase
+func (this BooleanKind) KindName() name.KindName {
+	return name.Boolean
 }
 
-func (this booleanEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaArray{}
-	return schema, nil
+func (this BooleanKind) Validate(config ValidatorConfig) error {
+	return nil
 }
 
-func (this booleanEntity) ToJson() ([]byte, error)             { return ToJson(this) }
-func (this booleanEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
-func (this booleanEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
-func (this booleanEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
-func (this booleanEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
+// //////////////////////////////////////////////////////////////////////////
+// Boolean Kind Builder
+// //////////////////////////////////////////////////////////////////////////
 
-func (this *booleanEntity) QName(s string) *booleanEntity     { this.qname = s; return this }
-func (this *booleanEntity) License(s License) *booleanEntity  { this.license = s; return this }
-func (this *booleanEntity) Copyright(s string) *booleanEntity { this.copyright = s; return this }
-func (this *booleanEntity) Comments(s string) *booleanEntity  { this.comments = s; return this }
-func (this *booleanEntity) LongDescription(s string) *booleanEntity {
-	this.longDescription = s
+var _ kindBuilder[booleanKindBuilder] = &booleanKindBuilder{}
+
+type booleanKindBuilder struct {
+	kind *BooleanKind
+}
+
+func (this *booleanKindBuilder) Done() Kind {
+	return *this.kind
+}
+
+func (this *booleanKindBuilder) Name(v string) *booleanKindBuilder {
+	this.kind.KindCommon.Name = optioner.Some(v)
 	return this
 }
-func (this *booleanEntity) ShortDescription(s string) *booleanEntity {
-	this.shortDescription = s
-	return this
-}
-func (this *booleanEntity) Serde(s string) *booleanEntity { this.serde = s; return this }
-func (this *booleanEntity) Json(s string) *booleanEntity  { this.json = s; return this }
-func (this *booleanEntity) Yaml(s string) *booleanEntity  { this.yaml = s; return this }
-func (this *booleanEntity) Sql(s string) *booleanEntity   { this.sql = s; return this }
 
-func (this *booleanEntity) Required(b bool) *booleanEntity { this.required = b; return this }
-func (this *booleanEntity) AdditionalValidation(b bool) *booleanEntity {
-	this.additionalValidation = b
-	return this
-}
-func (this *booleanEntity) Default(m map[string]any) *booleanEntity {
-	this.defaultValue = m
+func (this *booleanKindBuilder) Type(v string) *booleanKindBuilder {
+	this.kind.KindCommon.Type = optioner.Some(v)
 	return this
 }

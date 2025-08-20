@@ -1,147 +1,135 @@
 package kind
 
 import (
-	"github.com/boundedinfinity/go-commoner/errorer"
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
+	"boundedinfinity/codegen/kind/name"
+	"errors"
+
+	"boundedinfinity/codegen/errorer"
+
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
-func Float() *floatEntity {
-	return &floatEntity{
-		entityBase: entityBase{entityType: FloatType},
-	}
+// //////////////////////////////////////////////////////////////////////////
+// Float Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &FloatKind{}
+
+type FloatKind struct {
+	KindCommon
+	Min        optioner.Option[float64]
+	Max        optioner.Option[float64]
+	MultipleOf optioner.Option[float64]
+	Positive   optioner.Option[bool]
+	Negative   optioner.Option[bool]
+	OneOf      optioner.Option[[]float64]
+	NoneOf     optioner.Option[[]float64]
 }
 
-var _ Kind = &floatEntity{}
-
-type floatEntity struct {
-	entityBase
-	min        int
-	max        int
-	multipleOf int
-	oneOf      []int
-	positive   bool
-	negative   bool
-	ranges     []FloatRange
-}
-
-type FloatRange struct {
-	Min int
-	Max int
+func (this FloatKind) KindName() name.KindName {
+	return name.Float
 }
 
 var (
-	ErrFloatEntityMinAboveMax    = errorer.New("min above max")
-	ErrFloatEntityLessThan1      = errorer.New("less than one")
-	ErrFloatEntityPosAndNegMutEx = errorer.New("positive and negative are mutually exclusive")
+	ErrFloatKindMinGreaterThanMax     = errorer.New("min is greater than max")
+	errFloatKindMinGreaterThanMaxFn   = errorer.ValueFnf(ErrFloatKindMinGreaterThanMax, "%v max, %v min")
+	ErrFloatKindPositiveAndNegative   = errorer.New("positive and negative at the same time")
+	ErrFloatKindMultipleOfZero        = errorer.New("multiple-of is zero")
+	ErrFloatKindOneOfOverlapsNoneOf   = errorer.New("one-of overlaps with none-of")
+	errFloatKindOneOfOverlapsNoneOfFn = errorer.ValueFnf(ErrFloatKindOneOfOverlapsNoneOf, "overlapping values [%v]")
 )
 
-func (this floatEntity) Validate() error {
-	if err := this.entityBase.Validate(); err != nil {
-		return err
+func (this FloatKind) Validate(config ValidatorConfig) error {
+	var errs []error
+
+	if this.Max.Defined() && this.Min.Defined() && this.Min.Get() > this.Max.Get() {
+		errs = append(errs, errFloatKindMinGreaterThanMaxFn(this.Max.Get(), this.Min.Get()))
 	}
 
-	if this.positive && this.negative {
-		return ErrFloatEntityPosAndNegMutEx
+	if this.Positive.Defined() && this.Negative.Defined() {
+		errs = append(errs, ErrFloatKindPositiveAndNegative)
 	}
 
-	if this.min > this.max {
-		return ErrFloatEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
+	if this.MultipleOf.Defined() && this.MultipleOf.Get() == 0 {
+		errs = append(errs, ErrFloatKindMultipleOfZero)
 	}
 
-	if this.multipleOf < 1 {
-		return ErrFloatEntityLessThan1.WithValue(this.multipleOf)
-	}
+	if this.OneOf.Defined() && this.NoneOf.Defined() {
+		var overlaps []float64
 
-	for i, rng := range this.ranges {
-		return ErrFloatEntityMinAboveMax.FormatFn("ranges[%v] min: %v, max: v")(i, rng.Min, rng.Max)
-	}
-
-	return nil
-}
-
-func (this floatEntity) ToMap() (map[string]any, error) {
-	data, err := this.entityBase.ToMap()
-
-	if err != nil {
-		return data, err
-	}
-
-	iparam(data, "min", this.min)
-	iparam(data, "min", this.max)
-	iparam(data, "multiple-of", this.multipleOf)
-	bparam(data, "positive", this.positive)
-	bparam(data, "negative", this.negative)
-
-	if len(this.oneOf) > 0 {
-		data["one-of"] = this.oneOf
-	}
-
-	if len(this.ranges) > 0 {
-		ranges := []map[string]any{}
-		for _, irange := range this.ranges {
-			ranges = append(ranges, map[string]any{
-				"min": irange.Min,
-				"max": irange.Max,
-			})
+		for _, oneOf := range this.OneOf.Get() {
+			for _, noneOf := range this.NoneOf.Get() {
+				if oneOf == noneOf {
+					overlaps = append(overlaps, oneOf)
+				}
+			}
 		}
-		data["ranges"] = ranges
+
+		if len(overlaps) > 0 {
+			value := stringer.Join(", ", overlaps...)
+			errs = append(errs, errFloatKindOneOfOverlapsNoneOfFn(value))
+		}
 	}
 
-	if this.positive {
-		data["positive"] = true
-	}
-
-	if this.negative {
-		data["negative"] = true
-	}
-
-	return data, nil
+	return errors.Join(errs...)
 }
 
-func (this floatEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaArray{}
-	return schema, nil
+// //////////////////////////////////////////////////////////////////////////
+// Float Kind Builder
+// //////////////////////////////////////////////////////////////////////////
+
+var _ kindBuilder[floatKindBuilder] = &floatKindBuilder{}
+
+type floatKindBuilder struct {
+	kind *FloatKind
 }
 
-func (this floatEntity) ToJson() ([]byte, error)             { return ToJson(this) }
-func (this floatEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
-func (this floatEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
-func (this floatEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
-func (this floatEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
-
-func (this *floatEntity) QName(s string) *floatEntity     { this.qname = s; return this }
-func (this *floatEntity) License(s License) *floatEntity  { this.license = s; return this }
-func (this *floatEntity) Copyright(s string) *floatEntity { this.copyright = s; return this }
-func (this *floatEntity) Comments(s string) *floatEntity  { this.comments = s; return this }
-func (this *floatEntity) LongDescription(s string) *floatEntity {
-	this.longDescription = s
-	return this
+func (this *floatKindBuilder) Done() Kind {
+	return *this.kind
 }
-func (this *floatEntity) ShortDescription(s string) *floatEntity {
-	this.shortDescription = s
-	return this
-}
-func (this *floatEntity) Serde(s string) *floatEntity { this.serde = s; return this }
-func (this *floatEntity) Json(s string) *floatEntity  { this.json = s; return this }
-func (this *floatEntity) Yaml(s string) *floatEntity  { this.yaml = s; return this }
-func (this *floatEntity) Sql(s string) *floatEntity   { this.sql = s; return this }
 
-func (this *floatEntity) Required(b bool) *floatEntity          { this.required = b; return this }
-func (this *floatEntity) Default(m map[string]any) *floatEntity { this.defaultValue = m; return this }
-func (this *floatEntity) AdditionalValidation(b bool) *floatEntity {
-	this.additionalValidation = b
+func (this *floatKindBuilder) Name(v string) *floatKindBuilder {
+	this.kind.KindCommon.Name = optioner.OfZero(v)
 	return this
 }
 
-func (this *floatEntity) Positive() *floatEntity                  { this.positive = true; return this }
-func (this *floatEntity) Negative() *floatEntity                  { this.negative = true; return this }
-func (this *floatEntity) Min(n int) *floatEntity                  { this.min = n; return this }
-func (this *floatEntity) Max(n int) *floatEntity                  { this.max = n; return this }
-func (this *floatEntity) OneOf(n ...int) *floatEntity             { this.oneOf = n; return this }
-func (this *floatEntity) Range(ranges ...FloatRange) *floatEntity { this.ranges = ranges; return this }
+func (this *floatKindBuilder) Type(v string) *floatKindBuilder {
+	this.kind.KindCommon.Type = optioner.OfZero(v)
+	return this
+}
 
-func (this *floatEntity) MultipleOf(n int) *floatEntity {
-	this.multipleOf = n
-	this.multipleOf = n
+func (this *floatKindBuilder) Min(v float64) *floatKindBuilder {
+	this.kind.Min = optioner.Some(v)
+	return this
+}
+
+func (this *floatKindBuilder) Max(v float64) *floatKindBuilder {
+	this.kind.Max = optioner.Some(v)
+	return this
+}
+
+func (this *floatKindBuilder) MultipleOf(v float64) *floatKindBuilder {
+	this.kind.MultipleOf = optioner.Some(v)
+	return this
+}
+
+func (this *floatKindBuilder) Positive(v bool) *floatKindBuilder {
+	this.kind.Positive = optioner.Some(v)
+	return this
+}
+
+func (this *floatKindBuilder) Negative(v bool) *floatKindBuilder {
+	this.kind.Negative = optioner.Some(v)
+	return this
+}
+
+func (this *floatKindBuilder) OneOf(v []float64) *floatKindBuilder {
+	this.kind.OneOf = optioner.OfSlice(v)
+	return this
+}
+
+func (this *floatKindBuilder) NoneOf(v []float64) *floatKindBuilder {
+	this.kind.NoneOf = optioner.OfSlice(v)
 	return this
 }

@@ -1,10 +1,10 @@
 package kind
 
 import (
+	"boundedinfinity/codegen/kind/name"
 	"time"
 
 	"github.com/boundedinfinity/go-commoner/errorer"
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func DateTime() *dateTimeEntity {
@@ -27,6 +27,10 @@ var (
 	ErrDateTimeEntityMinAboveMax = errorer.New("min above max")
 	ErrDateTimeEntityLessThan1   = errorer.New("less than one")
 )
+
+func (this dateTimeEntity) Name() name.KindName {
+	return name.DateTime
+}
 
 func (this dateTimeEntity) Validate() error {
 
@@ -76,17 +80,6 @@ func (this dateTimeEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (this dateTimeEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaArray{}
-	return schema, nil
-}
-
-func (this dateTimeEntity) ToJson() ([]byte, error)             { return ToJson(this) }
-func (this dateTimeEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
-func (this dateTimeEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
-func (this dateTimeEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
-func (this dateTimeEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
-
 func (this *dateTimeEntity) License(s License) *dateTimeEntity  { this.license = s; return this }
 func (this *dateTimeEntity) Copyright(s string) *dateTimeEntity { this.copyright = s; return this }
 func (this *dateTimeEntity) Comments(s string) *dateTimeEntity  { this.comments = s; return this }
@@ -98,10 +91,6 @@ func (this *dateTimeEntity) ShortDescription(s string) *dateTimeEntity {
 	this.shortDescription = s
 	return this
 }
-func (this *dateTimeEntity) Serde(s string) *dateTimeEntity { this.serde = s; return this }
-func (this *dateTimeEntity) Json(s string) *dateTimeEntity  { this.json = s; return this }
-func (this *dateTimeEntity) Yaml(s string) *dateTimeEntity  { this.yaml = s; return this }
-func (this *dateTimeEntity) Sql(s string) *dateTimeEntity   { this.sql = s; return this }
 
 func (this *dateTimeEntity) Required(b bool) *dateTimeEntity { this.required = b; return this }
 func (this *dateTimeEntity) Default(m map[string]any) *dateTimeEntity {

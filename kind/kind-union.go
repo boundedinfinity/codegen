@@ -2,7 +2,6 @@ package kind
 
 import (
 	"github.com/boundedinfinity/go-commoner/errorer"
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
 )
 
 func Union() *unionEntity {
@@ -11,8 +10,7 @@ func Union() *unionEntity {
 	}
 }
 
-var _ Marshalable = &unionEntity{}
-var _ Validatable = &unionEntity{}
+var _ Validator = &unionEntity{}
 
 type unionEntity struct {
 	entityBase
@@ -54,18 +52,6 @@ func (this unionEntity) ToMap() (map[string]any, error) {
 	return data, nil
 }
 
-func (this unionEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaArray{}
-	return schema, nil
-}
-
-func (this unionEntity) ToJson() ([]byte, error)             { return ToJson(this) }
-func (this unionEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
-func (this unionEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
-func (this unionEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
-func (this unionEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
-
-func (this *unionEntity) QName(s string) *unionEntity     { this.qname = s; return this }
 func (this *unionEntity) License(s License) *unionEntity  { this.license = s; return this }
 func (this *unionEntity) Copyright(s string) *unionEntity { this.copyright = s; return this }
 func (this *unionEntity) Comments(s string) *unionEntity  { this.comments = s; return this }

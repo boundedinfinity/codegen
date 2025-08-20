@@ -1,157 +1,134 @@
 package kind
 
 import (
-	"github.com/boundedinfinity/go-commoner/errorer"
-	"github.com/boundedinfinity/go-jsonschema/idiomatic/json_schema"
+	"boundedinfinity/codegen/errorer"
+	"boundedinfinity/codegen/kind/name"
+	"errors"
+
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
 )
 
-func Integer() *integerEntity {
-	return &integerEntity{
-		entityBase: entityBase{entityType: IntegerType},
-	}
+// //////////////////////////////////////////////////////////////////////////
+// Integer Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &IntegerKind{}
+
+type IntegerKind struct {
+	KindCommon
+	Min        optioner.Option[int]
+	Max        optioner.Option[int]
+	MultipleOf optioner.Option[int]
+	Positive   optioner.Option[bool]
+	Negative   optioner.Option[bool]
+	OneOf      optioner.Option[[]int]
+	NoneOf     optioner.Option[[]int]
 }
 
-var _ Kind = &integerEntity{}
-
-type integerEntity struct {
-	entityBase
-	min        int
-	max        int
-	multipleOf int
-	oneOf      []int
-	positive   bool
-	negative   bool
-	ranges     []IntegerRange
-}
-
-type IntegerRange struct {
-	Min int
-	Max int
+func (this IntegerKind) KindName() name.KindName {
+	return name.Integer
 }
 
 var (
-	ErrIntegerEntityMinAboveMax    = errorer.New("min above max")
-	ErrIntegerEntityLessThan1      = errorer.New("less than one")
-	ErrIntegerEntityPosAndNegMutEx = errorer.New("positive and negative are mutually exclusive")
+	ErrIntegerKindMinGreaterThanMax     = errorer.New("min is greater than max")
+	errIntegerKindMinGreaterThanMaxFn   = errorer.ValueFnf(ErrIntegerKindMinGreaterThanMax, "%v max, %v min")
+	ErrIntegerKindPositiveAndNegative   = errorer.New("positive and negative at the same time")
+	ErrIntegerKindMultipleOfZero        = errorer.New("multiple-of is zero")
+	ErrIntegerKindOneOfOverlapsNoneOf   = errorer.New("one-of overlaps with none-of")
+	errIntegerKindOneOfOverlapsNoneOfFn = errorer.ValueFnf(ErrIntegerKindOneOfOverlapsNoneOf, "overlapping values [%v]")
 )
 
-func (this integerEntity) Validate() error {
-	if err := this.entityBase.Validate(); err != nil {
-		return err
+func (this IntegerKind) Validate(config ValidatorConfig) error {
+	var errs []error
+
+	if this.Max.Defined() && this.Min.Defined() && this.Min.Get() > this.Max.Get() {
+		errs = append(errs, errIntegerKindMinGreaterThanMaxFn(this.Max.Get(), this.Min.Get()))
 	}
 
-	if this.positive && this.negative {
-		return ErrIntegerEntityPosAndNegMutEx
+	if this.Positive.Defined() && this.Negative.Defined() {
+		errs = append(errs, ErrIntegerKindPositiveAndNegative)
 	}
 
-	if this.min > this.max {
-		return ErrIntegerEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
+	if this.MultipleOf.Defined() && this.MultipleOf.Get() == 0 {
+		errs = append(errs, ErrIntegerKindMultipleOfZero)
 	}
 
-	if this.multipleOf < 1 {
-		return ErrIntegerEntityLessThan1.WithValue(this.multipleOf)
-	}
+	if this.OneOf.Defined() && this.NoneOf.Defined() {
+		var overlaps []int
 
-	for i, rng := range this.ranges {
-		return ErrIntegerEntityMinAboveMax.FormatFn("ranges[%v] min: %v, max: v")(i, rng.Min, rng.Max)
-	}
-
-	return nil
-}
-
-func (this integerEntity) ToMap() (map[string]any, error) {
-	data, err := this.entityBase.ToMap()
-
-	if err != nil {
-		return data, err
-	}
-
-	iparam(data, "min", this.min)
-	iparam(data, "min", this.max)
-	iparam(data, "multiple-of", this.multipleOf)
-	bparam(data, "positive", this.positive)
-	bparam(data, "negative", this.negative)
-
-	if len(this.oneOf) > 0 {
-		data["one-of"] = this.oneOf
-	}
-
-	if len(this.ranges) > 0 {
-		ranges := []map[string]any{}
-		for _, irange := range this.ranges {
-			ranges = append(ranges, map[string]any{
-				"min": irange.Min,
-				"max": irange.Max,
-			})
+		for _, oneOf := range this.OneOf.Get() {
+			for _, noneOf := range this.NoneOf.Get() {
+				if oneOf == noneOf {
+					overlaps = append(overlaps, oneOf)
+				}
+			}
 		}
-		data["ranges"] = ranges
+
+		if len(overlaps) > 0 {
+			value := stringer.Join(", ", overlaps...)
+			errs = append(errs, errIntegerKindOneOfOverlapsNoneOfFn(value))
+		}
 	}
 
-	if this.positive {
-		data["positive"] = true
-	}
-
-	if this.negative {
-		data["negative"] = true
-	}
-
-	return data, nil
+	return errors.Join(errs...)
 }
 
-func (this integerEntity) AsJsonSchema() (json_schema.JsonSchema, error) {
-	schema := &json_schema.JsonSchemaInteger{
-		JsonSchemaCore: json_schema.JsonSchemaCore{
-			Schema:      json_schema.SCHEMA_VERSION_2020_12,
-			Id:          this.qname,
-			Comment:     this.comments,
-			Title:       this.shortDescription,
-			Description: this.longDescription,
-		},
-	}
-	return schema, nil
+// //////////////////////////////////////////////////////////////////////////
+// Integer Kind Builder
+// //////////////////////////////////////////////////////////////////////////
+
+var _ kindBuilder[integerKindBuilder] = &integerKindBuilder{}
+
+type integerKindBuilder struct {
+	kind *IntegerKind
 }
 
-func (this integerEntity) ToJson() ([]byte, error)             { return ToJson(this) }
-func (this integerEntity) ToJsonIndent() ([]byte, error)       { return ToJsonIndent(this) }
-func (this integerEntity) ToYaml() ([]byte, error)             { return ToYaml(this) }
-func (this integerEntity) ToJsonSchema() ([]byte, error)       { return ToJsonIndent(this) }
-func (this integerEntity) ToJsonSchemaIndent() ([]byte, error) { return ToJsonSchemaIndent(this) }
-
-func (this *integerEntity) QName(s string) *integerEntity     { this.qname = s; return this }
-func (this *integerEntity) License(s License) *integerEntity  { this.license = s; return this }
-func (this *integerEntity) Copyright(s string) *integerEntity { this.copyright = s; return this }
-func (this *integerEntity) Comments(s string) *integerEntity  { this.comments = s; return this }
-func (this *integerEntity) LongDescription(s string) *integerEntity {
-	this.longDescription = s
-	return this
+func (this *integerKindBuilder) Done() Kind {
+	return *this.kind
 }
-func (this *integerEntity) Serde(s string) *integerEntity { this.serde = s; return this }
-func (this *integerEntity) Json(s string) *integerEntity  { this.json = s; return this }
-func (this *integerEntity) Yaml(s string) *integerEntity  { this.yaml = s; return this }
-func (this *integerEntity) Sql(s string) *integerEntity   { this.sql = s; return this }
 
-func (this *integerEntity) Required(b bool) *integerEntity { this.required = b; return this }
-func (this *integerEntity) Default(m map[string]any) *integerEntity {
-	this.defaultValue = m
-	return this
-}
-func (this *integerEntity) AdditionalValidation(b bool) *integerEntity {
-	this.additionalValidation = b
+func (this *integerKindBuilder) Name(v string) *integerKindBuilder {
+	this.kind.KindCommon.Name = optioner.OfZero(v)
 	return this
 }
 
-func (this *integerEntity) Positive() *integerEntity      { this.positive = true; return this }
-func (this *integerEntity) Negative() *integerEntity      { this.negative = true; return this }
-func (this *integerEntity) Min(n int) *integerEntity      { this.min = n; return this }
-func (this *integerEntity) Max(n int) *integerEntity      { this.max = n; return this }
-func (this *integerEntity) OneOf(n ...int) *integerEntity { this.oneOf = n; return this }
-func (this *integerEntity) Range(ranges ...IntegerRange) *integerEntity {
-	this.ranges = ranges
+func (this *integerKindBuilder) Type(v string) *integerKindBuilder {
+	this.kind.KindCommon.Type = optioner.OfZero(v)
 	return this
 }
 
-func (this *integerEntity) MultipleOf(n int) *integerEntity {
-	this.multipleOf = n
-	this.multipleOf = n
+func (this *integerKindBuilder) Min(v int) *integerKindBuilder {
+	this.kind.Min = optioner.Some(v)
+	return this
+}
+
+func (this *integerKindBuilder) Max(v int) *integerKindBuilder {
+	this.kind.Max = optioner.Some(v)
+	return this
+}
+
+func (this *integerKindBuilder) MultipleOf(v int) *integerKindBuilder {
+	this.kind.MultipleOf = optioner.Some(v)
+	return this
+}
+
+func (this *integerKindBuilder) Positive(v bool) *integerKindBuilder {
+	this.kind.Positive = optioner.Some(v)
+	return this
+}
+
+func (this *integerKindBuilder) Negative(v bool) *integerKindBuilder {
+	this.kind.Negative = optioner.Some(v)
+	return this
+}
+
+func (this *integerKindBuilder) OneOf(v []int) *integerKindBuilder {
+	this.kind.OneOf = optioner.OfSlice(v)
+	return this
+}
+
+func (this *integerKindBuilder) NoneOf(v []int) *integerKindBuilder {
+	this.kind.NoneOf = optioner.OfSlice(v)
 	return this
 }

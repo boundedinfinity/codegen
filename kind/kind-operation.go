@@ -5,7 +5,7 @@ func Operation() *operationEntity {
 }
 
 var _ Marshalable = &operationEntity{}
-var _ Validatable = &operationEntity{}
+var _ Validator = &operationEntity{}
 
 type operationEntity struct {
 	common

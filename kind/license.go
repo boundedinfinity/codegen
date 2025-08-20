@@ -2,43 +2,46 @@ package kind
 
 // https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository
 
+// //////////////////////////////////////////////////////////////////////////
+// License Type
+// //////////////////////////////////////////////////////////////////////////
+
 type LicenseType string
 
-func (l LicenseType) String() string {
-	return licenseType2Name[l]
+func (this LicenseType) String() string {
+	return string(this)
+}
+
+func (this LicenseType) Name() string {
+	return licenseType2Name[this]
 }
 
 const (
-	NoLicenseType LicenseType = "none"
-	AFL30         LicenseType = "AFL-3.0"
-	Apache20      LicenseType = "Apache-2.0"
+	None     LicenseType = "none"
+	AFL30    LicenseType = "AFL-3.0"
+	Apache20 LicenseType = "Apache-2.0"
 )
 
 var (
 	licenseType2Name = map[LicenseType]string{
-		NoLicenseType: "",
-		AFL30:         "Academic Free License v3.0",
-		Apache20:      "Apache license 2.0",
+		None:     "",
+		AFL30:    "Academic Free License v3.0",
+		Apache20: "Apache license 2.0",
 	}
 )
+
+// //////////////////////////////////////////////////////////////////////////
+// License
+// //////////////////////////////////////////////////////////////////////////
 
 type License struct {
 	Type LicenseType
 	Text string
 }
 
-func (this License) ToMap() (map[string]any, error) {
-	data := map[string]any{}
-
-	sparam(data, "text", this.Text)
-	sparam(data, "type", this.Type.String())
-
-	return data, nil
-}
-
 func NewLicenseText(s string) License {
 	return License{
-		Type: NoLicenseType,
+		Type: None,
 		Text: s,
 	}
 }

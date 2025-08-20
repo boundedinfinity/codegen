@@ -4,7 +4,6 @@ go 1.21.5
 
 require (
 	github.com/boundedinfinity/go-commoner v1.0.37
-	github.com/boundedinfinity/go-jsonschema v1.0.10
 	github.com/boundedinfinity/go-mimetyper v1.0.18
 	github.com/davecgh/go-spew v1.1.1
 	github.com/invopop/yaml v0.3.1
@@ -26,5 +25,3 @@ require (
 )
 
 replace github.com/boundedinfinity/go-commoner => ../go-commoner
-
-replace github.com/boundedinfinity/go-jsonschema => ../go-jsonschema
