@@ -1,145 +1,287 @@
 package kind
 
 import (
+	"boundedinfinity/codegen/errorer"
 	"boundedinfinity/codegen/kind/name"
-	"time"
+	"errors"
 
-	"github.com/boundedinfinity/go-commoner/errorer"
+	"github.com/boundedinfinity/go-commoner/functional/optioner"
+	"github.com/boundedinfinity/go-commoner/idiomatic/stringer"
+	"github.com/boundedinfinity/rfc3339date"
 )
 
-func DateTime() *dateTimeEntity {
-	return &dateTimeEntity{
-		entityBase: entityBase{entityType: DateTimeType},
-	}
+// //////////////////////////////////////////////////////////////////////////
+// DateTime Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &DateTimeKind{}
+
+type DateTimeKind struct {
+	KindCommon
+	Before optioner.Option[rfc3339date.Rfc3339DateTime]
+	After  optioner.Option[rfc3339date.Rfc3339DateTime]
+	OneOf  optioner.Option[[]rfc3339date.Rfc3339DateTime]
+	NoneOf optioner.Option[[]rfc3339date.Rfc3339DateTime]
 }
 
-var _ Kind = &dateTimeEntity{}
-
-type dateTimeEntity struct {
-	entityBase
-	min    time.Time
-	max    time.Time
-	oneOf  []time.Time
-	ranges []DateTimeRange
-}
-
-var (
-	ErrDateTimeEntityMinAboveMax = errorer.New("min above max")
-	ErrDateTimeEntityLessThan1   = errorer.New("less than one")
-)
-
-func (this dateTimeEntity) Name() name.KindName {
+func (this DateTimeKind) KindName() name.KindName {
 	return name.DateTime
 }
 
-func (this dateTimeEntity) Validate() error {
+var (
+	ErrDateTimeKindBeforeLaterThanAfter   = errorer.New("before is later then after")
+	errDateTimeKindBeforeLaterThanAfterFn = errorer.ValueFnf(ErrDateTimeKindBeforeLaterThanAfter, "%v before, %v after")
+	ErrDateTimeKindOneOfOverlapsNoneOf    = errorer.New("one-of overlaps with none-of")
+	errDateTimeKindOneOfOverlapsNoneOfFn  = errorer.ValueFnf(ErrDateTimeKindOneOfOverlapsNoneOf, "overlapping values [%v]")
+)
 
-	if err := this.entityBase.Validate(); err != nil {
-		return err
-	}
+func (this DateTimeKind) Validate(config ValidatorConfig) error {
+	var errs []error
 
-	var zero time.Time
+	if this.OneOf.Defined() && this.NoneOf.Defined() {
+		var overlaps []rfc3339date.Rfc3339DateTime
 
-	if this.min != zero && this.max != zero && this.min.After(this.max) {
-		return ErrDateTimeEntityMinAboveMax.FormatFn("min: %v, max: v")(this.min, this.max)
-	}
-
-	for i, rng := range this.ranges {
-		return ErrDateTimeEntityMinAboveMax.FormatFn("ranges[%v] min: %v, max: v")(i, rng.Min, rng.Max)
-	}
-
-	return nil
-}
-
-func (this dateTimeEntity) ToMap() (map[string]any, error) {
-	data, err := this.entityBase.ToMap()
-
-	if err != nil {
-		return data, err
-	}
-
-	tparam(data, "min", this.min)
-	tparam(data, "max", this.max)
-	tparams(data, "one-of", this.oneOf...)
-
-	if len(this.ranges) > 0 {
-		ranges := []map[string]any{}
-
-		for _, rng := range this.ranges {
-			rm := map[string]any{}
-			tparam(rm, "min", rng.Min)
-			tparam(rm, "max", rng.Max)
-			ranges = append(ranges, rm)
+		for _, oneOf := range this.OneOf.Get() {
+			for _, noneOf := range this.NoneOf.Get() {
+				if oneOf == noneOf {
+					overlaps = append(overlaps, oneOf)
+				}
+			}
 		}
 
-		if len(ranges) > 0 {
-			data["ranges"] = ranges
+		if len(overlaps) > 0 {
+			value := stringer.Join(", ", overlaps...)
+			errs = append(errs, errDateTimeKindOneOfOverlapsNoneOfFn(value))
 		}
 	}
 
-	return data, nil
+	return errors.Join(errs...)
 }
 
-func (this *dateTimeEntity) License(s License) *dateTimeEntity  { this.license = s; return this }
-func (this *dateTimeEntity) Copyright(s string) *dateTimeEntity { this.copyright = s; return this }
-func (this *dateTimeEntity) Comments(s string) *dateTimeEntity  { this.comments = s; return this }
-func (this *dateTimeEntity) LongDescription(s string) *dateTimeEntity {
-	this.longDescription = s
-	return this
-}
-func (this *dateTimeEntity) ShortDescription(s string) *dateTimeEntity {
-	this.shortDescription = s
-	return this
+// //////////////////////////////////////////////////////////////////////////
+// DateTime Kind Builder
+// //////////////////////////////////////////////////////////////////////////
+
+var _ kindBuilder[dateTimeKindBuilder] = &dateTimeKindBuilder{}
+
+type dateTimeKindBuilder struct {
+	kind *DateTimeKind
 }
 
-func (this *dateTimeEntity) Required(b bool) *dateTimeEntity { this.required = b; return this }
-func (this *dateTimeEntity) Default(m map[string]any) *dateTimeEntity {
-	this.defaultValue = m
-	return this
+func (this *dateTimeKindBuilder) Done() Kind {
+	return *this.kind
 }
-func (this *dateTimeEntity) AdditionalValidation(b bool) *dateTimeEntity {
-	this.additionalValidation = b
+
+func (this *dateTimeKindBuilder) Name(v string) *dateTimeKindBuilder {
+	this.kind.KindCommon.Name = optioner.OfZero(v)
 	return this
 }
 
-func (this *dateTimeEntity) Min(n time.Time) *dateTimeEntity      { this.min = n; return this }
-func (this *dateTimeEntity) Max(n time.Time) *dateTimeEntity      { this.max = n; return this }
-func (this *dateTimeEntity) OneOf(n ...time.Time) *dateTimeEntity { this.oneOf = n; return this }
-func (this *dateTimeEntity) Range(ranges ...DateTimeRange) *dateTimeEntity {
-	this.ranges = append(this.ranges, ranges...)
+func (this *dateTimeKindBuilder) Type(v string) *dateTimeKindBuilder {
+	this.kind.KindCommon.Type = optioner.OfZero(v)
 	return this
 }
 
-// ========================================================================================
-
-type DateTimeRange struct {
-	Min time.Time
-	Max time.Time
+func (this *dateTimeKindBuilder) Before(v rfc3339date.Rfc3339DateTime) *dateTimeKindBuilder {
+	this.kind.Before = optioner.Some(v)
+	return this
 }
 
-var DateTimeRanges = dateTimeRanges{}
-
-type dateTimeRanges struct {
+func (this *dateTimeKindBuilder) After(v rfc3339date.Rfc3339DateTime) *dateTimeKindBuilder {
+	this.kind.After = optioner.Some(v)
+	return this
 }
 
-func (this dateTimeRanges) NextWeekFrom(d time.Time) DateTimeRange {
-	return DateTimeRange{
-		Min: d,
-		Max: d.Add(7 * 24 * time.Hour),
+func (this *dateTimeKindBuilder) OneOf(v []rfc3339date.Rfc3339DateTime) *dateTimeKindBuilder {
+	this.kind.OneOf = optioner.OfSlice(v)
+	return this
+}
+
+func (this *dateTimeKindBuilder) NoneOf(v []rfc3339date.Rfc3339DateTime) *dateTimeKindBuilder {
+	this.kind.NoneOf = optioner.OfSlice(v)
+	return this
+}
+
+// //////////////////////////////////////////////////////////////////////////
+// Date Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &DateKind{}
+
+type DateKind struct {
+	KindCommon
+	Before optioner.Option[rfc3339date.Rfc3339Date]
+	After  optioner.Option[rfc3339date.Rfc3339Date]
+	OneOf  optioner.Option[[]rfc3339date.Rfc3339Date]
+	NoneOf optioner.Option[[]rfc3339date.Rfc3339Date]
+}
+
+func (this DateKind) KindName() name.KindName {
+	return name.Date
+}
+
+var (
+	ErrDateKindBeforeLaterThanAfter   = errorer.New("before is later then after")
+	errDateKindBeforeLaterThanAfterFn = errorer.ValueFnf(ErrDateKindBeforeLaterThanAfter, "%v before, %v after")
+	ErrDateKindOneOfOverlapsNoneOf    = errorer.New("one-of overlaps with none-of")
+	errDateKindOneOfOverlapsNoneOfFn  = errorer.ValueFnf(ErrDateKindOneOfOverlapsNoneOf, "overlapping values [%v]")
+)
+
+func (this DateKind) Validate(config ValidatorConfig) error {
+	var errs []error
+
+	if this.OneOf.Defined() && this.NoneOf.Defined() {
+		var overlaps []rfc3339date.Rfc3339Date
+
+		for _, oneOf := range this.OneOf.Get() {
+			for _, noneOf := range this.NoneOf.Get() {
+				if oneOf == noneOf {
+					overlaps = append(overlaps, oneOf)
+				}
+			}
+		}
+
+		if len(overlaps) > 0 {
+			value := stringer.Join(", ", overlaps...)
+			errs = append(errs, errDateKindOneOfOverlapsNoneOfFn(value))
+		}
 	}
+
+	return errors.Join(errs...)
 }
 
-func (this dateTimeRanges) NextWeekFromNow() DateTimeRange {
-	return this.NextWeekFrom(time.Now())
+// //////////////////////////////////////////////////////////////////////////
+// Date Kind Builder
+// //////////////////////////////////////////////////////////////////////////
+
+var _ kindBuilder[dateKindBuilder] = &dateKindBuilder{}
+
+type dateKindBuilder struct {
+	kind *DateKind
 }
 
-func (this dateTimeRanges) PrevWeekFrom(d time.Time) DateTimeRange {
-	return DateTimeRange{
-		Min: d,
-		Max: d.Add(-7 * 24 * time.Hour),
+func (this *dateKindBuilder) Done() Kind {
+	return *this.kind
+}
+
+func (this *dateKindBuilder) Name(v string) *dateKindBuilder {
+	this.kind.KindCommon.Name = optioner.OfZero(v)
+	return this
+}
+
+func (this *dateKindBuilder) Type(v string) *dateKindBuilder {
+	this.kind.KindCommon.Type = optioner.OfZero(v)
+	return this
+}
+
+func (this *dateKindBuilder) Before(v rfc3339date.Rfc3339Date) *dateKindBuilder {
+	this.kind.Before = optioner.Some(v)
+	return this
+}
+
+func (this *dateKindBuilder) After(v rfc3339date.Rfc3339Date) *dateKindBuilder {
+	this.kind.After = optioner.Some(v)
+	return this
+}
+
+func (this *dateKindBuilder) OneOf(v []rfc3339date.Rfc3339Date) *dateKindBuilder {
+	this.kind.OneOf = optioner.OfSlice(v)
+	return this
+}
+
+func (this *dateKindBuilder) NoneOf(v []rfc3339date.Rfc3339Date) *dateKindBuilder {
+	this.kind.NoneOf = optioner.OfSlice(v)
+	return this
+}
+
+// //////////////////////////////////////////////////////////////////////////
+// Time Kind
+// //////////////////////////////////////////////////////////////////////////
+
+var _ Kind = &TimeKind{}
+
+type TimeKind struct {
+	KindCommon
+	Before optioner.Option[rfc3339date.Rfc3339Time]
+	After  optioner.Option[rfc3339date.Rfc3339Time]
+	OneOf  optioner.Option[[]rfc3339date.Rfc3339Time]
+	NoneOf optioner.Option[[]rfc3339date.Rfc3339Time]
+}
+
+func (this TimeKind) KindName() name.KindName {
+	return name.Time
+}
+
+var (
+	ErrTimeKindBeforeLaterThanAfter   = errorer.New("before is later then after")
+	errTimeKindBeforeLaterThanAfterFn = errorer.ValueFnf(ErrTimeKindBeforeLaterThanAfter, "%v before, %v after")
+	ErrTimeKindOneOfOverlapsNoneOf    = errorer.New("one-of overlaps with none-of")
+	errTimeKindOneOfOverlapsNoneOfFn  = errorer.ValueFnf(ErrTimeKindOneOfOverlapsNoneOf, "overlapping values [%v]")
+)
+
+func (this TimeKind) Validate(config ValidatorConfig) error {
+	var errs []error
+
+	if this.OneOf.Defined() && this.NoneOf.Defined() {
+		var overlaps []rfc3339date.Rfc3339Time
+
+		for _, oneOf := range this.OneOf.Get() {
+			for _, noneOf := range this.NoneOf.Get() {
+				if oneOf == noneOf {
+					overlaps = append(overlaps, oneOf)
+				}
+			}
+		}
+
+		if len(overlaps) > 0 {
+			value := stringer.Join(", ", overlaps...)
+			errs = append(errs, errTimeKindOneOfOverlapsNoneOfFn(value))
+		}
 	}
+
+	return errors.Join(errs...)
 }
 
-func (this dateTimeRanges) PrevWeekFromNow() DateTimeRange {
-	return this.PrevWeekFrom(time.Now())
+// //////////////////////////////////////////////////////////////////////////
+// Time Kind Builder
+// //////////////////////////////////////////////////////////////////////////
+
+var _ kindBuilder[timeKindBuilder] = &timeKindBuilder{}
+
+type timeKindBuilder struct {
+	kind *TimeKind
+}
+
+func (this *timeKindBuilder) Done() Kind {
+	return *this.kind
+}
+
+func (this *timeKindBuilder) Name(v string) *timeKindBuilder {
+	this.kind.KindCommon.Name = optioner.OfZero(v)
+	return this
+}
+
+func (this *timeKindBuilder) Type(v string) *timeKindBuilder {
+	this.kind.KindCommon.Type = optioner.OfZero(v)
+	return this
+}
+
+func (this *timeKindBuilder) Before(v rfc3339date.Rfc3339Time) *timeKindBuilder {
+	this.kind.Before = optioner.Some(v)
+	return this
+}
+
+func (this *timeKindBuilder) After(v rfc3339date.Rfc3339Time) *timeKindBuilder {
+	this.kind.After = optioner.Some(v)
+	return this
+}
+
+func (this *timeKindBuilder) OneOf(v []rfc3339date.Rfc3339Time) *timeKindBuilder {
+	this.kind.OneOf = optioner.OfSlice(v)
+	return this
+}
+
+func (this *timeKindBuilder) NoneOf(v []rfc3339date.Rfc3339Time) *timeKindBuilder {
+	this.kind.NoneOf = optioner.OfSlice(v)
+	return this
 }

@@ -1,9 +1,9 @@
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=
 github.com/antlr4-go/antlr/v4 v4.13.0/go.mod h1:pfChB/xh/Unjila75QW7+VU4TSnWnnk9UTnmpPaOR2g=
-github.com/boundedinfinity/enumer v1.0.27 h1:6EKORWpEXuD86pa8gfPhezLEu6sUluxue1rCA12WDKU=
-github.com/boundedinfinity/enumer v1.0.27/go.mod h1:gwjRqzoPpxmkhIhhFM+AoCtc2AuCJ/mdTvKWvYAQrLw=
 github.com/boundedinfinity/go-mimetyper v1.0.18 h1:Bicjgu/P6WK+Tmjc8Q+/esxMdKuq0pUSdR7H1abmenA=
 github.com/boundedinfinity/go-mimetyper v1.0.18/go.mod h1:cuHO3Lo98CkvgDYJTmq63+JaaAfgJ9aEjQfFusDTD3g=
+github.com/boundedinfinity/rfc3339date v1.0.7 h1:LYzOmzEwPX0d2k2uCyDt1c5NwWp3RX2up3h/IEz9IoU=
+github.com/boundedinfinity/rfc3339date v1.0.7/go.mod h1:kAazYSadaCJGeME4vx1F84637nbjIPy9pguMLFF2/lo=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
