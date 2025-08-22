@@ -9,7 +9,8 @@ import (
 )
 
 type ValidatorConfig struct {
-	prefix string
+	prefix    string
+	prefixSep string
 }
 
 type Kind interface {
@@ -45,5 +46,4 @@ func (this KindCommon) HasValidation() bool {
 type kindBuilder[K any] interface {
 	Done() Kind
 	Name(v string) *K
-	Type(v string) *K
 }
